@@ -5,35 +5,35 @@
 
   - A C++ compiler with C++11 support.
     The following compilers have been tested:
-    - GCC 4.8.2, 4.9.2 (GNU/Linux x86_64).
-    - LLVM/Clang 3.3, 3.5 (GNU/Linux x86_64).
-    - MSVC 2013 Express (Windows 7 x86_64).
+    - GCC 4.8.2, 4.9.2 (Linux x86_64).
+    - LLVM/Clang 3.3, 3.5 (Linux x86_64).
+    - MSVC 2013 Express (MS Windows 7 x86_64).
 
 - Build:
 
-  - GNU/Linux - GCC:
+  - Linux - GCC:
     - Execute in a terminal (running bash):
 
       pkg_dir=$PWD
-      mkdir ../GnuspeechSA-build
-      cd ../GnuspeechSA-build
+      mkdir ../gama_tts-build
+      cd ../gama_tts-build
       cmake -D CMAKE_BUILD_TYPE=Release $pkg_dir
       make
 
-  - GNU/Linux - LLVM/Clang:
+  - Linux - LLVM/Clang:
     - Execute in a terminal (running bash):
 
       pkg_dir=$PWD
-      mkdir ../GnuspeechSA-build
-      cd ../GnuspeechSA-build
+      mkdir ../gama_tts-build
+      cd ../gama_tts-build
       CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release $pkg_dir
       make
 
-- Install (GNU/Linux):
+- Install (Linux):
 
   # Optional:
   make install
 
-- Test (GNU/Linux):
+- Test (Linux):
 
-  ./gnuspeech_sa -c $pkg_dir/data/en -p /tmp/test_param.txt -o /tmp/test.wav "Hello world." && aplay -q /tmp/test.wav
+  ./gama_tts -c $pkg_dir/data/en -p /tmp/test_param.txt -o /tmp/test.wav "Hello world." && aplay -q /tmp/test.wav

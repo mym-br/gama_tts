@@ -1,18 +1,34 @@
 
-GnuspeechSA (Stand-Alone)
-==========================
+GamaTTS
+=======
 
-GnuspeechSA is a port to C++/C of the TTS_Server in the original Gnuspeech
-(http://www.gnu.org/software/gnuspeech/) source code written for NeXTSTEP.
-It is a command-line program that converts text to speech.
+GamaTTS is a command-line articulatory synthesizer that converts text
+to speech.
 
-This project is based on code from Gnuspeech SVN, rev. 672, downloaded in
-2014-08-02. The source code was obtained from the directories:
-
+GamaTTS is a port to C++/C of the TTS_Server in the original Gnuspeech
+(http://www.gnu.org/software/gnuspeech/) source code written for NeXTSTEP,
+provided by David R. Hill, Leonard Manzara, Craig Schock and contributors.
+This project is based on code from Gnuspeech's Subversion repository,
+revision 672, downloaded in 2014-08-02. The source code was obtained
+from the directories:
 nextstep/trunk/ObjectiveC/Monet.realtime
 nextstep/trunk/src/SpeechObject/postMonet/server.monet
 
-This software is part of Gnuspeech.
+This software includes code from RapidXml (http://rapidxml.sourceforge.net/),
+provided by Marcin Kalicinski. See the file src/rapidxml/license.txt
+for details.
+
+Status
+------
+
+Only english is supported.
+
+The quality of the synthesized speech is very far from the best speech
+synthesizers. This software is mostly for people interested in articulatory
+speech synthesis.
+
+License
+-------
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

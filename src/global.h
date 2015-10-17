@@ -19,6 +19,6 @@
 #define GLOBAL_H_
 
 #define PROGRAM_VERSION "0.1.5"
-#define TRM_CONTROL_MODEL_CONFIG_FILE "/monet.xml"
+#define TRM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
 
 #endif /* GLOBAL_H_ */

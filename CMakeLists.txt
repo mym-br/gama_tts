@@ -1,4 +1,4 @@
-project(GnuspeechSA)
+project(gama_tts)
 cmake_minimum_required(VERSION 2.8)
 
 if(UNIX)
@@ -9,10 +9,10 @@ if(UNIX)
     endif()
 endif()
 
-set(GNUSPEECHSA_VERSION_MAJOR 0)
-set(GNUSPEECHSA_VERSION_MINOR 1)
-set(GNUSPEECHSA_VERSION_PATCH 5)
-set(GNUSPEECHSA_VERSION_STRING ${GNUSPEECHSA_VERSION_MAJOR}.${GNUSPEECHSA_VERSION_MINOR}.${GNUSPEECHSA_VERSION_PATCH})
+set(GAMA_TTS_VERSION_MAJOR 0)
+set(GAMA_TTS_VERSION_MINOR 1)
+set(GAMA_TTS_VERSION_PATCH 5)
+set(GAMA_TTS_VERSION_STRING ${GAMA_TTS_VERSION_MAJOR}.${GAMA_TTS_VERSION_MINOR}.${GAMA_TTS_VERSION_PATCH})
 
 if(MSVC)
     # To have M_PI defined in <cmath>.
@@ -111,34 +111,35 @@ set(LIBRARY_FILES
 )
 
 if(UNIX)
-    add_library(gnuspeechsa SHARED ${LIBRARY_FILES})
-    set_target_properties(gnuspeechsa PROPERTIES
-        VERSION ${GNUSPEECHSA_VERSION_STRING}
-        SOVERSION ${GNUSPEECHSA_VERSION_MAJOR})
+    add_library(gamatts SHARED ${LIBRARY_FILES})
+    set_target_properties(gamatts PROPERTIES
+        VERSION ${GAMA_TTS_VERSION_STRING}
+        SOVERSION ${GAMA_TTS_VERSION_MAJOR})
 else()
-    add_library(gnuspeechsa STATIC ${LIBRARY_FILES})
+    add_library(gamatts STATIC ${LIBRARY_FILES})
 endif()
 
-add_executable(gnuspeech_sa
+add_executable(gama_tts
     src/main.cpp
 )
-target_link_libraries(gnuspeech_sa gnuspeechsa)
+target_link_libraries(gama_tts gamatts)
 
-add_executable(gnuspeech_sa_trm
-    src/trm/gnuspeech_trm.cpp
+add_executable(gama_tts_trm
+    src/trm/gama_tts_trm.cpp
 )
-target_link_libraries(gnuspeech_sa_trm gnuspeechsa)
+target_link_libraries(gama_tts_trm gamatts)
 
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
-    install(TARGETS gnuspeechsa gnuspeech_sa gnuspeech_sa_trm
+    install(TARGETS gamatts gama_tts gama_tts_trm
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(DIRECTORY src/ DESTINATION include/gnuspeechsa FILES_MATCHING PATTERN "*.h")
-    install(DIRECTORY data DESTINATION share/gnuspeech/gnuspeechsa)
-    configure_file(gnuspeechsa.pc.pre gnuspeechsa.pc @ONLY)
-    install(FILES ${CMAKE_BINARY_DIR}/gnuspeechsa.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/)
+    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.h")
+    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.hpp")
+    install(DIRECTORY data DESTINATION share/gama_tts)
+    configure_file(gama_tts.pc.pre gama_tts.pc @ONLY)
+    install(FILES ${CMAKE_BINARY_DIR}/gama_tts.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/)
 endif()
 
-#add_dependencies(gnuspeech_sa gnuspeechsa)
-#add_dependencies(gnuspeech_sa_trm gnuspeechsa)
+#add_dependencies(gama_tts gamatts)
+#add_dependencies(gama_tts_trm gamatts)
