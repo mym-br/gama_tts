@@ -40,7 +40,7 @@ readXMLFile(const std::string& filePath)
 
 	std::string source;
 	in.seekg(0, std::ios::end);
-	source.resize(in.tellg());
+	source.resize(static_cast<std::string::size_type>(in.tellg()));
 	in.seekg(0, std::ios::beg);
 	in.read(&source[0], source.size());
 	in.close();
