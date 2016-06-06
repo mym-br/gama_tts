@@ -85,6 +85,7 @@ set(LIBRARY_FILES
     src/trm/SampleRateConverter.cpp src/trm/SampleRateConverter.h
     src/trm/Throat.cpp src/trm/Throat.h
     src/trm/TRMConfiguration.cpp src/trm/TRMConfiguration.h
+    src/trm/TRMUtil.cpp src/trm/TRMUtil.h
     src/trm/Tube.cpp src/trm/Tube.h
     src/trm/WavetableGlottalSource.cpp src/trm/WavetableGlottalSource.h
 

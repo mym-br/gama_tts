@@ -84,6 +84,42 @@ public:
 		PARAM_R8         = 14,
 		PARAM_VELUM      = 15
 	};
+	enum Waveform {
+		GLOTTAL_SOURCE_PULSE = 0,
+		GLOTTAL_SOURCE_SINE = 1
+	};
+
+	struct Configuration {
+		float  outputRate;                  /*  output sample rate (22.05, 44.1)  */
+		float  controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
+
+		double volume;                      /*  master volume (0 - 60 dB)  */
+		int    channels;                    /*  # of sound output channels (1, 2)  */
+		double balance;                     /*  stereo balance (-1 to +1)  */
+
+		int    waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
+		double tp;                          /*  % glottal pulse rise time  */
+		double tnMin;                       /*  % glottal pulse fall time minimum  */
+		double tnMax;                       /*  % glottal pulse fall time maximum  */
+		double breathiness;                 /*  % glottal source breathiness  */
+
+		double length;                      /*  nominal tube length (10 - 20 cm)  */
+		double temperature;                 /*  tube temperature (25 - 40 C)  */
+		double lossFactor;                  /*  junction loss factor in (0 - 5 %)  */
+
+		double apertureRadius;              /*  aperture scl. radius (3.05 - 12 cm)  */
+		double mouthCoef;                   /*  mouth aperture coefficient  */
+		double noseCoef;                    /*  nose aperture coefficient  */
+
+		// Set noseRadius[N1] to 0.0, because it is not used.
+		double noseRadius[TOTAL_NASAL_SECTIONS]; /*  fixed nose radii (0 - 3 cm)  */
+
+		double throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
+		double throatVol;                   /*  throat volume (0 - 48 dB) */
+
+		int    modulation;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
+		double mixOffset;                   /*  noise crossmix offset (30 - 60 dB)  */
+	};
 
 	Tube();
 	~Tube();
@@ -91,7 +127,10 @@ public:
 	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
 	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
 
-	template<typename T> void loadConfigurationForInteractiveExecution(const T& config);
+	void loadConfiguration(const Configuration& config) {
+		config_ = config;
+	}
+
 	void initializeSynthesizer();
 	void initializeInputFilters(double period);
 	void loadSingleInput(const VocalTractModelParameterValue pv);
@@ -106,8 +145,8 @@ public:
 		outputDataPos_ = 0;
 	}
 	double maximumOutputSampleValue() const { return srConv_->maximumSampleValue(); }
-	float outputRate() const { return outputRate_; }
-	unsigned int numChannels() const { return channels_; }
+	float outputRate() const { return config_.outputRate; }
+	unsigned int numChannels() const { return config_.channels; }
 private:
 	enum {
 		VELUM = N1
@@ -257,7 +296,6 @@ private:
 	void reset();
 	void calculateTubeCoefficients();
 	void initializeNasalCavity();
-	void printInfo(const char* inputFile);
 	void parseInputStream(std::istream& in);
 	void sampleRateInterpolation();
 	void setControlRateParameters(int pos);
@@ -269,38 +307,9 @@ private:
 	float calculateMonoScale();
 	void calculateStereoScale(float& leftScale, float& rightScale);
 
-	static double amplitude(double decibelLevel);
-	static double frequency(double pitch);
-	static double speedOfSound(double temperature);
+	template<typename T> T readParameterFromInputStream(std::istream& in, std::string& line, const char* paramName);
 
-	float  outputRate_;                  /*  output sample rate (22.05, 44.1)  */
-	float  controlRate_;                 /*  1.0-1000.0 input tables/second (Hz)  */
-
-	double volume_;                      /*  master volume (0 - 60 dB)  */
-	int    channels_;                    /*  # of sound output channels (1, 2)  */
-	double balance_;                     /*  stereo balance (-1 to +1)  */
-
-	int    waveform_;                    /*  GS waveform type (0=PULSE, 1=SINE  */
-	double tp_;                          /*  % glottal pulse rise time  */
-	double tnMin_;                       /*  % glottal pulse fall time minimum  */
-	double tnMax_;                       /*  % glottal pulse fall time maximum  */
-	double breathiness_;                 /*  % glottal source breathiness  */
-
-	double length_;                      /*  nominal tube length (10 - 20 cm)  */
-	double temperature_;                 /*  tube temperature (25 - 40 C)  */
-	double lossFactor_;                  /*  junction loss factor in (0 - 5 %)  */
-
-	double apertureRadius_;              /*  aperture scl. radius (3.05 - 12 cm)  */
-	double mouthCoef_;                   /*  mouth aperture coefficient  */
-	double noseCoef_;                    /*  nose aperture coefficient  */
-
-	double noseRadius_[TOTAL_NASAL_SECTIONS]; /*  fixed nose radii (0 - 3 cm)  */
-
-	double throatCutoff_;                /*  throat lp cutoff (50 - nyquist Hz)  */
-	double throatVol_;                   /*  throat volume (0 - 48 dB) */
-
-	int    modulation_;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
-	double mixOffset_;                   /*  noise crossmix offset (30 - 60 dB)  */
+	Configuration config_;
 
 	/*  DERIVED VALUES  */
 	int    controlPeriod_;
@@ -344,42 +353,6 @@ private:
 	std::unique_ptr<NoiseSource> noiseSource_;
 	std::unique_ptr<InputFilters> inputFilters_;
 };
-
-
-
-template<typename T>
-void
-Tube::loadConfigurationForInteractiveExecution(const T& config)
-{
-	outputRate_   = config.outputRate;
-	controlRate_  = config.controlRate;
-	volume_       = 0.0;
-	channels_     = 1;
-	balance_      = 0.0;
-	waveform_     = 0;
-	tp_           = config.tp;
-	tnMin_        = config.tn;
-	tnMax_        = config.tn;
-	breathiness_  = config.breathiness;
-	length_       = config.length;
-	temperature_  = config.temperature;
-	lossFactor_   = config.lossFactor;
-	apertureRadius_ = config.apertureRadius;
-	mouthCoef_    = config.mouthCoef;
-	noseCoef_     = config.noseCoef;
-
-	noseRadius_[0] = 0.0;
-	noseRadius_[1] = config.staticParamList[0];
-	noseRadius_[2] = config.staticParamList[1];
-	noseRadius_[3] = config.staticParamList[2];
-	noseRadius_[4] = config.staticParamList[3];
-	noseRadius_[5] = config.staticParamList[4];
-
-	throatCutoff_ = config.throatCutoff;
-	throatVol_    = config.throatVol;
-	modulation_   = config.modulation;
-	mixOffset_    = config.mixOffset;
-}
 
 } /* namespace TRM */
 } /* namespace GS */

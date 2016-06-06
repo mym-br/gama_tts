@@ -22,7 +22,7 @@
 *
 *     Program:       tube
 *
-*     Description:   Software (non-real-time) implementation of the Tube
+*     Description:   Software implementation of the Tube
 *                    Resonance Model for speech production.
 *
 *     Author:        Leonard Manzara
@@ -33,10 +33,10 @@
 
 #include "Tube.h"
 
+#include <algorithm> /* max */
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -45,24 +45,11 @@
 #include "Exception.h"
 #include "Log.h"
 #include "Text.h"
+#include "TRMUtil.h"
 #include "WAVEFileWriter.h"
-
-/*  COMPILE SO THAT INTERPOLATION NOT DONE FOR SOME CONTROL RATE PARAMETERS  */
-//#define MATCH_DSP                 1
 
 #define INPUT_VECTOR_RESERVE 128
 #define OUTPUT_VECTOR_RESERVE 1024
-
-#define GLOTTAL_SOURCE_PULSE 0
-#define GLOTTAL_SOURCE_SINE 1
-
-/*  PITCH VARIABLES  */
-#define PITCH_BASE                220.0
-#define PITCH_OFFSET              3           /*  MIDDLE C = 0  */
-//#define LOG_FACTOR                3.32193
-
-/*  RANGE OF ALL VOLUME CONTROLS  */
-#define VOL_MAX                   60
 
 /*  SCALING CONSTANT FOR INPUT TO VOCAL TRACT & THROAT (MATCHES DSP)  */
 //#define VT_SCALE                  0.03125     /*  2^(-5)  */
@@ -75,9 +62,6 @@
 /*  BI-DIRECTIONAL TRANSMISSION LINE POINTERS  */
 #define TOP                       0
 #define BOTTOM                    1
-
-//#define OUTPUT_SRATE_LOW          22050.0
-//#define OUTPUT_SRATE_HIGH         44100.0
 
 
 
@@ -99,27 +83,27 @@ Tube::~Tube()
 void
 Tube::reset()
 {
-	outputRate_  = 0.0;
-	controlRate_ = 0.0;
-	volume_      = 0.0;
-	channels_    = 0;
-	balance_     = 0.0;
-	waveform_    = 0;
-	tp_          = 0.0;
-	tnMin_       = 0.0;
-	tnMax_       = 0.0;
-	breathiness_ = 0.0;
-	length_      = 0.0;
-	temperature_ = 0.0;
-	lossFactor_  = 0.0;
-	apertureRadius_ = 0.0;
-	mouthCoef_   = 0.0;
-	noseCoef_    = 0.0;
-	memset(noseRadius_, 0, sizeof(double) * TOTAL_NASAL_SECTIONS);
-	throatCutoff_     = 0.0;
-	throatVol_        = 0.0;
-	modulation_       = 0;
-	mixOffset_        = 0.0;
+	config_.outputRate       = 0.0;
+	config_.controlRate      = 0.0;
+	config_.volume           = 0.0;
+	config_.channels         = 0;
+	config_.balance          = 0.0;
+	config_.waveform         = 0;
+	config_.tp               = 0.0;
+	config_.tnMin            = 0.0;
+	config_.tnMax            = 0.0;
+	config_.breathiness      = 0.0;
+	config_.length           = 0.0;
+	config_.temperature      = 0.0;
+	config_.lossFactor       = 0.0;
+	config_.apertureRadius   = 0.0;
+	config_.mouthCoef        = 0.0;
+	config_.noseCoef         = 0.0;
+	memset(config_.noseRadius, 0, sizeof(double) * TOTAL_NASAL_SECTIONS);
+	config_.throatCutoff     = 0.0;
+	config_.throatVol        = 0.0;
+	config_.modulation       = 0;
+	config_.mixOffset        = 0.0;
 	controlPeriod_    = 0;
 	sampleRate_       = 0;
 	actualTubeLength_ = 0.0;
@@ -162,11 +146,6 @@ Tube::synthesizeToFile(std::istream& inputStream, const char* outputFile)
 	}
 	parseInputStream(inputStream);
 	initializeSynthesizer();
-#if 0
-	if (Log::debugEnabled) {
-		printInfo(inputFile);
-	}
-#endif
 	synthesizeForInputSequence();
 	writeOutputToFile(outputFile);
 }
@@ -183,269 +162,49 @@ Tube::synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBu
 	writeOutputToBuffer(outputBuffer);
 }
 
-/******************************************************************************
-*
-*  function:  printInfo
-*
-*  purpose:   Prints pertinent variables to standard output.
-*
-******************************************************************************/
-void
-Tube::printInfo(const char* inputFile)
+template<typename T>
+T
+Tube::readParameterFromInputStream(std::istream& in, std::string& line, const char* paramName)
 {
-	/*  PRINT INPUT FILE NAME  */
-	printf("input file:\t\t%s\n\n", inputFile);
-
-	/*  ECHO INPUT PARAMETERS  */
-	printf("outputRate:\t\t%.1f Hz\n", outputRate_);
-	printf("controlRate:\t\t%.2f Hz\n\n", controlRate_);
-
-	printf("volume:\t\t\t%.2f dB\n", volume_);
-	printf("channels:\t\t%-d\n", channels_);
-	printf("balance:\t\t%+1.2f\n\n", balance_);
-
-	printf("waveform:\t\t");
-	if (waveform_ == GLOTTAL_SOURCE_PULSE) {
-		printf("pulse\n");
-	} else if (waveform_ == GLOTTAL_SOURCE_SINE) {
-		printf("sine\n");
+	if (!std::getline(in, line)) {
+		THROW_EXCEPTION(TRMException, "[TRM::Tube] Error in input parameter parsing: Could not read " << paramName << '.');
 	}
-	printf("tp:\t\t\t%.2f%%\n", tp_);
-	printf("tnMin:\t\t\t%.2f%%\n", tnMin_);
-	printf("tnMax:\t\t\t%.2f%%\n", tnMax_);
-	printf("breathiness:\t\t%.2f%%\n\n", breathiness_);
-
-	printf("nominal tube length:\t%.2f cm\n", length_);
-	printf("temperature:\t\t%.2f degrees C\n", temperature_);
-	printf("lossFactor:\t\t%.2f%%\n\n", lossFactor_);
-
-	printf("apertureRadius:\t\t%.2f cm\n", apertureRadius_);
-	printf("mouthCoef:\t\t%.1f Hz\n", mouthCoef_);
-	printf("noseCoef:\t\t%.1f Hz\n\n", noseCoef_);
-
-	for (int i = 1; i < TOTAL_NASAL_SECTIONS; i++) {
-		printf("n%-d:\t\t\t%.2f cm\n", i, noseRadius_[i]);
-	}
-
-	printf("\nthroatCutoff:\t\t%.1f Hz\n", throatCutoff_);
-	printf("throatVol:\t\t%.2f dB\n\n", throatVol_);
-
-	printf("modulation:\t\t");
-	if (modulation_) {
-		printf("on\n");
-	} else {
-		printf("off\n");
-	}
-	printf("mixOffset:\t\t%.2f dB\n\n", mixOffset_);
-
-	/*  PRINT OUT DERIVED VALUES  */
-	printf("\nactual tube length:\t%.4f cm\n", actualTubeLength_);
-	printf("internal sample rate:\t%-d Hz\n", sampleRate_);
-	printf("control period:\t\t%-d samples (%.4f seconds)\n\n",
-		controlPeriod_, (float) controlPeriod_ / (float) sampleRate_);
-
-#if 0
-	/*  PRINT OUT WAVE TABLE VALUES  */
-	printf("\n");
-	for (int i = 0; i < TABLE_LENGTH; i++)
-		printf("table[%-d] = %.4f\n", i, wavetable[i]);
-#endif
-
-	/*  ECHO TABLE VALUES  */
-	printf("\n%-ld control rate input tables:\n\n", inputData_.size() - 1);
-
-	/*  HEADER  */
-	printf("glPitch");
-	printf("\tglotVol");
-	printf("\taspVol");
-	printf("\tfricVol");
-	printf("\tfricPos");
-	printf("\tfricCF");
-	printf("\tfricBW");
-	for (int i = 1; i <= TOTAL_REGIONS; i++) {
-		printf("\tr%-d", i);
-	}
-	printf("\tvelum\n");
-
-	/*  ACTUAL VALUES  */
-	for (int i = 0; i < static_cast<int>(inputData_.size()) - 1; ++i) {
-		printf("%.2f"  , inputData_[i]->glotPitch);
-		printf("\t%.2f", inputData_[i]->glotVol);
-		printf("\t%.2f", inputData_[i]->aspVol);
-		printf("\t%.2f", inputData_[i]->fricVol);
-		printf("\t%.2f", inputData_[i]->fricPos);
-		printf("\t%.2f", inputData_[i]->fricCF);
-		printf("\t%.2f", inputData_[i]->fricBW);
-		for (int j = 0; j < TOTAL_REGIONS; ++j) {
-			printf("\t%.2f", inputData_[i]->radius[j]);
-		}
-		printf("\t%.2f\n", inputData_[i]->velum);
-	}
-	printf("\n");
+	return Text::parseString<T>(line);
 }
 
-/******************************************************************************
-*
-*  function:  parseInputStream
-*
-*  purpose:   Parses the input stream and assigns values to global
-*             variables.
-*
-******************************************************************************/
 void
 Tube::parseInputStream(std::istream& in)
 {
 	std::string line;
 
-	/*  GET THE OUTPUT SAMPLE RATE  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read output sample rate.");
-	} else {
-		outputRate_ = Text::parseString<float>(line);
+	config_.outputRate     = readParameterFromInputStream<float>( in, line, "output sample rate");
+	config_.controlRate    = readParameterFromInputStream<float>( in, line, "input control rate");
+	config_.volume         = readParameterFromInputStream<double>(in, line, "master volume");
+	config_.channels       = readParameterFromInputStream<int>(   in, line, "number of sound output channels");
+	config_.balance        = readParameterFromInputStream<double>(in, line, "stereo balance");
+	config_.waveform       = readParameterFromInputStream<int>(   in, line, "glottal source waveform type");
+	config_.tp             = readParameterFromInputStream<double>(in, line, "glottal pulse rise time (tp)");
+	config_.tnMin          = readParameterFromInputStream<double>(in, line, "glottal pulse fall time minimum (tnMin)");
+	config_.tnMax          = readParameterFromInputStream<double>(in, line, "glottal pulse fall time maximum (tnMax)");
+	config_.breathiness    = readParameterFromInputStream<double>(in, line, "glottal source breathiness");
+	config_.length         = readParameterFromInputStream<double>(in, line, "nominal tube length");
+	config_.temperature    = readParameterFromInputStream<double>(in, line, "tube temperature");
+	config_.lossFactor     = readParameterFromInputStream<double>(in, line, "junction loss factor");
+	config_.apertureRadius = readParameterFromInputStream<double>(in, line, "aperture scaling radius");
+	config_.mouthCoef      = readParameterFromInputStream<double>(in, line, "mouth aperture coefficient");
+	config_.noseCoef       = readParameterFromInputStream<double>(in, line, "nose aperture coefficient");
+
+	config_.noseRadius[N1] = 0.0;
+	for (int i = N2; i < TOTAL_NASAL_SECTIONS; i++) {
+		std::ostringstream out;
+		out << "nose radius " << i;
+		config_.noseRadius[i] = std::max(readParameterFromInputStream<double>(in, line, out.str().c_str()), GS_TRM_TUBE_MIN_RADIUS);
 	}
 
-	/*  GET THE INPUT CONTROL RATE  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read input control rate.");
-	} else {
-		controlRate_ = Text::parseString<float>(line);
-	}
-
-	/*  GET THE MASTER VOLUME  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read master volume.");
-	} else {
-		volume_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE NUMBER OF SOUND OUTPUT CHANNELS  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read number of sound output channels.");
-	} else {
-		channels_ = Text::parseString<int>(line);
-	}
-
-	/*  GET THE STEREO BALANCE  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read stereo balance.");
-	} else {
-		balance_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE GLOTTAL SOURCE WAVEFORM TYPE  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read glottal source waveform type.");
-	} else {
-		waveform_ = Text::parseString<int>(line);
-	}
-
-	/*  GET THE GLOTTAL PULSE RISE TIME (tp)  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read glottal pulse rise time (tp).");
-	} else {
-		tp_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE GLOTTAL PULSE FALL TIME MINIMUM (tnMin)  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read glottal pulse fall time minimum (tnMin).");
-	} else {
-		tnMin_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE GLOTTAL PULSE FALL TIME MAXIMUM (tnMax)  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read glottal pulse fall time maximum (tnMax).");
-	} else {
-		tnMax_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE GLOTTAL SOURCE BREATHINESS  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read glottal source breathiness.");
-	} else {
-		breathiness_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE NOMINAL TUBE LENGTH  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read nominal tube length.");
-	} else {
-		length_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE TUBE TEMPERATURE  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read tube temperature.");
-	} else {
-		temperature_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE JUNCTION LOSS FACTOR  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read junction loss factor.");
-	} else {
-		lossFactor_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE APERTURE SCALING RADIUS  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read aperture scaling radius.");
-	} else {
-		apertureRadius_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE MOUTH APERTURE COEFFICIENT  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read mouth aperture coefficient.");
-	} else {
-		mouthCoef_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE NOSE APERTURE COEFFICIENT  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read nose aperture coefficient.");
-	} else {
-		noseCoef_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE NOSE RADII  */
-	noseRadius_[0] = 0.0;
-	for (int i = 1; i < TOTAL_NASAL_SECTIONS; i++) {
-		if (!std::getline(in, line)) {
-			THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read nose radius " << i << '.');
-		} else {
-			noseRadius_[i] = std::max(Text::parseString<double>(line), GS_TRM_TUBE_MIN_RADIUS);
-		}
-	}
-
-	/*  GET THE THROAT LOWPASS FREQUENCY CUTOFF  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read throat lowpass filter cutoff.");
-	} else {
-		throatCutoff_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE THROAT VOLUME  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read throat volume.");
-	} else {
-		throatVol_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE PULSE MODULATION OF NOISE FLAG  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read pulse modulation of noise flag.");
-	} else {
-		modulation_ = Text::parseString<int>(line);
-	}
-
-	/*  GET THE NOISE CROSSMIX OFFSET  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read noise crossmix offset.");
-	} else {
-		mixOffset_ = Text::parseString<double>(line);
-	}
+	config_.throatCutoff   = readParameterFromInputStream<double>(in, line, "throat lowpass filter cutoff");
+	config_.throatVol      = readParameterFromInputStream<double>(in, line, "throat volume");
+	config_.modulation     = readParameterFromInputStream<int>(   in, line, "pulse modulation of noise flag");
+	config_.mixOffset      = readParameterFromInputStream<double>(in, line, "noise crossmix offset");
 
 	/*  GET THE INPUT TABLE VALUES  */
 	unsigned int paramNumber = 0;
@@ -468,9 +227,8 @@ Tube::parseInputStream(std::istream& in)
 			data->radius[i] = std::max(radius, GS_TRM_TUBE_MIN_RADIUS);
 		}
 		lineStream >> data->velum;
-
 		if (!lineStream) {
-			THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read parameters (number " << paramNumber << ").");
+			THROW_EXCEPTION(TRMException, "[TRM::Tube] Error in input parameter parsing: Could not read parameters (number " << paramNumber << ").");
 		}
 
 		inputData_.push_back(std::move(data));
@@ -487,20 +245,6 @@ Tube::parseInputStream(std::istream& in)
 
 /******************************************************************************
 *
-*  function:  speedOfSound
-*
-*  purpose:   Returns the speed of sound according to the value of
-*             the temperature (in Celsius degrees).
-*
-******************************************************************************/
-double
-Tube::speedOfSound(double temperature)
-{
-	return 331.4 + (0.6 * temperature);
-}
-
-/******************************************************************************
-*
 *  function:  initializeSynthesizer
 *
 *  purpose:   Initializes all variables so that the synthesis can
@@ -513,10 +257,10 @@ Tube::initializeSynthesizer()
 	double nyquist;
 
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
-	if (length_ > 0.0) {
-		double c = speedOfSound(temperature_);
-		controlPeriod_ = static_cast<int>(rint((c * TOTAL_SECTIONS * 100.0) / (length_ * controlRate_)));
-		sampleRate_ = static_cast<int>(controlRate_ * controlPeriod_);
+	if (config_.length > 0.0) {
+		double c = Util::speedOfSound(config_.temperature);
+		controlPeriod_ = static_cast<int>(rint((c * TOTAL_SECTIONS * 100.0) / (config_.length * config_.controlRate)));
+		sampleRate_ = static_cast<int>(config_.controlRate * controlPeriod_);
 		actualTubeLength_ = (c * TOTAL_SECTIONS * 100.0) / sampleRate_;
 		nyquist = sampleRate_ / 2.0;
 	} else {
@@ -524,29 +268,29 @@ Tube::initializeSynthesizer()
 	}
 
 	/*  CALCULATE THE BREATHINESS FACTOR  */
-	breathinessFactor_ = breathiness_ / 100.0;
+	breathinessFactor_ = config_.breathiness / 100.0;
 
 	/*  CALCULATE CROSSMIX FACTOR  */
-	crossmixFactor_ = 1.0 / amplitude(mixOffset_);
+	crossmixFactor_ = 1.0 / Util::amplitude60dB(config_.mixOffset);
 
 	/*  CALCULATE THE DAMPING FACTOR  */
-	dampingFactor_ = (1.0 - (lossFactor_ / 100.0));
+	dampingFactor_ = (1.0 - (config_.lossFactor / 100.0));
 
 	/*  INITIALIZE THE WAVE TABLE  */
 	glottalSource_.reset(new WavetableGlottalSource(
-				waveform_ == GLOTTAL_SOURCE_PULSE ?
+				config_.waveform == GLOTTAL_SOURCE_PULSE ?
 					WavetableGlottalSource::TYPE_PULSE :
 					WavetableGlottalSource::TYPE_SINE,
 				sampleRate_,
-				tp_, tnMin_, tnMax_));
+				config_.tp, config_.tnMin, config_.tnMax));
 
 	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR MOUTH  */
-	double mouthApertureCoeff = (nyquist - mouthCoef_) / nyquist;
+	double mouthApertureCoeff = (nyquist - config_.mouthCoef) / nyquist;
 	mouthRadiationFilter_.reset(new RadiationFilter(mouthApertureCoeff));
 	mouthReflectionFilter_.reset(new ReflectionFilter(mouthApertureCoeff));
 
 	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR NOSE  */
-	double nasalApertureCoeff = (nyquist - noseCoef_) / nyquist;
+	double nasalApertureCoeff = (nyquist - config_.noseCoef) / nyquist;
 	nasalRadiationFilter_.reset(new RadiationFilter(nasalApertureCoeff));
 	nasalReflectionFilter_.reset(new ReflectionFilter(nasalApertureCoeff));
 
@@ -554,10 +298,10 @@ Tube::initializeSynthesizer()
 	initializeNasalCavity();
 
 	/*  INITIALIZE THE THROAT LOWPASS FILTER  */
-	throat_.reset(new Throat(sampleRate_, throatCutoff_, amplitude(throatVol_)));
+	throat_.reset(new Throat(sampleRate_, config_.throatCutoff, Util::amplitude60dB(config_.throatVol)));
 
 	/*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-	srConv_.reset(new SampleRateConverter(sampleRate_, outputRate_, outputData_));
+	srConv_.reset(new SampleRateConverter(sampleRate_, config_.outputRate, outputData_));
 
 	/*  INITIALIZE THE OUTPUT VECTOR  */
 	outputData_.clear();
@@ -632,9 +376,9 @@ void
 Tube::synthesize()
 {
 	/*  CONVERT PARAMETERS HERE  */
-	double f0 = frequency(currentData_.glotPitch);
-	double ax = amplitude(currentData_.glotVol);
-	double ah1 = amplitude(currentData_.aspVol);
+	double f0 = Util::frequency(currentData_.glotPitch);
+	double ax = Util::amplitude60dB(currentData_.glotVol);
+	double ah1 = Util::amplitude60dB(currentData_.aspVol);
 	calculateTubeCoefficients();
 	setFricationTaps();
 	bandpassFilter_->update(sampleRate_, currentData_.fricBW, currentData_.fricCF);
@@ -644,7 +388,7 @@ Tube::synthesize()
 	double lpNoise = noiseFilter_->filter(noiseSource_->getSample());
 
 	/*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
-	if (waveform_ == GLOTTAL_SOURCE_PULSE) {
+	if (config_.waveform == GLOTTAL_SOURCE_PULSE) {
 		if (ax != prevGlotAmplitude_) {
 			glottalSource_->updateWavetable(ax);
 		}
@@ -662,7 +406,7 @@ Tube::synthesize()
 
 	double signal;
 	/*  CROSS-MIX PURE NOISE WITH PULSED NOISE  */
-	if (modulation_) {
+	if (config_.modulation) {
 		double crossmix = ax * crossmixFactor_;
 		crossmix = (crossmix < 1.0) ? crossmix : 1.0;
 		signal = (pulsedNoise * crossmix) +
@@ -697,61 +441,32 @@ Tube::setControlRateParameters(int pos)
 {
 	double controlFreq = 1.0 / controlPeriod_;
 
-	/*  GLOTTAL PITCH  */
 	currentData_.glotPitch = inputData_[pos - 1]->glotPitch;
 	currentData_.glotPitchDelta = (inputData_[pos]->glotPitch - currentData_.glotPitch) * controlFreq;
 
-	/*  GLOTTAL VOLUME  */
 	currentData_.glotVol = inputData_[pos - 1]->glotVol;
 	currentData_.glotVolDelta = (inputData_[pos]->glotVol - currentData_.glotVol) * controlFreq;
 
-	/*  ASPIRATION VOLUME  */
 	currentData_.aspVol = inputData_[pos - 1]->aspVol;
-#if MATCH_DSP
-	currentData_.aspVolDelta = 0.0;
-#else
 	currentData_.aspVolDelta = (inputData_[pos]->aspVol - currentData_.aspVol) * controlFreq;
-#endif
 
-	/*  FRICATION VOLUME  */
 	currentData_.fricVol = inputData_[pos - 1]->fricVol;
-#if MATCH_DSP
-	currentData_.fricVolDelta = 0.0;
-#else
 	currentData_.fricVolDelta = (inputData_[pos]->fricVol - currentData_.fricVol) * controlFreq;
-#endif
 
-	/*  FRICATION POSITION  */
 	currentData_.fricPos = inputData_[pos - 1]->fricPos;
-#if MATCH_DSP
-	currentData_.fricPosDelta = 0.0;
-#else
 	currentData_.fricPosDelta = (inputData_[pos]->fricPos - currentData_.fricPos) * controlFreq;
-#endif
 
-	/*  FRICATION CENTER FREQUENCY  */
 	currentData_.fricCF = inputData_[pos - 1]->fricCF;
-#if MATCH_DSP
-	currentData_.fricCFDelta = 0.0;
-#else
 	currentData_.fricCFDelta = (inputData_[pos]->fricCF - currentData_.fricCF) * controlFreq;
-#endif
 
-	/*  FRICATION BANDWIDTH  */
 	currentData_.fricBW = inputData_[pos - 1]->fricBW;
-#if MATCH_DSP
-	currentData_.fricBWDelta = 0.0;
-#else
 	currentData_.fricBWDelta = (inputData_[pos]->fricBW - currentData_.fricBW) * controlFreq;
-#endif
 
-	/*  TUBE REGION RADII  */
 	for (int i = 0; i < TOTAL_REGIONS; i++) {
 		currentData_.radius[i] = inputData_[pos - 1]->radius[i];
 		currentData_.radiusDelta[i] = (inputData_[pos]->radius[i] - currentData_.radius[i]) * controlFreq;
 	}
 
-	/*  VELUM RADIUS  */
 	currentData_.velum = inputData_[pos - 1]->velum;
 	currentData_.velumDelta = (inputData_[pos]->velum - currentData_.velum) * controlFreq;
 }
@@ -794,14 +509,14 @@ Tube::initializeNasalCavity()
 
 	/*  CALCULATE COEFFICIENTS FOR INTERNAL FIXED SECTIONS OF NASAL CAVITY  */
 	for (int i = N2, j = NC2; i < N6; i++, j++) {
-		radA2 = noseRadius_[i]     * noseRadius_[i];
-		radB2 = noseRadius_[i + 1] * noseRadius_[i + 1];
+		radA2 = config_.noseRadius[i]     * config_.noseRadius[i];
+		radB2 = config_.noseRadius[i + 1] * config_.noseRadius[i + 1];
 		nasalCoeff_[j] = (radA2 - radB2) / (radA2 + radB2);
 	}
 
 	/*  CALCULATE THE FIXED COEFFICIENT FOR THE NOSE APERTURE  */
-	radA2 = noseRadius_[N6] * noseRadius_[N6];
-	radB2 = apertureRadius_ * apertureRadius_;
+	radA2 = config_.noseRadius[N6] * config_.noseRadius[N6];
+	radB2 = config_.apertureRadius * config_.apertureRadius;
 	nasalCoeff_[NC6] = (radA2 - radB2) / (radA2 + radB2);
 }
 
@@ -830,7 +545,7 @@ Tube::calculateTubeCoefficients()
 
 	/*  CALCULATE THE COEFFICIENT FOR THE MOUTH APERTURE  */
 	radA2 = currentData_.radius[R8] * currentData_.radius[R8];
-	radB2 = apertureRadius_ * apertureRadius_;
+	radB2 = config_.apertureRadius * config_.apertureRadius;
 	oropharynxCoeff_[C8] = (radA2 - radB2) / (radA2 + radB2);
 
 	/*  CALCULATE ALPHA COEFFICIENTS FOR 3-WAY JUNCTION  */
@@ -844,7 +559,7 @@ Tube::calculateTubeCoefficients()
 
 	/*  AND 1ST NASAL PASSAGE COEFFICIENT  */
 	radA2 = currentData_.velum * currentData_.velum;
-	radB2 = noseRadius_[N2] * noseRadius_[N2];
+	radB2 = config_.noseRadius[N2] * config_.noseRadius[N2];
 	nasalCoeff_[NC1] = (radA2 - radB2) / (radA2 + radB2);
 }
 
@@ -861,7 +576,7 @@ Tube::setFricationTaps()
 {
 	int integerPart;
 	double complement, remainder;
-	double fricationAmplitude = amplitude(currentData_.fricVol);
+	double fricationAmplitude = Util::amplitude60dB(currentData_.fricVol);
 
 	/*  CALCULATE POSITION REMAINDER AND COMPLEMENT  */
 	integerPart = (int) currentData_.fricPos;
@@ -1024,9 +739,9 @@ Tube::writeOutputToFile(const char* outputFile)
 	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
-	WAVEFileWriter fileWriter(outputFile, channels_, srConv_->numberSamples(), outputRate_);
+	WAVEFileWriter fileWriter(outputFile, config_.channels, srConv_->numberSamples(), config_.outputRate);
 
-	if (channels_ == 1) {
+	if (config_.channels == 1) {
 		float scale = calculateMonoScale();
 		for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
 			fileWriter.writeSample(outputData_[i] * scale);
@@ -1049,9 +764,9 @@ Tube::writeOutputToBuffer(std::vector<float>& outputBuffer)
 	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
-	outputBuffer.resize(srConv_->numberSamples() * channels_);
+	outputBuffer.resize(srConv_->numberSamples() * config_.channels);
 
-	if (channels_ == 1) {
+	if (config_.channels == 1) {
 		float scale = calculateMonoScale();
 		for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
 			outputBuffer[i] = outputData_[i] * scale;
@@ -1070,7 +785,7 @@ Tube::writeOutputToBuffer(std::vector<float>& outputBuffer)
 float
 Tube::calculateMonoScale()
 {
-	float scale = static_cast<float>((OUTPUT_SCALE / srConv_->maximumSampleValue()) * amplitude(volume_));
+	float scale = static_cast<float>((OUTPUT_SCALE / srConv_->maximumSampleValue()) * Util::amplitude60dB(config_.volume));
 	LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
 }
@@ -1078,54 +793,13 @@ Tube::calculateMonoScale()
 void
 Tube::calculateStereoScale(float& leftScale, float& rightScale)
 {
-	leftScale = static_cast<float>(-((balance_ / 2.0) - 0.5));
-	rightScale = static_cast<float>(((balance_ / 2.0) + 0.5));
-	float newMax = static_cast<float>(srConv_->maximumSampleValue() * (balance_ > 0.0 ? rightScale : leftScale));
-	float scale = static_cast<float>((OUTPUT_SCALE / newMax) * amplitude(volume_));
+	leftScale = static_cast<float>(-((config_.balance / 2.0) - 0.5));
+	rightScale = static_cast<float>(((config_.balance / 2.0) + 0.5));
+	float newMax = static_cast<float>(srConv_->maximumSampleValue() * (config_.balance > 0.0 ? rightScale : leftScale));
+	float scale = static_cast<float>((OUTPUT_SCALE / newMax) * Util::amplitude60dB(config_.volume));
 	leftScale  *= scale;
 	rightScale *= scale;
 	LOG_DEBUG("\nLeft scale: " << leftScale << " Right scale: " << rightScale << '\n');
-}
-
-/******************************************************************************
-*
-*  function:  amplitude
-*
-*  purpose:   Converts dB value to amplitude value.
-*
-******************************************************************************/
-double
-Tube::amplitude(double decibelLevel)
-{
-	/*  CONVERT 0-60 RANGE TO -60-0 RANGE  */
-	decibelLevel -= VOL_MAX;
-
-	/*  IF -60 OR LESS, RETURN AMPLITUDE OF 0  */
-	if (decibelLevel <= (-VOL_MAX)) {
-		return 0.0;
-	}
-
-	/*  IF 0 OR GREATER, RETURN AMPLITUDE OF 1  */
-	if (decibelLevel >= 0.0) {
-		return 1.0;
-	}
-
-	/*  ELSE RETURN INVERSE LOG VALUE  */
-	return pow(10.0, decibelLevel / 20.0);
-}
-
-/******************************************************************************
-*
-*  function:  frequency
-*
-*  purpose:   Converts a given pitch (0 = middle C) to the
-*             corresponding frequency.
-*
-******************************************************************************/
-double
-Tube::frequency(double pitch)
-{
-	return PITCH_BASE * pow(2.0, (pitch + PITCH_OFFSET) / 12.0);
 }
 
 void
