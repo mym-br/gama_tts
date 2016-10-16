@@ -5,9 +5,7 @@
 
   - A C++ compiler with C++11 support.
     The following compilers have been tested:
-    - GCC 4.8.2, 4.9.2 (Linux x86_64).
-    - LLVM/Clang 3.3, 3.5 (Linux x86_64).
-    - MSVC 2013 Express (MS Windows 7 x86_64).
+    - GCC 5.3 (Linux x86_64).
 
 - Build:
 
