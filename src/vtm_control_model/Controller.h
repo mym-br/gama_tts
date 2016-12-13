@@ -91,7 +91,7 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
 
-	VTM::Tube vtm;
+	VTM::VocalTractModel0 vtm;
 	vtm.synthesizeToFile(vtmParamStream, outputFile);
 }
 
@@ -106,7 +106,7 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
 
-	VTM::Tube vtm;
+	VTM::VocalTractModel0 vtm;
 	vtm.synthesizeToBuffer(vtmParamStream, buffer);
 }
 

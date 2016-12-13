@@ -46,7 +46,7 @@ main(int argc, char* argv[])
 		outputFile = argv[3];
 	} else {
 		std::cout << "\nGamaTTS VTM " << PROGRAM_VERSION << "\n\n";
-		std::cerr << "Usage: " << argv[0] << " [-v] trm_param_file.txt output_file.wav\n";
+		std::cerr << "Usage: " << argv[0] << " [-v] vtm_param_file.txt output_file.wav\n";
 		std::cout << "         -v : verbose\n" << std::endl;
 		return 1;
 	}
@@ -57,8 +57,8 @@ main(int argc, char* argv[])
 		return 1;
 	}
 
-	VTM::Tube trm;
-	trm.synthesizeToFile(inputStream, outputFile);
+	VTM::VocalTractModel0 vtm;
+	vtm.synthesizeToFile(inputStream, outputFile);
 
 	LOG_DEBUG("\nWrote scaled samples to file: " << outputFile);
 

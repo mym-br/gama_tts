@@ -1,0 +1,98 @@
+
+Contents of data/en/vtm0
+------------------------
+
+It is recommended that users modify a copy of this directory, not the original.
+
+artic.xml
+	Contains the articulatory database.
+
+	It can be modified with a plain text editor, but the use of an editor
+	like GamaTTS:Editor is recommended.
+
+intonation
+	Controls the intonation.
+
+	If random_intonation = 0 in vtm_control_model.config, only the first
+	line in each tone group will be used. If random_intonation = 1, the
+	line will be randomly selected.
+
+MainDictionary
+	Contains the main dictionary, which relates words to postures.
+
+vtm.config
+	Contains the parameters for the vocal tract model.
+
+	Interesting parameters are:
+		vocal_tract_length_offset
+			This value is added to the vocal tract length.
+		loss_factor
+			Defines the acoustic loss inside the vocal tract.
+
+vtm_control_model.config
+	Contains the parameters for the vocal tract model controller.
+
+	Interesting parameters are:
+
+		voice_name
+			A value of EXAMPLE will load the voice file named
+			voice_EXAMPLE.config.
+		tempo
+			Values greater than 1 will speed up the speech.
+		pitch_offset
+			Modifies the voice pitch.
+
+		drift_deviation
+		drift_lowpass_cutoff
+			Control the random perturbations in the intonation
+			(requires intonation_drift = 1).
+
+		dictionary_1_file
+		dictionary_2_file
+		dictionary_3_file
+			Indicate the dictionaries (the dictionaries will be
+			searched in the order 1, 2, 3).
+
+	Note:
+		The following parameters are not being used at the moment:
+			notional_pitch
+			pretonic_range
+			pretonic_lift
+			tonic_range
+			tonic_movement
+
+voice_baby.config
+voice_female.config
+voice_large_child.config
+voice_male.config
+voice_small_child.config
+	Contain the voice parameters.
+
+	Interesting parameters are:
+
+		vocal_tract_length
+
+		glottal_pulse_tp
+			Rise time, in % of the period.
+		glottal_pulse_tn_min
+			Fall time, in % of the period - for the highest pulse
+			amplitude.
+		glottal_pulse_tn_max
+			Fall time, in % of the period - for the lowest pulse
+			amplitude.
+
+			These parameters modify the glottal pulse shape.
+
+		reference_glottal_pitch
+			Modify the voice pitch.
+
+		breathiness
+
+vowelTransitions
+	Controls vowel transitions.
+
+	Normal users should not modify this file.
+
+vowelTransitions_2
+	Alternative version of vowelTransitions.
+	It is not used.

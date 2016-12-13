@@ -20,7 +20,7 @@
 
 /******************************************************************************
 *
-*     Program:       tube
+*     Program:       VocalTractModel0
 *
 *     Description:   Software implementation of the Tube
 *                    Resonance Model for speech production.
@@ -68,7 +68,7 @@
 namespace GS {
 namespace VTM {
 
-Tube::Tube()
+VocalTractModel0::VocalTractModel0()
 {
 	reset();
 
@@ -76,12 +76,12 @@ Tube::Tube()
 	outputData_.reserve(OUTPUT_VECTOR_RESERVE);
 }
 
-Tube::~Tube()
+VocalTractModel0::~VocalTractModel0()
 {
 }
 
 void
-Tube::reset()
+VocalTractModel0::reset()
 {
 	config_.outputRate       = 0.0;
 	config_.controlRate      = 0.0;
@@ -139,7 +139,7 @@ Tube::reset()
 }
 
 void
-Tube::synthesizeToFile(std::istream& inputStream, const char* outputFile)
+VocalTractModel0::synthesizeToFile(std::istream& inputStream, const char* outputFile)
 {
 	if (!outputData_.empty()) {
 		reset();
@@ -151,7 +151,7 @@ Tube::synthesizeToFile(std::istream& inputStream, const char* outputFile)
 }
 
 void
-Tube::synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer)
+VocalTractModel0::synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer)
 {
 	if (!outputData_.empty()) {
 		reset();
@@ -164,16 +164,16 @@ Tube::synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBu
 
 template<typename T>
 T
-Tube::readParameterFromInputStream(std::istream& in, std::string& line, const char* paramName)
+VocalTractModel0::readParameterFromInputStream(std::istream& in, std::string& line, const char* paramName)
 {
 	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(VTMException, "[VTM::Tube] Error in input parameter parsing: Could not read " << paramName << '.');
+		THROW_EXCEPTION(VTMException, "[VTM::VocalTractModel0] Error in input parameter parsing: Could not read " << paramName << '.');
 	}
 	return Text::parseString<T>(line);
 }
 
 void
-Tube::parseInputStream(std::istream& in)
+VocalTractModel0::parseInputStream(std::istream& in)
 {
 	std::string line;
 
@@ -228,7 +228,7 @@ Tube::parseInputStream(std::istream& in)
 		}
 		lineStream >> data->velum;
 		if (!lineStream) {
-			THROW_EXCEPTION(VTMException, "[VTM::Tube] Error in input parameter parsing: Could not read parameters (number " << paramNumber << ").");
+			THROW_EXCEPTION(VTMException, "[VTM::VocalTractModel0] Error in input parameter parsing: Could not read parameters (number " << paramNumber << ").");
 		}
 
 		inputData_.push_back(std::move(data));
@@ -252,7 +252,7 @@ Tube::parseInputStream(std::istream& in)
 *
 ******************************************************************************/
 void
-Tube::initializeSynthesizer()
+VocalTractModel0::initializeSynthesizer()
 {
 	double nyquist;
 
@@ -312,7 +312,7 @@ Tube::initializeSynthesizer()
 }
 
 void
-Tube::initializeInputFilters(double period)
+VocalTractModel0::initializeInputFilters(double period)
 {
 	inputFilters_.reset(new InputFilters(sampleRate_, period));
 }
@@ -325,7 +325,7 @@ Tube::initializeInputFilters(double period)
 *
 ******************************************************************************/
 void
-Tube::synthesizeForInputSequence()
+VocalTractModel0::synthesizeForInputSequence()
 {
 	/*  CONTROL RATE LOOP  */
 	for (int i = 1, size = inputData_.size(); i < size; i++) {
@@ -343,7 +343,7 @@ Tube::synthesizeForInputSequence()
 }
 
 void
-Tube::synthesizeForSingleInput(int numIterations)
+VocalTractModel0::synthesizeForSingleInput(int numIterations)
 {
 	if (!inputFilters_) {
 		THROW_EXCEPTION(InvalidStateException, "Input filters have not been initialized.");
@@ -373,7 +373,7 @@ Tube::synthesizeForSingleInput(int numIterations)
 }
 
 void
-Tube::synthesize()
+VocalTractModel0::synthesize()
 {
 	/*  CONVERT PARAMETERS HERE  */
 	double f0 = Util::frequency(currentData_.glotPitch);
@@ -437,7 +437,7 @@ Tube::synthesize()
 *
 ******************************************************************************/
 void
-Tube::setControlRateParameters(int pos)
+VocalTractModel0::setControlRateParameters(int pos)
 {
 	double controlFreq = 1.0 / controlPeriod_;
 
@@ -479,7 +479,7 @@ Tube::setControlRateParameters(int pos)
 *
 ******************************************************************************/
 void
-Tube::sampleRateInterpolation()
+VocalTractModel0::sampleRateInterpolation()
 {
 	currentData_.glotPitch += currentData_.glotPitchDelta;
 	currentData_.glotVol   += currentData_.glotVolDelta;
@@ -503,7 +503,7 @@ Tube::sampleRateInterpolation()
 *
 ******************************************************************************/
 void
-Tube::initializeNasalCavity()
+VocalTractModel0::initializeNasalCavity()
 {
 	double radA2, radB2;
 
@@ -532,7 +532,7 @@ Tube::initializeNasalCavity()
 *
 ******************************************************************************/
 void
-Tube::calculateTubeCoefficients()
+VocalTractModel0::calculateTubeCoefficients()
 {
 	double radA2, radB2, r0_2, r1_2, r2_2, sum;
 
@@ -572,7 +572,7 @@ Tube::calculateTubeCoefficients()
 *
 ******************************************************************************/
 void
-Tube::setFricationTaps()
+VocalTractModel0::setFricationTaps()
 {
 	int integerPart;
 	double complement, remainder;
@@ -614,7 +614,7 @@ Tube::setFricationTaps()
 *
 ******************************************************************************/
 double
-Tube::vocalTract(double input, double frication)
+VocalTractModel0::vocalTract(double input, double frication)
 {
 	int i, j, k;
 	double delta, output, junctionPressure;
@@ -731,7 +731,7 @@ Tube::vocalTract(double input, double frication)
 *
 ******************************************************************************/
 void
-Tube::writeOutputToFile(const char* outputFile)
+VocalTractModel0::writeOutputToFile(const char* outputFile)
 {
 	/*  BE SURE TO FLUSH SRC BUFFER  */
 	srConv_->flushBuffer();
@@ -756,7 +756,7 @@ Tube::writeOutputToFile(const char* outputFile)
 }
 
 void
-Tube::writeOutputToBuffer(std::vector<float>& outputBuffer)
+VocalTractModel0::writeOutputToBuffer(std::vector<float>& outputBuffer)
 {
 	/*  BE SURE TO FLUSH SRC BUFFER  */
 	srConv_->flushBuffer();
@@ -783,7 +783,7 @@ Tube::writeOutputToBuffer(std::vector<float>& outputBuffer)
 }
 
 float
-Tube::calculateMonoScale()
+VocalTractModel0::calculateMonoScale()
 {
 	float scale = static_cast<float>((OUTPUT_SCALE / srConv_->maximumSampleValue()) * Util::amplitude60dB(config_.volume));
 	LOG_DEBUG("\nScale: " << scale << '\n');
@@ -791,7 +791,7 @@ Tube::calculateMonoScale()
 }
 
 void
-Tube::calculateStereoScale(float& leftScale, float& rightScale)
+VocalTractModel0::calculateStereoScale(float& leftScale, float& rightScale)
 {
 	leftScale = static_cast<float>(-((config_.balance / 2.0) - 0.5));
 	rightScale = static_cast<float>(((config_.balance / 2.0) + 0.5));
@@ -803,7 +803,7 @@ Tube::calculateStereoScale(float& leftScale, float& rightScale)
 }
 
 void
-Tube::loadSingleInput(const VocalTractModelParameterValue pv)
+VocalTractModel0::loadSingleInput(const VocalTractModelParameterValue pv)
 {
 	switch (pv.index) {
 	case PARAM_GLOT_PITCH:

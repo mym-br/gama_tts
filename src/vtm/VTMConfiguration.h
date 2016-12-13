@@ -64,8 +64,8 @@ struct Configuration {
 	double vocalTractLength;
 	double referenceGlottalPitch;
 	double apertureRadius;               /*  aperture scl. radius (3.05 - 12 cm)  */
-	double noseRadius[Tube::TOTAL_NASAL_SECTIONS];   /*  fixed nose radii (0 - 3 cm)  */
-	double radiusCoef[Tube::TOTAL_REGIONS];
+	double noseRadius[VocalTractModel0::TOTAL_NASAL_SECTIONS];   /*  fixed nose radii (0 - 3 cm)  */
+	double radiusCoef[VocalTractModel0::TOTAL_REGIONS];
 };
 
 } /* namespace VTM */

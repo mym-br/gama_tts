@@ -18,8 +18,8 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef VTM_TUBE_H_
-#define VTM_TUBE_H_
+#ifndef VTM_VOCALTRACTMODEL0_H_
+#define VTM_VOCALTRACTMODEL0_H_
 
 #include <algorithm> /* max, min */
 #include <istream>
@@ -44,7 +44,7 @@
 namespace GS {
 namespace VTM {
 
-class Tube {
+class VocalTractModel0 {
 public:
 	enum { /*  OROPHARYNX REGIONS  */
 		R1 = 0, /*  S1  */
@@ -121,8 +121,8 @@ public:
 		double mixOffset;                   /*  noise crossmix offset (30 - 60 dB)  */
 	};
 
-	Tube();
-	~Tube();
+	VocalTractModel0();
+	~VocalTractModel0();
 
 	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
 	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
@@ -290,8 +290,8 @@ private:
 		}
 	};
 
-	Tube(const Tube&) = delete;
-	Tube& operator=(const Tube&) = delete;
+	VocalTractModel0(const VocalTractModel0&) = delete;
+	VocalTractModel0& operator=(const VocalTractModel0&) = delete;
 
 	void reset();
 	void calculateTubeCoefficients();
@@ -357,4 +357,4 @@ private:
 } /* namespace VTM */
 } /* namespace GS */
 
-#endif /* VTM_TUBE_H_ */
+#endif /* VTM_VOCALTRACTMODEL0_H_ */
