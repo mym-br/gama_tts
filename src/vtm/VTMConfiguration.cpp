@@ -32,8 +32,6 @@ namespace VTM {
 Configuration::Configuration()
 		: outputRate(0.0)
 		, volume(0.0)
-		, channels(0)
-		, balance(0.0)
 		, waveform(0)
 		, vtlOffset(0.0)
 		, temperature(0.0)
@@ -68,8 +66,6 @@ Configuration::load(const std::string& configFilePath, const std::string& voiceF
 
 	outputRate    = reader.value<double>("output_rate");
 	volume        = reader.value<double>("volume");
-	channels      = reader.value<int>("channels");
-	balance       = reader.value<double>("balance");
 	waveform      = reader.value<int>("waveform");
 
 	vtlOffset     = reader.value<double>("vocal_tract_length_offset");

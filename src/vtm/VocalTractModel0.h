@@ -94,8 +94,6 @@ public:
 		float  controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
 
 		double volume;                      /*  master volume (0 - 60 dB)  */
-		int    channels;                    /*  # of sound output channels (1, 2)  */
-		double balance;                     /*  stereo balance (-1 to +1)  */
 
 		int    waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
 		double tp;                          /*  % glottal pulse rise time  */
@@ -146,7 +144,6 @@ public:
 	}
 	double maximumOutputSampleValue() const { return srConv_->maximumSampleValue(); }
 	float outputRate() const { return config_.outputRate; }
-	unsigned int numChannels() const { return config_.channels; }
 private:
 	enum {
 		VELUM = N1
@@ -304,8 +301,7 @@ private:
 	void writeOutputToFile(const char* outputFile);
 	void writeOutputToBuffer(std::vector<float>& outputBuffer);
 	void synthesize();
-	float calculateMonoScale();
-	void calculateStereoScale(float& leftScale, float& rightScale);
+	float calculateOutputScale();
 
 	template<typename T> T readParameterFromInputStream(std::istream& in, std::string& line, const char* paramName);
 

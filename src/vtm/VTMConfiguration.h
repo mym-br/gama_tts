@@ -38,8 +38,6 @@ struct Configuration {
 	double outputRate;                   /*  output sample rate (22.05, 44.1)  */
 
 	double volume;                       /*  master volume (0 - 60 dB)  */
-	int    channels;                     /*  # of sound output channels (1, 2)  */
-	double balance;                      /*  stereo balance (-1 to +1)  */
 
 	int    waveform;                     /*  GS waveform type (0=PULSE, 1=SINE  */
 

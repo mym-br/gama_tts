@@ -86,8 +86,6 @@ VocalTractModel0::reset()
 	config_.outputRate       = 0.0;
 	config_.controlRate      = 0.0;
 	config_.volume           = 0.0;
-	config_.channels         = 0;
-	config_.balance          = 0.0;
 	config_.waveform         = 0;
 	config_.tp               = 0.0;
 	config_.tnMin            = 0.0;
@@ -180,8 +178,6 @@ VocalTractModel0::parseInputStream(std::istream& in)
 	config_.outputRate     = readParameterFromInputStream<float>( in, line, "output sample rate");
 	config_.controlRate    = readParameterFromInputStream<float>( in, line, "input control rate");
 	config_.volume         = readParameterFromInputStream<double>(in, line, "master volume");
-	config_.channels       = readParameterFromInputStream<int>(   in, line, "number of sound output channels");
-	config_.balance        = readParameterFromInputStream<double>(in, line, "stereo balance");
 	config_.waveform       = readParameterFromInputStream<int>(   in, line, "glottal source waveform type");
 	config_.tp             = readParameterFromInputStream<double>(in, line, "glottal pulse rise time (tp)");
 	config_.tnMin          = readParameterFromInputStream<double>(in, line, "glottal pulse fall time minimum (tnMin)");
@@ -726,8 +722,7 @@ VocalTractModel0::vocalTract(double input, double frication)
 *
 *  purpose:   Scales the samples stored in the temporary file, and
 *             writes them to the output file, with the appropriate
-*             header. Also does master volume scaling, and stereo
-*             balance scaling, if 2 channels of output.
+*             header. Also does master volume scaling.
 *
 ******************************************************************************/
 void
@@ -739,19 +734,11 @@ VocalTractModel0::writeOutputToFile(const char* outputFile)
 	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
-	WAVEFileWriter fileWriter(outputFile, config_.channels, srConv_->numberSamples(), config_.outputRate);
+	WAVEFileWriter fileWriter(outputFile, 1, srConv_->numberSamples(), config_.outputRate);
 
-	if (config_.channels == 1) {
-		float scale = calculateMonoScale();
-		for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
-			fileWriter.writeSample(outputData_[i] * scale);
-		}
-	} else {
-		float leftScale, rightScale;
-		calculateStereoScale(leftScale, rightScale);
-		for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
-			fileWriter.writeStereoSamples(outputData_[i] * leftScale, outputData_[i] * rightScale);
-		}
+	float scale = calculateOutputScale();
+	for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
+		fileWriter.writeSample(outputData_[i] * scale);
 	}
 }
 
@@ -764,42 +751,20 @@ VocalTractModel0::writeOutputToBuffer(std::vector<float>& outputBuffer)
 	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
-	outputBuffer.resize(srConv_->numberSamples() * config_.channels);
+	outputBuffer.resize(srConv_->numberSamples());
 
-	if (config_.channels == 1) {
-		float scale = calculateMonoScale();
-		for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
-			outputBuffer[i] = outputData_[i] * scale;
-		}
-	} else {
-		float leftScale, rightScale;
-		calculateStereoScale(leftScale, rightScale);
-		for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
-			unsigned int baseIndex = i * 2;
-			outputBuffer[baseIndex    ] = outputData_[i] * leftScale;
-			outputBuffer[baseIndex + 1] = outputData_[i] * rightScale;
-		}
+	float scale = calculateOutputScale();
+	for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
+		outputBuffer[i] = outputData_[i] * scale;
 	}
 }
 
 float
-VocalTractModel0::calculateMonoScale()
+VocalTractModel0::calculateOutputScale()
 {
 	float scale = static_cast<float>((OUTPUT_SCALE / srConv_->maximumSampleValue()) * Util::amplitude60dB(config_.volume));
 	LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
-}
-
-void
-VocalTractModel0::calculateStereoScale(float& leftScale, float& rightScale)
-{
-	leftScale = static_cast<float>(-((config_.balance / 2.0) - 0.5));
-	rightScale = static_cast<float>(((config_.balance / 2.0) + 0.5));
-	float newMax = static_cast<float>(srConv_->maximumSampleValue() * (config_.balance > 0.0 ? rightScale : leftScale));
-	float scale = static_cast<float>((OUTPUT_SCALE / newMax) * Util::amplitude60dB(config_.volume));
-	leftScale  *= scale;
-	rightScale *= scale;
-	LOG_DEBUG("\nLeft scale: " << leftScale << " Right scale: " << rightScale << '\n');
 }
 
 void

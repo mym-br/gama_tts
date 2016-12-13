@@ -133,8 +133,6 @@ Controller::initUtterance(std::ostream& vtmParamStream)
 		vtmConfig_.outputRate              << '\n' <<
 		vtmControlModelConfig_.controlRate << '\n' <<
 		vtmConfig_.volume                  << '\n' <<
-		vtmConfig_.channels                << '\n' <<
-		vtmConfig_.balance                 << '\n' <<
 		vtmConfig_.waveform                << '\n' <<
 		vtmConfig_.glottalPulseTp          << '\n' <<
 		vtmConfig_.glottalPulseTnMin       << '\n' <<
