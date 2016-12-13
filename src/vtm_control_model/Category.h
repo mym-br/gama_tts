@@ -1,5 +1,7 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 2014 Marcelo Y. Matuda                                       *
+ *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
+ *    David R. Hill, Leonard Manzara, Craig Schock                         *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -14,11 +16,39 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
+// 2015-01
+// This file was created by Marcelo Y. Matuda, and code/information
+// from Gnuspeech was added to it later.
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#ifndef VTM_CONTROL_MODEL_CATEGORY_H_
+#define VTM_CONTROL_MODEL_CATEGORY_H_
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
+#include <string>
 
-#endif /* GLOBAL_H_ */
+
+
+namespace GS {
+namespace VTMControlModel {
+
+class Category {
+public:
+	Category(const std::string& name) : name_(name), native_(false) {}
+
+	const std::string& name() const { return name_; }
+	void setName(const std::string& name) { name_ = name; }
+
+	const std::string& comment() const { return comment_; }
+	void setComment(const std::string& comment) { comment_ = comment; }
+
+	bool native() const { return native_; }
+	void setNative() { native_ = true; }
+private:
+	std::string name_;
+	std::string comment_;
+	bool native_;
+};
+
+} /* namespace VTMControlModel */
+} /* namespace GS */
+
+#endif /* VTM_CONTROL_MODEL_CATEGORY_H_ */

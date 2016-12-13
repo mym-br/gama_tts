@@ -15,10 +15,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#ifndef VTM_CONTROL_MODEL_POSTURE_LIST_H_
+#define VTM_CONTROL_MODEL_POSTURE_LIST_H_
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
+#include <string>
+#include <memory>
+#include <vector>
 
-#endif /* GLOBAL_H_ */
+
+
+namespace GS {
+namespace VTMControlModel {
+
+class Posture;
+
+class PostureList {
+public:
+	typedef std::vector<std::unique_ptr<Posture>>::size_type size_type;
+
+	PostureList();
+	~PostureList();
+
+	size_type size() const { return postureList_.size(); }
+	void clear();
+
+	void add(std::unique_ptr<Posture> posture);
+	void remove(size_type index);
+
+	const Posture& operator[](size_type index) const;
+	Posture& operator[](size_type index);
+
+	const Posture* find(const std::string& name) const;
+	Posture* find(const std::string& name);
+private:
+	std::vector<std::unique_ptr<Posture>> postureList_; // always sorted, by name
+};
+
+} /* namespace VTMControlModel */
+} /* namespace GS */
+
+#endif /* VTM_CONTROL_MODEL_POSTURE_LIST_H_ */

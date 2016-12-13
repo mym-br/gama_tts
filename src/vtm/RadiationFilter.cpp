@@ -1,5 +1,6 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
+ *    David R. Hill, Leonard Manzara, Craig Schock                         *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -14,11 +15,43 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
+// 2014-09
+// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#include "RadiationFilter.h"
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
 
-#endif /* GLOBAL_H_ */
+
+namespace GS {
+namespace VTM {
+
+RadiationFilter::RadiationFilter(double apertureCoeff)
+		: radiationX_(0.0)
+		, radiationY_(0.0)
+{
+	a20_ = apertureCoeff;
+	a21_ = b21_ = -a20_;
+}
+
+RadiationFilter::~RadiationFilter()
+{
+}
+
+void
+RadiationFilter::reset()
+{
+	radiationX_ = 0.0;
+	radiationY_ = 0.0;
+}
+
+double
+RadiationFilter::filter(double input)
+{
+	double output = (a20_ * input) + (a21_ * radiationX_) - (b21_ * radiationY_);
+	radiationX_ = input;
+	radiationY_ = output;
+	return output;
+}
+
+} /* namespace VTM */
+} /* namespace GS */

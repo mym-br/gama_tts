@@ -30,7 +30,7 @@
 #include "Model.h"
 #include "en/phonetic_string_parser/PhoneticStringParser.h"
 #include "en/text_parser/TextParser.h"
-#include "TRMControlModelConfiguration.h"
+#include "VTMControlModelConfiguration.h"
 
 
 
@@ -41,10 +41,10 @@ showUsage(const char* programName)
 	std::cout << "Usage:\n\n";
 	std::cout << programName << " --version\n";
 	std::cout << "        Shows the program version.\n\n";
-	std::cout << programName << " [-v] -c config_dir -p trm_param_file.txt -o output_file.wav \"Hello world.\"\n";
+	std::cout << programName << " [-v] -c config_dir -p vtm_param_file.txt -o output_file.wav \"Hello world.\"\n";
 	std::cout << "        Synthesizes text from the command line.\n";
 	std::cout << "        -v : verbose\n\n";
-	std::cout << programName << " [-v] -c config_dir -i input_text.txt -p trm_param_file.txt -o output_file.wav\n";
+	std::cout << programName << " [-v] -c config_dir -i input_text.txt -p vtm_param_file.txt -o output_file.wav\n";
 	std::cout << "        Synthesizes text from a file.\n";
 	std::cout << "        -v : verbose\n" << std::endl;
 }
@@ -60,7 +60,7 @@ main(int argc, char* argv[])
 	const char* configDirPath = nullptr;
 	const char* inputFile = nullptr;
 	const char* outputFile = nullptr;
-	const char* trmParamFile = nullptr;
+	const char* vtmParamFile = nullptr;
 	std::ostringstream inputTextStream;
 
 	int i = 1;
@@ -90,7 +90,7 @@ main(int argc, char* argv[])
 				showUsage(argv[0]);
 				return 1;
 			}
-			trmParamFile = argv[i];
+			vtmParamFile = argv[i];
 			++i;
 		} else if (strcmp(argv[i], "-o") == 0) {
 			++i;
@@ -111,7 +111,7 @@ main(int argc, char* argv[])
 		}
 	}
 
-	if (configDirPath == nullptr || trmParamFile == nullptr || outputFile == nullptr) {
+	if (configDirPath == nullptr || vtmParamFile == nullptr || outputFile == nullptr) {
 		showUsage(argv[0]);
 		return 1;
 	}
@@ -137,27 +137,27 @@ main(int argc, char* argv[])
 	}
 
 	try {
-		std::unique_ptr<GS::TRMControlModel::Model> trmControlModel(new GS::TRMControlModel::Model());
-		trmControlModel->load(configDirPath, TRM_CONTROL_MODEL_CONFIG_FILE);
+		std::unique_ptr<GS::VTMControlModel::Model> vtmControlModel(new GS::VTMControlModel::Model());
+		vtmControlModel->load(configDirPath, VTM_CONTROL_MODEL_CONFIG_FILE);
 		if (GS::Log::debugEnabled) {
-			trmControlModel->printInfo();
+			vtmControlModel->printInfo();
 		}
 
-		std::unique_ptr<GS::TRMControlModel::Controller> trmController(new GS::TRMControlModel::Controller(configDirPath, *trmControlModel));
-		const GS::TRMControlModel::Configuration& trmControlConfig = trmController->trmControlModelConfiguration();
+		std::unique_ptr<GS::VTMControlModel::Controller> vtmController(new GS::VTMControlModel::Controller(configDirPath, *vtmControlModel));
+		const GS::VTMControlModel::Configuration& vtmControlConfig = vtmController->vtmControlModelConfiguration();
 
 		std::unique_ptr<GS::En::TextParser> textParser(new GS::En::TextParser(configDirPath,
-											trmControlConfig.dictionary1File,
-											trmControlConfig.dictionary2File,
-											trmControlConfig.dictionary3File));
-		std::unique_ptr<GS::En::PhoneticStringParser> phoneticStringParser(new GS::En::PhoneticStringParser(configDirPath, *trmController));
+											vtmControlConfig.dictionary1File,
+											vtmControlConfig.dictionary2File,
+											vtmControlConfig.dictionary3File));
+		std::unique_ptr<GS::En::PhoneticStringParser> phoneticStringParser(new GS::En::PhoneticStringParser(configDirPath, *vtmController));
 
 		std::string phoneticString = textParser->parseText(inputText.c_str());
 		if (GS::Log::debugEnabled) {
 			std::cout << "Phonetic string: [" << phoneticString << ']' << std::endl;
 		}
 
-		trmController->synthesizePhoneticString(*phoneticStringParser, phoneticString.c_str(), trmParamFile, outputFile);
+		vtmController->synthesizePhoneticString(*phoneticStringParser, phoneticString.c_str(), vtmParamFile, outputFile);
 
 	} catch (std::exception& e) {
 		std::cerr << "Caught an exception: " << e.what() << std::endl;

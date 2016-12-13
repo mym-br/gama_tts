@@ -18,49 +18,45 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_PHONETIC_STRING_PARSER_H_
-#define EN_PHONETIC_STRING_PARSER_H_
-
-#include <memory>
-
-#include "Controller.h"
+#ifndef VTM_CONTROL_MODEL_INTONATION_POINT_H_
+#define VTM_CONTROL_MODEL_INTONATION_POINT_H_
 
 
 
 namespace GS {
-namespace En {
+namespace VTMControlModel {
 
-class PhoneticStringParser {
+class EventList;
+
+class IntonationPoint {
 public:
-	PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller);
-	~PhoneticStringParser();
+	IntonationPoint(EventList* eventList);
+	~IntonationPoint() {}
 
-	int parseString(const char* string);
+	void setSemitone(double newValue) { semitone_ = newValue; }
+	double semitone() const { return semitone_; }
+
+	void setOffsetTime(double newValue) { offsetTime_ = newValue; }
+	double offsetTime() const { return offsetTime_; }
+
+	void setSlope(double newValue) { slope_ = newValue; }
+	double slope() const { return slope_; }
+
+	void setRuleIndex(int newIndex) { ruleIndex_ = newIndex; }
+	int ruleIndex() const { return ruleIndex_; }
+
+	double absoluteTime() const;
+	double beatTime() const;
+
 private:
-	PhoneticStringParser(const PhoneticStringParser&) = delete;
-	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;
-
-	struct RewriterData {
-		int currentState;
-		const VTMControlModel::Posture* lastPosture;
-		RewriterData() : currentState(0), lastPosture(nullptr) {}
-	};
-
-	void initVowelTransitions(const char* configDirPath);
-	void printVowelTransitions();
-	const VTMControlModel::Posture* rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data);
-	const VTMControlModel::Posture* calcVowelTransition(const VTMControlModel::Posture& nextPosture, RewriterData& data);
-	std::shared_ptr<VTMControlModel::Category> getCategory(const char* name);
-	const VTMControlModel::Posture* getPosture(const char* name);
-
-	const VTMControlModel::Model& model_;
-	VTMControlModel::EventList& eventList_;
-	std::shared_ptr<const VTMControlModel::Category> category_[18];
-	const VTMControlModel::Posture* returnPhone_[7];
-	int vowelTransitions_[13][13];
+	double semitone_;      /* Value of the in semitones */
+	double offsetTime_;    /* Points are timed wrt a beat + this offset */
+	double slope_;         /* Slope of point */
+	int ruleIndex_;        /* Index of posture which is the focus of this point */
+	EventList* eventList_; /* Current EventList */
 };
 
-} /* namespace En */
+} /* namespace VTMControlModel */
 } /* namespace GS */
 
-#endif /* EN_PHONETIC_STRING_PARSER_H_ */
+#endif /* VTM_CONTROL_MODEL_INTONATION_POINT_H_ */

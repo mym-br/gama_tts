@@ -1,5 +1,6 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
+ *    David R. Hill, Leonard Manzara, Craig Schock                         *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -14,11 +15,43 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
+// 2014-09
+// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#include "IntonationPoint.h"
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
+#include "EventList.h"
+#include "Exception.h"
 
-#endif /* GLOBAL_H_ */
+
+
+namespace GS {
+namespace VTMControlModel {
+
+IntonationPoint::IntonationPoint(EventList* eventList)
+	: semitone_(0.0)
+	, offsetTime_(0.0)
+	, slope_(0.0)
+	, ruleIndex_(0)
+	, eventList_(eventList) {
+
+	if (eventList_ == nullptr) {
+		THROW_EXCEPTION(InvalidParameterException, "The pointer to event list is null.");
+	}
+}
+
+double
+IntonationPoint::absoluteTime() const
+{
+	double time = eventList_->getBeatAtIndex(ruleIndex_);
+	return time + offsetTime_;
+}
+
+double
+IntonationPoint::beatTime() const
+{
+	return eventList_->getBeatAtIndex(ruleIndex_);
+}
+
+} /* namespace VTMControlModel */
+} /* namespace GS */

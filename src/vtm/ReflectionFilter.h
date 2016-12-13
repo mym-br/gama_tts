@@ -1,5 +1,6 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
+ *    David R. Hill, Leonard Manzara, Craig Schock                         *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -14,11 +15,36 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
+// 2014-09
+// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#ifndef VTM_REFLECTION_FILTER_H_
+#define VTM_REFLECTION_FILTER_H_
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
 
-#endif /* GLOBAL_H_ */
+
+namespace GS {
+namespace VTM {
+
+// Is a variable, one-pole lowpass filter, whose cutoff
+// is determined by the aperture coefficient.
+class ReflectionFilter {
+public:
+	ReflectionFilter(double apertureCoeff);
+	~ReflectionFilter();
+
+	void reset();
+	double filter(double input);
+private:
+	ReflectionFilter(const ReflectionFilter&) = delete;
+	ReflectionFilter& operator=(const ReflectionFilter&) = delete;
+
+	double a10_;
+	double b11_;
+	double reflectionY_;
+};
+
+} /* namespace VTM */
+} /* namespace GS */
+
+#endif /* VTM_REFLECTION_FILTER_H_ */

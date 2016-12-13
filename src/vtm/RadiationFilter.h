@@ -1,5 +1,6 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
+ *    David R. Hill, Leonard Manzara, Craig Schock                         *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -14,11 +15,39 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
+// 2014-09
+// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#ifndef VTM_RADIATION_FILTER_H_
+#define VTM_RADIATION_FILTER_H_
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
 
-#endif /* GLOBAL_H_ */
+
+namespace GS {
+namespace VTM {
+
+// Is a variable, one-zero, one-pole, highpass filter,
+// whose cutoff point is determined by the aperture
+// coefficient.
+class RadiationFilter {
+public:
+	RadiationFilter(double apertureCoeff);
+	~RadiationFilter();
+
+	void reset();
+	double filter(double input);
+private:
+	RadiationFilter(const RadiationFilter&) = delete;
+	RadiationFilter& operator=(const RadiationFilter&) = delete;
+
+	double a20_;
+	double a21_;
+	double b21_;
+	double radiationX_;
+	double radiationY_;
+};
+
+} /* namespace VTM */
+} /* namespace GS */
+
+#endif /* VTM_RADIATION_FILTER_H_ */

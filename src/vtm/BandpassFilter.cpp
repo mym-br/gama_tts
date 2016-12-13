@@ -18,49 +18,69 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_PHONETIC_STRING_PARSER_H_
-#define EN_PHONETIC_STRING_PARSER_H_
+#include "BandpassFilter.h"
 
-#include <memory>
-
-#include "Controller.h"
+#include <cmath>
 
 
 
 namespace GS {
-namespace En {
+namespace VTM {
 
-class PhoneticStringParser {
-public:
-	PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller);
-	~PhoneticStringParser();
+BandpassFilter::BandpassFilter()
+		: bpAlpha_(0.0)
+		, bpBeta_(0.0)
+		, bpGamma_(0.0)
+		, xn1_(0.0)
+		, xn2_(0.0)
+		, yn1_(0.0)
+		, yn2_(0.0)
+{
+}
 
-	int parseString(const char* string);
-private:
-	PhoneticStringParser(const PhoneticStringParser&) = delete;
-	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;
+BandpassFilter::~BandpassFilter()
+{
+}
 
-	struct RewriterData {
-		int currentState;
-		const VTMControlModel::Posture* lastPosture;
-		RewriterData() : currentState(0), lastPosture(nullptr) {}
-	};
+void
+BandpassFilter::reset()
+{
+	xn1_ = 0.0;
+	xn2_ = 0.0;
+	yn1_ = 0.0;
+	yn2_ = 0.0;
+}
 
-	void initVowelTransitions(const char* configDirPath);
-	void printVowelTransitions();
-	const VTMControlModel::Posture* rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data);
-	const VTMControlModel::Posture* calcVowelTransition(const VTMControlModel::Posture& nextPosture, RewriterData& data);
-	std::shared_ptr<VTMControlModel::Category> getCategory(const char* name);
-	const VTMControlModel::Posture* getPosture(const char* name);
+void
+BandpassFilter::update(double sampleRate, double bandwidth, double centerFreq)
+{
+	double tanValue = tan((M_PI * bandwidth) / sampleRate);
+	double cosValue = cos((2.0 * M_PI * centerFreq) / sampleRate);
+	bpBeta_ = (1.0 - tanValue) / (2.0 * (1.0 + tanValue));
+	bpGamma_ = (0.5 + bpBeta_) * cosValue;
+	bpAlpha_ = (0.5 - bpBeta_) / 2.0;
+}
 
-	const VTMControlModel::Model& model_;
-	VTMControlModel::EventList& eventList_;
-	std::shared_ptr<const VTMControlModel::Category> category_[18];
-	const VTMControlModel::Posture* returnPhone_[7];
-	int vowelTransitions_[13][13];
-};
+/******************************************************************************
+*
+*  function:  bandpassFilter
+*
+*  purpose:   Frication bandpass filter, with variable center
+*             frequency and bandwidth.
+*
+******************************************************************************/
+double
+BandpassFilter::filter(double input)
+{
+	double output = 2.0 * ((bpAlpha_ * (input - xn2_)) + (bpGamma_ * yn1_) - (bpBeta_ * yn2_));
 
-} /* namespace En */
+	xn2_ = xn1_;
+	xn1_ = input;
+	yn2_ = yn1_;
+	yn1_ = output;
+
+	return output;
+}
+
+} /* namespace VTM */
 } /* namespace GS */
-
-#endif /* EN_PHONETIC_STRING_PARSER_H_ */

@@ -36,7 +36,7 @@
 namespace GS {
 namespace En {
 
-PhoneticStringParser::PhoneticStringParser(const char* configDirPath, TRMControlModel::Controller& controller)
+PhoneticStringParser::PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller)
 		: model_(controller.model())
 		, eventList_(controller.eventList())
 {
@@ -48,7 +48,7 @@ PhoneticStringParser::PhoneticStringParser(const char* configDirPath, TRMControl
 	const std::vector<const char*> postureList = {"h", "h'", "hv", "hv'", "ll", "ll'", "s", "s'", "z", "z'"};
 	for (unsigned int i = 0; i < postureList.size(); ++i) {
 		const char* posture = postureList[i];
-		const TRMControlModel::Posture* tempPosture = getPosture(posture);
+		const VTMControlModel::Posture* tempPosture = getPosture(posture);
 		category_[i + 4U] = tempPosture->findCategory(posture);
 		if (!category_[i + 4U]) {
 			THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << posture << "\".");
@@ -75,20 +75,20 @@ PhoneticStringParser::~PhoneticStringParser()
 {
 }
 
-std::shared_ptr<TRMControlModel::Category>
+std::shared_ptr<VTMControlModel::Category>
 PhoneticStringParser::getCategory(const char* name)
 {
-	const std::shared_ptr<TRMControlModel::Category> category = model_.findCategory(name);
+	const std::shared_ptr<VTMControlModel::Category> category = model_.findCategory(name);
 	if (!category) {
 		THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << name << "\".");
 	}
 	return category;
 }
 
-const TRMControlModel::Posture*
+const VTMControlModel::Posture*
 PhoneticStringParser::getPosture(const char* name)
 {
-	const TRMControlModel::Posture* posture = model_.postureList().find(name);
+	const VTMControlModel::Posture* posture = model_.postureList().find(name);
 	if (!posture) {
 		THROW_EXCEPTION(UnavailableResourceException, "Could not find the posture \"" << name << "\".");
 	}
@@ -150,13 +150,13 @@ PhoneticStringParser::printVowelTransitions()
 	}
 }
 
-const TRMControlModel::Posture*
-PhoneticStringParser::rewrite(const TRMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data)
+const VTMControlModel::Posture*
+PhoneticStringParser::rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data)
 {
-	const TRMControlModel::Posture* tempPosture;
+	const VTMControlModel::Posture* tempPosture;
 	int transitionMade = 0;
 	const char* temp;
-	const TRMControlModel::Posture* returnValue = nullptr;
+	const VTMControlModel::Posture* returnValue = nullptr;
 
 	static const int stateTable[19][18] = {
 		{ 1,  9,  0,  7,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 0 */
@@ -272,8 +272,8 @@ PhoneticStringParser::rewrite(const TRMControlModel::Posture& nextPosture, int w
 int
 PhoneticStringParser::parseString(const char* string)
 {
-	const TRMControlModel::Posture* tempPosture;
-	const TRMControlModel::Posture* tempPosture1;
+	const VTMControlModel::Posture* tempPosture;
+	const VTMControlModel::Posture* tempPosture1;
 	int length;
 	int index = 0, bufferIndex = 0;
 	int chunk = 0;
@@ -453,8 +453,8 @@ PhoneticStringParser::parseString(const char* string)
 	return 0;
 }
 
-const TRMControlModel::Posture*
-PhoneticStringParser::calcVowelTransition(const TRMControlModel::Posture& nextPosture, RewriterData& data)
+const VTMControlModel::Posture*
+PhoneticStringParser::calcVowelTransition(const VTMControlModel::Posture& nextPosture, RewriterData& data)
 {
 	int vowelHash[13] = { 194, 201, 97, 101, 105, 111, 221, 117, 211, 216, 202, 215, 234 };
 	int lastValue, nextValue, i, action;

@@ -15,52 +15,54 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-// 2014-09
+// 2014-10
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_PHONETIC_STRING_PARSER_H_
-#define EN_PHONETIC_STRING_PARSER_H_
+#ifndef VTM_CONTROL_MODEL_CONFIGURATION_H_
+#define VTM_CONTROL_MODEL_CONFIGURATION_H_
 
-#include <memory>
-
-#include "Controller.h"
+#include <string>
 
 
 
 namespace GS {
-namespace En {
+namespace VTMControlModel {
 
-class PhoneticStringParser {
-public:
-	PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller);
-	~PhoneticStringParser();
-
-	int parseString(const char* string);
-private:
-	PhoneticStringParser(const PhoneticStringParser&) = delete;
-	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;
-
-	struct RewriterData {
-		int currentState;
-		const VTMControlModel::Posture* lastPosture;
-		RewriterData() : currentState(0), lastPosture(nullptr) {}
+struct Configuration {
+	enum Intonation {
+		INTONATION_NONE      = 0x00,
+		INTONATION_MICRO     = 0x01,
+		INTONATION_MACRO     = 0x02,
+		INTONATION_SMOOTH    = 0x04,
+		INTONATION_DRIFT     = 0x08,
+		INTONATION_RANDOMIZE = 0x10
 	};
 
-	void initVowelTransitions(const char* configDirPath);
-	void printVowelTransitions();
-	const VTMControlModel::Posture* rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data);
-	const VTMControlModel::Posture* calcVowelTransition(const VTMControlModel::Posture& nextPosture, RewriterData& data);
-	std::shared_ptr<VTMControlModel::Category> getCategory(const char* name);
-	const VTMControlModel::Posture* getPosture(const char* name);
+	Configuration();
 
-	const VTMControlModel::Model& model_;
-	VTMControlModel::EventList& eventList_;
-	std::shared_ptr<const VTMControlModel::Category> category_[18];
-	const VTMControlModel::Posture* returnPhone_[7];
-	int vowelTransitions_[13][13];
+	void load(const std::string& configFilePath);
+
+	double controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
+	double tempo;
+	double pitchOffset;
+	double driftDeviation;
+	double driftLowpassCutoff;
+	int    intonation;
+
+	// Intonation parameters.
+	double notionalPitch;
+	double pretonicRange;
+	double pretonicLift;
+	double tonicRange;
+	double tonicMovement;
+
+	std::string voiceName;
+	std::string dictionary1File;
+	std::string dictionary2File;
+	std::string dictionary3File;
 };
 
-} /* namespace En */
+} /* namespace VTMControlModel */
 } /* namespace GS */
 
-#endif /* EN_PHONETIC_STRING_PARSER_H_ */
+#endif /* VTM_CONTROL_MODEL_CONFIGURATION_H_ */

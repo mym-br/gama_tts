@@ -1,5 +1,6 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
+ *    David R. Hill, Leonard Manzara, Craig Schock                         *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -14,11 +15,40 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
+// 2014-09
+// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#include "NoiseSource.h"
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
+#define FACTOR                    377.0
+#define INITIAL_SEED              0.7892347
 
-#endif /* GLOBAL_H_ */
+
+
+namespace GS {
+namespace VTM {
+
+NoiseSource::NoiseSource() : seed_(INITIAL_SEED)
+{
+}
+
+NoiseSource::~NoiseSource()
+{
+}
+
+void
+NoiseSource::reset()
+{
+	seed_ = INITIAL_SEED;
+}
+
+double
+NoiseSource::getSample()
+{
+	double product = seed_ * FACTOR;
+	seed_ = product - static_cast<int>(product);
+	return seed_ - 0.5;
+}
+
+} /* namespace VTM */
+} /* namespace GS */

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 2014, 2015 Marcelo Y. Matuda                                 *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,10 +15,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#ifndef VTM_CONTROL_MODEL_XML_CONFIG_FILE_WRITER_H_
+#define VTM_CONTROL_MODEL_XML_CONFIG_FILE_WRITER_H_
 
-#define PROGRAM_VERSION "0.1.6"
-#define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
+#include <string>
 
-#endif /* GLOBAL_H_ */
+
+
+namespace GS {
+
+class StreamXMLWriter;
+
+namespace VTMControlModel {
+
+class Model;
+
+/*******************************************************************************
+ *
+ */
+class XMLConfigFileWriter {
+public:
+	XMLConfigFileWriter(const Model& model, const std::string& filePath);
+	~XMLConfigFileWriter();
+
+	void saveModel();
+private:
+	XMLConfigFileWriter(const XMLConfigFileWriter&) = delete;
+	XMLConfigFileWriter& operator=(const XMLConfigFileWriter&) = delete;
+
+	void writeElements(StreamXMLWriter& xml);
+
+	const Model& model_;
+	std::string filePath_;
+};
+
+} /* namespace VTMControlModel */
+} /* namespace GS */
+
+#endif /* VTM_CONTROL_MODEL_XML_CONFIG_FILE_WRITER_H_ */

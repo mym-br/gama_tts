@@ -18,49 +18,61 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_PHONETIC_STRING_PARSER_H_
-#define EN_PHONETIC_STRING_PARSER_H_
+#ifndef VTM_SAMPLE_RATE_CONVERTER_H_
+#define VTM_SAMPLE_RATE_CONVERTER_H_
 
-#include <memory>
-
-#include "Controller.h"
+#include <vector>
 
 
 
 namespace GS {
-namespace En {
+namespace VTM {
 
-class PhoneticStringParser {
+class SampleRateConverter {
 public:
-	PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller);
-	~PhoneticStringParser();
+	SampleRateConverter(int sampleRate, float outputRate, std::vector<float>& outputData);
+	~SampleRateConverter();
 
-	int parseString(const char* string);
+	void reset();
+	void dataFill(double data);
+	void dataEmpty();
+	void flushBuffer();
+
+	double maximumSampleValue() const { return maximumSampleValue_; }
+	long numberSamples() const { return numberSamples_; }
 private:
-	PhoneticStringParser(const PhoneticStringParser&) = delete;
-	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;
+	SampleRateConverter(const SampleRateConverter&) = delete;
+	SampleRateConverter& operator=(const SampleRateConverter&) = delete;
 
-	struct RewriterData {
-		int currentState;
-		const VTMControlModel::Posture* lastPosture;
-		RewriterData() : currentState(0), lastPosture(nullptr) {}
-	};
+	void initializeConversion(int sampleRate, float outputRate);
+	void initializeBuffer();
+	void initializeFilter();
 
-	void initVowelTransitions(const char* configDirPath);
-	void printVowelTransitions();
-	const VTMControlModel::Posture* rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data);
-	const VTMControlModel::Posture* calcVowelTransition(const VTMControlModel::Posture& nextPosture, RewriterData& data);
-	std::shared_ptr<VTMControlModel::Category> getCategory(const char* name);
-	const VTMControlModel::Posture* getPosture(const char* name);
+	static double Izero(double x);
+	static void srIncrement(int *pointer, int modulus);
+	static void srDecrement(int *pointer, int modulus);
 
-	const VTMControlModel::Model& model_;
-	VTMControlModel::EventList& eventList_;
-	std::shared_ptr<const VTMControlModel::Category> category_[18];
-	const VTMControlModel::Posture* returnPhone_[7];
-	int vowelTransitions_[13][13];
+	double sampleRateRatio_;
+	int fillPtr_;
+	int emptyPtr_;
+	int padSize_;
+	int fillSize_;
+	unsigned int timeRegisterIncrement_;
+	unsigned int filterIncrement_;
+	unsigned int phaseIncrement_;
+	unsigned int timeRegister_;
+	int fillCounter_;
+
+	double maximumSampleValue_;
+	long numberSamples_;
+
+	std::vector<double> h_;
+	std::vector<double> deltaH_;
+	std::vector<double> buffer_;
+	std::vector<float>& outputData_;
 };
 
-} /* namespace En */
+} /* namespace VTM */
 } /* namespace GS */
 
-#endif /* EN_PHONETIC_STRING_PARSER_H_ */
+#endif /* VTM_SAMPLE_RATE_CONVERTER_H_ */
