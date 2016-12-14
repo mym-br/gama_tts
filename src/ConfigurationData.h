@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef KEY_VALUE_FILE_READER_H_
-#define KEY_VALUE_FILE_READER_H_
+#ifndef CONFIGURATION_DATA_H_
+#define CONFIGURATION_DATA_H_
 
 #include <string>
 #include <unordered_map>
@@ -28,9 +28,9 @@
 namespace GS {
 
 // Format: "key = value"
-class KeyValueFileReader {
+class ConfigurationData {
 public:
-	KeyValueFileReader(const std::string& filePath);
+	ConfigurationData(const std::string& filePath);
 
 	template<typename T> T value(const std::string& key) const;
 	template<typename T> T value(const std::string& key, T minValue, T maxValue) const;
@@ -47,7 +47,7 @@ private:
 
 template<typename T>
 T
-KeyValueFileReader::value(const std::string& key) const
+ConfigurationData::value(const std::string& key) const
 {
 	auto iter = valueMap_.find(key);
 	if (iter == valueMap_.end()) {
@@ -67,7 +67,7 @@ KeyValueFileReader::value(const std::string& key) const
 
 template<typename T>
 T
-KeyValueFileReader::value(const std::string& key, T minValue, T maxValue) const
+ConfigurationData::value(const std::string& key, T minValue, T maxValue) const
 {
 	T v = value<T>(key);
 
@@ -82,4 +82,4 @@ KeyValueFileReader::value(const std::string& key, T minValue, T maxValue) const
 
 } /* namespace GS */
 
-#endif /* KEY_VALUE_FILE_READER_H_ */
+#endif /* CONFIGURATION_DATA_H_ */

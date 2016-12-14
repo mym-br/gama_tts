@@ -20,7 +20,7 @@
 
 #include "VTMControlModelConfiguration.h"
 
-#include "KeyValueFileReader.h"
+#include "ConfigurationData.h"
 
 
 
@@ -45,41 +45,41 @@ Configuration::Configuration()
 void
 Configuration::load(const std::string& configFilePath)
 {
-	KeyValueFileReader reader(configFilePath);
+	ConfigurationData config(configFilePath);
 
-	controlRate        = reader.value<double>("control_rate");
-	tempo              = reader.value<double>("tempo");
-	pitchOffset        = reader.value<double>("pitch_offset");
-	driftDeviation     = reader.value<double>("drift_deviation");
-	driftLowpassCutoff = reader.value<double>("drift_lowpass_cutoff");
+	controlRate        = config.value<double>("control_rate");
+	tempo              = config.value<double>("tempo");
+	pitchOffset        = config.value<double>("pitch_offset");
+	driftDeviation     = config.value<double>("drift_deviation");
+	driftLowpassCutoff = config.value<double>("drift_lowpass_cutoff");
 
 	intonation = 0;
-	if (reader.value<int>("micro_intonation") != 0) {
+	if (config.value<int>("micro_intonation") != 0) {
 		intonation += INTONATION_MICRO;
 	}
-	if (reader.value<int>("macro_intonation") != 0) {
+	if (config.value<int>("macro_intonation") != 0) {
 		intonation += INTONATION_MACRO;
 	}
-//	if (reader.value<int>("smooth_intonation") != 0) {
+//	if (config.value<int>("smooth_intonation") != 0) {
 //		intonation += INTONATION_SMOOTH;
 //	}
-	if (reader.value<int>("intonation_drift") != 0) {
+	if (config.value<int>("intonation_drift") != 0) {
 		intonation += INTONATION_DRIFT;
 	}
-	if (reader.value<int>("random_intonation") != 0) {
+	if (config.value<int>("random_intonation") != 0) {
 		intonation += INTONATION_RANDOMIZE;
 	}
 
-	notionalPitch = reader.value<double>("notional_pitch");
-	pretonicRange = reader.value<double>("pretonic_range");
-	pretonicLift  = reader.value<double>("pretonic_lift");
-	tonicRange    = reader.value<double>("tonic_range");
-	tonicMovement = reader.value<double>("tonic_movement");
+	notionalPitch = config.value<double>("notional_pitch");
+	pretonicRange = config.value<double>("pretonic_range");
+	pretonicLift  = config.value<double>("pretonic_lift");
+	tonicRange    = config.value<double>("tonic_range");
+	tonicMovement = config.value<double>("tonic_movement");
 
-	voiceName = reader.value<std::string>("voice_name");
-	dictionary1File = reader.value<std::string>("dictionary_1_file");
-	dictionary2File = reader.value<std::string>("dictionary_2_file");
-	dictionary3File = reader.value<std::string>("dictionary_3_file");
+	voiceName = config.value<std::string>("voice_name");
+	dictionary1File = config.value<std::string>("dictionary_1_file");
+	dictionary2File = config.value<std::string>("dictionary_2_file");
+	dictionary3File = config.value<std::string>("dictionary_3_file");
 }
 
 } /* namespace VTMControlModel */

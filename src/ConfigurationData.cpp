@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "KeyValueFileReader.h"
+#include "ConfigurationData.h"
 
 #include <cctype> /* isspace */
 #include <fstream>
@@ -30,14 +30,14 @@ const char COMMENT_CHAR = '#';
 void
 throwException(const std::string& filePath, int lineNumber, const char* message)
 {
-	THROW_EXCEPTION(GS::ParsingException, "[KeyValueFileReader] Error in file " << filePath << " (line " << lineNumber << "): " << message << '.');
+	THROW_EXCEPTION(GS::ParsingException, "[ConfigurationData] Error in file " << filePath << " (line " << lineNumber << "): " << message << '.');
 }
 
 template<typename T>
 void
 throwException(const std::string& filePath, int lineNumber, const char* message, const T& complement)
 {
-	THROW_EXCEPTION(GS::ParsingException, "[KeyValueFileReader] Error in file " << filePath << " (line " << lineNumber << "): " << message << complement << '.');
+	THROW_EXCEPTION(GS::ParsingException, "[ConfigurationData] Error in file " << filePath << " (line " << lineNumber << "): " << message << complement << '.');
 }
 
 } /* namespace */
@@ -46,7 +46,7 @@ throwException(const std::string& filePath, int lineNumber, const char* message,
 
 namespace GS {
 
-KeyValueFileReader::KeyValueFileReader(const std::string& filePath)
+ConfigurationData::ConfigurationData(const std::string& filePath)
 		: filePath_(filePath)
 {
 	typedef Map::iterator MI;
@@ -98,35 +98,35 @@ KeyValueFileReader::KeyValueFileReader(const std::string& filePath)
 
 template<>
 int
-KeyValueFileReader::convertString<int>(const std::string& s)
+ConfigurationData::convertString<int>(const std::string& s)
 {
 	return std::stoi(s);
 }
 
 template<>
 long
-KeyValueFileReader::convertString<long>(const std::string& s)
+ConfigurationData::convertString<long>(const std::string& s)
 {
 	return std::stol(s);
 }
 
 template<>
 float
-KeyValueFileReader::convertString<float>(const std::string& s)
+ConfigurationData::convertString<float>(const std::string& s)
 {
 	return std::stof(s);
 }
 
 template<>
 double
-KeyValueFileReader::convertString<double>(const std::string& s)
+ConfigurationData::convertString<double>(const std::string& s)
 {
 	return std::stod(s);
 }
 
 template<>
 std::string
-KeyValueFileReader::convertString<std::string>(const std::string& s)
+ConfigurationData::convertString<std::string>(const std::string& s)
 {
 	return s;
 }

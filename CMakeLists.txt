@@ -31,12 +31,12 @@ include_directories(
 )
 
 set(LIBRARY_FILES
+    src/ConfigurationData.cpp
+    src/ConfigurationData.h
     src/Dictionary.cpp
     src/Dictionary.h
     src/Exception.h
     src/global.h
-    src/KeyValueFileReader.cpp
-    src/KeyValueFileReader.h
     src/Log.cpp
     src/Log.h
     src/Text.cpp
