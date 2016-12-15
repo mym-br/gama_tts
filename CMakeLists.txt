@@ -108,7 +108,6 @@ set(LIBRARY_FILES
     src/vtm/NoiseSource.h
     src/vtm/RadiationFilter.h
     src/vtm/ReflectionFilter.h
-    src/vtm/SampleRateConverter.cpp
     src/vtm/SampleRateConverter.h
     src/vtm/Throat.h
     src/vtm/VocalTractModel0.h

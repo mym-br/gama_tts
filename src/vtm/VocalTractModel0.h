@@ -262,23 +262,23 @@ private:
 	};
 
 	struct InputFilters {
-		MovingAverageFilter<double> glotPitchFilter;
-		MovingAverageFilter<double> glotVolFilter;
-		MovingAverageFilter<double> aspVolFilter;
-		MovingAverageFilter<double> fricVolFilter;
-		MovingAverageFilter<double> fricPosFilter;
-		MovingAverageFilter<double> fricCFFilter;
-		MovingAverageFilter<double> fricBWFilter;
-		MovingAverageFilter<double> radius0Filter;
-		MovingAverageFilter<double> radius1Filter;
-		MovingAverageFilter<double> radius2Filter;
-		MovingAverageFilter<double> radius3Filter;
-		MovingAverageFilter<double> radius4Filter;
-		MovingAverageFilter<double> radius5Filter;
-		MovingAverageFilter<double> radius6Filter;
-		MovingAverageFilter<double> radius7Filter;
-		MovingAverageFilter<double> velumFilter;
-		InputFilters(double sampleRate, double period)
+		MovingAverageFilter<FloatType> glotPitchFilter;
+		MovingAverageFilter<FloatType> glotVolFilter;
+		MovingAverageFilter<FloatType> aspVolFilter;
+		MovingAverageFilter<FloatType> fricVolFilter;
+		MovingAverageFilter<FloatType> fricPosFilter;
+		MovingAverageFilter<FloatType> fricCFFilter;
+		MovingAverageFilter<FloatType> fricBWFilter;
+		MovingAverageFilter<FloatType> radius0Filter;
+		MovingAverageFilter<FloatType> radius1Filter;
+		MovingAverageFilter<FloatType> radius2Filter;
+		MovingAverageFilter<FloatType> radius3Filter;
+		MovingAverageFilter<FloatType> radius4Filter;
+		MovingAverageFilter<FloatType> radius5Filter;
+		MovingAverageFilter<FloatType> radius6Filter;
+		MovingAverageFilter<FloatType> radius7Filter;
+		MovingAverageFilter<FloatType> velumFilter;
+		InputFilters(FloatType sampleRate, FloatType period)
 			: glotPitchFilter(sampleRate, period)
 			, glotVolFilter(sampleRate, period)
 			, aspVolFilter(sampleRate, period)
@@ -365,7 +365,7 @@ private:
 	InputData singleInput_;
 	std::size_t outputDataPos_;
 	std::vector<float> outputData_;
-	std::unique_ptr<SampleRateConverter> srConv_;
+	std::unique_ptr<SampleRateConverter<FloatType>> srConv_;
 	std::unique_ptr<RadiationFilter<FloatType>>  mouthRadiationFilter_;
 	std::unique_ptr<ReflectionFilter<FloatType>> mouthReflectionFilter_;
 	std::unique_ptr<RadiationFilter<FloatType>>  nasalRadiationFilter_;
@@ -520,7 +520,7 @@ VocalTractModel0<FloatType>::parseInputStream(std::istream& in)
 	unsigned int paramNumber = 0;
 	while (std::getline(in, line)) {
 		std::istringstream lineStream(line);
-		std::unique_ptr<InputData> data(new InputData());
+		auto data = std::make_unique<InputData>();
 
 		/*  GET EACH PARAMETER  */
 		lineStream >>
@@ -547,7 +547,7 @@ VocalTractModel0<FloatType>::parseInputStream(std::istream& in)
 
 	/*  DOUBLE UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  */
 	if (!inputData_.empty()) {
-		std::unique_ptr<InputData> lastData(new InputData());
+		auto lastData = std::make_unique<InputData>();
 		*lastData = *inputData_.back();
 		inputData_.push_back(std::move(lastData));
 	}
@@ -612,7 +612,7 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 	throat_ = std::make_unique<Throat<FloatType>>(sampleRate_, config_.throatCutoff, Util::amplitude60dB(config_.throatVol));
 
 	/*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-	srConv_.reset(new SampleRateConverter(sampleRate_, config_.outputRate, outputData_));
+	srConv_ = std::make_unique<SampleRateConverter<FloatType>>(sampleRate_, config_.outputRate, outputData_);
 
 	/*  INITIALIZE THE OUTPUT VECTOR  */
 	outputData_.clear();
@@ -626,7 +626,7 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::initializeInputFilters(double period)
 {
-	inputFilters_.reset(new InputFilters(sampleRate_, period));
+	inputFilters_ = std::make_unique<InputFilters>(sampleRate_, period);
 }
 
 /******************************************************************************
