@@ -57,7 +57,7 @@ main(int argc, char* argv[])
 		return 1;
 	}
 
-	VTM::VocalTractModel0 vtm;
+	VTM::VocalTractModel0<double> vtm;
 	vtm.synthesizeToFile(inputStream, outputFile);
 
 	LOG_DEBUG("\nWrote scaled samples to file: " << outputFile);

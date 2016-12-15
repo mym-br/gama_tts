@@ -247,7 +247,7 @@ private:
 	std::mt19937 randSrc_;
 	std::uniform_real_distribution<> randDist_;
 
-	double radiusCoef[VTM::VocalTractModel0::TOTAL_REGIONS];
+	double radiusCoef[VTM::VocalTractModel0<double>::TOTAL_REGIONS];
 };
 
 } /* namespace VTMControlModel */

@@ -50,10 +50,10 @@ Configuration::Configuration()
 		, referenceGlottalPitch(0.0)
 		, apertureRadius(0.0)
 {
-	for (int i = 0; i < VocalTractModel0::TOTAL_NASAL_SECTIONS; ++i) {
+	for (int i = 0; i < VocalTractModel0<double>::TOTAL_NASAL_SECTIONS; ++i) {
 		noseRadius[i] = 0.0;
 	}
-	for (int i = 0; i < VocalTractModel0::TOTAL_REGIONS; ++i) {
+	for (int i = 0; i < VocalTractModel0<double>::TOTAL_REGIONS; ++i) {
 		radiusCoef[i] = 0.0;
 	}
 }

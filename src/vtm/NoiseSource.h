@@ -28,15 +28,27 @@ namespace VTM {
 
 class NoiseSource {
 public:
-	NoiseSource();
-	~NoiseSource();
+	NoiseSource()
+		: initialSeed_ {0.7892347}
+		, factor_ {377.0}
+		, seed_ {initialSeed_} {}
+	~NoiseSource() {}
 
-	void reset();
-	double getSample();
+	void reset() {
+		seed_ = initialSeed_;
+	}
+	double getSample() {
+		double product = seed_ * factor_;
+		seed_ = product - static_cast<int>(product);
+		return seed_ - 0.5;
+	}
+
 private:
 	NoiseSource(const NoiseSource&) = delete;
 	NoiseSource& operator=(const NoiseSource&) = delete;
 
+	const double initialSeed_;
+	const double factor_;
 	double seed_;
 };
 

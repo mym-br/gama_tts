@@ -101,30 +101,20 @@ set(LIBRARY_FILES
 
     src/rapidxml/rapidxml.hpp
 
-    src/vtm/BandpassFilter.cpp
     src/vtm/BandpassFilter.h
-    src/vtm/FIRFilter.cpp
     src/vtm/FIRFilter.h
     src/vtm/MovingAverageFilter.h
-    src/vtm/NoiseFilter.cpp
     src/vtm/NoiseFilter.h
-    src/vtm/NoiseSource.cpp
     src/vtm/NoiseSource.h
-    src/vtm/RadiationFilter.cpp
     src/vtm/RadiationFilter.h
-    src/vtm/ReflectionFilter.cpp
     src/vtm/ReflectionFilter.h
     src/vtm/SampleRateConverter.cpp
     src/vtm/SampleRateConverter.h
-    src/vtm/Throat.cpp
     src/vtm/Throat.h
-    src/vtm/VocalTractModel0.cpp
     src/vtm/VocalTractModel0.h
     src/vtm/VTMConfiguration.cpp
     src/vtm/VTMConfiguration.h
-    src/vtm/VTMUtil.cpp
     src/vtm/VTMUtil.h
-    src/vtm/WavetableGlottalSource.cpp
     src/vtm/WavetableGlottalSource.h
 
     src/vtm_control_model/Category.h

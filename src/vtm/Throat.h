@@ -26,22 +26,63 @@
 namespace GS {
 namespace VTM {
 
+template<typename FloatType>
 class Throat {
 public:
-	Throat(double sampleRate, double throatCutoff, double throatGain);
-	~Throat();
+	Throat(FloatType sampleRate, FloatType throatCutoff, FloatType throatGain);
+	~Throat() {}
 
 	void reset();
-	double process(double input);
+	FloatType process(FloatType input);
 private:
 	Throat(const Throat&) = delete;
 	Throat& operator=(const Throat&) = delete;
 
-	double tb1_;
-	double ta0_;
-	double throatGain_;
-	double throatY_;
+	const FloatType ta0_;
+	const FloatType tb1_;
+	const FloatType throatGain_;
+	FloatType throatY_;
 };
+
+
+
+template<typename FloatType>
+Throat<FloatType>::Throat(FloatType sampleRate, FloatType throatCutoff, FloatType throatGain)
+		// Initializes the throat lowpass filter coefficients
+		// according to the throatCutoff value, and also the
+		// throatGain, according to the throatVol value.
+		: ta0_ {(throatCutoff * 2.0) / sampleRate}
+		, tb1_ {1.0 - ta0_}
+		, throatGain_ {throatGain}
+		, throatY_ {}
+{
+}
+
+template<typename FloatType>
+void
+Throat<FloatType>::reset()
+{
+	throatY_ = 0.0;
+}
+
+/******************************************************************************
+*
+*  function:  throat
+*
+*  purpose:   Simulates the radiation of sound through the walls
+*             of the throat. Note that this form of the filter
+*             uses addition instead of subtraction for the
+*             second term, since tb1 has reversed sign.
+*
+******************************************************************************/
+template<typename FloatType>
+FloatType
+Throat<FloatType>::process(FloatType input)
+{
+	const FloatType output = (ta0_ * input) + (tb1_ * throatY_);
+	throatY_ = output;
+	return output * throatGain_;
+}
 
 } /* namespace VTM */
 } /* namespace GS */

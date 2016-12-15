@@ -52,10 +52,10 @@ private:
  */
 template<typename FloatType>
 MovingAverageFilter<FloatType>::MovingAverageFilter(FloatType sampleRate, FloatType period)
-		: buf_(static_cast<std::size_t>(std::round(sampleRate * period)))
-		, pos_(buf_.size())
-		, sum_(0.0)
-		, invN_(1.0 / buf_.size())
+		: buf_ {static_cast<std::size_t>(std::round(sampleRate * period))}
+		, pos_ {buf_.size()}
+		, sum_ {}
+		, invN_ {1.0 / buf_.size()}
 {
 	assert(!buf_.empty());
 }

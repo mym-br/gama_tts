@@ -18,6 +18,7 @@
 #ifndef CONFIGURATION_DATA_H_
 #define CONFIGURATION_DATA_H_
 
+#include <sstream>
 #include <string>
 #include <unordered_map>
 
@@ -30,14 +31,20 @@ namespace GS {
 // Format: "key = value"
 class ConfigurationData {
 public:
+	ConfigurationData() {}
 	ConfigurationData(const std::string& filePath);
 
 	template<typename T> T value(const std::string& key) const;
 	template<typename T> T value(const std::string& key, T minValue, T maxValue) const;
+
+	// If an entry with the same key exists, it is overwritten.
+	template<typename T> void put(const std::string& key, T value);
+	void put(const std::string& key, const char* value);
 private:
 	typedef std::unordered_map<std::string, std::string> Map;
 
 	template<typename T> static T convertString(const std::string& s);
+	template<typename T> static void convertValue(const T& value, std::string& s);
 
 	std::string filePath_;
 	Map valueMap_;
@@ -51,16 +58,28 @@ ConfigurationData::value(const std::string& key) const
 {
 	auto iter = valueMap_.find(key);
 	if (iter == valueMap_.end()) {
-		THROW_EXCEPTION(InvalidParameterException, "Key '" << key << "' not found in file " << filePath_ << '.');
+		if (filePath_.empty()) {
+			THROW_EXCEPTION(InvalidParameterException, "Key '" << key << "' not found.");
+		} else {
+			THROW_EXCEPTION(InvalidParameterException, "Key '" << key << "' not found in file " << filePath_ << '.');
+		}
 	}
 
 	T value;
 	try {
 		value = convertString<T>(iter->second);
 	} catch (const std::invalid_argument& e) {
-		THROW_EXCEPTION(InvalidValueException, "No value conversion could be performed for key '" << key << "' in file " << filePath_ << ": " << e.what() << '.');
+		if (filePath_.empty()) {
+			THROW_EXCEPTION(InvalidValueException, "No value conversion could be performed for key '" << key << "'.");
+		} else {
+			THROW_EXCEPTION(InvalidValueException, "No value conversion could be performed for key '" << key << "' in file " << filePath_ << ": " << e.what() << '.');
+		}
 	} catch (const std::out_of_range& e) {
-		THROW_EXCEPTION(InvalidValueException, "The converted value would fall out of the range for key '" << key << "' in file " << filePath_ << ": " << e.what() << '.');
+		if (filePath_.empty()) {
+			THROW_EXCEPTION(InvalidValueException, "The converted value would fall out of the range for key '" << key << "'.");
+		} else {
+			THROW_EXCEPTION(InvalidValueException, "The converted value would fall out of the range for key '" << key << "' in file " << filePath_ << ": " << e.what() << '.');
+		}
 	}
 	return value;
 }
@@ -78,6 +97,23 @@ ConfigurationData::value(const std::string& key, T minValue, T maxValue) const
 	}
 
 	return v;
+}
+
+template<typename T>
+void
+ConfigurationData::put(const std::string& key, T value)
+{
+	std::string& valueString = valueMap_[key];
+	convertValue(value, valueString);
+}
+
+template<typename T>
+void
+convertValue(const T& value, std::string& s)
+{
+	std::ostringstream out;
+	out << value;
+	s = out.str();
 }
 
 } /* namespace GS */

@@ -65,7 +65,7 @@ EventList::EventList(const char* configDirPath, Model& model)
 	for (int i = 0; i < 10; ++i) {
 		fixedIntonationParameters_[i] = 0.0;
 	}
-	for (int i = 0; i < VTM::VocalTractModel0::TOTAL_REGIONS; ++i) {
+	for (int i = 0; i < VTM::VocalTractModel0<double>::TOTAL_REGIONS; ++i) {
 		radiusCoef[i] = 1.0;
 	}
 }
@@ -155,7 +155,7 @@ EventList::setFixedIntonationParameters(float notionalPitch, float pretonicRange
 void
 EventList::setRadiusCoef(const double* values)
 {
-	for (int i = 0; i < VTM::VocalTractModel0::TOTAL_REGIONS; ++i) {
+	for (int i = 0; i < VTM::VocalTractModel0<double>::TOTAL_REGIONS; ++i) {
 		radiusCoef[i] = values[i];
 	}
 }

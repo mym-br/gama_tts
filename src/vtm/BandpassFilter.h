@@ -21,31 +21,91 @@
 #ifndef VTM_BANDPASS_FILTER_H_
 #define VTM_BANDPASS_FILTER_H_
 
+#include <cmath>
+
 
 
 namespace GS {
 namespace VTM {
 
+template<typename FloatType>
 class BandpassFilter {
 public:
 	BandpassFilter();
-	~BandpassFilter();
+	~BandpassFilter() {}
 
 	void reset();
-	void update(double sampleRate, double bandwidth, double centerFreq);
-	double filter(double input);
+	void update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq);
+	FloatType filter(FloatType input);
 private:
 	BandpassFilter(const BandpassFilter&) = delete;
 	BandpassFilter& operator=(const BandpassFilter&) = delete;
 
-	double bpAlpha_;
-	double bpBeta_;
-	double bpGamma_;
-	double xn1_;
-	double xn2_;
-	double yn1_;
-	double yn2_;
+	FloatType bpAlpha_;
+	FloatType bpBeta_;
+	FloatType bpGamma_;
+	FloatType xn1_;
+	FloatType xn2_;
+	FloatType yn1_;
+	FloatType yn2_;
 };
+
+
+
+template<typename FloatType>
+BandpassFilter<FloatType>::BandpassFilter()
+		: bpAlpha_ {}
+		, bpBeta_ {}
+		, bpGamma_ {}
+		, xn1_ {}
+		, xn2_ {}
+		, yn1_ {}
+		, yn2_ {}
+{
+}
+
+template<typename FloatType>
+void
+BandpassFilter<FloatType>::reset()
+{
+	xn1_ = 0.0;
+	xn2_ = 0.0;
+	yn1_ = 0.0;
+	yn2_ = 0.0;
+}
+
+template<typename FloatType>
+void
+BandpassFilter<FloatType>::update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq)
+{
+	const FloatType tanValue = std::tan((static_cast<FloatType>(M_PI) * bandwidth) / sampleRate);
+	const FloatType cosValue = std::cos((2.0f * static_cast<FloatType>(M_PI) * centerFreq) / sampleRate);
+	bpBeta_ = (1.0f - tanValue) / (2.0f * (1.0f + tanValue));
+	bpGamma_ = (0.5f + bpBeta_) * cosValue;
+	bpAlpha_ = (0.5f - bpBeta_) / 2.0f;
+}
+
+/******************************************************************************
+*
+*  function:  bandpassFilter
+*
+*  purpose:   Frication bandpass filter, with variable center
+*             frequency and bandwidth.
+*
+******************************************************************************/
+template<typename FloatType>
+FloatType
+BandpassFilter<FloatType>::filter(FloatType input)
+{
+	const FloatType output = 2.0f * ((bpAlpha_ * (input - xn2_)) + (bpGamma_ * yn1_) - (bpBeta_ * yn2_));
+
+	xn2_ = xn1_;
+	xn1_ = input;
+	yn2_ = yn1_;
+	yn1_ = output;
+
+	return output;
+}
 
 } /* namespace VTM */
 } /* namespace GS */

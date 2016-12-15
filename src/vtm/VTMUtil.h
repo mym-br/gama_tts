@@ -21,6 +21,10 @@
 #ifndef VTM_UTIL_H_
 #define VTM_UTIL_H_
 
+#include <cmath> /* pow */
+
+
+
 namespace GS {
 namespace VTM {
 namespace Util {
@@ -30,20 +34,55 @@ namespace Util {
 //
 // 0 <= decibelLevel <= 60 dB
 //******************************************************************************
-double amplitude60dB(double decibelLevel);
+template<typename FloatType>
+FloatType
+amplitude60dB(FloatType decibelLevel)
+{
+	/*  RANGE OF ALL VOLUME CONTROLS  */
+	const FloatType volMax60dB = 60.0;
+
+	/*  CONVERT 0-60 RANGE TO -60-0 RANGE  */
+	decibelLevel -= volMax60dB;
+
+	/*  IF -60 OR LESS, RETURN AMPLITUDE OF 0  */
+	if (decibelLevel <= -volMax60dB) {
+		return 0.0;
+	}
+
+	/*  IF 0 OR GREATER, RETURN AMPLITUDE OF 1  */
+	if (decibelLevel >= 0.0) {
+		return 1.0;
+	}
+
+	/*  ELSE RETURN INVERSE LOG VALUE  */
+	return std::pow(static_cast<FloatType>(10.0), decibelLevel / 20.0f);
+}
 
 //******************************************************************************
 // Converts a given pitch to the corresponding frequency.
 //
 // pitch in semitones, 0 = middle C
 //******************************************************************************
-double frequency(double pitch);
+template<typename FloatType>
+FloatType
+frequency(FloatType pitch)
+{
+	const FloatType pitchBase = 220.0;
+	const FloatType pitchOffset = 3.0; /*  MIDDLE C = 0  */
+
+	return pitchBase * std::pow(static_cast<FloatType>(2.0), (pitch + pitchOffset) / 12.0f);
+}
 
 //******************************************************************************
 // Returns the speed of sound according to the value of
 // the temperature (in Celsius degrees).
 //******************************************************************************
-double speedOfSound(double temperature);
+template<typename FloatType>
+FloatType
+speedOfSound(FloatType temperature)
+{
+	return 331.4f + (0.6f * temperature);
+}
 
 } /* namespace Util */
 } /* namespace VTM */

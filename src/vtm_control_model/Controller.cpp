@@ -83,7 +83,7 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, const char* output
 
 	vtmParamStream.seekg(0);
 
-	VTM::VocalTractModel0 vtm;
+	VTM::VocalTractModel0<double> vtm;
 	vtm.synthesizeToFile(vtmParamStream, outputFile);
 }
 
@@ -101,7 +101,7 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, std::vector<float>
 
 	vtmParamStream.seekg(0);
 
-	VTM::VocalTractModel0 vtm;
+	VTM::VocalTractModel0<double> vtm;
 	vtm.synthesizeToBuffer(vtmParamStream, buffer);
 }
 

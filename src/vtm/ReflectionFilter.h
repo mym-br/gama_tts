@@ -21,28 +21,57 @@
 #ifndef VTM_REFLECTION_FILTER_H_
 #define VTM_REFLECTION_FILTER_H_
 
+#include <cmath>
+
 
 
 namespace GS {
 namespace VTM {
 
-// Is a variable, one-pole lowpass filter, whose cutoff
+// This is a variable, one-pole lowpass filter, whose cutoff
 // is determined by the aperture coefficient.
+template<typename FloatType>
 class ReflectionFilter {
 public:
-	ReflectionFilter(double apertureCoeff);
-	~ReflectionFilter();
+	ReflectionFilter(FloatType apertureCoeff);
+	~ReflectionFilter() {}
 
 	void reset();
-	double filter(double input);
+	FloatType filter(FloatType input);
 private:
 	ReflectionFilter(const ReflectionFilter&) = delete;
 	ReflectionFilter& operator=(const ReflectionFilter&) = delete;
 
-	double a10_;
-	double b11_;
-	double reflectionY_;
+	const FloatType a10_;
+	const FloatType b11_;
+	FloatType reflectionY_;
 };
+
+
+
+template<typename FloatType>
+ReflectionFilter<FloatType>::ReflectionFilter(FloatType apertureCoeff)
+		: a10_ {1.0 - std::abs(-apertureCoeff)}
+		, b11_ {-apertureCoeff}
+		, reflectionY_ {}
+{
+}
+
+template<typename FloatType>
+void
+ReflectionFilter<FloatType>::reset()
+{
+	reflectionY_ = 0.0;
+}
+
+template<typename FloatType>
+FloatType
+ReflectionFilter<FloatType>::filter(FloatType input)
+{
+	const FloatType output = (a10_ * input) - (b11_ * reflectionY_);
+	reflectionY_ = output;
+	return output;
+}
 
 } /* namespace VTM */
 } /* namespace GS */

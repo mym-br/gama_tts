@@ -131,4 +131,38 @@ ConfigurationData::convertString<std::string>(const std::string& s)
 	return s;
 }
 
+template<>
+void
+ConfigurationData::convertValue<float>(const float& value, std::string& s)
+{
+	std::ostringstream out;
+	out.precision(9);
+	out << value;
+	s = out.str();
+}
+
+template<>
+void
+ConfigurationData::convertValue<double>(const double& value, std::string& s)
+{
+	std::ostringstream out;
+	out.precision(17);
+	out << value;
+	s = out.str();
+}
+
+template<>
+void
+ConfigurationData::convertValue<std::string>(const std::string& value, std::string& s)
+{
+	s = value;
+}
+
+void
+ConfigurationData::put(const std::string& key, const char* value)
+{
+	std::string& valueString = valueMap_[key];
+	convertValue(std::string(value), valueString);
+}
+
 } /* namespace GS */

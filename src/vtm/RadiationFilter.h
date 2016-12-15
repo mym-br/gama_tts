@@ -26,26 +26,55 @@
 namespace GS {
 namespace VTM {
 
-// Is a variable, one-zero, one-pole, highpass filter,
+// This is a variable, one-zero, one-pole, highpass filter,
 // whose cutoff point is determined by the aperture
 // coefficient.
+template<typename FloatType>
 class RadiationFilter {
 public:
-	RadiationFilter(double apertureCoeff);
-	~RadiationFilter();
+	RadiationFilter(FloatType apertureCoeff);
+	~RadiationFilter() {}
 
 	void reset();
-	double filter(double input);
+	FloatType filter(FloatType input);
 private:
 	RadiationFilter(const RadiationFilter&) = delete;
 	RadiationFilter& operator=(const RadiationFilter&) = delete;
 
-	double a20_;
-	double a21_;
-	double b21_;
-	double radiationX_;
-	double radiationY_;
+	const FloatType a20_;
+	const FloatType a21_;
+	const FloatType b21_;
+	FloatType radiationX_;
+	FloatType radiationY_;
 };
+
+template<typename FloatType>
+RadiationFilter<FloatType>::RadiationFilter(FloatType apertureCoeff)
+		: a20_ {apertureCoeff}
+		, a21_ {-a20_}
+		, b21_ {-a20_}
+		, radiationX_ {}
+		, radiationY_ {}
+{
+}
+
+template<typename FloatType>
+void
+RadiationFilter<FloatType>::reset()
+{
+	radiationX_ = 0.0;
+	radiationY_ = 0.0;
+}
+
+template<typename FloatType>
+FloatType
+RadiationFilter<FloatType>::filter(FloatType input)
+{
+	const FloatType output = (a20_ * input) + (a21_ * radiationX_) - (b21_ * radiationY_);
+	radiationX_ = input;
+	radiationY_ = output;
+	return output;
+}
 
 } /* namespace VTM */
 } /* namespace GS */
