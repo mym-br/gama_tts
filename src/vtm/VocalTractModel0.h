@@ -444,7 +444,7 @@ VocalTractModel0<FloatType>::parseInputStream(std::istream& in)
 		}
 
 		for (int i = 0; i < TOTAL_REGIONS; ++i) {
-			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i], GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS);
+			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS);
 		}
 
 		inputData_.push_back(value);
@@ -966,7 +966,9 @@ VocalTractModel0<FloatType>::loadSingleInput(const VocalTractModelParameterValue
 	case PARAM_R6:
 	case PARAM_R7:
 	case PARAM_R8:
-		singleInput_[pv.index] = std::max(static_cast<FloatType>(pv.value), FloatType{GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS});
+		singleInput_[pv.index] = std::max(
+					pv.value * config_.radiusCoef[pv.index - PARAM_R1],
+					FloatType{GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS});
 		break;
 	default:
 		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << pv.index << '.');
