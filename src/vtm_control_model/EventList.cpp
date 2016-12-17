@@ -1019,15 +1019,11 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 
 		table[0] += static_cast<float>(pitchMean_);
 
-		vtmParamStream << std::fixed << std::setprecision(3);
+		//vtmParamStream << std::fixed << std::setprecision(3);
 		vtmParamStream << table[0];
-		for (int k = 1; k < 7; ++k) {
+		for (int k = 1; k < 16; ++k) {
 			vtmParamStream << ' ' << table[k];
 		}
-		for (int k = 7; k < 15; ++k) { // R1 - R8
-			vtmParamStream << ' ' << table[k];
-		}
-		vtmParamStream << ' ' << table[15];
 		vtmParamStream << '\n';
 
 		for (int j = 0; j < 32; j++) {
