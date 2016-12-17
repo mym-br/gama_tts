@@ -18,10 +18,11 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef VTM_VOCALTRACTMODEL0_H_
-#define VTM_VOCALTRACTMODEL0_H_
+#ifndef VTM_VOCAL_TRACT_MODEL0_H_
+#define VTM_VOCAL_TRACT_MODEL0_H_
 
 #include <algorithm> /* max, min */
+#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -34,6 +35,7 @@
 #include <vector>
 
 #include "BandpassFilter.h"
+#include "ConfigurationData.h"
 #include "Exception.h"
 #include "Log.h"
 #include "MovingAverageFilter.h"
@@ -49,22 +51,16 @@
 #include "WAVEFileWriter.h"
 #include "WavetableGlottalSource.h"
 
-#define GS_VTM_TUBE_MIN_RADIUS (0.001)
-
-#define INPUT_VECTOR_RESERVE 128
-#define OUTPUT_VECTOR_RESERVE 1024
+#define GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS (0.001)
+#define GS_VTM_VOCAL_TRACT_MODEL_0_INPUT_FILTER_PERIOD_SEC (50.0e-3)
 
 /*  SCALING CONSTANT FOR INPUT TO VOCAL TRACT & THROAT (MATCHES DSP)  */
-//#define VT_SCALE                  0.03125     /*  2^(-5)  */
+//#define GS_VTM_VOCAL_TRACT_MODEL_0_VT_SCALE                  0.03125     /*  2^(-5)  */
 // this is a temporary fix only, to try to match dsp synthesizer
-#define VT_SCALE                  0.125     /*  2^(-3)  */
+#define GS_VTM_VOCAL_TRACT_MODEL_0_VT_SCALE                  0.125     /*  2^(-3)  */
 
 /*  FINAL OUTPUT SCALING, SO THAT .SND FILES APPROX. MATCH DSP OUTPUT  */
-#define OUTPUT_SCALE              0.95
-
-/*  BI-DIRECTIONAL TRANSMISSION LINE POINTERS  */
-#define TOP                       0
-#define BOTTOM                    1
+#define GS_VTM_VOCAL_TRACT_MODEL_0_OUTPUT_SCALE              0.95
 
 
 
@@ -110,55 +106,25 @@ public:
 		PARAM_R6         = 12,
 		PARAM_R7         = 13,
 		PARAM_R8         = 14,
-		PARAM_VELUM      = 15
+		PARAM_VELUM      = 15,
+		TOTAL_PARAMETERS = 16
 	};
 	enum Waveform {
 		GLOTTAL_SOURCE_PULSE = 0,
 		GLOTTAL_SOURCE_SINE = 1
 	};
-
-	struct Configuration {
-		float  outputRate;                  /*  output sample rate (22.05, 44.1)  */
-		float  controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
-
-		double volume;                      /*  master volume (0 - 60 dB)  */
-
-		int    waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
-		double tp;                          /*  % glottal pulse rise time  */
-		double tnMin;                       /*  % glottal pulse fall time minimum  */
-		double tnMax;                       /*  % glottal pulse fall time maximum  */
-		double breathiness;                 /*  % glottal source breathiness  */
-
-		double length;                      /*  nominal tube length (10 - 20 cm)  */
-		double temperature;                 /*  tube temperature (25 - 40 C)  */
-		double lossFactor;                  /*  junction loss factor in (0 - 5 %)  */
-
-		double apertureRadius;              /*  aperture scl. radius (3.05 - 12 cm)  */
-		double mouthCoef;                   /*  mouth aperture coefficient  */
-		double noseCoef;                    /*  nose aperture coefficient  */
-
-		// Set noseRadius[N1] to 0.0, because it is not used.
-		double noseRadius[TOTAL_NASAL_SECTIONS]; /*  fixed nose radii (0 - 3 cm)  */
-
-		double throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
-		double throatVol;                   /*  throat volume (0 - 48 dB) */
-
-		int    modulation;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
-		double mixOffset;                   /*  noise crossmix offset (30 - 60 dB)  */
+	enum { /*  BI-DIRECTIONAL TRANSMISSION LINE POINTERS  */
+		TOP    = 0,
+		BOTTOM = 1
 	};
 
-	VocalTractModel0();
+	VocalTractModel0(const ConfigurationData& data, bool interactive = false);
 	~VocalTractModel0() {}
 
 	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
 	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
 
-	void loadConfiguration(const Configuration& config) {
-		config_ = config;
-	}
-
 	void initializeSynthesizer();
-	void initializeInputFilters(double period);
 	void loadSingleInput(const VocalTractModelParameterValue pv);
 	void synthesizeForInputSequence();
 	void synthesizeForSingleInput(int numIterations);
@@ -170,8 +136,8 @@ public:
 		outputData_.clear();
 		outputDataPos_ = 0;
 	}
-	double maximumOutputSampleValue() const { return srConv_->maximumSampleValue(); }
-	float outputRate() const { return config_.outputRate; }
+	FloatType maximumOutputSampleValue() const { return srConv_->maximumSampleValue(); }
+	FloatType outputRate() const { return config_.outputRate; }
 private:
 	enum {
 		VELUM = N1
@@ -227,91 +193,54 @@ private:
 		TOTAL_FRIC_COEFFICIENTS = 8
 	};
 
-	struct InputData {
-		double glotPitch;
-		double glotVol;
-		double aspVol;
-		double fricVol;
-		double fricPos;
-		double fricCF;
-		double fricBW;
-		double radius[TOTAL_REGIONS];
-		double velum;
-	};
-
-	/*  VARIABLES FOR INTERPOLATION  */
-	struct CurrentData {
-		double glotPitch;
-		double glotPitchDelta;
-		double glotVol;
-		double glotVolDelta;
-		double aspVol;
-		double aspVolDelta;
-		double fricVol;
-		double fricVolDelta;
-		double fricPos;
-		double fricPosDelta;
-		double fricCF;
-		double fricCFDelta;
-		double fricBW;
-		double fricBWDelta;
-		double radius[TOTAL_REGIONS];
-		double radiusDelta[TOTAL_REGIONS];
-		double velum;
-		double velumDelta;
+	struct Configuration {
+		FloatType outputRate;                  /*  output sample rate (22.05, 44.1)  */
+		FloatType controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
+		int       waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
+		FloatType tp;                          /*  % glottal pulse rise time  */
+		FloatType tnMin;                       /*  % glottal pulse fall time minimum  */
+		FloatType tnMax;                       /*  % glottal pulse fall time maximum  */
+		FloatType breathiness;                 /*  % glottal source breathiness  */
+		FloatType length;                      /*  nominal tube length (10 - 20 cm)  */
+		FloatType temperature;                 /*  tube temperature (25 - 40 C)  */
+		FloatType lossFactor;                  /*  junction loss factor in (0 - 5 %)  */
+		FloatType apertureRadius;              /*  aperture scl. radius (3.05 - 12 cm)  */
+		FloatType mouthCoef;                   /*  mouth aperture coefficient  */
+		FloatType noseCoef;                    /*  nose aperture coefficient  */
+		// Set noseRadius[N1] to 0.0, because it is not used.
+		std::array<FloatType, TOTAL_NASAL_SECTIONS> noseRadius; /*  fixed nose radii (0 - 3 cm)  */
+		FloatType throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
+		FloatType throatVol;                   /*  throat volume (0 - 48 dB) */
+		int       modulation;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
+		FloatType mixOffset;                   /*  noise crossmix offset (30 - 60 dB)  */
+		std::array<FloatType, TOTAL_REGIONS> radiusCoef;
 	};
 
 	struct InputFilters {
-		MovingAverageFilter<FloatType> glotPitchFilter;
-		MovingAverageFilter<FloatType> glotVolFilter;
-		MovingAverageFilter<FloatType> aspVolFilter;
-		MovingAverageFilter<FloatType> fricVolFilter;
-		MovingAverageFilter<FloatType> fricPosFilter;
-		MovingAverageFilter<FloatType> fricCFFilter;
-		MovingAverageFilter<FloatType> fricBWFilter;
-		MovingAverageFilter<FloatType> radius0Filter;
-		MovingAverageFilter<FloatType> radius1Filter;
-		MovingAverageFilter<FloatType> radius2Filter;
-		MovingAverageFilter<FloatType> radius3Filter;
-		MovingAverageFilter<FloatType> radius4Filter;
-		MovingAverageFilter<FloatType> radius5Filter;
-		MovingAverageFilter<FloatType> radius6Filter;
-		MovingAverageFilter<FloatType> radius7Filter;
-		MovingAverageFilter<FloatType> velumFilter;
+		std::array<MovingAverageFilter<FloatType>, TOTAL_PARAMETERS> filter;
+
 		InputFilters(FloatType sampleRate, FloatType period)
-			: glotPitchFilter(sampleRate, period)
-			, glotVolFilter(sampleRate, period)
-			, aspVolFilter(sampleRate, period)
-			, fricVolFilter(sampleRate, period)
-			, fricPosFilter(sampleRate, period)
-			, fricCFFilter(sampleRate, period)
-			, fricBWFilter(sampleRate, period)
-			, radius0Filter(sampleRate, period)
-			, radius1Filter(sampleRate, period)
-			, radius2Filter(sampleRate, period)
-			, radius3Filter(sampleRate, period)
-			, radius4Filter(sampleRate, period)
-			, radius5Filter(sampleRate, period)
-			, radius6Filter(sampleRate, period)
-			, radius7Filter(sampleRate, period)
-			, velumFilter(sampleRate, period) {}
+			: filter {
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period),
+				MovingAverageFilter<FloatType>(sampleRate, period)} {}
 		void reset() {
-			glotPitchFilter.reset();
-			glotVolFilter.reset();
-			aspVolFilter.reset();
-			fricVolFilter.reset();
-			fricPosFilter.reset();
-			fricCFFilter.reset();
-			fricBWFilter.reset();
-			radius0Filter.reset();
-			radius1Filter.reset();
-			radius2Filter.reset();
-			radius3Filter.reset();
-			radius4Filter.reset();
-			radius5Filter.reset();
-			radius6Filter.reset();
-			radius7Filter.reset();
-			velumFilter.reset();
+			for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
+				filter[i].reset();
+			}
 		}
 	};
 
@@ -325,51 +254,53 @@ private:
 	void sampleRateInterpolation();
 	void setControlRateParameters(int pos);
 	void setFricationTaps();
-	double vocalTract(double input, double frication);
+	FloatType vocalTract(FloatType input, FloatType frication);
 	void writeOutputToFile(const char* outputFile);
 	void writeOutputToBuffer(std::vector<float>& outputBuffer);
 	void synthesize();
 	float calculateOutputScale();
 
-	template<typename T> T readParameterFromInputStream(std::istream& in, std::string& line, const char* paramName);
+	void loadConfiguration(const ConfigurationData& data);
 
+	bool interactive_;
 	Configuration config_;
 
 	/*  DERIVED VALUES  */
-	int    controlPeriod_;
-	int    sampleRate_;
-	double actualTubeLength_;            /*  actual length in cm  */
+	int controlPeriod_;
+	int sampleRate_;
+	FloatType actualTubeLength_;            /*  actual length in cm  */
 
 	/*  MEMORY FOR TUBE AND TUBE COEFFICIENTS  */
-	double oropharynx_[TOTAL_SECTIONS][2][2];
-	double oropharynxCoeff_[TOTAL_COEFFICIENTS];
+	FloatType oropharynx_[TOTAL_SECTIONS][2][2];
+	FloatType oropharynxCoeff_[TOTAL_COEFFICIENTS];
 
-	double nasal_[TOTAL_NASAL_SECTIONS][2][2];
-	double nasalCoeff_[TOTAL_NASAL_COEFFICIENTS];
+	FloatType nasal_[TOTAL_NASAL_SECTIONS][2][2];
+	FloatType nasalCoeff_[TOTAL_NASAL_COEFFICIENTS];
 
-	double alpha_[TOTAL_ALPHA_COEFFICIENTS];
+	FloatType alpha_[TOTAL_ALPHA_COEFFICIENTS];
 	int currentPtr_;
 	int prevPtr_;
 
 	/*  MEMORY FOR FRICATION TAPS  */
-	double fricationTap_[TOTAL_FRIC_COEFFICIENTS];
+	FloatType fricationTap_[TOTAL_FRIC_COEFFICIENTS];
 
-	double dampingFactor_;               /*  calculated damping factor  */
-	double crossmixFactor_;              /*  calculated crossmix factor  */
-	double breathinessFactor_;
+	FloatType dampingFactor_;               /*  calculated damping factor  */
+	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
+	FloatType breathinessFactor_;
 
-	double prevGlotAmplitude_;
+	FloatType prevGlotAmplitude_;
 
-	std::vector<std::unique_ptr<InputData>> inputData_;
-	CurrentData currentData_;
-	InputData singleInput_;
+	std::vector<std::array<FloatType, TOTAL_PARAMETERS>> inputData_;
+	std::array<FloatType, TOTAL_PARAMETERS> currentParameter_;
+	std::array<FloatType, TOTAL_PARAMETERS> currentParameterDelta_;
+	std::array<FloatType, TOTAL_PARAMETERS> singleInput_;
 	std::size_t outputDataPos_;
 	std::vector<float> outputData_;
-	std::unique_ptr<SampleRateConverter<FloatType>> srConv_;
-	std::unique_ptr<RadiationFilter<FloatType>>  mouthRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>> mouthReflectionFilter_;
-	std::unique_ptr<RadiationFilter<FloatType>>  nasalRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>> nasalReflectionFilter_;
+	std::unique_ptr<SampleRateConverter<FloatType>>    srConv_;
+	std::unique_ptr<RadiationFilter<FloatType>>        mouthRadiationFilter_;
+	std::unique_ptr<ReflectionFilter<FloatType>>       mouthReflectionFilter_;
+	std::unique_ptr<RadiationFilter<FloatType>>        nasalRadiationFilter_;
+	std::unique_ptr<ReflectionFilter<FloatType>>       nasalReflectionFilter_;
 	std::unique_ptr<Throat<FloatType>>                 throat_;
 	std::unique_ptr<WavetableGlottalSource<FloatType>> glottalSource_;
 	std::unique_ptr<BandpassFilter<FloatType>>         bandpassFilter_;
@@ -381,69 +312,91 @@ private:
 
 
 template<typename FloatType>
-VocalTractModel0<FloatType>::VocalTractModel0()
+VocalTractModel0<FloatType>::VocalTractModel0(const ConfigurationData& data, bool interactive)
+		: interactive_ {interactive}
 {
+	loadConfiguration(data);
 	reset();
+	inputData_.reserve(128);
+	outputData_.reserve(1024);
+}
 
-	inputData_.reserve(INPUT_VECTOR_RESERVE);
-	outputData_.reserve(OUTPUT_VECTOR_RESERVE);
+template<typename FloatType>
+void
+VocalTractModel0<FloatType>::loadConfiguration(const ConfigurationData& data)
+{
+	config_.outputRate     = data.value<FloatType>("output_rate");
+	config_.controlRate    = data.value<FloatType>("control_rate");
+	config_.waveform       = data.value<int>("waveform");
+	config_.tp             = data.value<FloatType>("glottal_pulse_tp");
+	config_.tnMin          = data.value<FloatType>("glottal_pulse_tn_min");
+	config_.tnMax          = data.value<FloatType>("glottal_pulse_tn_max");
+	config_.breathiness    = data.value<FloatType>("breathiness");
+	config_.length         = data.value<FloatType>("vocal_tract_length_offset") + data.value<FloatType>("vocal_tract_length");
+	config_.temperature    = data.value<FloatType>("temperature");
+	config_.lossFactor     = data.value<FloatType>("loss_factor");
+	config_.mouthCoef      = data.value<FloatType>("mouth_coefficient");
+	config_.noseCoef       = data.value<FloatType>("nose_coefficient");
+	config_.throatCutoff   = data.value<FloatType>("throat_cutoff");
+	config_.throatVol      = data.value<FloatType>("throat_volume");
+	config_.modulation     = data.value<int>("noise_modulation");
+	config_.mixOffset      = data.value<FloatType>("mix_offset");
+	const FloatType globalRadiusCoef     = data.value<FloatType>("global_radius_coef");
+	const FloatType globalNoseRadiusCoef = data.value<FloatType>("global_nose_radius_coef");
+	config_.apertureRadius = data.value<FloatType>("aperture_radius") * globalRadiusCoef;
+	config_.noseRadius[0]  = 0.0;
+	config_.noseRadius[1]  = data.value<FloatType>("nose_radius_1") * globalNoseRadiusCoef;
+	config_.noseRadius[2]  = data.value<FloatType>("nose_radius_2") * globalNoseRadiusCoef;
+	config_.noseRadius[3]  = data.value<FloatType>("nose_radius_3") * globalNoseRadiusCoef;
+	config_.noseRadius[4]  = data.value<FloatType>("nose_radius_4") * globalNoseRadiusCoef;
+	config_.noseRadius[5]  = data.value<FloatType>("nose_radius_5") * globalNoseRadiusCoef;
+	config_.radiusCoef[0]  = data.value<FloatType>("radius_1_coef") * globalRadiusCoef;
+	config_.radiusCoef[1]  = data.value<FloatType>("radius_2_coef") * globalRadiusCoef;
+	config_.radiusCoef[2]  = data.value<FloatType>("radius_3_coef") * globalRadiusCoef;
+	config_.radiusCoef[3]  = data.value<FloatType>("radius_4_coef") * globalRadiusCoef;
+	config_.radiusCoef[4]  = data.value<FloatType>("radius_5_coef") * globalRadiusCoef;
+	config_.radiusCoef[5]  = data.value<FloatType>("radius_6_coef") * globalRadiusCoef;
+	config_.radiusCoef[6]  = data.value<FloatType>("radius_7_coef") * globalRadiusCoef;
+	config_.radiusCoef[7]  = data.value<FloatType>("radius_8_coef") * globalRadiusCoef;
 }
 
 template<typename FloatType>
 void
 VocalTractModel0<FloatType>::reset()
 {
-	config_.outputRate       = 0.0;
-	config_.controlRate      = 0.0;
-	config_.volume           = 0.0;
-	config_.waveform         = 0;
-	config_.tp               = 0.0;
-	config_.tnMin            = 0.0;
-	config_.tnMax            = 0.0;
-	config_.breathiness      = 0.0;
-	config_.length           = 0.0;
-	config_.temperature      = 0.0;
-	config_.lossFactor       = 0.0;
-	config_.apertureRadius   = 0.0;
-	config_.mouthCoef        = 0.0;
-	config_.noseCoef         = 0.0;
-	memset(config_.noseRadius, 0, sizeof(double) * TOTAL_NASAL_SECTIONS);
-	config_.throatCutoff     = 0.0;
-	config_.throatVol        = 0.0;
-	config_.modulation       = 0;
-	config_.mixOffset        = 0.0;
 	controlPeriod_    = 0;
 	sampleRate_       = 0;
 	actualTubeLength_ = 0.0;
-	memset(&oropharynx_[0][0][0], 0, sizeof(double) * TOTAL_SECTIONS * 2 * 2);
-	memset(oropharynxCoeff_,      0, sizeof(double) * TOTAL_COEFFICIENTS);
-	memset(&nasal_[0][0][0],      0, sizeof(double) * TOTAL_NASAL_SECTIONS * 2 * 2);
-	memset(nasalCoeff_,           0, sizeof(double) * TOTAL_NASAL_COEFFICIENTS);
-	memset(alpha_,                0, sizeof(double) * TOTAL_ALPHA_COEFFICIENTS);
+	memset(&oropharynx_[0][0][0], 0, sizeof(FloatType) * TOTAL_SECTIONS * 2 * 2);
+	memset(oropharynxCoeff_,      0, sizeof(FloatType) * TOTAL_COEFFICIENTS);
+	memset(&nasal_[0][0][0],      0, sizeof(FloatType) * TOTAL_NASAL_SECTIONS * 2 * 2);
+	memset(nasalCoeff_,           0, sizeof(FloatType) * TOTAL_NASAL_COEFFICIENTS);
+	memset(alpha_,                0, sizeof(FloatType) * TOTAL_ALPHA_COEFFICIENTS);
 	currentPtr_ = 1;
 	prevPtr_    = 0;
-	memset(fricationTap_, 0, sizeof(double) * TOTAL_FRIC_COEFFICIENTS);
+	memset(fricationTap_, 0, sizeof(FloatType) * TOTAL_FRIC_COEFFICIENTS);
 	dampingFactor_     = 0.0;
 	crossmixFactor_    = 0.0;
 	breathinessFactor_ = 0.0;
 	prevGlotAmplitude_ = -1.0;
 	inputData_.resize(0);
-	memset(&currentData_, 0, sizeof(CurrentData));
-	memset(&singleInput_, 0, sizeof(InputData));
+	currentParameter_.fill(0.0);
+	currentParameterDelta_.fill(0.0);
+	singleInput_.fill(0.0);
 	outputDataPos_ = 0;
 	outputData_.resize(0);
 
-	if (srConv_) srConv_->reset();
-	if (mouthRadiationFilter_) mouthRadiationFilter_->reset();
+	if (srConv_)                srConv_->reset();
+	if (mouthRadiationFilter_)  mouthRadiationFilter_->reset();
 	if (mouthReflectionFilter_) mouthReflectionFilter_->reset();
-	if (nasalRadiationFilter_) nasalRadiationFilter_->reset();
+	if (nasalRadiationFilter_)  nasalRadiationFilter_->reset();
 	if (nasalReflectionFilter_) nasalReflectionFilter_->reset();
-	if (throat_) throat_->reset();
-	if (glottalSource_) glottalSource_->reset();
-	if (bandpassFilter_) bandpassFilter_->reset();
-	if (noiseFilter_) noiseFilter_->reset();
-	if (noiseSource_) noiseSource_->reset();
-	if (inputFilters_) inputFilters_->reset();
+	if (throat_)                throat_->reset();
+	if (glottalSource_)         glottalSource_->reset();
+	if (bandpassFilter_)        bandpassFilter_->reset();
+	if (noiseFilter_)           noiseFilter_->reset();
+	if (noiseSource_)           noiseSource_->reset();
+	if (inputFilters_)          inputFilters_->reset();
 }
 
 template<typename FloatType>
@@ -473,83 +426,34 @@ VocalTractModel0<FloatType>::synthesizeToBuffer(std::istream& inputStream, std::
 }
 
 template<typename FloatType>
-template<typename T>
-T
-VocalTractModel0<FloatType>::readParameterFromInputStream(std::istream& in, std::string& line, const char* paramName)
-{
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(VTMException, "[VTM::VocalTractModel0] Error in input parameter parsing: Could not read " << paramName << '.');
-	}
-	return Text::parseString<T>(line);
-}
-
-template<typename FloatType>
 void
 VocalTractModel0<FloatType>::parseInputStream(std::istream& in)
 {
 	std::string line;
+	std::array<FloatType, TOTAL_PARAMETERS> value;
 
-	config_.outputRate     = readParameterFromInputStream<float>( in, line, "output sample rate");
-	config_.controlRate    = readParameterFromInputStream<float>( in, line, "input control rate");
-	config_.volume         = readParameterFromInputStream<double>(in, line, "master volume");
-	config_.waveform       = readParameterFromInputStream<int>(   in, line, "glottal source waveform type");
-	config_.tp             = readParameterFromInputStream<double>(in, line, "glottal pulse rise time (tp)");
-	config_.tnMin          = readParameterFromInputStream<double>(in, line, "glottal pulse fall time minimum (tnMin)");
-	config_.tnMax          = readParameterFromInputStream<double>(in, line, "glottal pulse fall time maximum (tnMax)");
-	config_.breathiness    = readParameterFromInputStream<double>(in, line, "glottal source breathiness");
-	config_.length         = readParameterFromInputStream<double>(in, line, "nominal tube length");
-	config_.temperature    = readParameterFromInputStream<double>(in, line, "tube temperature");
-	config_.lossFactor     = readParameterFromInputStream<double>(in, line, "junction loss factor");
-	config_.apertureRadius = readParameterFromInputStream<double>(in, line, "aperture scaling radius");
-	config_.mouthCoef      = readParameterFromInputStream<double>(in, line, "mouth aperture coefficient");
-	config_.noseCoef       = readParameterFromInputStream<double>(in, line, "nose aperture coefficient");
-
-	config_.noseRadius[N1] = 0.0;
-	for (int i = N2; i < TOTAL_NASAL_SECTIONS; i++) {
-		std::ostringstream out;
-		out << "nose radius " << i;
-		config_.noseRadius[i] = std::max(readParameterFromInputStream<double>(in, line, out.str().c_str()), GS_VTM_TUBE_MIN_RADIUS);
-	}
-
-	config_.throatCutoff   = readParameterFromInputStream<double>(in, line, "throat lowpass filter cutoff");
-	config_.throatVol      = readParameterFromInputStream<double>(in, line, "throat volume");
-	config_.modulation     = readParameterFromInputStream<int>(   in, line, "pulse modulation of noise flag");
-	config_.mixOffset      = readParameterFromInputStream<double>(in, line, "noise crossmix offset");
-
-	/*  GET THE INPUT TABLE VALUES  */
-	unsigned int paramNumber = 0;
+	unsigned int lineNumber = 1;
 	while (std::getline(in, line)) {
 		std::istringstream lineStream(line);
-		auto data = std::make_unique<InputData>();
 
-		/*  GET EACH PARAMETER  */
-		lineStream >>
-			data->glotPitch >>
-			data->glotVol >>
-			data->aspVol >>
-			data->fricVol >>
-			data->fricPos >>
-			data->fricCF >>
-			data->fricBW;
-		for (int i = 0; i < TOTAL_REGIONS; i++) {
-			double radius;
-			lineStream >> radius;
-			data->radius[i] = std::max(radius, GS_VTM_TUBE_MIN_RADIUS);
+		for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
+			lineStream >> value[i];
 		}
-		lineStream >> data->velum;
 		if (!lineStream) {
-			THROW_EXCEPTION(VTMException, "[VTM::VocalTractModel0] Error in input parameter parsing: Could not read parameters (number " << paramNumber << ").");
+			THROW_EXCEPTION(VTMException, "[VTM::VocalTractModel0] Error in input parameter parsing: Could not read parameters (line number " << lineNumber << ").");
 		}
 
-		inputData_.push_back(std::move(data));
-		++paramNumber;
+		for (int i = 0; i < TOTAL_REGIONS; ++i) {
+			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i], GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS);
+		}
+
+		inputData_.push_back(value);
+		++lineNumber;
 	}
 
 	/*  DOUBLE UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  */
 	if (!inputData_.empty()) {
-		auto lastData = std::make_unique<InputData>();
-		*lastData = *inputData_.back();
-		inputData_.push_back(std::move(lastData));
+		inputData_.push_back(inputData_.back());
 	}
 }
 
@@ -565,27 +469,27 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::initializeSynthesizer()
 {
-	double nyquist;
+	FloatType nyquist;
 
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
 	if (config_.length > 0.0) {
-		double c = Util::speedOfSound(config_.temperature);
-		controlPeriod_ = static_cast<int>(rint((c * TOTAL_SECTIONS * 100.0) / (config_.length * config_.controlRate)));
+		const FloatType c = Util::speedOfSound(config_.temperature);
+		controlPeriod_ = static_cast<int>(std::rint((c * TOTAL_SECTIONS * 100.0f) / (config_.length * config_.controlRate)));
 		sampleRate_ = static_cast<int>(config_.controlRate * controlPeriod_);
-		actualTubeLength_ = (c * TOTAL_SECTIONS * 100.0) / sampleRate_;
-		nyquist = sampleRate_ / 2.0;
+		actualTubeLength_ = (c * TOTAL_SECTIONS * 100.0f) / sampleRate_;
+		nyquist = sampleRate_ / 2.0f;
 	} else {
 		THROW_EXCEPTION(VTMException, "Illegal tube length.\n");
 	}
 
 	/*  CALCULATE THE BREATHINESS FACTOR  */
-	breathinessFactor_ = config_.breathiness / 100.0;
+	breathinessFactor_ = config_.breathiness / 100.0f;
 
 	/*  CALCULATE CROSSMIX FACTOR  */
-	crossmixFactor_ = 1.0 / Util::amplitude60dB(config_.mixOffset);
+	crossmixFactor_ = 1.0f / Util::amplitude60dB(config_.mixOffset);
 
 	/*  CALCULATE THE DAMPING FACTOR  */
-	dampingFactor_ = (1.0 - (config_.lossFactor / 100.0));
+	dampingFactor_ = 1.0f - (config_.lossFactor / 100.0f);
 
 	/*  INITIALIZE THE WAVE TABLE  */
 	glottalSource_ = std::make_unique<WavetableGlottalSource<FloatType>>(
@@ -596,12 +500,12 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 						config_.tp, config_.tnMin, config_.tnMax);
 
 	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR MOUTH  */
-	double mouthApertureCoeff = (nyquist - config_.mouthCoef) / nyquist;
+	FloatType mouthApertureCoeff = (nyquist - config_.mouthCoef) / nyquist;
 	mouthRadiationFilter_  = std::make_unique<RadiationFilter<FloatType>>(mouthApertureCoeff);
 	mouthReflectionFilter_ = std::make_unique<ReflectionFilter<FloatType>>(mouthApertureCoeff);
 
 	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR NOSE  */
-	double nasalApertureCoeff = (nyquist - config_.noseCoef) / nyquist;
+	FloatType nasalApertureCoeff = (nyquist - config_.noseCoef) / nyquist;
 	nasalRadiationFilter_  = std::make_unique<RadiationFilter<FloatType>>(nasalApertureCoeff);
 	nasalReflectionFilter_ = std::make_unique<ReflectionFilter<FloatType>>(nasalApertureCoeff);
 
@@ -618,15 +522,12 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 	outputData_.clear();
 
 	bandpassFilter_ = std::make_unique<BandpassFilter<FloatType>>();
-	noiseFilter_ = std::make_unique<NoiseFilter<FloatType>>();
-	noiseSource_ = std::make_unique<NoiseSource>();
-}
+	noiseFilter_    = std::make_unique<NoiseFilter<FloatType>>();
+	noiseSource_    = std::make_unique<NoiseSource>();
 
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::initializeInputFilters(double period)
-{
-	inputFilters_ = std::make_unique<InputFilters>(sampleRate_, period);
+	if (interactive_) {
+		inputFilters_ = std::make_unique<InputFilters>(sampleRate_, GS_VTM_VOCAL_TRACT_MODEL_0_INPUT_FILTER_PERIOD_SEC);
+	}
 }
 
 /******************************************************************************
@@ -664,23 +565,9 @@ VocalTractModel0<FloatType>::synthesizeForSingleInput(int numIterations)
 	}
 
 	for (int i = 0; i < numIterations; ++i) {
-
-		currentData_.glotPitch = inputFilters_->glotPitchFilter.filter(singleInput_.glotPitch);
-		currentData_.glotVol   = inputFilters_->glotVolFilter.filter(  singleInput_.glotVol);
-		currentData_.aspVol    = inputFilters_->aspVolFilter.filter(   singleInput_.aspVol);
-		currentData_.fricVol   = inputFilters_->fricVolFilter.filter(  singleInput_.fricVol);
-		currentData_.fricPos   = inputFilters_->fricPosFilter.filter(  singleInput_.fricPos);
-		currentData_.fricCF    = inputFilters_->fricCFFilter.filter(   singleInput_.fricCF);
-		currentData_.fricBW    = inputFilters_->fricBWFilter.filter(   singleInput_.fricBW);
-		currentData_.radius[0] = inputFilters_->radius0Filter.filter(  singleInput_.radius[0]);
-		currentData_.radius[1] = inputFilters_->radius1Filter.filter(  singleInput_.radius[1]);
-		currentData_.radius[2] = inputFilters_->radius2Filter.filter(  singleInput_.radius[2]);
-		currentData_.radius[3] = inputFilters_->radius3Filter.filter(  singleInput_.radius[3]);
-		currentData_.radius[4] = inputFilters_->radius4Filter.filter(  singleInput_.radius[4]);
-		currentData_.radius[5] = inputFilters_->radius5Filter.filter(  singleInput_.radius[5]);
-		currentData_.radius[6] = inputFilters_->radius6Filter.filter(  singleInput_.radius[6]);
-		currentData_.radius[7] = inputFilters_->radius7Filter.filter(  singleInput_.radius[7]);
-		currentData_.velum     = inputFilters_->velumFilter.filter(    singleInput_.velum);
+		for (int j = 0; j < TOTAL_PARAMETERS; ++j) {
+			currentParameter_[j] = inputFilters_.filter[j].filter(singleInput_[j]);
+		}
 
 		synthesize();
 	}
@@ -691,16 +578,16 @@ void
 VocalTractModel0<FloatType>::synthesize()
 {
 	/*  CONVERT PARAMETERS HERE  */
-	double f0 = Util::frequency(currentData_.glotPitch);
-	double ax = Util::amplitude60dB(currentData_.glotVol);
-	double ah1 = Util::amplitude60dB(currentData_.aspVol);
+	FloatType f0 = Util::frequency(currentParameter_[PARAM_GLOT_PITCH]);
+	FloatType ax = Util::amplitude60dB(currentParameter_[PARAM_GLOT_VOL]);
+	FloatType ah1 = Util::amplitude60dB(currentParameter_[PARAM_ASP_VOL]);
 	calculateTubeCoefficients();
 	setFricationTaps();
-	bandpassFilter_->update(sampleRate_, currentData_.fricBW, currentData_.fricCF);
+	bandpassFilter_->update(sampleRate_, currentParameter_[PARAM_FRIC_BW], currentParameter_[PARAM_FRIC_CF]);
 
 	/*  DO SYNTHESIS HERE  */
 	/*  CREATE LOW-PASS FILTERED NOISE  */
-	double lpNoise = noiseFilter_->filter(noiseSource_->getSample());
+	FloatType lpNoise = noiseFilter_->filter(noiseSource_->getSample());
 
 	/*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
 	if (config_.waveform == GLOTTAL_SOURCE_PULSE) {
@@ -710,32 +597,32 @@ VocalTractModel0<FloatType>::synthesize()
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
-	double pulse = glottalSource_->getSample(f0);
+	FloatType pulse = glottalSource_->getSample(f0);
 
 	/*  CREATE PULSED NOISE  */
-	double pulsedNoise = lpNoise * pulse;
+	FloatType pulsedNoise = lpNoise * pulse;
 
 	/*  CREATE NOISY GLOTTAL PULSE  */
-	pulse = ax * ((pulse * (1.0 - breathinessFactor_)) +
+	pulse = ax * ((pulse * (1.0f - breathinessFactor_)) +
 			(pulsedNoise * breathinessFactor_));
 
-	double signal;
+	FloatType signal;
 	/*  CROSS-MIX PURE NOISE WITH PULSED NOISE  */
 	if (config_.modulation) {
-		double crossmix = ax * crossmixFactor_;
-		crossmix = (crossmix < 1.0) ? crossmix : 1.0;
+		FloatType crossmix = ax * crossmixFactor_;
+		crossmix = (crossmix < 1.0f) ? crossmix : 1.0f;
 		signal = (pulsedNoise * crossmix) +
-				(lpNoise * (1.0 - crossmix));
+				(lpNoise * (1.0f - crossmix));
 	} else {
 		signal = lpNoise;
 	}
 
 	/*  PUT SIGNAL THROUGH VOCAL TRACT  */
-	signal = vocalTract(((pulse + (ah1 * signal)) * VT_SCALE),
+	signal = vocalTract(((pulse + (ah1 * signal)) * FloatType{GS_VTM_VOCAL_TRACT_MODEL_0_VT_SCALE}),
 				bandpassFilter_->filter(signal));
 
 	/*  PUT PULSE THROUGH THROAT  */
-	signal += throat_->process(pulse * VT_SCALE);
+	signal += throat_->process(pulse * FloatType{GS_VTM_VOCAL_TRACT_MODEL_0_VT_SCALE});
 
 	/*  OUTPUT SAMPLE HERE  */
 	srConv_->dataFill(signal);
@@ -755,36 +642,12 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::setControlRateParameters(int pos)
 {
-	double controlFreq = 1.0 / controlPeriod_;
+	const FloatType controlFreq = 1.0 / controlPeriod_;
 
-	currentData_.glotPitch = inputData_[pos - 1]->glotPitch;
-	currentData_.glotPitchDelta = (inputData_[pos]->glotPitch - currentData_.glotPitch) * controlFreq;
-
-	currentData_.glotVol = inputData_[pos - 1]->glotVol;
-	currentData_.glotVolDelta = (inputData_[pos]->glotVol - currentData_.glotVol) * controlFreq;
-
-	currentData_.aspVol = inputData_[pos - 1]->aspVol;
-	currentData_.aspVolDelta = (inputData_[pos]->aspVol - currentData_.aspVol) * controlFreq;
-
-	currentData_.fricVol = inputData_[pos - 1]->fricVol;
-	currentData_.fricVolDelta = (inputData_[pos]->fricVol - currentData_.fricVol) * controlFreq;
-
-	currentData_.fricPos = inputData_[pos - 1]->fricPos;
-	currentData_.fricPosDelta = (inputData_[pos]->fricPos - currentData_.fricPos) * controlFreq;
-
-	currentData_.fricCF = inputData_[pos - 1]->fricCF;
-	currentData_.fricCFDelta = (inputData_[pos]->fricCF - currentData_.fricCF) * controlFreq;
-
-	currentData_.fricBW = inputData_[pos - 1]->fricBW;
-	currentData_.fricBWDelta = (inputData_[pos]->fricBW - currentData_.fricBW) * controlFreq;
-
-	for (int i = 0; i < TOTAL_REGIONS; i++) {
-		currentData_.radius[i] = inputData_[pos - 1]->radius[i];
-		currentData_.radiusDelta[i] = (inputData_[pos]->radius[i] - currentData_.radius[i]) * controlFreq;
+	for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
+		currentParameter_[i] = inputData_[pos - 1][i];
+		currentParameterDelta_[i] = (inputData_[pos][i] - currentParameter_[i]) * controlFreq;
 	}
-
-	currentData_.velum = inputData_[pos - 1]->velum;
-	currentData_.velumDelta = (inputData_[pos]->velum - currentData_.velum) * controlFreq;
 }
 
 /******************************************************************************
@@ -798,17 +661,9 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::sampleRateInterpolation()
 {
-	currentData_.glotPitch += currentData_.glotPitchDelta;
-	currentData_.glotVol   += currentData_.glotVolDelta;
-	currentData_.aspVol    += currentData_.aspVolDelta;
-	currentData_.fricVol   += currentData_.fricVolDelta;
-	currentData_.fricPos   += currentData_.fricPosDelta;
-	currentData_.fricCF    += currentData_.fricCFDelta;
-	currentData_.fricBW    += currentData_.fricBWDelta;
-	for (int i = 0; i < TOTAL_REGIONS; i++) {
-		currentData_.radius[i] += currentData_.radiusDelta[i];
+	for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
+		currentParameter_[i] += currentParameterDelta_[i];
 	}
-	currentData_.velum     += currentData_.velumDelta;
 }
 
 /******************************************************************************
@@ -823,18 +678,16 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::initializeNasalCavity()
 {
-	double radA2, radB2;
-
 	/*  CALCULATE COEFFICIENTS FOR INTERNAL FIXED SECTIONS OF NASAL CAVITY  */
 	for (int i = N2, j = NC2; i < N6; i++, j++) {
-		radA2 = config_.noseRadius[i]     * config_.noseRadius[i];
-		radB2 = config_.noseRadius[i + 1] * config_.noseRadius[i + 1];
+		const FloatType radA2 = config_.noseRadius[i]     * config_.noseRadius[i];
+		const FloatType radB2 = config_.noseRadius[i + 1] * config_.noseRadius[i + 1];
 		nasalCoeff_[j] = (radA2 - radB2) / (radA2 + radB2);
 	}
 
 	/*  CALCULATE THE FIXED COEFFICIENT FOR THE NOSE APERTURE  */
-	radA2 = config_.noseRadius[N6] * config_.noseRadius[N6];
-	radB2 = config_.apertureRadius * config_.apertureRadius;
+	const FloatType radA2 = config_.noseRadius[N6] * config_.noseRadius[N6];
+	const FloatType radB2 = config_.apertureRadius * config_.apertureRadius;
 	nasalCoeff_[NC6] = (radA2 - radB2) / (radA2 + radB2);
 }
 
@@ -853,31 +706,30 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::calculateTubeCoefficients()
 {
-	double radA2, radB2, r0_2, r1_2, r2_2, sum;
-
 	/*  CALCULATE COEFFICIENTS FOR THE OROPHARYNX  */
 	for (int i = 0; i < (TOTAL_REGIONS - 1); i++) {
-		radA2 = currentData_.radius[i]     * currentData_.radius[i];
-		radB2 = currentData_.radius[i + 1] * currentData_.radius[i + 1];
+		const FloatType radA2 = currentParameter_[PARAM_R1 + i]     * currentParameter_[PARAM_R1 + i];
+		const FloatType radB2 = currentParameter_[PARAM_R1 + i + 1] * currentParameter_[PARAM_R1 + i + 1];
 		oropharynxCoeff_[i] = (radA2 - radB2) / (radA2 + radB2);
 	}
 
 	/*  CALCULATE THE COEFFICIENT FOR THE MOUTH APERTURE  */
-	radA2 = currentData_.radius[R8] * currentData_.radius[R8];
-	radB2 = config_.apertureRadius * config_.apertureRadius;
+	FloatType radA2 = currentParameter_[PARAM_R8] * currentParameter_[PARAM_R8];
+	FloatType radB2 = config_.apertureRadius * config_.apertureRadius;
 	oropharynxCoeff_[C8] = (radA2 - radB2) / (radA2 + radB2);
 
 	/*  CALCULATE ALPHA COEFFICIENTS FOR 3-WAY JUNCTION  */
 	/*  NOTE:  SINCE JUNCTION IS IN MIDDLE OF REGION 4, r0_2 = r1_2  */
-	r0_2 = r1_2 = currentData_.radius[R4] * currentData_.radius[R4];
-	r2_2 = currentData_.velum * currentData_.velum;
-	sum = 2.0 / (r0_2 + r1_2 + r2_2);
+	const FloatType r1_2 = currentParameter_[PARAM_R4] * currentParameter_[PARAM_R4];
+	const FloatType r0_2 = r1_2;
+	const FloatType r2_2 = currentParameter_[PARAM_VELUM] * currentParameter_[PARAM_VELUM];
+	const FloatType sum = 2.0f / (r0_2 + r1_2 + r2_2);
 	alpha_[LEFT]  = sum * r0_2;
 	alpha_[RIGHT] = sum * r1_2;
 	alpha_[UPPER] = sum * r2_2;
 
 	/*  AND 1ST NASAL PASSAGE COEFFICIENT  */
-	radA2 = currentData_.velum * currentData_.velum;
+	radA2 = r2_2;
 	radB2 = config_.noseRadius[N2] * config_.noseRadius[N2];
 	nasalCoeff_[NC1] = (radA2 - radB2) / (radA2 + radB2);
 }
@@ -894,14 +746,12 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::setFricationTaps()
 {
-	int integerPart;
-	double complement, remainder;
-	double fricationAmplitude = Util::amplitude60dB(currentData_.fricVol);
+	const FloatType fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]);
 
 	/*  CALCULATE POSITION REMAINDER AND COMPLEMENT  */
-	integerPart = (int) currentData_.fricPos;
-	complement = currentData_.fricPos - (double) integerPart;
-	remainder = 1.0 - complement;
+	const int integerPart = static_cast<int>(currentParameter_[PARAM_FRIC_POS]);
+	const FloatType complement = currentParameter_[PARAM_FRIC_POS] - integerPart;
+	const FloatType remainder = 1.0f - complement;
 
 	/*  SET THE FRICATION TAPS  */
 	for (int i = FC1; i < TOTAL_FRIC_COEFFICIENTS; i++) {
@@ -934,11 +784,9 @@ VocalTractModel0<FloatType>::setFricationTaps()
 *
 ******************************************************************************/
 template<typename FloatType>
-double
-VocalTractModel0<FloatType>::vocalTract(double input, double frication)
+FloatType VocalTractModel0<FloatType>::vocalTract(FloatType input, FloatType frication)
 {
-	int i, j, k;
-	double delta, output, junctionPressure;
+	FloatType delta;
 
 	/*  INCREMENT CURRENT AND PREVIOUS POINTERS  */
 	if (++currentPtr_ > 1) {
@@ -962,7 +810,7 @@ VocalTractModel0<FloatType>::vocalTract(double input, double frication)
 			(oropharynx_[S2][BOTTOM][prevPtr_] + delta) * dampingFactor_;
 
 	/*  CALCULATE THE SCATTERING JUNCTIONS FOR S2-S3 AND S3-S4  */
-	for (i = S2, j = C2, k = FC1; i < S4; i++, j++, k++) {
+	for (int i = S2, j = C2, k = FC1; i < S4; i++, j++, k++) {
 		delta = oropharynxCoeff_[j] *
 				(oropharynx_[i][TOP][prevPtr_] - oropharynx_[i + 1][BOTTOM][prevPtr_]);
 		oropharynx_[i + 1][TOP][currentPtr_] =
@@ -973,7 +821,7 @@ VocalTractModel0<FloatType>::vocalTract(double input, double frication)
 	}
 
 	/*  UPDATE 3-WAY JUNCTION BETWEEN THE MIDDLE OF R4 AND NASAL CAVITY  */
-	junctionPressure = (alpha_[LEFT] * oropharynx_[S4][TOP][prevPtr_])+
+	const FloatType junctionPressure = (alpha_[LEFT] * oropharynx_[S4][TOP][prevPtr_])+
 			(alpha_[RIGHT] * oropharynx_[S5][BOTTOM][prevPtr_]) +
 			(alpha_[UPPER] * nasal_[VELUM][BOTTOM][prevPtr_]);
 	oropharynx_[S4][BOTTOM][currentPtr_] =
@@ -1001,7 +849,7 @@ VocalTractModel0<FloatType>::vocalTract(double input, double frication)
 			oropharynx_[S7][BOTTOM][prevPtr_] * dampingFactor_;
 
 	/*  CALCULATE LAST 3 INTERNAL JUNCTIONS (S7-S8, S8-S9, S9-S10)  */
-	for (i = S7, j = C5, k = FC6; i < S10; i++, j++, k++) {
+	for (int i = S7, j = C5, k = FC6; i < S10; i++, j++, k++) {
 		delta = oropharynxCoeff_[j] *
 				(oropharynx_[i][TOP][prevPtr_] - oropharynx_[i + 1][BOTTOM][prevPtr_]);
 		oropharynx_[i + 1][TOP][currentPtr_] =
@@ -1017,11 +865,11 @@ VocalTractModel0<FloatType>::vocalTract(double input, double frication)
 							oropharynx_[S10][TOP][prevPtr_]);
 
 	/*  OUTPUT FROM MOUTH GOES THROUGH A HIGHPASS FILTER  */
-	output = mouthRadiationFilter_->filter((1.0 + oropharynxCoeff_[C8]) *
+	FloatType output = mouthRadiationFilter_->filter((1.0f + oropharynxCoeff_[C8]) *
 						oropharynx_[S10][TOP][prevPtr_]);
 
 	/*  UPDATE NASAL CAVITY  */
-	for (i = VELUM, j = NC1; i < N6; i++, j++) {
+	for (int i = VELUM, j = NC1; i < N6; i++, j++) {
 		delta = nasalCoeff_[j] *
 				(nasal_[i][TOP][prevPtr_] - nasal_[i + 1][BOTTOM][prevPtr_]);
 		nasal_[i+1][TOP][currentPtr_] =
@@ -1035,7 +883,7 @@ VocalTractModel0<FloatType>::vocalTract(double input, double frication)
 			nasalReflectionFilter_->filter(nasalCoeff_[NC6] * nasal_[N6][TOP][prevPtr_]);
 
 	/*  OUTPUT FROM NOSE GOES THROUGH A HIGHPASS FILTER  */
-	output += nasalRadiationFilter_->filter((1.0 + nasalCoeff_[NC6]) *
+	output += nasalRadiationFilter_->filter((1.0f + nasalCoeff_[NC6]) *
 						nasal_[N6][TOP][prevPtr_]);
 	/*  RETURN SUMMED OUTPUT FROM MOUTH AND NOSE  */
 	return output;
@@ -1062,7 +910,7 @@ VocalTractModel0<FloatType>::writeOutputToFile(const char* outputFile)
 
 	WAVEFileWriter fileWriter(outputFile, 1, srConv_->numberSamples(), config_.outputRate);
 
-	float scale = calculateOutputScale();
+	const float scale = calculateOutputScale();
 	for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
 		fileWriter.writeSample(outputData_[i] * scale);
 	}
@@ -1080,7 +928,7 @@ VocalTractModel0<FloatType>::writeOutputToBuffer(std::vector<float>& outputBuffe
 
 	outputBuffer.resize(srConv_->numberSamples());
 
-	float scale = calculateOutputScale();
+	const float scale = calculateOutputScale();
 	for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
 		outputBuffer[i] = outputData_[i] * scale;
 	}
@@ -1090,7 +938,7 @@ template<typename FloatType>
 float
 VocalTractModel0<FloatType>::calculateOutputScale()
 {
-	float scale = static_cast<float>((OUTPUT_SCALE / srConv_->maximumSampleValue()) * Util::amplitude60dB(config_.volume));
+	const float scale = GS_VTM_VOCAL_TRACT_MODEL_0_OUTPUT_SCALE / srConv_->maximumSampleValue();
 	LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
 }
@@ -1101,52 +949,24 @@ VocalTractModel0<FloatType>::loadSingleInput(const VocalTractModelParameterValue
 {
 	switch (pv.index) {
 	case PARAM_GLOT_PITCH:
-		singleInput_.glotPitch = pv.value;
-		break;
 	case PARAM_GLOT_VOL:
-		singleInput_.glotVol   = pv.value;
-		break;
 	case PARAM_ASP_VOL:
-		singleInput_.aspVol    = pv.value;
-		break;
 	case PARAM_FRIC_VOL:
-		singleInput_.fricVol   = pv.value;
-		break;
 	case PARAM_FRIC_POS:
-		singleInput_.fricPos   = pv.value;
-		break;
 	case PARAM_FRIC_CF:
-		singleInput_.fricCF    = pv.value;
-		break;
 	case PARAM_FRIC_BW:
-		singleInput_.fricBW    = pv.value;
+	case PARAM_VELUM:
+		singleInput_[pv.index] = pv.value;
 		break;
 	case PARAM_R1:
-		singleInput_.radius[0] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
 	case PARAM_R2:
-		singleInput_.radius[1] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
 	case PARAM_R3:
-		singleInput_.radius[2] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
 	case PARAM_R4:
-		singleInput_.radius[3] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
 	case PARAM_R5:
-		singleInput_.radius[4] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
 	case PARAM_R6:
-		singleInput_.radius[5] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
 	case PARAM_R7:
-		singleInput_.radius[6] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
 	case PARAM_R8:
-		singleInput_.radius[7] = std::max(pv.value, GS_VTM_TUBE_MIN_RADIUS);
-		break;
-	case PARAM_VELUM:
-		singleInput_.velum     = pv.value;
+		singleInput_[pv.index] = std::max(static_cast<FloatType>(pv.value), FloatType{GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS});
 		break;
 	default:
 		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << pv.index << '.');
@@ -1156,4 +976,4 @@ VocalTractModel0<FloatType>::loadSingleInput(const VocalTractModelParameterValue
 } /* namespace VTM */
 } /* namespace GS */
 
-#endif /* VTM_VOCALTRACTMODEL0_H_ */
+#endif /* VTM_VOCAL_TRACT_MODEL0_H_ */

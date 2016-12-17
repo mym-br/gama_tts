@@ -40,7 +40,7 @@ public:
 	void dataEmpty();
 	void flushBuffer();
 
-	double maximumSampleValue() const { return maximumSampleValue_; }
+	FloatType maximumSampleValue() const { return maximumSampleValue_; }
 	long numberSamples() const { return numberSamples_; }
 private:
 	enum {

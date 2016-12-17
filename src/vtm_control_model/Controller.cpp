@@ -63,7 +63,8 @@ Controller::loadConfiguration(const char* configDirPath)
 	std::ostringstream voiceFilePath;
 	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << vtmControlModelConfig_.voiceName << ".config";
 
-	vtmConfig_.load(vtmConfigFilePath.str(), voiceFilePath.str());
+	vtmConfigData_ = std::make_unique<ConfigurationData>(voiceFilePath.str());
+	vtmConfigData_->insert(ConfigurationData(vtmConfigFilePath.str()));
 }
 
 /*******************************************************************************
@@ -77,13 +78,13 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, const char* output
 		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
 	}
 
-	initUtterance(vtmParamStream);
+	initUtterance();
 
 	eventList_.generateOutput(vtmParamStream);
 
 	vtmParamStream.seekg(0);
 
-	VTM::VocalTractModel0<double> vtm;
+	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
 	vtm.synthesizeToFile(vtmParamStream, outputFile);
 }
 
@@ -95,64 +96,44 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, std::vector<float>
 		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
 	}
 
-	initUtterance(vtmParamStream);
+	initUtterance();
 
 	eventList_.generateOutput(vtmParamStream);
 
 	vtmParamStream.seekg(0);
 
-	VTM::VocalTractModel0<double> vtm;
+	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
 	vtm.synthesizeToBuffer(vtmParamStream, buffer);
 }
 
 void
-Controller::initUtterance(std::ostream& vtmParamStream)
+Controller::initUtterance()
 {
-	if ((vtmConfig_.outputRate != 22050.0) && (vtmConfig_.outputRate != 44100.0)) {
-		vtmConfig_.outputRate = 44100.0;
+	int outputRate = vtmConfigData_->value<int>("output_rate");
+	const float vtlOffset = vtmConfigData_->value<float>("vocal_tract_length_offset");
+	const float vocalTractLength = vtmConfigData_->value<float>("vocal_tract_length");
+
+	if ((outputRate != 22050) && (outputRate != 44100)) {
+		vtmConfigData_->put("output_rate", 44100);
+		outputRate = 44100;
 	}
-	if ((vtmConfig_.vtlOffset + vtmConfig_.vocalTractLength) < 15.9) {
-		vtmConfig_.outputRate = 44100.0;
+	if ((vtlOffset + vocalTractLength) < 15.9f) {
+		vtmConfigData_->put("output_rate", 44100);
+		outputRate = 44100;
 	}
 
 	if (Log::debugEnabled) {
-		printf("Tube Length = %f\n", vtmConfig_.vtlOffset + vtmConfig_.vocalTractLength);
-		printf("Voice: %s L: %f  tp: %f  tnMin: %f  tnMax: %f  glotPitch: %f\n", vtmControlModelConfig_.voiceName.c_str(),
-			vtmConfig_.vocalTractLength, vtmConfig_.glottalPulseTp, vtmConfig_.glottalPulseTnMin,
-			vtmConfig_.glottalPulseTnMax, vtmConfig_.referenceGlottalPitch);
-		printf("sampling Rate: %f\n", vtmConfig_.outputRate);
+		printf("Tube Length = %f\n", vtlOffset + vocalTractLength);
+		printf("Voice: %s\n", vtmControlModelConfig_.voiceName.c_str());
+		printf("sampling Rate: %d\n", outputRate);
 	}
 
-	eventList_.setPitchMean(vtmControlModelConfig_.pitchOffset + vtmConfig_.referenceGlottalPitch);
+	const float referenceGlottalPitch = vtmConfigData_->value<float>("reference_glottal_pitch");
+
+	eventList_.setPitchMean(vtmControlModelConfig_.pitchOffset + referenceGlottalPitch);
 	eventList_.setGlobalTempo(vtmControlModelConfig_.tempo);
 	setIntonation(vtmControlModelConfig_.intonation);
 	eventList_.setUpDriftGenerator(vtmControlModelConfig_.driftDeviation, vtmControlModelConfig_.controlRate, vtmControlModelConfig_.driftLowpassCutoff);
-	eventList_.setRadiusCoef(vtmConfig_.radiusCoef);
-
-	vtmParamStream <<
-		vtmConfig_.outputRate              << '\n' <<
-		vtmControlModelConfig_.controlRate << '\n' <<
-		vtmConfig_.volume                  << '\n' <<
-		vtmConfig_.waveform                << '\n' <<
-		vtmConfig_.glottalPulseTp          << '\n' <<
-		vtmConfig_.glottalPulseTnMin       << '\n' <<
-		vtmConfig_.glottalPulseTnMax       << '\n' <<
-		vtmConfig_.breathiness             << '\n' <<
-		vtmConfig_.vtlOffset + vtmConfig_.vocalTractLength << '\n' << // tube length
-		vtmConfig_.temperature             << '\n' <<
-		vtmConfig_.lossFactor              << '\n' <<
-		vtmConfig_.apertureRadius          << '\n' <<
-		vtmConfig_.mouthCoef               << '\n' <<
-		vtmConfig_.noseCoef                << '\n' <<
-		vtmConfig_.noseRadius[1]           << '\n' <<
-		vtmConfig_.noseRadius[2]           << '\n' <<
-		vtmConfig_.noseRadius[3]           << '\n' <<
-		vtmConfig_.noseRadius[4]           << '\n' <<
-		vtmConfig_.noseRadius[5]           << '\n' <<
-		vtmConfig_.throatCutoff            << '\n' <<
-		vtmConfig_.throatVol               << '\n' <<
-		vtmConfig_.modulation              << '\n' <<
-		vtmConfig_.mixOffset               << '\n';
 }
 
 // Chunks are separated by /c.

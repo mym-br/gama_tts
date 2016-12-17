@@ -5,7 +5,7 @@ namespace GS {
 
 struct VocalTractModelParameterValue {
 	int index;
-	double value;
+	float value;
 };
 
 } /* namespace GS */

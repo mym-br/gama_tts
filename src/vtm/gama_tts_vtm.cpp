@@ -33,31 +33,40 @@ main(int argc, char* argv[])
 {
 	using namespace GS;
 
-	const char* inputFile = nullptr;
+	const char* configFile = nullptr;
+	const char* voiceFile = nullptr;
+	const char* paramFile = nullptr;
 	const char* outputFile = nullptr;
 
 	/*  PARSE THE COMMAND LINE  */
-	if (argc == 3) {
-		inputFile = argv[1];
-		outputFile = argv[2];
-	} else if ((argc == 4) && (strcmp("-v", argv[1]) == 0)) {
+	if (argc == 5) {
+		configFile = argv[1];
+		voiceFile = argv[2];
+		paramFile = argv[3];
+		outputFile = argv[4];
+	} else if ((argc == 6) && (strcmp("-v", argv[1]) == 0)) {
 		Log::debugEnabled = true;
-		inputFile = argv[2];
-		outputFile = argv[3];
+		configFile = argv[2];
+		voiceFile = argv[3];
+		paramFile = argv[4];
+		outputFile = argv[5];
 	} else {
 		std::cout << "\nGamaTTS VTM " << PROGRAM_VERSION << "\n\n";
-		std::cerr << "Usage: " << argv[0] << " [-v] vtm_param_file.txt output_file.wav\n";
+		std::cerr << "Usage: " << argv[0] << " [-v] config_file voice_file param_file output_file.wav\n";
 		std::cout << "         -v : verbose\n" << std::endl;
 		return 1;
 	}
 
-	std::ifstream inputStream(inputFile, std::ios_base::in | std::ios_base::binary);
+	std::ifstream inputStream(paramFile, std::ios_base::in | std::ios_base::binary);
 	if (!inputStream) {
-		std::cerr << "Could not open the file " << inputFile << '.' << std::endl;
+		std::cerr << "Could not open the file " << paramFile << '.' << std::endl;
 		return 1;
 	}
 
-	VTM::VocalTractModel0<double> vtm;
+	ConfigurationData vtmConfigData {voiceFile};
+	vtmConfigData.insert(ConfigurationData(configFile));
+
+	VTM::VocalTractModel0<double> vtm(vtmConfigData);
 	vtm.synthesizeToFile(inputStream, outputFile);
 
 	LOG_DEBUG("\nWrote scaled samples to file: " << outputFile);

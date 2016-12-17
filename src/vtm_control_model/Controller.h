@@ -24,8 +24,10 @@
 #include <cstdio>
 #include <fstream>
 #include <istream>
+#include <memory>
 #include <vector>
 
+#include "ConfigurationData.h"
 #include "EventList.h"
 #include "Log.h"
 #include "Model.h"
@@ -52,7 +54,7 @@ public:
 	Model& model() { return model_; }
 	EventList& eventList() { return eventList_; }
 	Configuration& vtmControlModelConfiguration() { return vtmControlModelConfig_; }
-	VTM::Configuration& vtmConfiguration() { return vtmConfig_; }
+	const ConfigurationData& vtmConfigurationData() const { return *vtmConfigData_; }
 private:
 	enum {
 		MAX_VOICES = 5
@@ -62,7 +64,7 @@ private:
 	Controller& operator=(const Controller&) = delete;
 
 	void loadConfiguration(const char* configDirPath);
-	void initUtterance(std::ostream& vtmParamStream);
+	void initUtterance();
 	int calcChunks(const char* string);
 	int nextChunk(const char* string);
 	void printVowelTransitions();
@@ -75,7 +77,7 @@ private:
 	Model& model_;
 	EventList eventList_;
 	Configuration vtmControlModelConfig_;
-	VTM::Configuration vtmConfig_;
+	std::unique_ptr<ConfigurationData> vtmConfigData_;
 };
 
 
@@ -91,7 +93,7 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
 
-	VTM::VocalTractModel0<double> vtm;
+	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
 	vtm.synthesizeToFile(vtmParamStream, outputFile);
 }
 
@@ -106,7 +108,7 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
 
-	VTM::VocalTractModel0<double> vtm;
+	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
 	vtm.synthesizeToBuffer(vtmParamStream, buffer);
 }
 
@@ -116,7 +118,7 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 {
 	int chunks = calcChunks(phoneticString);
 
-	initUtterance(vtmParamStream);
+	initUtterance();
 
 	int index = 0;
 	while (chunks > 0) {

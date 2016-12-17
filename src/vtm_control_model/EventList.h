@@ -179,8 +179,6 @@ public:
 
 	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }
 	void setFixedIntonationParameters(float notionalPitch, float pretonicRange, float pretonicLift, float tonicRange, float tonicMovement);
-
-	void setRadiusCoef(const double* values);
 private:
 	EventList(const EventList&) = delete;
 	EventList& operator=(const EventList&) = delete;
@@ -246,8 +244,6 @@ private:
 	std::random_device randDev_;
 	std::mt19937 randSrc_;
 	std::uniform_real_distribution<> randDist_;
-
-	double radiusCoef[VTM::VocalTractModel0<double>::TOTAL_REGIONS];
 };
 
 } /* namespace VTMControlModel */

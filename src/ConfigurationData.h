@@ -40,6 +40,7 @@ public:
 	// If an entry with the same key exists, it is overwritten.
 	template<typename T> void put(const std::string& key, T value);
 	void put(const std::string& key, const char* value);
+	ConfigurationData& insert(const ConfigurationData& other);
 private:
 	typedef std::unordered_map<std::string, std::string> Map;
 
@@ -109,11 +110,19 @@ ConfigurationData::put(const std::string& key, T value)
 
 template<typename T>
 void
-convertValue(const T& value, std::string& s)
+ConfigurationData::convertValue(const T& value, std::string& s)
 {
 	std::ostringstream out;
 	out << value;
 	s = out.str();
+}
+
+inline
+ConfigurationData&
+ConfigurationData::insert(const ConfigurationData& other)
+{
+	valueMap_.insert(other.valueMap_.begin(), other.valueMap_.end());
+	return *this;
 }
 
 } /* namespace GS */
