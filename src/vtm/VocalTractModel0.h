@@ -202,8 +202,8 @@ private:
 		FloatType apertureRadius;              /*  aperture scl. radius (3.05 - 12 cm)  */
 		FloatType mouthCoef;                   /*  mouth aperture coefficient  */
 		FloatType noseCoef;                    /*  nose aperture coefficient  */
-		// Set noseRadius[N1] to 0.0, because it is not used.
-		std::array<FloatType, TOTAL_NASAL_SECTIONS> noseRadius; /*  fixed nose radii (0 - 3 cm)  */
+		// Set nasalRadius[N1] to 0.0, because it is not used.
+		std::array<FloatType, TOTAL_NASAL_SECTIONS> nasalRadius; /*  fixed nasal radii (0 - 3 cm)  */
 		FloatType throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
 		FloatType throatVol;                   /*  throat volume (0 - 48 dB) */
 		int       modulation;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
@@ -337,14 +337,14 @@ VocalTractModel0<FloatType>::loadConfiguration(const ConfigurationData& data)
 	config_.modulation     = data.value<int>("noise_modulation");
 	config_.mixOffset      = data.value<FloatType>("mix_offset");
 	const FloatType globalRadiusCoef     = data.value<FloatType>("global_radius_coef");
-	const FloatType globalNoseRadiusCoef = data.value<FloatType>("global_nose_radius_coef");
+	const FloatType globalNasalRadiusCoef = data.value<FloatType>("global_nasal_radius_coef");
 	config_.apertureRadius = data.value<FloatType>("aperture_radius") * globalRadiusCoef;
-	config_.noseRadius[0]  = 0.0;
-	config_.noseRadius[1]  = data.value<FloatType>("nose_radius_1") * globalNoseRadiusCoef;
-	config_.noseRadius[2]  = data.value<FloatType>("nose_radius_2") * globalNoseRadiusCoef;
-	config_.noseRadius[3]  = data.value<FloatType>("nose_radius_3") * globalNoseRadiusCoef;
-	config_.noseRadius[4]  = data.value<FloatType>("nose_radius_4") * globalNoseRadiusCoef;
-	config_.noseRadius[5]  = data.value<FloatType>("nose_radius_5") * globalNoseRadiusCoef;
+	config_.nasalRadius[0]  = 0.0;
+	config_.nasalRadius[1]  = data.value<FloatType>("nasal_radius_1") * globalNasalRadiusCoef;
+	config_.nasalRadius[2]  = data.value<FloatType>("nasal_radius_2") * globalNasalRadiusCoef;
+	config_.nasalRadius[3]  = data.value<FloatType>("nasal_radius_3") * globalNasalRadiusCoef;
+	config_.nasalRadius[4]  = data.value<FloatType>("nasal_radius_4") * globalNasalRadiusCoef;
+	config_.nasalRadius[5]  = data.value<FloatType>("nasal_radius_5") * globalNasalRadiusCoef;
 	config_.radiusCoef[0]  = data.value<FloatType>("radius_1_coef") * globalRadiusCoef;
 	config_.radiusCoef[1]  = data.value<FloatType>("radius_2_coef") * globalRadiusCoef;
 	config_.radiusCoef[2]  = data.value<FloatType>("radius_3_coef") * globalRadiusCoef;
@@ -652,13 +652,13 @@ VocalTractModel0<FloatType>::initializeNasalCavity()
 {
 	/*  CALCULATE COEFFICIENTS FOR INTERNAL FIXED SECTIONS OF NASAL CAVITY  */
 	for (int i = N2, j = NC2; i < N6; i++, j++) {
-		const FloatType radA2 = config_.noseRadius[i]     * config_.noseRadius[i];
-		const FloatType radB2 = config_.noseRadius[i + 1] * config_.noseRadius[i + 1];
+		const FloatType radA2 = config_.nasalRadius[i]     * config_.nasalRadius[i];
+		const FloatType radB2 = config_.nasalRadius[i + 1] * config_.nasalRadius[i + 1];
 		nasalCoeff_[j] = (radA2 - radB2) / (radA2 + radB2);
 	}
 
 	/*  CALCULATE THE FIXED COEFFICIENT FOR THE NOSE APERTURE  */
-	const FloatType radA2 = config_.noseRadius[N6] * config_.noseRadius[N6];
+	const FloatType radA2 = config_.nasalRadius[N6] * config_.nasalRadius[N6];
 	const FloatType radB2 = config_.apertureRadius * config_.apertureRadius;
 	nasalCoeff_[NC6] = (radA2 - radB2) / (radA2 + radB2);
 }
@@ -702,7 +702,7 @@ VocalTractModel0<FloatType>::calculateTubeCoefficients()
 
 	/*  AND 1ST NASAL PASSAGE COEFFICIENT  */
 	radA2 = r2_2;
-	radB2 = config_.noseRadius[N2] * config_.noseRadius[N2];
+	radB2 = config_.nasalRadius[N2] * config_.nasalRadius[N2];
 	nasalCoeff_[NC1] = (radA2 - radB2) / (radA2 + radB2);
 }
 
