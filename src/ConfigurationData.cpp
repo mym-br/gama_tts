@@ -19,6 +19,7 @@
 
 #include <cctype> /* isspace */
 #include <fstream>
+#include <limits>
 
 
 
@@ -96,6 +97,8 @@ ConfigurationData::ConfigurationData(const std::string& filePath)
 	}
 }
 
+
+
 template<>
 int
 ConfigurationData::convertString<int>(const std::string& s)
@@ -104,10 +107,28 @@ ConfigurationData::convertString<int>(const std::string& s)
 }
 
 template<>
+unsigned int
+ConfigurationData::convertString<unsigned int>(const std::string& s)
+{
+	unsigned long v = std::stoul(s);
+	if (v > std::numeric_limits<unsigned int>::max()) {
+		throw std::out_of_range("ConfigurationData::convertString<unsigned int>");
+	}
+	return static_cast<unsigned int>(v);
+}
+
+template<>
 long
 ConfigurationData::convertString<long>(const std::string& s)
 {
 	return std::stol(s);
+}
+
+template<>
+unsigned long
+ConfigurationData::convertString<unsigned long>(const std::string& s)
+{
+	return std::stoul(s);
 }
 
 template<>

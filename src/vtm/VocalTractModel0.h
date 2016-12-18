@@ -106,7 +106,8 @@ public:
 
 	// ----- Interactive mode.
 	void loadSingleInput(const VocalTractModelParameterValue pv);
-	void synthesizeSamples(int numberOfSamples);
+	// Synthesizes at least numberOfSamples samples (may synthesize more samples).
+	void synthesizeSamples(std::size_t numberOfSamples);
 	// Returns the number of samples read.
 	std::size_t getOutputSamples(std::size_t n, float* buffer);
 
@@ -336,15 +337,15 @@ VocalTractModel0<FloatType>::loadConfiguration(const ConfigurationData& data)
 	config_.throatVol      = data.value<FloatType>("throat_volume");
 	config_.modulation     = data.value<int>("noise_modulation");
 	config_.mixOffset      = data.value<FloatType>("mix_offset");
-	const FloatType globalRadiusCoef     = data.value<FloatType>("global_radius_coef");
+	const FloatType globalRadiusCoef      = data.value<FloatType>("global_radius_coef");
 	const FloatType globalNasalRadiusCoef = data.value<FloatType>("global_nasal_radius_coef");
 	config_.apertureRadius = data.value<FloatType>("aperture_radius") * globalRadiusCoef;
-	config_.nasalRadius[0]  = 0.0;
-	config_.nasalRadius[1]  = data.value<FloatType>("nasal_radius_1") * globalNasalRadiusCoef;
-	config_.nasalRadius[2]  = data.value<FloatType>("nasal_radius_2") * globalNasalRadiusCoef;
-	config_.nasalRadius[3]  = data.value<FloatType>("nasal_radius_3") * globalNasalRadiusCoef;
-	config_.nasalRadius[4]  = data.value<FloatType>("nasal_radius_4") * globalNasalRadiusCoef;
-	config_.nasalRadius[5]  = data.value<FloatType>("nasal_radius_5") * globalNasalRadiusCoef;
+	config_.nasalRadius[0] = 0.0;
+	config_.nasalRadius[1] = data.value<FloatType>("nasal_radius_1") * globalNasalRadiusCoef;
+	config_.nasalRadius[2] = data.value<FloatType>("nasal_radius_2") * globalNasalRadiusCoef;
+	config_.nasalRadius[3] = data.value<FloatType>("nasal_radius_3") * globalNasalRadiusCoef;
+	config_.nasalRadius[4] = data.value<FloatType>("nasal_radius_4") * globalNasalRadiusCoef;
+	config_.nasalRadius[5] = data.value<FloatType>("nasal_radius_5") * globalNasalRadiusCoef;
 	config_.radiusCoef[0]  = data.value<FloatType>("radius_1_coef") * globalRadiusCoef;
 	config_.radiusCoef[1]  = data.value<FloatType>("radius_2_coef") * globalRadiusCoef;
 	config_.radiusCoef[2]  = data.value<FloatType>("radius_3_coef") * globalRadiusCoef;
@@ -560,7 +561,7 @@ VocalTractModel0<FloatType>::synthesizeForInputSequence()
 
 template<typename FloatType>
 void
-VocalTractModel0<FloatType>::synthesizeSamples(int numberOfSamples)
+VocalTractModel0<FloatType>::synthesizeSamples(std::size_t numberOfSamples)
 {
 	if (!inputFilters_) {
 		THROW_EXCEPTION(InvalidStateException, "Input filters have not been initialized.");
@@ -568,7 +569,7 @@ VocalTractModel0<FloatType>::synthesizeSamples(int numberOfSamples)
 
 	while (outputData_.size() < numberOfSamples) {
 		for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
-			currentParameter_[i] = inputFilters_.filter[i].filter(singleInput_[i]);
+			currentParameter_[i] = inputFilters_->filter[i].filter(singleInput_[i]);
 		}
 
 		synthesize();
@@ -910,7 +911,12 @@ template<typename FloatType>
 float
 VocalTractModel0<FloatType>::calculateOutputScale()
 {
-	const float scale = GS_VTM_VOCAL_TRACT_MODEL_0_OUTPUT_SCALE / srConv_->maximumSampleValue();
+	const float maxValue = srConv_->maximumSampleValue();
+	if (maxValue < 1.0e-10f) {
+		return 0.0;
+	}
+
+	const float scale = GS_VTM_VOCAL_TRACT_MODEL_0_OUTPUT_SCALE / maxValue;
 	LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
 }
@@ -955,7 +961,7 @@ VocalTractModel0<FloatType>::getOutputSamples(std::size_t n, float* buffer)
 
 	const std::size_t size = outputData_.size();
 	const std::size_t initialPos = outputDataPos_;
-	for (std::size_t j = 0; j < n, outputDataPos_ < size; ++j, ++outputDataPos_) {
+	for (std::size_t j = 0; j < n && outputDataPos_ < size; ++j, ++outputDataPos_) {
 		buffer[j] = outputData_[outputDataPos_];
 	}
 
