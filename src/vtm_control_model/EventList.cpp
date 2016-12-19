@@ -349,7 +349,7 @@ EventList::insertEvent(int number, double time, double value)
 	//}
 
 	if (list_.empty()) {
-		std::unique_ptr<Event> tempEvent(new Event());
+		auto tempEvent = std::make_unique<Event>();
 		tempEvent->time = tempTime;
 		if (number >= 0) {
 			tempEvent->setValue(value, number);
@@ -367,7 +367,7 @@ EventList::insertEvent(int number, double time, double value)
 			return list_[i].get();
 		}
 		if (list_[i]->time < tempTime) {
-			std::unique_ptr<Event> tempEvent(new Event());
+			auto tempEvent = std::make_unique<Event>();
 			tempEvent->time = tempTime;
 			if (number >= 0) {
 				tempEvent->setValue(value, number);
@@ -377,7 +377,7 @@ EventList::insertEvent(int number, double time, double value)
 		}
 	}
 
-	std::unique_ptr<Event> tempEvent(new Event());
+	auto tempEvent = std::make_unique<Event>();
 	tempEvent->time = tempTime;
 	if (number >= 0) {
 		tempEvent->setValue(value, number);

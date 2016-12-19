@@ -177,7 +177,7 @@ FormulaNodeParser::parseFactor()
 		return parseFactor();
 	case SYMBOL_TYPE_SUB: // unary minus
 		nextSymbol();
-		return FormulaNode_ptr(new FormulaMinusUnaryOp(parseFactor()));
+		return std::make_unique<FormulaMinusUnaryOp>(parseFactor());
 	case SYMBOL_TYPE_STRING: // const / symbol
 	{
 		std::string symbolTmp = symbol_;
@@ -185,9 +185,9 @@ FormulaNodeParser::parseFactor()
 		FormulaSymbol::CodeMap::const_iterator iter = formulaSymbolMap_.find(symbolTmp);
 		if (iter == formulaSymbolMap_.end()) {
 			// It's not a symbol.
-			return FormulaNode_ptr(new FormulaConst(GS::Text::parseString<float>(symbolTmp)));
+			return std::make_unique<FormulaConst>(GS::Text::parseString<float>(symbolTmp));
 		} else {
-			return FormulaNode_ptr(new FormulaSymbolValue(iter->second));
+			return std::make_unique<FormulaSymbolValue>(iter->second);
 		}
 	}
 	case SYMBOL_TYPE_RIGHT_PAREN:
@@ -215,9 +215,9 @@ FormulaNode_ptr FormulaNodeParser::parseTerm()
 		FormulaNode_ptr term2 = parseFactor();
 		FormulaNode_ptr expr;
 		if (type == SYMBOL_TYPE_MULT) {
-			expr.reset(new FormulaMultBinaryOp(std::move(term1), std::move(term2)));
+			expr = std::make_unique<FormulaMultBinaryOp>(std::move(term1), std::move(term2));
 		} else {
-			expr.reset(new FormulaDivBinaryOp(std::move(term1), std::move(term2)));
+			expr = std::make_unique<FormulaDivBinaryOp>(std::move(term1), std::move(term2));
 		}
 		term1.swap(expr);
 		type = symbolType_;
@@ -242,9 +242,9 @@ FormulaNodeParser::parseExpression()
 
 		FormulaNode_ptr expr;
 		if (type == SYMBOL_TYPE_ADD) {
-			expr.reset(new FormulaAddBinaryOp(std::move(term1), std::move(term2)));
+			expr = std::make_unique<FormulaAddBinaryOp>(std::move(term1), std::move(term2));
 		} else {
-			expr.reset(new FormulaSubBinaryOp(std::move(term1), std::move(term2)));
+			expr = std::make_unique<FormulaSubBinaryOp>(std::move(term1), std::move(term2));
 		}
 
 		term1 = std::move(expr);

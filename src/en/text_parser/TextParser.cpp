@@ -1961,19 +1961,19 @@ TextParser::TextParser(const char* configDirPath,
 		: escape_character_(DEFAULT_ESCAPE_CHARACTER)
 {
 	if (dictionary1Path != "none") {
-		dict1_.reset(new DictionarySearch);
+		dict1_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << configDirPath << '/' << dictionary1Path;
 		dict1_->load(filePath.str().c_str());
 	}
 	if (dictionary2Path != "none") {
-		dict2_.reset(new DictionarySearch);
+		dict2_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << configDirPath << '/' << dictionary2Path;
 		dict2_->load(filePath.str().c_str());
 	}
 	if (dictionary3Path != "none") {
-		dict3_.reset(new DictionarySearch);
+		dict3_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << configDirPath << '/' << dictionary3Path;
 		dict3_->load(filePath.str().c_str());

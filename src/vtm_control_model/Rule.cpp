@@ -175,7 +175,7 @@ Parser::getBooleanNode()
 			nextSymbol();
 			RuleBooleanNode_ptr op(getBooleanNode());
 
-			p.reset(new RuleBooleanNotExpression(std::move(op)));
+			p = std::make_unique<RuleBooleanNotExpression>(std::move(op));
 		} else {
 			// 1st operand.
 			RuleBooleanNode_ptr op1(getBooleanNode());
@@ -187,7 +187,7 @@ Parser::getBooleanNode()
 				nextSymbol();
 				RuleBooleanNode_ptr op2(getBooleanNode());
 
-				p.reset(new RuleBooleanOrExpression(std::move(op1), std::move(op2)));
+				p = std::make_unique<RuleBooleanOrExpression>(std::move(op1), std::move(op2));
 				break;
 			}
 			case SYMBOL_TYPE_AND_OP:
@@ -195,7 +195,7 @@ Parser::getBooleanNode()
 				nextSymbol();
 				RuleBooleanNode_ptr op2(getBooleanNode());
 
-				p.reset(new RuleBooleanAndExpression(std::move(op1), std::move(op2)));
+				p = std::make_unique<RuleBooleanAndExpression>(std::move(op1), std::move(op2));
 				break;
 			}
 			case SYMBOL_TYPE_XOR_OP:
@@ -203,7 +203,7 @@ Parser::getBooleanNode()
 				nextSymbol();
 				RuleBooleanNode_ptr op2(getBooleanNode());
 
-				p.reset(new RuleBooleanXorExpression(std::move(op1), std::move(op2)));
+				p = std::make_unique<RuleBooleanXorExpression>(std::move(op1), std::move(op2));
 				break;
 			}
 			case SYMBOL_TYPE_NOT_OP:
@@ -248,7 +248,7 @@ Parser::getBooleanNode()
 		}
 
 		nextSymbol();
-		return RuleBooleanNode_ptr(new RuleBooleanTerminal(category, matchAll));
+		return std::make_unique<RuleBooleanTerminal>(category, matchAll);
 	}
 	case SYMBOL_TYPE_OR_OP:
 		throwException("Unexpected OR op.");

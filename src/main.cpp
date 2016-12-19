@@ -137,20 +137,20 @@ main(int argc, char* argv[])
 	}
 
 	try {
-		std::unique_ptr<GS::VTMControlModel::Model> vtmControlModel(new GS::VTMControlModel::Model());
+		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
 		vtmControlModel->load(configDirPath, VTM_CONTROL_MODEL_CONFIG_FILE);
 		if (GS::Log::debugEnabled) {
 			vtmControlModel->printInfo();
 		}
 
-		std::unique_ptr<GS::VTMControlModel::Controller> vtmController(new GS::VTMControlModel::Controller(configDirPath, *vtmControlModel));
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(configDirPath, *vtmControlModel);
 		const GS::VTMControlModel::Configuration& vtmControlConfig = vtmController->vtmControlModelConfiguration();
 
-		std::unique_ptr<GS::En::TextParser> textParser(new GS::En::TextParser(configDirPath,
-											vtmControlConfig.dictionary1File,
-											vtmControlConfig.dictionary2File,
-											vtmControlConfig.dictionary3File));
-		std::unique_ptr<GS::En::PhoneticStringParser> phoneticStringParser(new GS::En::PhoneticStringParser(configDirPath, *vtmController));
+		auto textParser = std::make_unique<GS::En::TextParser>(configDirPath,
+									vtmControlConfig.dictionary1File,
+									vtmControlConfig.dictionary2File,
+									vtmControlConfig.dictionary3File);
+		auto phoneticStringParser = std::make_unique<GS::En::PhoneticStringParser>(configDirPath, *vtmController);
 
 		std::string phoneticString = textParser->parseText(inputText.c_str());
 		if (GS::Log::debugEnabled) {

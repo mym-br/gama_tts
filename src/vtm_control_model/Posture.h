@@ -58,7 +58,7 @@ public:
 			THROW_EXCEPTION(InvalidParameterException, "Invalid number of symbols: 0.");
 		}
 
-		std::shared_ptr<Category> newCategory(new Category(name));
+		auto newCategory = std::make_shared<Category>(name);
 		newCategory->setNative();
 		categoryList_.push_back(newCategory);
 	}
@@ -150,7 +150,7 @@ inline
 std::unique_ptr<Posture>
 Posture::copy(const std::string& newName) const
 {
-	std::unique_ptr<Posture> newPosture(new Posture(newName, parameterTargetList_.size(), symbolTargetList_.size()));
+	auto newPosture = std::make_unique<Posture>(newName, parameterTargetList_.size(), symbolTargetList_.size());
 
 	for (const auto& category : categoryList_) {
 		if (!category->native()) {

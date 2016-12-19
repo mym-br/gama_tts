@@ -114,7 +114,7 @@ XMLConfigFileReader::parseCategories(rapidxml::xml_node<char>* categoriesElem)
 				categoryElem;
 				categoryElem = nextSibling(categoryElem, categoryTagName)) {
 
-		std::shared_ptr<Category> newCategory(new Category(attributeValue(categoryElem, nameAttrName)));
+		auto newCategory = std::make_shared<Category>(attributeValue(categoryElem, nameAttrName));
 		model_.categoryList().push_back(newCategory);
 
 		xml_node<char>* commentElem = firstChild(categoryElem, commentTagName);
@@ -221,10 +221,10 @@ XMLConfigFileReader::parsePostureParameters(rapidxml::xml_node<char>* parameterT
 void
 XMLConfigFileReader::parsePosture(rapidxml::xml_node<char>* postureElem)
 {
-	std::unique_ptr<Posture> posture(new Posture(
-						attributeValue(postureElem, symbolAttrName),
-						model_.parameterList().size(),
-						model_.symbolList().size()));
+	auto posture = std::make_unique<Posture>(
+					attributeValue(postureElem, symbolAttrName),
+					model_.parameterList().size(),
+					model_.symbolList().size());
 
 	for (xml_node<char>* childElem = firstChild(postureElem);
 				childElem;
@@ -274,7 +274,7 @@ XMLConfigFileReader::parseEquationsGroup(rapidxml::xml_node<char>* equationGroup
 		if (formula.empty()) {
 			LOG_ERROR("Equation " << name << " without formula (ignored).");
 		} else {
-			std::shared_ptr<Equation> eq(new Equation(name));
+			auto eq = std::make_shared<Equation>(name);
 			eq->setFormula(formula);
 			if (!comment.empty()) {
 				eq->setComment(comment);
@@ -300,7 +300,7 @@ XMLConfigFileReader::parseEquations(rapidxml::xml_node<char>* equationsElem)
 void
 XMLConfigFileReader::parseSlopeRatio(rapidxml::xml_node<char>* slopeRatioElem, Transition& transition)
 {
-	std::unique_ptr<Transition::SlopeRatio> p(new Transition::SlopeRatio());
+	auto p = std::make_unique<Transition::SlopeRatio>();
 
 	for (xml_node<char>* childElem = firstChild(slopeRatioElem);
 				childElem;
@@ -309,7 +309,7 @@ XMLConfigFileReader::parseSlopeRatio(rapidxml::xml_node<char>* slopeRatioElem, T
 			for (xml_node<char>* pointElem = firstChild(childElem, pointTagName);
 						pointElem;
 						pointElem = nextSibling(pointElem, pointTagName)) {
-				std::unique_ptr<Transition::Point> p2(new Transition::Point());
+				auto p2 = std::make_unique<Transition::Point>();
 				p2->type = Transition::Point::getTypeFromName(attributeValue(pointElem, typeAttrName));
 				p2->value = Text::parseString<float>(attributeValue(pointElem, valueAttrName));
 
@@ -333,7 +333,7 @@ XMLConfigFileReader::parseSlopeRatio(rapidxml::xml_node<char>* slopeRatioElem, T
 			for (xml_node<char>* slopeElem = firstChild(childElem, slopeTagName);
 						slopeElem;
 						slopeElem = nextSibling(slopeElem, slopeTagName)) {
-				std::unique_ptr<Transition::Slope> p2(new Transition::Slope());
+				auto p2 = std::make_unique<Transition::Slope>();
 				p2->slope = Text::parseString<float>(attributeValue(slopeElem, slopeAttrName));
 				p2->displayTime = Text::parseString<float>(attributeValue(slopeElem, displayTimeAttrName));
 				p->slopeList.push_back(std::move(p2));
@@ -351,7 +351,7 @@ XMLConfigFileReader::parseTransitionPointOrSlopes(rapidxml::xml_node<char>* poin
 				childElem;
 				childElem = nextSibling(childElem)) {
 		if (compareElementName(childElem, pointTagName)) {
-			std::unique_ptr<Transition::Point> p(new Transition::Point());
+			auto p = std::make_unique<Transition::Point>();
 			p->type = Transition::Point::getTypeFromName(attributeValue(childElem, typeAttrName));
 			p->value = Text::parseString<float>(attributeValue(childElem, valueAttrName));
 
@@ -389,7 +389,7 @@ XMLConfigFileReader::parseTransitionsGroup(rapidxml::xml_node<char>* transitionG
 		std::string name = attributeValue(childElem, nameAttrName);
 		Transition::Type type = Transition::getTypeFromName(attributeValue(childElem, typeAttrName));
 
-		std::shared_ptr<Transition> tr(new Transition(name, type, special));
+		auto tr = std::make_shared<Transition>(name, type, special);
 
 		for (xml_node<char>* transitionChildElem = firstChild(childElem);
 					transitionChildElem;
@@ -505,7 +505,7 @@ XMLConfigFileReader::parseRuleBooleanExpressions(rapidxml::xml_node<char>* boole
 void
 XMLConfigFileReader::parseRule(rapidxml::xml_node<char>* ruleElem)
 {
-	std::unique_ptr<Rule> rule(new Rule(model_.parameterList().size()));
+	auto rule = std::make_unique<Rule>(model_.parameterList().size());
 
 	for (xml_node<char>* childElem = firstChild(ruleElem);
 				childElem;
