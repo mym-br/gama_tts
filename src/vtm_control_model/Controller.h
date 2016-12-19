@@ -31,7 +31,6 @@
 #include "EventList.h"
 #include "Log.h"
 #include "Model.h"
-#include "VTMConfiguration.h"
 #include "VTMControlModelConfiguration.h"
 #include "VocalTractModel0.h"
 

@@ -111,8 +111,6 @@ set(LIBRARY_FILES
     src/vtm/SampleRateConverter.h
     src/vtm/Throat.h
     src/vtm/VocalTractModel0.h
-    src/vtm/VTMConfiguration.cpp
-    src/vtm/VTMConfiguration.h
     src/vtm/VTMUtil.h
     src/vtm/WavetableGlottalSource.h
 
