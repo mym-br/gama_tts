@@ -29,10 +29,11 @@
 
 #include "ConfigurationData.h"
 #include "EventList.h"
+#include "Exception.h"
 #include "Log.h"
 #include "Model.h"
 #include "VTMControlModelConfiguration.h"
-#include "VocalTractModel0.h"
+#include "VocalTractModel.h"
 
 
 
@@ -92,8 +93,8 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
 
-	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
-	vtm.synthesizeToFile(vtmParamStream, outputFile);
+	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
+	vtm->synthesizeToFile(vtmParamStream, outputFile);
 }
 
 template<typename T>
@@ -107,8 +108,8 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
 
-	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
-	vtm.synthesizeToBuffer(vtmParamStream, buffer);
+	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
+	vtm->synthesizeToBuffer(vtmParamStream, buffer);
 }
 
 template<typename T>

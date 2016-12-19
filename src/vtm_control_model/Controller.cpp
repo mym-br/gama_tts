@@ -23,9 +23,6 @@
 #include <cstring>
 #include <sstream>
 
-#include "Exception.h"
-#include "VocalTractModel0.h"
-
 #define VTM_CONTROL_MODEL_CONFIG_FILE_NAME "/vtm_control_model.config"
 #define VTM_CONFIG_FILE_NAME "/vtm.config"
 #define VOICE_FILE_PREFIX "/voice_"
@@ -84,8 +81,8 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, const char* output
 
 	vtmParamStream.seekg(0);
 
-	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
-	vtm.synthesizeToFile(vtmParamStream, outputFile);
+	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
+	vtm->synthesizeToFile(vtmParamStream, outputFile);
 }
 
 void
@@ -102,8 +99,8 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, std::vector<float>
 
 	vtmParamStream.seekg(0);
 
-	VTM::VocalTractModel0<double> vtm(*vtmConfigData_);
-	vtm.synthesizeToBuffer(vtmParamStream, buffer);
+	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
+	vtm->synthesizeToBuffer(vtmParamStream, buffer);
 }
 
 void

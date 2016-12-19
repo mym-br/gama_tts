@@ -51,8 +51,8 @@ Throat<FloatType>::Throat(FloatType sampleRate, FloatType throatCutoff, FloatTyp
 		// Initializes the throat lowpass filter coefficients
 		// according to the throatCutoff value, and also the
 		// throatGain, according to the throatVol value.
-		: ta0_ {(throatCutoff * 2.0) / sampleRate}
-		, tb1_ {1.0 - ta0_}
+		: ta0_ {(throatCutoff * 2.0f) / sampleRate}
+		, tb1_ {1.0f - ta0_}
 		, throatGain_ {throatGain}
 		, throatY_ {}
 {

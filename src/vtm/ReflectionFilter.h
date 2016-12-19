@@ -51,7 +51,7 @@ private:
 
 template<typename FloatType>
 ReflectionFilter<FloatType>::ReflectionFilter(FloatType apertureCoeff)
-		: a10_ {1.0 - std::abs(-apertureCoeff)}
+		: a10_ {1.0f - std::abs(-apertureCoeff)}
 		, b11_ {-apertureCoeff}
 		, reflectionY_ {}
 {

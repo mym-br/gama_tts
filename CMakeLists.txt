@@ -110,6 +110,8 @@ set(LIBRARY_FILES
     src/vtm/ReflectionFilter.h
     src/vtm/SampleRateConverter.h
     src/vtm/Throat.h
+    src/vtm/VocalTractModel.cpp
+    src/vtm/VocalTractModel.h
     src/vtm/VocalTractModel0.h
     src/vtm/VTMUtil.h
     src/vtm/WavetableGlottalSource.h

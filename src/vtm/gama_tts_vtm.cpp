@@ -22,9 +22,10 @@
 #include <fstream>
 #include <iostream>
 
+#include "ConfigurationData.h"
 #include "global.h"
 #include "Log.h"
-#include "VocalTractModel0.h"
+#include "VocalTractModel.h"
 
 
 
@@ -66,8 +67,8 @@ main(int argc, char* argv[])
 	ConfigurationData vtmConfigData {voiceFile};
 	vtmConfigData.insert(ConfigurationData(configFile));
 
-	VTM::VocalTractModel0<double> vtm(vtmConfigData);
-	vtm.synthesizeToFile(inputStream, outputFile);
+	auto vtm = VTM::VocalTractModel::getInstance(vtmConfigData);
+	vtm->synthesizeToFile(inputStream, outputFile);
 
 	LOG_DEBUG("\nWrote scaled samples to file: " << outputFile);
 

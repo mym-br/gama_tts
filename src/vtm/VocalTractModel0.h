@@ -18,8 +18,8 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef VTM_VOCAL_TRACT_MODEL0_H_
-#define VTM_VOCAL_TRACT_MODEL0_H_
+#ifndef VTM_VOCAL_TRACT_MODEL_0_H_
+#define VTM_VOCAL_TRACT_MODEL_0_H_
 
 #include <algorithm> /* max, min */
 #include <array>
@@ -46,6 +46,7 @@
 #include "SampleRateConverter.h"
 #include "Text.h"
 #include "Throat.h"
+#include "VocalTractModel.h"
 #include "VocalTractModelParameterValue.h"
 #include "VTMUtil.h"
 #include "WAVEFileWriter.h"
@@ -68,7 +69,7 @@ namespace GS {
 namespace VTM {
 
 template<typename FloatType>
-class VocalTractModel0 {
+class VocalTractModel0 : public VocalTractModel {
 public:
 	enum { /*  OROPHARYNX REGIONS  */
 		R1 = 0, /*  S1  */
@@ -439,7 +440,7 @@ VocalTractModel0<FloatType>::parseInputStream(std::istream& in)
 
 		// R1 - R8.
 		for (int i = 0; i < TOTAL_REGIONS; ++i) {
-			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS);
+			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], FloatType{GS_VTM_VOCAL_TRACT_MODEL_0_MIN_RADIUS});
 		}
 
 		inputData_.push_back(value);
@@ -976,4 +977,4 @@ VocalTractModel0<FloatType>::getOutputSamples(std::size_t n, float* buffer)
 } /* namespace VTM */
 } /* namespace GS */
 
-#endif /* VTM_VOCAL_TRACT_MODEL0_H_ */
+#endif /* VTM_VOCAL_TRACT_MODEL_0_H_ */

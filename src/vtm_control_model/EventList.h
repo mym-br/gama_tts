@@ -30,7 +30,6 @@
 #include "DriftGenerator.h"
 #include "IntonationPoint.h"
 #include "Model.h"
-#include "VocalTractModel0.h"
 
 #define TONE_GROUP_TYPE_STATEMENT    0
 #define TONE_GROUP_TYPE_EXCLAMATION  1
