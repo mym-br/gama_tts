@@ -6,7 +6,7 @@ if(UNIX)
         set(CMAKE_CXX_FLAGS "-std=c++14 -stdlib=libc++")
     else()
         #set(CMAKE_CXX_FLAGS "-std=c++14 -Wall -Wextra -march=native")
-        set(CMAKE_CXX_FLAGS "-std=c++14 -Wall -Wextra")
+        set(CMAKE_CXX_FLAGS "-std=c++14 -Wall -Wextra -Wno-strict-overflow")
     endif()
 endif()
 
@@ -152,14 +152,14 @@ set(LIBRARY_FILES
     src/xml/StreamXMLWriter.h
 )
 
-if(UNIX)
-    add_library(gamatts SHARED ${LIBRARY_FILES})
-    set_target_properties(gamatts PROPERTIES
-        VERSION ${GAMA_TTS_VERSION_STRING}
-        SOVERSION ${GAMA_TTS_VERSION_MAJOR})
-else()
+#if(UNIX)
+#    add_library(gamatts SHARED ${LIBRARY_FILES})
+#    set_target_properties(gamatts PROPERTIES
+#        VERSION ${GAMA_TTS_VERSION_STRING}
+#        SOVERSION ${GAMA_TTS_VERSION_MAJOR})
+#else()
     add_library(gamatts STATIC ${LIBRARY_FILES})
-endif()
+#endif()
 
 add_executable(gama_tts
     src/main.cpp
@@ -175,7 +175,8 @@ if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
     install(TARGETS gamatts gama_tts gama_tts_vtm
         RUNTIME DESTINATION bin
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.h")
     install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.hpp")
     install(DIRECTORY data DESTINATION share/gama_tts)
