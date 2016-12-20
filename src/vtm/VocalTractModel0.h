@@ -361,28 +361,15 @@ template<typename FloatType>
 void
 VocalTractModel0<FloatType>::reset()
 {
-	controlPeriod_    = 0;
-	sampleRate_       = 0;
-	actualTubeLength_ = 0.0;
 	memset(&oropharynx_[0][0][0], 0, sizeof(FloatType) * TOTAL_SECTIONS * 2 * 2);
-	memset(oropharynxCoeff_,      0, sizeof(FloatType) * TOTAL_COEFFICIENTS);
 	memset(&nasal_[0][0][0],      0, sizeof(FloatType) * TOTAL_NASAL_SECTIONS * 2 * 2);
-	memset(nasalCoeff_,           0, sizeof(FloatType) * TOTAL_NASAL_COEFFICIENTS);
-	memset(alpha_,                0, sizeof(FloatType) * TOTAL_ALPHA_COEFFICIENTS);
 	currentPtr_ = 1;
 	prevPtr_    = 0;
-	memset(fricationTap_, 0, sizeof(FloatType) * TOTAL_FRIC_COEFFICIENTS);
-	dampingFactor_     = 0.0;
-	crossmixFactor_    = 0.0;
-	breathinessFactor_ = 0.0;
 	prevGlotAmplitude_ = -1.0;
 	inputData_.clear();
-	currentParameter_.fill(0.0);
-	currentParameterDelta_.fill(0.0);
 	singleInput_.fill(0.0);
-	outputDataPos_ = 0;
 	outputData_.clear();
-
+	outputDataPos_ = 0;
 	if (srConv_)                srConv_->reset();
 	if (mouthRadiationFilter_)  mouthRadiationFilter_->reset();
 	if (mouthReflectionFilter_) mouthReflectionFilter_->reset();
