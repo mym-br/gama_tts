@@ -939,7 +939,7 @@ EventList::addIntonationPoint(double semitone, double offsetTime, double slope, 
 	iPoint.setSlope(slope);
 
 	double time = iPoint.absoluteTime();
-	for (unsigned int i = 0; i < intonationPoints_.size(); i++) {
+	for (std::size_t i = 0; i < intonationPoints_.size(); i++) {
 		if (time < intonationPoints_[i].absoluteTime()) {
 			intonationPoints_.insert(intonationPoints_.begin() + i, iPoint);
 			return;
