@@ -1,6 +1,7 @@
 /***************************************************************************
  *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
  *    David R. Hill, Leonard Manzara, Craig Schock                         *
+ *  Copyright 2016 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,8 +16,21 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-// 2014-09
-// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
+
+//                                            NJ1   NJ2   NJ3   NJ4   NJ5   NJ6
+//                                             |     |     |     |     |     |
+//                                       VELUM |     |     |     |     |     |
+//                               nasal   -------------------------------------
+//                                  _____| N1  | N2  | N3  | N4  | N5  | N6  | nose
+//                                 |     -------------------------------------
+//         oropharynx              |
+//         -------------------------------------------------------------
+// vocal   | S1  | S2  | S3  | S4  | S5  | S6  | S7  | S8  | S9  | S10 | mouth
+// folds   -------------------------------------------------------------
+//               |     |     |     |     |     |     |     |     |     |
+//           R1  | R2  | R3  | R4  | R4  | R5  | R5  | R6  | R7  | R8  |
+//              J1    J2    J3          J4          J5    J6    J7    J8
+//                    FC1   FC2   FC3   FC4   FC5   FC6   FC7   FC8
 
 #ifndef VTM_VOCAL_TRACT_MODEL_2_H_
 #define VTM_VOCAL_TRACT_MODEL_2_H_
@@ -71,6 +85,23 @@ namespace VTM {
 template<typename FloatType>
 class VocalTractModel2 : public VocalTractModel {
 public:
+	VocalTractModel2(const ConfigurationData& data, bool interactive = false);
+	~VocalTractModel2() {}
+
+	double outputRate() const { return config_.outputRate; }
+
+	// ----- Batch mode.
+	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
+	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
+
+	// ----- Interactive mode.
+	void loadSingleInput(const VocalTractModelParameterValue pv);
+	// Synthesizes at least numberOfSamples samples (may synthesize more samples).
+	void synthesizeSamples(std::size_t numberOfSamples);
+	// Returns the number of samples read.
+	std::size_t getOutputSamples(std::size_t n, float* buffer);
+
+private:
 	enum { /*  OROPHARYNX REGIONS  */
 		R1 = 0, /*  S1  */
 		R2 = 1, /*  S2  */
@@ -95,24 +126,6 @@ public:
 		GLOTTAL_SOURCE_PULSE = 0,
 		GLOTTAL_SOURCE_SINE = 1
 	};
-
-	VocalTractModel2(const ConfigurationData& data, bool interactive = false);
-	~VocalTractModel2() {}
-
-	double outputRate() const { return config_.outputRate; }
-
-	// ----- Batch mode.
-	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
-	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
-
-	// ----- Interactive mode.
-	void loadSingleInput(const VocalTractModelParameterValue pv);
-	// Synthesizes at least numberOfSamples samples (may synthesize more samples).
-	void synthesizeSamples(std::size_t numberOfSamples);
-	// Returns the number of samples read.
-	std::size_t getOutputSamples(std::size_t n, float* buffer);
-
-private:
 	enum {
 		VELUM = N1
 	};
