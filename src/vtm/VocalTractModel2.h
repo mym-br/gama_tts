@@ -31,7 +31,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <utility> /* move */
+#include <utility> /* move, swap */
 #include <vector>
 
 #include "BandpassFilter.h"
@@ -117,15 +117,15 @@ private:
 		VELUM = N1
 	};
 	enum { /*  OROPHARYNX SCATTERING JUNCTION COEFFICIENTS (BETWEEN EACH REGION)  */
-		C1 = R1, /*  R1-R2 (S1-S2)  */
-		C2 = R2, /*  R2-R3 (S2-S3)  */
-		C3 = R3, /*  R3-R4 (S3-S4)  */
-		C4 = R4, /*  R4-R5 (S5-S6)  */
-		C5 = R5, /*  R5-R6 (S7-S8)  */
-		C6 = R6, /*  R6-R7 (S8-S9)  */
-		C7 = R7, /*  R7-R8 (S9-S10)  */
-		C8 = R8, /*  R8-AIR (S10-AIR)  */
-		TOTAL_COEFFICIENTS = TOTAL_REGIONS
+		J1 = R1, /*  R1-R2 (S1-S2)  */
+		J2 = R2, /*  R2-R3 (S2-S3)  */
+		J3 = R3, /*  R3-R4 (S3-S4)  */
+		J4 = R4, /*  R4-R5 (S5-S6)  */
+		J5 = R5, /*  R5-R6 (S7-S8)  */
+		J6 = R6, /*  R6-R7 (S8-S9)  */
+		J7 = R7, /*  R7-R8 (S9-S10)  */
+		J8 = R8, /*  R8-AIR (S10-AIR)  */
+		TOTAL_JUNCTIONS = TOTAL_REGIONS
 	};
 	enum { /*  OROPHARYNX SECTIONS  */
 		S1  = 0, /*  R1  */
@@ -141,19 +141,13 @@ private:
 		TOTAL_SECTIONS = 10
 	};
 	enum { /*  NASAL TRACT COEFFICIENTS  */
-		NC1 = N1, /*  N1-N2  */
-		NC2 = N2, /*  N2-N3  */
-		NC3 = N3, /*  N3-N4  */
-		NC4 = N4, /*  N4-N5  */
-		NC5 = N5, /*  N5-N6  */
-		NC6 = N6, /*  N6-AIR  */
-		TOTAL_NASAL_COEFFICIENTS = TOTAL_NASAL_SECTIONS
-	};
-	enum { /*  THREE-WAY JUNCTION ALPHA COEFFICIENTS  */
-		LEFT  = 0,
-		RIGHT = 1,
-		UPPER = 2,
-		TOTAL_ALPHA_COEFFICIENTS = 3
+		NJ1 = N1, /*  N1-N2  */
+		NJ2 = N2, /*  N2-N3  */
+		NJ3 = N3, /*  N3-N4  */
+		NJ4 = N4, /*  N4-N5  */
+		NJ5 = N5, /*  N5-N6  */
+		NJ6 = N6, /*  N6-AIR  */
+		TOTAL_NASAL_JUNCTIONS = TOTAL_NASAL_SECTIONS
 	};
 	enum { /*  FRICATION INJECTION COEFFICIENTS  */
 		FC1 = 0, /*  S3  */
@@ -165,10 +159,6 @@ private:
 		FC7 = 6, /*  S9  */
 		FC8 = 7, /*  S10  */
 		TOTAL_FRIC_COEFFICIENTS = 8
-	};
-	enum { /*  BI-DIRECTIONAL TRANSMISSION LINE POINTERS  */
-		TOP    = 0,
-		BOTTOM = 1
 	};
 	enum ParameterIndex {
 		PARAM_GLOT_PITCH = 0,
@@ -241,6 +231,56 @@ private:
 		}
 	};
 
+	struct Junction2 {
+		FloatType coeff {};
+		void configure(FloatType leftRadius, FloatType rightRadius) {
+			const FloatType r0_2 = leftRadius * leftRadius;
+			const FloatType r1_2 = rightRadius * rightRadius;
+			coeff = (r0_2 - r1_2) / (r0_2 + r1_2);
+		}
+	};
+	struct Junction3 {
+		FloatType leftAlpha  {};
+		FloatType rightAlpha {};
+		FloatType upperAlpha {};
+		void configure(FloatType leftRadius, FloatType rightRadius, FloatType upperRadius) {
+			const FloatType r0_2 = leftRadius * leftRadius;
+			const FloatType r1_2 = rightRadius * rightRadius;
+			const FloatType r2_2 = upperRadius * upperRadius;
+			const FloatType sum = 2.0f / (r0_2 + r1_2 + r2_2);
+			leftAlpha  = sum * r0_2;
+			rightAlpha = sum * r1_2;
+			upperAlpha = sum * r2_2;
+		}
+	};
+	struct Section {
+		std::array<FloatType, 2> top    {};
+		std::array<FloatType, 2> bottom {};
+		void reset() {
+			top.fill(0.0);
+			bottom.fill(0.0);
+		}
+	};
+
+	void propagate(Section& left, Section& right, FloatType fricNoise) {
+		right.top[  inPtr_] = left.top[    outPtr_] * dampingFactor_ + fricNoise;
+		left.bottom[inPtr_] = right.bottom[outPtr_] * dampingFactor_;
+	}
+	void propagateJunction(Section& left, Junction2& junction, Section& right, FloatType fricNoise = 0.0) {
+		const FloatType delta = junction.coeff * (left.top[outPtr_] - right.bottom[outPtr_]);
+		right.top[  inPtr_] = (left.top[    outPtr_] + delta) * dampingFactor_ + fricNoise;
+		left.bottom[inPtr_] = (right.bottom[outPtr_] + delta) * dampingFactor_;
+	}
+	void propagateJunction(Section& left, Junction3& junction, Section& right, Section& upper, FloatType fricNoise) {
+		const FloatType junctionPressure =
+				junction.leftAlpha  *  left.top[   outPtr_] +
+				junction.rightAlpha * right.bottom[outPtr_] +
+				junction.upperAlpha * upper.bottom[outPtr_];
+		left.bottom[inPtr_] = (junctionPressure -  left.top[   outPtr_]) * dampingFactor_;
+		right.top[  inPtr_] = (junctionPressure - right.bottom[outPtr_]) * dampingFactor_ + fricNoise;
+		upper.top[  inPtr_] = (junctionPressure - upper.bottom[outPtr_]) * dampingFactor_;
+	}
+
 	VocalTractModel2(const VocalTractModel2&) = delete;
 	VocalTractModel2& operator=(const VocalTractModel2&) = delete;
 
@@ -267,18 +307,16 @@ private:
 	FloatType actualTubeLength_;            /*  actual length in cm  */
 
 	/*  MEMORY FOR TUBE AND TUBE COEFFICIENTS  */
-	FloatType oropharynx_[TOTAL_SECTIONS][2][2];
-	FloatType oropharynxCoeff_[TOTAL_COEFFICIENTS];
-
-	FloatType nasal_[TOTAL_NASAL_SECTIONS][2][2];
-	FloatType nasalCoeff_[TOTAL_NASAL_COEFFICIENTS];
-
-	FloatType alpha_[TOTAL_ALPHA_COEFFICIENTS];
-	int currentPtr_;
-	int prevPtr_;
+	std::array<Section, TOTAL_SECTIONS> oropharynx_;
+	Junction2 oropharynxJunction_[TOTAL_JUNCTIONS];
+	std::array<Section, TOTAL_NASAL_SECTIONS> nasal_;
+	Junction2 nasalJunction_[TOTAL_NASAL_JUNCTIONS];
+	Junction3 velumJunction_;
+	int inPtr_;
+	int outPtr_;
 
 	/*  MEMORY FOR FRICATION TAPS  */
-	FloatType fricationTap_[TOTAL_FRIC_COEFFICIENTS];
+	std::array<FloatType, TOTAL_FRIC_COEFFICIENTS> fricationTap_;
 
 	FloatType dampingFactor_;               /*  calculated damping factor  */
 	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
@@ -361,10 +399,14 @@ template<typename FloatType>
 void
 VocalTractModel2<FloatType>::reset()
 {
-	memset(&oropharynx_[0][0][0], 0, sizeof(FloatType) * TOTAL_SECTIONS * 2 * 2);
-	memset(&nasal_[0][0][0],      0, sizeof(FloatType) * TOTAL_NASAL_SECTIONS * 2 * 2);
-	currentPtr_ = 1;
-	prevPtr_    = 0;
+	for (auto& elem : oropharynx_) {
+		elem.reset();
+	}
+	for (auto& elem : nasal_) {
+		elem.reset();
+	}
+	inPtr_  = 1;
+	outPtr_ = 0;
 	prevGlotAmplitude_ = -1.0;
 	inputData_.clear();
 	singleInput_.fill(0.0);
@@ -639,19 +681,14 @@ template<typename FloatType>
 void
 VocalTractModel2<FloatType>::initializeNasalCavity()
 {
-	/*  CALCULATE COEFFICIENTS FOR INTERNAL FIXED SECTIONS OF NASAL CAVITY  */
-	for (int i = N2, j = NC2; i < N6; i++, j++) {
-		const FloatType radA2 = config_.nasalRadius[i]     * config_.nasalRadius[i];
-		const FloatType radB2 = config_.nasalRadius[i + 1] * config_.nasalRadius[i + 1];
-		nasalCoeff_[j] = (radA2 - radB2) / (radA2 + radB2);
+	// Configure junctions for fixed nasal sections.
+	for (int i = NJ2, j = N2; i < NJ6; ++i, ++j) {
+		nasalJunction_[i].configure(config_.nasalRadius[j], config_.nasalRadius[j + 1]);
 	}
 
-	/*  CALCULATE THE FIXED COEFFICIENT FOR THE NOSE APERTURE  */
-	const FloatType radA2 = config_.nasalRadius[N6] * config_.nasalRadius[N6];
-	const FloatType radB2 = config_.apertureRadius * config_.apertureRadius;
-	nasalCoeff_[NC6] = (radA2 - radB2) / (radA2 + radB2);
+	// Configure junction for the nose aperture.
+	nasalJunction_[NJ6].configure(config_.nasalRadius[N6], config_.apertureRadius);
 }
-
 
 /******************************************************************************
 *
@@ -667,32 +704,20 @@ template<typename FloatType>
 void
 VocalTractModel2<FloatType>::calculateTubeCoefficients()
 {
-	/*  CALCULATE COEFFICIENTS FOR THE OROPHARYNX  */
-	for (int i = 0; i < (TOTAL_REGIONS - 1); i++) {
-		const FloatType radA2 = currentParameter_[PARAM_R1 + i]     * currentParameter_[PARAM_R1 + i];
-		const FloatType radB2 = currentParameter_[PARAM_R1 + i + 1] * currentParameter_[PARAM_R1 + i + 1];
-		oropharynxCoeff_[i] = (radA2 - radB2) / (radA2 + radB2);
+	// Configure oropharynx junctions.
+	for (int i = J1, j = PARAM_R1; i < J8; ++i, ++j) {
+		oropharynxJunction_[i].configure(currentParameter_[j], currentParameter_[j + 1]);
 	}
 
-	/*  CALCULATE THE COEFFICIENT FOR THE MOUTH APERTURE  */
-	FloatType radA2 = currentParameter_[PARAM_R8] * currentParameter_[PARAM_R8];
-	FloatType radB2 = config_.apertureRadius * config_.apertureRadius;
-	oropharynxCoeff_[C8] = (radA2 - radB2) / (radA2 + radB2);
+	// Configure junction for the mouth aperture.
+	oropharynxJunction_[J8].configure(currentParameter_[PARAM_R8], config_.apertureRadius);
 
-	/*  CALCULATE ALPHA COEFFICIENTS FOR 3-WAY JUNCTION  */
-	/*  NOTE:  SINCE JUNCTION IS IN MIDDLE OF REGION 4, r0_2 = r1_2  */
-	const FloatType r1_2 = currentParameter_[PARAM_R4] * currentParameter_[PARAM_R4];
-	const FloatType r0_2 = r1_2;
-	const FloatType r2_2 = currentParameter_[PARAM_VELUM] * currentParameter_[PARAM_VELUM];
-	const FloatType sum = 2.0f / (r0_2 + r1_2 + r2_2);
-	alpha_[LEFT]  = sum * r0_2;
-	alpha_[RIGHT] = sum * r1_2;
-	alpha_[UPPER] = sum * r2_2;
+	// Configure 3-way junction.
+	// Note: Since junction is in middle of region 4, leftRadius = rightRadius.
+	velumJunction_.configure(currentParameter_[PARAM_R4], currentParameter_[PARAM_R4], currentParameter_[PARAM_VELUM]);
 
-	/*  AND 1ST NASAL PASSAGE COEFFICIENT  */
-	radA2 = r2_2;
-	radB2 = config_.nasalRadius[N2] * config_.nasalRadius[N2];
-	nasalCoeff_[NC1] = (radA2 - radB2) / (radA2 + radB2);
+	// Configure 1st nasal junction.
+	nasalJunction_[NJ1].configure(currentParameter_[PARAM_VELUM], config_.nasalRadius[N2]);
 }
 
 /******************************************************************************
@@ -747,106 +772,46 @@ VocalTractModel2<FloatType>::setFricationTaps()
 template<typename FloatType>
 FloatType VocalTractModel2<FloatType>::vocalTract(FloatType input, FloatType frication)
 {
-	FloatType delta;
+	std::swap(inPtr_, outPtr_);
 
-	/*  INCREMENT CURRENT AND PREVIOUS POINTERS  */
-	if (++currentPtr_ > 1) {
-		currentPtr_ = 0;
-	}
-	if (++prevPtr_ > 1) {
-		prevPtr_ = 0;
-	}
+	// Input to the tube.
+	oropharynx_[S1].top[inPtr_] = oropharynx_[S1].bottom[outPtr_] * dampingFactor_ + input;
 
-	/*  UPDATE OROPHARYNX  */
-	/*  INPUT TO TOP OF TUBE  */
-	oropharynx_[S1][TOP][currentPtr_] =
-			(oropharynx_[S1][BOTTOM][prevPtr_] * dampingFactor_) + input;
+	propagateJunction(oropharynx_[S1], oropharynxJunction_[J1], oropharynx_[S2]);
 
-	/*  CALCULATE THE SCATTERING JUNCTIONS FOR S1-S2  */
-	delta = oropharynxCoeff_[C1] *
-			(oropharynx_[S1][TOP][prevPtr_] - oropharynx_[S2][BOTTOM][prevPtr_]);
-	oropharynx_[S2][TOP][currentPtr_] =
-			(oropharynx_[S1][TOP][prevPtr_] + delta) * dampingFactor_;
-	oropharynx_[S1][BOTTOM][currentPtr_] =
-			(oropharynx_[S2][BOTTOM][prevPtr_] + delta) * dampingFactor_;
-
-	/*  CALCULATE THE SCATTERING JUNCTIONS FOR S2-S3 AND S3-S4  */
-	for (int i = S2, j = C2, k = FC1; i < S4; i++, j++, k++) {
-		delta = oropharynxCoeff_[j] *
-				(oropharynx_[i][TOP][prevPtr_] - oropharynx_[i + 1][BOTTOM][prevPtr_]);
-		oropharynx_[i + 1][TOP][currentPtr_] =
-				((oropharynx_[i][TOP][prevPtr_] + delta) * dampingFactor_) +
-				(fricationTap_[k] * frication);
-		oropharynx_[i][BOTTOM][currentPtr_] =
-				(oropharynx_[i + 1][BOTTOM][prevPtr_] + delta) * dampingFactor_;
+	for (int i = S2, j = J2, k = FC1; i < S4; ++i, ++j, ++k) {
+		propagateJunction(oropharynx_[i], oropharynxJunction_[j], oropharynx_[i + 1], fricationTap_[k] * frication);
 	}
 
-	/*  UPDATE 3-WAY JUNCTION BETWEEN THE MIDDLE OF R4 AND NASAL CAVITY  */
-	const FloatType junctionPressure = (alpha_[LEFT] * oropharynx_[S4][TOP][prevPtr_])+
-			(alpha_[RIGHT] * oropharynx_[S5][BOTTOM][prevPtr_]) +
-			(alpha_[UPPER] * nasal_[VELUM][BOTTOM][prevPtr_]);
-	oropharynx_[S4][BOTTOM][currentPtr_] =
-			(junctionPressure - oropharynx_[S4][TOP][prevPtr_]) * dampingFactor_;
-	oropharynx_[S5][TOP][currentPtr_] =
-			((junctionPressure - oropharynx_[S5][BOTTOM][prevPtr_]) * dampingFactor_)
-			+ (fricationTap_[FC3] * frication);
-	nasal_[VELUM][TOP][currentPtr_] =
-			(junctionPressure - nasal_[VELUM][BOTTOM][prevPtr_]) * dampingFactor_;
+	// 3-way junction between the middle of R4 and the nasal cavity.
+	propagateJunction(oropharynx_[S4], velumJunction_, oropharynx_[S5], nasal_[VELUM], fricationTap_[FC3] * frication);
 
-	/*  CALCULATE JUNCTION BETWEEN R4 AND R5 (S5-S6)  */
-	delta = oropharynxCoeff_[C4] *
-			(oropharynx_[S5][TOP][prevPtr_] - oropharynx_[S6][BOTTOM][prevPtr_]);
-	oropharynx_[S6][TOP][currentPtr_] =
-			((oropharynx_[S5][TOP][prevPtr_] + delta) * dampingFactor_) +
-			(fricationTap_[FC4] * frication);
-	oropharynx_[S5][BOTTOM][currentPtr_] =
-			(oropharynx_[S6][BOTTOM][prevPtr_] + delta) * dampingFactor_;
+	propagateJunction(oropharynx_[S5], oropharynxJunction_[J4], oropharynx_[S6], fricationTap_[FC4] * frication);
 
-	/*  CALCULATE JUNCTION INSIDE R5 (S6-S7) (PURE DELAY WITH DAMPING)  */
-	oropharynx_[S7][TOP][currentPtr_] =
-			(oropharynx_[S6][TOP][prevPtr_] * dampingFactor_) +
-			(fricationTap_[FC5] * frication);
-	oropharynx_[S6][BOTTOM][currentPtr_] =
-			oropharynx_[S7][BOTTOM][prevPtr_] * dampingFactor_;
+	// Pure delay with damping.
+	propagate(oropharynx_[S6], oropharynx_[S7], fricationTap_[FC5] * frication);
 
-	/*  CALCULATE LAST 3 INTERNAL JUNCTIONS (S7-S8, S8-S9, S9-S10)  */
-	for (int i = S7, j = C5, k = FC6; i < S10; i++, j++, k++) {
-		delta = oropharynxCoeff_[j] *
-				(oropharynx_[i][TOP][prevPtr_] - oropharynx_[i + 1][BOTTOM][prevPtr_]);
-		oropharynx_[i + 1][TOP][currentPtr_] =
-				((oropharynx_[i][TOP][prevPtr_] + delta) * dampingFactor_) +
-				(fricationTap_[k] * frication);
-		oropharynx_[i][BOTTOM][currentPtr_] =
-				(oropharynx_[i + 1][BOTTOM][prevPtr_] + delta) * dampingFactor_;
+	for (int i = S7, j = J5, k = FC6; i < S10; ++i, ++j, ++k) {
+		propagateJunction(oropharynx_[i], oropharynxJunction_[j], oropharynx_[i + 1] , fricationTap_[k] * frication);
 	}
 
-	/*  REFLECTED SIGNAL AT MOUTH GOES THROUGH A LOWPASS FILTER  */
-	oropharynx_[S10][BOTTOM][currentPtr_] =  dampingFactor_ *
-			mouthReflectionFilter_->filter(oropharynxCoeff_[C8] *
-							oropharynx_[S10][TOP][prevPtr_]);
+	// Reflected signal at the mouth goes through a lowpass filter.
+	oropharynx_[S10].bottom[inPtr_] = dampingFactor_ * mouthReflectionFilter_->filter(oropharynxJunction_[J8].coeff * oropharynx_[S10].top[outPtr_]);
 
-	/*  OUTPUT FROM MOUTH GOES THROUGH A HIGHPASS FILTER  */
-	FloatType output = mouthRadiationFilter_->filter((1.0f + oropharynxCoeff_[C8]) *
-						oropharynx_[S10][TOP][prevPtr_]);
+	// Output from mouth goes through a highpass filter.
+	FloatType output = mouthRadiationFilter_->filter((1.0f + oropharynxJunction_[J8].coeff) * oropharynx_[S10].top[outPtr_]);
 
-	/*  UPDATE NASAL CAVITY  */
-	for (int i = VELUM, j = NC1; i < N6; i++, j++) {
-		delta = nasalCoeff_[j] *
-				(nasal_[i][TOP][prevPtr_] - nasal_[i + 1][BOTTOM][prevPtr_]);
-		nasal_[i+1][TOP][currentPtr_] =
-				(nasal_[i][TOP][prevPtr_] + delta) * dampingFactor_;
-		nasal_[i][BOTTOM][currentPtr_] =
-				(nasal_[i + 1][BOTTOM][prevPtr_] + delta) * dampingFactor_;
+	for (int i = N1, j = NJ1; i < N6; ++i, ++j) {
+		propagateJunction(nasal_[i], nasalJunction_[j], nasal_[i + 1]);
 	}
 
-	/*  REFLECTED SIGNAL AT NOSE GOES THROUGH A LOWPASS FILTER  */
-	nasal_[N6][BOTTOM][currentPtr_] = dampingFactor_ *
-			nasalReflectionFilter_->filter(nasalCoeff_[NC6] * nasal_[N6][TOP][prevPtr_]);
+	// Reflected signal at the nose goes through a lowpass filter.
+	nasal_[N6].bottom[inPtr_] = dampingFactor_ * nasalReflectionFilter_->filter(nasalJunction_[NJ6].coeff * nasal_[N6].top[outPtr_]);
 
-	/*  OUTPUT FROM NOSE GOES THROUGH A HIGHPASS FILTER  */
-	output += nasalRadiationFilter_->filter((1.0f + nasalCoeff_[NC6]) *
-						nasal_[N6][TOP][prevPtr_]);
-	/*  RETURN SUMMED OUTPUT FROM MOUTH AND NOSE  */
+	// Output from nose goes through a highpass filter.
+	output += nasalRadiationFilter_->filter((1.0f + nasalJunction_[NJ6].coeff) * nasal_[N6].top[outPtr_]);
+
+	// Return summed output from mouth and nose.
 	return output;
 }
 
