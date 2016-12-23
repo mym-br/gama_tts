@@ -31,7 +31,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <utility> /* move */
+#include <utility> /* move, swap */
 #include <vector>
 
 #include "BandpassFilter.h"
@@ -748,14 +748,7 @@ template<typename FloatType>
 FloatType VocalTractModel0<FloatType>::vocalTract(FloatType input, FloatType frication)
 {
 	FloatType delta;
-
-	/*  INCREMENT CURRENT AND PREVIOUS POINTERS  */
-	if (++currentPtr_ > 1) {
-		currentPtr_ = 0;
-	}
-	if (++prevPtr_ > 1) {
-		prevPtr_ = 0;
-	}
+	std::swap(prevPtr_, currentPtr_);
 
 	/*  UPDATE OROPHARYNX  */
 	/*  INPUT TO TOP OF TUBE  */
