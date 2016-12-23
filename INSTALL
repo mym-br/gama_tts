@@ -3,9 +3,9 @@
 
   - CMake.
 
-  - A C++ compiler with C++11 support.
-    The following compilers have been tested:
-    - GCC 5.3 (Linux x86_64).
+  - A C++ compiler with C++14 support.
+    The following compiler has been tested:
+    - GCC 5.4 (Linux x86_64).
 
 - Build:
 
