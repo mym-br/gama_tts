@@ -36,7 +36,7 @@ namespace En {
 *                       character.
 *
 *       arguments:      in, eow
-*                       
+*
 *	internal
 *	functions:	member
 *
@@ -47,7 +47,7 @@ namespace En {
 char
 final_s(char * /* in */, char **eow)
 {
-    register char      *end = *eow;
+    char      *end = *eow;
     char                retval = 0;
 
     /*  STRIP TRAILING S's  */

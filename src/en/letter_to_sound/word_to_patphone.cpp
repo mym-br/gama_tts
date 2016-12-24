@@ -163,11 +163,11 @@ namespace En {
 *
 *	function:	word_to_patphone
 *
-*	purpose:	
-*                       
-*			
+*	purpose:
+*
+*
 *       arguments:      word
-*                       
+*
 *	internal
 *	functions:	all_caps, spell_it, vowel_before, check_word_list,
 *                       final_s, ie_to_y, mark_final_e, long_medial_vowels,
@@ -181,7 +181,7 @@ int
 word_to_patphone(char *word)
 {
     char                *end_of_word;
-    register char       replace_s = 0;
+    char       replace_s = 0;
 
 
     /*  FIND END OF WORD  */
@@ -212,7 +212,7 @@ word_to_patphone(char *word)
 
     /*  FLIP IE TO Y, IF ANY CHANGES RECHECK WORD LIST  */
     if (ie_to_y(word, &end_of_word) || replace_s)
-        /*  IN WORD LIST NOW ALL DONE  */
+	/*  IN WORD LIST NOW ALL DONE  */
 	if (check_word_list(word, &end_of_word)) {   /* Will eliminate this as well */
 	    if (replace_s) {
 		*++end_of_word = replace_s;            /* & 0x5f [source of problems] */

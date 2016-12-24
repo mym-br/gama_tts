@@ -32,10 +32,10 @@ namespace En {
 *
 *	function:	medial_silent_e
 *
-*	purpose:	
-*                       
+*	purpose:
+*
 *       arguments:      in, eow
-*                       
+*
 *	internal
 *	functions:	member, insert_mark
 *
@@ -47,8 +47,8 @@ void
 medial_silent_e(char *in, char **eow)
 {
     char               *end = *eow;
-    register char      *position;
-    register int        index;
+    char      *position;
+    int        index;
 
     for (position = in + 2; position < end - 5; position++) {
 	if (!member(position[0], "bcdfgmnprst"))

@@ -29,11 +29,11 @@ namespace En {
 *
 *	function:	insert_mark
 *
-*	purpose:	
-*                       
-*			
+*	purpose:
+*
+*
 *       arguments:      end, at
-*                       
+*
 *	internal
 *	functions:	none
 *
@@ -44,7 +44,7 @@ namespace En {
 void
 insert_mark(char **end, char *at)
 {
-    register char      *temp = *end;
+    char      *temp = *end;
 
     at++;
 
