@@ -1,0 +1,16 @@
+0: Original from Gnuspeech, double precision.
+	The delay in each section is 1 period.
+	Class: VocalTractModel0
+	Data directory: en/vtm0/
+
+1: Original from Gnuspeech, single precision.
+	Class: VocalTractModel0
+	Data directory: en/vtm0/
+
+2: Equivalent to model 0, but the source code is easier to understand.
+	Class: VocalTractModel2
+	Data directory: en/vtm0/
+
+3: Based on model 2, but the delay in each section is 3 periods.
+	Class: VocalTractModel2
+	Data directory: en/vtm0/
