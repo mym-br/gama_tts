@@ -37,7 +37,9 @@ VocalTractModel::getInstance(const ConfigurationData& data, bool interactive)
 	case 1:
 		return std::make_unique<VocalTractModel0<float>>(data, interactive);
 	case 2:
-		return std::make_unique<VocalTractModel2<double>>(data, interactive);
+		return std::make_unique<VocalTractModel2<double, 1>>(data, interactive);
+	case 3:
+		return std::make_unique<VocalTractModel2<double, 3>>(data, interactive);
 	default:
 		THROW_EXCEPTION(InvalidValueException, "[VocalTractModel::getInstance] Invalid vocal tract model number: " << modelNumber << '.');
 	}
