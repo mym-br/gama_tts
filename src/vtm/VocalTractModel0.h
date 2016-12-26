@@ -745,7 +745,8 @@ VocalTractModel0<FloatType>::setFricationTaps()
 *
 ******************************************************************************/
 template<typename FloatType>
-FloatType VocalTractModel0<FloatType>::vocalTract(FloatType input, FloatType frication)
+FloatType
+VocalTractModel0<FloatType>::vocalTract(FloatType input, FloatType frication)
 {
 	FloatType delta;
 	std::swap(prevPtr_, currentPtr_);

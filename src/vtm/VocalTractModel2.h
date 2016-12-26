@@ -82,7 +82,7 @@
 namespace GS {
 namespace VTM {
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 class VocalTractModel2 : public VocalTractModel {
 public:
 	VocalTractModel2(const ConfigurationData& data, bool interactive = false);
@@ -273,11 +273,12 @@ private:
 			top.fill(0.0);
 			bottom.fill(0.0);
 		}
-		static void movePointer(int& p) {
-			if (p == SectionDelay) {
-				p = 0;
+		static void movePointers(unsigned int& in, unsigned int& out) {
+			in = out;
+			if (out == SectionDelay) {
+				out = 0;
 			} else {
-				++p;
+				++out;
 			}
 		}
 	};
@@ -332,8 +333,8 @@ private:
 	std::array<Section, TOTAL_NASAL_SECTIONS> nasal_;
 	Junction2 nasalJunction_[TOTAL_NASAL_JUNCTIONS];
 	Junction3 velumJunction_;
-	int inPtr_;
-	int outPtr_;
+	unsigned int inPtr_;
+	unsigned int outPtr_;
 
 	/*  MEMORY FOR FRICATION TAPS  */
 	std::array<FloatType, TOTAL_FRIC_COEFFICIENTS> fricationTap_;
@@ -365,7 +366,7 @@ private:
 
 
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 VocalTractModel2<FloatType, SectionDelay>::VocalTractModel2(const ConfigurationData& data, bool interactive)
 		: interactive_ {interactive}
 {
@@ -376,7 +377,7 @@ VocalTractModel2<FloatType, SectionDelay>::VocalTractModel2(const ConfigurationD
 	outputData_.reserve(1024);
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::loadConfiguration(const ConfigurationData& data)
 {
@@ -415,7 +416,7 @@ VocalTractModel2<FloatType, SectionDelay>::loadConfiguration(const Configuration
 	config_.radiusCoef[7]  = data.value<FloatType>("radius_8_coef") * globalRadiusCoef;
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::reset()
 {
@@ -445,7 +446,7 @@ VocalTractModel2<FloatType, SectionDelay>::reset()
 	if (inputFilters_)          inputFilters_->reset();
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::synthesizeToFile(std::istream& inputStream, const char* outputFile)
 {
@@ -457,7 +458,7 @@ VocalTractModel2<FloatType, SectionDelay>::synthesizeToFile(std::istream& inputS
 	writeOutputToFile(outputFile);
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer)
 {
@@ -469,7 +470,7 @@ VocalTractModel2<FloatType, SectionDelay>::synthesizeToBuffer(std::istream& inpu
 	writeOutputToBuffer(outputBuffer);
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::parseInputStream(std::istream& in)
 {
@@ -510,7 +511,7 @@ VocalTractModel2<FloatType, SectionDelay>::parseInputStream(std::istream& in)
 *             be run.
 *
 ******************************************************************************/
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::initializeSynthesizer()
 {
@@ -583,7 +584,7 @@ VocalTractModel2<FloatType, SectionDelay>::initializeSynthesizer()
 *  purpose:   Performs the actual synthesis of sound samples.
 *
 ******************************************************************************/
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::synthesizeForInputSequence()
 {
@@ -610,7 +611,7 @@ VocalTractModel2<FloatType, SectionDelay>::synthesizeForInputSequence()
 	}
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::synthesizeSamples(std::size_t numberOfSamples)
 {
@@ -633,7 +634,7 @@ VocalTractModel2<FloatType, SectionDelay>::synthesizeSamples(std::size_t numberO
 	}
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::synthesize()
 {
@@ -698,7 +699,7 @@ VocalTractModel2<FloatType, SectionDelay>::synthesize()
 *             sections of the nasal cavity.
 *
 ******************************************************************************/
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::initializeNasalCavity()
 {
@@ -721,7 +722,7 @@ VocalTractModel2<FloatType, SectionDelay>::initializeNasalCavity()
 *             pair for the mouth and nose.
 *
 ******************************************************************************/
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::calculateTubeCoefficients()
 {
@@ -749,7 +750,7 @@ VocalTractModel2<FloatType, SectionDelay>::calculateTubeCoefficients()
 *             position and amplitude of frication.
 *
 ******************************************************************************/
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::setFricationTaps()
 {
@@ -790,11 +791,11 @@ VocalTractModel2<FloatType, SectionDelay>::setFricationTaps()
 *             cavities.  Also injects frication appropriately.
 *
 ******************************************************************************/
-template<typename FloatType, int SectionDelay>
-FloatType VocalTractModel2<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType frication)
+template<typename FloatType, unsigned int SectionDelay>
+FloatType
+VocalTractModel2<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType frication)
 {
-	Section::movePointer(inPtr_);
-	Section::movePointer(outPtr_);
+	Section::movePointers(inPtr_, outPtr_);
 
 	// Input to the tube.
 	oropharynx_[S1].top[inPtr_] = oropharynx_[S1].bottom[outPtr_] * dampingFactor_ + input;
@@ -846,7 +847,7 @@ FloatType VocalTractModel2<FloatType, SectionDelay>::vocalTract(FloatType input,
 *             header. Also does master volume scaling.
 *
 ******************************************************************************/
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::writeOutputToFile(const char* outputFile)
 {
@@ -864,7 +865,7 @@ VocalTractModel2<FloatType, SectionDelay>::writeOutputToFile(const char* outputF
 	}
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::writeOutputToBuffer(std::vector<float>& outputBuffer)
 {
@@ -882,7 +883,7 @@ VocalTractModel2<FloatType, SectionDelay>::writeOutputToBuffer(std::vector<float
 	}
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 float
 VocalTractModel2<FloatType, SectionDelay>::calculateOutputScale()
 {
@@ -896,7 +897,7 @@ VocalTractModel2<FloatType, SectionDelay>::calculateOutputScale()
 	return scale;
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel2<FloatType, SectionDelay>::loadSingleInput(const VocalTractModelParameterValue pv)
 {
@@ -928,7 +929,7 @@ VocalTractModel2<FloatType, SectionDelay>::loadSingleInput(const VocalTractModel
 	}
 }
 
-template<typename FloatType, int SectionDelay>
+template<typename FloatType, unsigned int SectionDelay>
 std::size_t
 VocalTractModel2<FloatType, SectionDelay>::getOutputSamples(std::size_t n, float* buffer)
 {
