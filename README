@@ -2,12 +2,6 @@
 GamaTTS
 =======
 
-################################################################################
-WARNING:
-  This software is dangerous to your health.
-  Use at your own risk.
-################################################################################
-
 GamaTTS is a command-line articulatory synthesizer that converts text
 to speech.
 
