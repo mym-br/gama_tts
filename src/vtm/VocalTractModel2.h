@@ -32,6 +32,9 @@
 //              J1    J2    J3          J4          J5    J6    J7    J8
 //                    FC1   FC2   FC3   FC4   FC5   FC6   FC7   FC8
 
+// Note:
+// - NoiseFilter has not been adapted for SectionDelay > 1.
+
 #ifndef VTM_VOCAL_TRACT_MODEL_2_H_
 #define VTM_VOCAL_TRACT_MODEL_2_H_
 
