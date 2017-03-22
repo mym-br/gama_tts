@@ -328,7 +328,6 @@ private:
 	/*  DERIVED VALUES  */
 	int controlPeriod_;
 	int sampleRate_;
-	FloatType actualTubeLength_;            /*  actual length in cm  */
 
 	/*  MEMORY FOR TUBE AND TUBE COEFFICIENTS  */
 	std::array<Section, TOTAL_SECTIONS> oropharynx_;
@@ -525,7 +524,6 @@ VocalTractModel2<FloatType, SectionDelay>::initializeSynthesizer()
 		const FloatType c = Util::speedOfSound(config_.temperature);
 		controlPeriod_ = static_cast<int>(std::rint((c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / (config_.length * config_.controlRate)));
 		sampleRate_ = static_cast<int>(config_.controlRate * controlPeriod_);
-		actualTubeLength_ = (c * TOTAL_SECTIONS * 100.0f) / sampleRate_;
 		nyquist = sampleRate_ / 2.0f;
 		LOG_DEBUG("[VocalTractModel2] Internal sample rate: " << sampleRate_);
 	} else {

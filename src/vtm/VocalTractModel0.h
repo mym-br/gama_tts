@@ -264,7 +264,6 @@ private:
 	/*  DERIVED VALUES  */
 	int controlPeriod_;
 	int sampleRate_;
-	FloatType actualTubeLength_;            /*  actual length in cm  */
 
 	/*  MEMORY FOR TUBE AND TUBE COEFFICIENTS  */
 	FloatType oropharynx_[TOTAL_SECTIONS][2][2];
@@ -459,7 +458,6 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 		const FloatType c = Util::speedOfSound(config_.temperature);
 		controlPeriod_ = static_cast<int>(std::rint((c * TOTAL_SECTIONS * 100.0f) / (config_.length * config_.controlRate)));
 		sampleRate_ = static_cast<int>(config_.controlRate * controlPeriod_);
-		actualTubeLength_ = (c * TOTAL_SECTIONS * 100.0f) / sampleRate_;
 		nyquist = sampleRate_ / 2.0f;
 	} else {
 		THROW_EXCEPTION(VTMException, "Illegal tube length.\n");
