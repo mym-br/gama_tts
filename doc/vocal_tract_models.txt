@@ -14,3 +14,8 @@
 3: Based on model 2, but the delay in each section is 3 periods.
 	Class: VocalTractModel2
 	Data directory: en/vtm0/
+
+4: Based on model 2, but with 30 main sections. The size of the regions are:
+   3, 2, 4, 6, 6, 4, 2, 3 (sections).
+	Class: VocalTractModel4
+	Data directory: en/vtm0/

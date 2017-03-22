@@ -21,6 +21,7 @@
 #include "Exception.h"
 #include "VocalTractModel0.h"
 #include "VocalTractModel2.h"
+#include "VocalTractModel4.h"
 
 
 
@@ -40,6 +41,8 @@ VocalTractModel::getInstance(const ConfigurationData& data, bool interactive)
 		return std::make_unique<VocalTractModel2<double, 1>>(data, interactive);
 	case 3:
 		return std::make_unique<VocalTractModel2<double, 3>>(data, interactive);
+	case 4:
+		return std::make_unique<VocalTractModel4<double, 1>>(data, interactive);
 	default:
 		THROW_EXCEPTION(InvalidValueException, "[VocalTractModel::getInstance] Invalid vocal tract model number: " << modelNumber << '.');
 	}

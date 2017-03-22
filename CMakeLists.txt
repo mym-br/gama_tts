@@ -115,6 +115,7 @@ set(LIBRARY_FILES
     src/vtm/VocalTractModel.h
     src/vtm/VocalTractModel0.h
     src/vtm/VocalTractModel2.h
+    src/vtm/VocalTractModel4.h
     src/vtm/VTMUtil.h
     src/vtm/WavetableGlottalSource.h
 
