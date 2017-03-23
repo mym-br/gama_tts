@@ -69,16 +69,16 @@
 #include "WAVEFileWriter.h"
 #include "WavetableGlottalSource.h"
 
-#define GS_VTM_VOCAL_TRACT_MODEL_2_MIN_RADIUS (0.001)
-#define GS_VTM_VOCAL_TRACT_MODEL_2_INPUT_FILTER_PERIOD_SEC (50.0e-3)
+#define GS_VTM_VOCAL_TRACT_MODEL_4_MIN_RADIUS (0.001)
+#define GS_VTM_VOCAL_TRACT_MODEL_4_INPUT_FILTER_PERIOD_SEC (50.0e-3)
 
 /*  SCALING CONSTANT FOR INPUT TO VOCAL TRACT & THROAT (MATCHES DSP)  */
-//#define GS_VTM_VOCAL_TRACT_MODEL_2_VT_SCALE                  0.03125     /*  2^(-5)  */
+//#define GS_VTM_VOCAL_TRACT_MODEL_4_VT_SCALE                  0.03125     /*  2^(-5)  */
 // this is a temporary fix only, to try to match dsp synthesizer
-#define GS_VTM_VOCAL_TRACT_MODEL_2_VT_SCALE                  0.125     /*  2^(-3)  */
+#define GS_VTM_VOCAL_TRACT_MODEL_4_VT_SCALE                  0.125     /*  2^(-3)  */
 
 /*  FINAL OUTPUT SCALING, SO THAT .SND FILES APPROX. MATCH DSP OUTPUT  */
-#define GS_VTM_VOCAL_TRACT_MODEL_2_OUTPUT_SCALE              0.95
+#define GS_VTM_VOCAL_TRACT_MODEL_4_OUTPUT_SCALE              0.95
 
 
 
@@ -549,7 +549,7 @@ VocalTractModel4<FloatType, SectionDelay>::parseInputStream(std::istream& in)
 
 		// R1 - R8.
 		for (int i = 0; i < TOTAL_REGIONS; ++i) {
-			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], FloatType{GS_VTM_VOCAL_TRACT_MODEL_2_MIN_RADIUS});
+			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], FloatType{GS_VTM_VOCAL_TRACT_MODEL_4_MIN_RADIUS});
 		}
 
 		inputData_.push_back(value);
@@ -631,7 +631,7 @@ VocalTractModel4<FloatType, SectionDelay>::initializeSynthesizer()
 	noiseSource_    = std::make_unique<NoiseSource>();
 
 	if (interactive_) {
-		inputFilters_ = std::make_unique<InputFilters>(sampleRate_, GS_VTM_VOCAL_TRACT_MODEL_2_INPUT_FILTER_PERIOD_SEC);
+		inputFilters_ = std::make_unique<InputFilters>(sampleRate_, GS_VTM_VOCAL_TRACT_MODEL_4_INPUT_FILTER_PERIOD_SEC);
 	}
 }
 
@@ -737,11 +737,11 @@ VocalTractModel4<FloatType, SectionDelay>::synthesize()
 	}
 
 	/*  PUT SIGNAL THROUGH VOCAL TRACT  */
-	signal = vocalTract(((pulse + (ah1 * signal)) * FloatType{GS_VTM_VOCAL_TRACT_MODEL_2_VT_SCALE}),
+	signal = vocalTract(((pulse + (ah1 * signal)) * FloatType{GS_VTM_VOCAL_TRACT_MODEL_4_VT_SCALE}),
 				bandpassFilter_->filter(signal));
 
 	/*  PUT PULSE THROUGH THROAT  */
-	signal += throat_->process(pulse * FloatType{GS_VTM_VOCAL_TRACT_MODEL_2_VT_SCALE});
+	signal += throat_->process(pulse * FloatType{GS_VTM_VOCAL_TRACT_MODEL_4_VT_SCALE});
 
 	/*  OUTPUT SAMPLE HERE  */
 	srConv_->dataFill(signal);
@@ -979,7 +979,7 @@ VocalTractModel4<FloatType, SectionDelay>::calculateOutputScale()
 		return 0.0;
 	}
 
-	const float scale = GS_VTM_VOCAL_TRACT_MODEL_2_OUTPUT_SCALE / maxValue;
+	const float scale = GS_VTM_VOCAL_TRACT_MODEL_4_OUTPUT_SCALE / maxValue;
 	LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
 }
@@ -1009,7 +1009,7 @@ VocalTractModel4<FloatType, SectionDelay>::loadSingleInput(const VocalTractModel
 	case PARAM_R8:
 		singleInput_[pv.index] = std::max(
 					pv.value * config_.radiusCoef[pv.index - PARAM_R1],
-					FloatType{GS_VTM_VOCAL_TRACT_MODEL_2_MIN_RADIUS});
+					FloatType{GS_VTM_VOCAL_TRACT_MODEL_4_MIN_RADIUS});
 		break;
 	default:
 		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << pv.index << '.');
