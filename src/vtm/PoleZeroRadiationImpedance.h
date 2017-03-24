@@ -101,7 +101,7 @@ private:
 	FloatType cR1_, cR2_, cR3_; // reflection coefficients
 	FloatType oldRadius_;
 
-	static constexpr FloatType MIN_RADIUS = 0.4e-2;
+	static constexpr FloatType TRANSITION_RADIUS = 0.5e-2;
 	//static constexpr FloatType MAX_RADIUS = 5.0e-2;
 	static constexpr FloatType MIN_SAMPLE_RATE = 50000.0;
 };
@@ -140,8 +140,8 @@ PoleZeroRadiationImpedance<FloatType>::reset()
 template<typename FloatType>
 FloatType
 PoleZeroRadiationImpedance<FloatType>::transitionFrequency(FloatType radius) {
-	if (radius < MIN_RADIUS) {
-		radius = MIN_RADIUS;
+	if (radius < TRANSITION_RADIUS) {
+		radius = TRANSITION_RADIUS;
 	}
 	return FloatType{62.547840296135675} / radius + FloatType{321.9571845220485};
 }
@@ -163,8 +163,12 @@ PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
 	const FloatType qb = -2.0f * (cosWT + 1.0f);
 	const FloatType qc = cosWT + 1.0f;
 	const FloatType delta = qb * qb - 4.0f * qa * qc;
-	const FloatType a = (-qb - std::sqrt(delta)) / (2.0f * qa);
+	FloatType a = (-qb - std::sqrt(delta)) / (2.0f * qa);
 	const FloatType b = 2.0f * a - 1.0f;
+
+	if (radius < TRANSITION_RADIUS) {
+		a *= FloatType{40388.5882415607} * (radius * radius);
+	}
 
 	const FloatType coef = 1.0f / (a + 1.0f);
 	const FloatType aPlusB = a + b;
