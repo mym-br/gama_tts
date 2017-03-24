@@ -103,10 +103,12 @@ set(LIBRARY_FILES
     src/rapidxml/rapidxml.hpp
 
     src/vtm/BandpassFilter.h
+    src/vtm/DifferenceFilter.h
     src/vtm/FIRFilter.h
     src/vtm/MovingAverageFilter.h
     src/vtm/NoiseFilter.h
     src/vtm/NoiseSource.h
+    src/vtm/PoleZeroRadiationImpedance.h
     src/vtm/RadiationFilter.h
     src/vtm/ReflectionFilter.h
     src/vtm/SampleRateConverter.h

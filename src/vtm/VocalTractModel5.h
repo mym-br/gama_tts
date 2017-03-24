@@ -40,6 +40,7 @@
 
 #include <algorithm> /* max, min */
 #include <array>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -53,13 +54,13 @@
 
 #include "BandpassFilter.h"
 #include "ConfigurationData.h"
+#include "DifferenceFilter.h"
 #include "Exception.h"
 #include "Log.h"
 #include "MovingAverageFilter.h"
 #include "NoiseFilter.h"
 #include "NoiseSource.h"
-#include "RadiationFilter.h"
-#include "ReflectionFilter.h"
+#include "PoleZeroRadiationImpedance.h"
 #include "SampleRateConverter.h"
 #include "Text.h"
 #include "Throat.h"
@@ -410,17 +411,16 @@ private:
 	std::array<FloatType, TOTAL_PARAMETERS> singleInput_;
 	std::size_t outputDataPos_;
 	std::vector<float> outputData_;
-	std::unique_ptr<SampleRateConverter<FloatType>>    srConv_;
-	std::unique_ptr<RadiationFilter<FloatType>>        mouthRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>>       mouthReflectionFilter_;
-	std::unique_ptr<RadiationFilter<FloatType>>        nasalRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>>       nasalReflectionFilter_;
-	std::unique_ptr<Throat<FloatType>>                 throat_;
-	std::unique_ptr<WavetableGlottalSource<FloatType>> glottalSource_;
-	std::unique_ptr<BandpassFilter<FloatType>>         bandpassFilter_;
-	std::unique_ptr<NoiseFilter<FloatType>>            noiseFilter_;
-	std::unique_ptr<NoiseSource>                       noiseSource_;
-	std::unique_ptr<InputFilters>                      inputFilters_;
+	std::unique_ptr<SampleRateConverter<FloatType>>        srConv_;
+	std::unique_ptr<PoleZeroRadiationImpedance<FloatType>> mouthRadiationImpedance_;
+	std::unique_ptr<PoleZeroRadiationImpedance<FloatType>> nasalRadiationImpedance_;
+	std::unique_ptr<Throat<FloatType>>                     throat_;
+	std::unique_ptr<WavetableGlottalSource<FloatType>>     glottalSource_;
+	std::unique_ptr<BandpassFilter<FloatType>>             bandpassFilter_;
+	std::unique_ptr<NoiseFilter<FloatType>>                noiseFilter_;
+	std::unique_ptr<NoiseSource>                           noiseSource_;
+	std::unique_ptr<InputFilters>                          inputFilters_;
+	DifferenceFilter<FloatType>                            outputDiffFilter_;
 };
 
 
@@ -492,17 +492,16 @@ VocalTractModel5<FloatType, SectionDelay>::reset()
 	singleInput_.fill(0.0);
 	outputData_.clear();
 	outputDataPos_ = 0;
-	if (srConv_)                srConv_->reset();
-	if (mouthRadiationFilter_)  mouthRadiationFilter_->reset();
-	if (mouthReflectionFilter_) mouthReflectionFilter_->reset();
-	if (nasalRadiationFilter_)  nasalRadiationFilter_->reset();
-	if (nasalReflectionFilter_) nasalReflectionFilter_->reset();
-	if (throat_)                throat_->reset();
-	if (glottalSource_)         glottalSource_->reset();
-	if (bandpassFilter_)        bandpassFilter_->reset();
-	if (noiseFilter_)           noiseFilter_->reset();
-	if (noiseSource_)           noiseSource_->reset();
-	if (inputFilters_)          inputFilters_->reset();
+	if (srConv_)                  srConv_->reset();
+	if (mouthRadiationImpedance_) mouthRadiationImpedance_->reset();
+	if (nasalRadiationImpedance_) nasalRadiationImpedance_->reset();
+	if (throat_)                  throat_->reset();
+	if (glottalSource_)           glottalSource_->reset();
+	if (bandpassFilter_)          bandpassFilter_->reset();
+	if (noiseFilter_)             noiseFilter_->reset();
+	if (noiseSource_)             noiseSource_->reset();
+	if (inputFilters_)            inputFilters_->reset();
+	outputDiffFilter_.reset();
 }
 
 template<typename FloatType, unsigned int SectionDelay>
@@ -574,14 +573,11 @@ template<typename FloatType, unsigned int SectionDelay>
 void
 VocalTractModel5<FloatType, SectionDelay>::initializeSynthesizer()
 {
-	FloatType nyquist;
-
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
 	if (config_.length > 0.0) {
 		const FloatType c = Util::speedOfSound(config_.temperature);
 		controlPeriod_ = static_cast<int>(std::rint((c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / (config_.length * config_.controlRate)));
 		sampleRate_ = static_cast<int>(config_.controlRate * controlPeriod_);
-		nyquist = sampleRate_ / 2.0f;
 		LOG_DEBUG("[VocalTractModel5] Internal sample rate: " << sampleRate_);
 	} else {
 		THROW_EXCEPTION(VTMException, "Illegal tube length.\n");
@@ -604,15 +600,11 @@ VocalTractModel5<FloatType, SectionDelay>::initializeSynthesizer()
 						sampleRate_,
 						config_.tp, config_.tnMin, config_.tnMax);
 
-	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR MOUTH  */
-	FloatType mouthApertureCoeff = (nyquist - config_.mouthCoef) / nyquist;
-	mouthRadiationFilter_  = std::make_unique<RadiationFilter<FloatType>>(mouthApertureCoeff);
-	mouthReflectionFilter_ = std::make_unique<ReflectionFilter<FloatType>>(mouthApertureCoeff);
+	/*  INITIALIZE RADIATION IMPEDANCE FOR MOUTH  */
+	mouthRadiationImpedance_ = std::make_unique<PoleZeroRadiationImpedance<FloatType>>(sampleRate_);
 
-	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR NOSE  */
-	FloatType nasalApertureCoeff = (nyquist - config_.noseCoef) / nyquist;
-	nasalRadiationFilter_  = std::make_unique<RadiationFilter<FloatType>>(nasalApertureCoeff);
-	nasalReflectionFilter_ = std::make_unique<ReflectionFilter<FloatType>>(nasalApertureCoeff);
+	/*  INITIALIZE RADIATION IMPEDANCE FOR NOSE  */
+	nasalRadiationImpedance_ = std::make_unique<PoleZeroRadiationImpedance<FloatType>>(sampleRate_);
 
 	/*  INITIALIZE NASAL CAVITY FIXED SCATTERING COEFFICIENTS  */
 	initializeNasalCavity();
@@ -766,8 +758,11 @@ VocalTractModel5<FloatType, SectionDelay>::initializeNasalCavity()
 		nasalJunction_[i].configure(config_.nasalRadius[j], config_.nasalRadius[j + 1]);
 	}
 
-	// Configure junction for the nose aperture.
-	nasalJunction_[NJ6].configure(config_.nasalRadius[NR6], config_.apertureRadius);
+	//// Configure junction for the nose aperture.
+	//nasalJunction_[NJ6].configure(config_.nasalRadius[NR6], config_.apertureRadius);
+
+	const FloatType r = std::sqrt(0.5f * config_.nasalRadius[NR6] * config_.nasalRadius[NR6]);
+	nasalRadiationImpedance_->update(r * 1.0e-2f /* cm --> m */);
 }
 
 /******************************************************************************
@@ -789,8 +784,10 @@ VocalTractModel5<FloatType, SectionDelay>::calculateTubeCoefficients()
 		oropharynxJunction_[i].configure(currentParameter_[j], currentParameter_[j + 1]);
 	}
 
-	// Configure junction for the mouth aperture.
-	oropharynxJunction_[J8].configure(currentParameter_[PARAM_R8], config_.apertureRadius);
+	//// Configure junction for the mouth aperture.
+	//oropharynxJunction_[J8].configure(currentParameter_[PARAM_R8], config_.apertureRadius);
+
+	mouthRadiationImpedance_->update(currentParameter_[PARAM_R8] * 1.0e-2f /* cm --> m */);
 
 	// Configure 3-way junction.
 	// Note: Since junction is in middle of region 4, leftRadius = rightRadius.
@@ -891,11 +888,9 @@ VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 	propagate(oropharynx_[S28], oropharynx_[S29]);
 	propagate(oropharynx_[S29], oropharynx_[S30]);
 
-	// Reflected signal at the mouth goes through a lowpass filter.
-	oropharynx_[S30].bottom[inPtr_] = dampingFactor_ * mouthReflectionFilter_->filter(oropharynxJunction_[J8].coeff * oropharynx_[S30].top[outPtr_]);
-
-	// Output from mouth goes through a highpass filter.
-	FloatType output = mouthRadiationFilter_->filter((1.0f - oropharynxJunction_[J8].coeff) * oropharynx_[S30].top[outPtr_]);
+	FloatType mouthOutputFlow;
+	mouthRadiationImpedance_->process(oropharynx_[S30].top[outPtr_], mouthOutputFlow, oropharynx_[S30].bottom[inPtr_]);
+	oropharynx_[S30].bottom[inPtr_] *= dampingFactor_;
 
 	propagate(nasal_[N1], nasal_[N2]);
 	propagate(nasal_[N2], nasal_[N3]);
@@ -915,14 +910,12 @@ VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 	propagate(nasal_[N16], nasal_[N17]);
 	propagate(nasal_[N17], nasal_[N18]);
 
-	// Reflected signal at the nose goes through a lowpass filter.
-	nasal_[N18].bottom[inPtr_] = dampingFactor_ * nasalReflectionFilter_->filter(nasalJunction_[NJ6].coeff * nasal_[N18].top[outPtr_]);
-
-	// Output from nose goes through a highpass filter.
-	output += nasalRadiationFilter_->filter((1.0f - nasalJunction_[NJ6].coeff) * nasal_[N18].top[outPtr_]);
+	FloatType nasalOutputFlow;
+	nasalRadiationImpedance_->process(nasal_[N18].top[outPtr_], nasalOutputFlow, nasal_[N18].bottom[inPtr_]);
+	nasal_[N18].bottom[inPtr_] *= dampingFactor_;
 
 	// Return summed output from mouth and nose.
-	return output;
+	return outputDiffFilter_.filter(mouthOutputFlow + nasalOutputFlow) * sampleRate_;
 }
 
 /******************************************************************************
