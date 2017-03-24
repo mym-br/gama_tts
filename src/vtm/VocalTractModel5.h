@@ -257,9 +257,6 @@ private:
 		FloatType length;                      /*  nominal tube length (10 - 20 cm)  */
 		FloatType temperature;                 /*  tube temperature (25 - 40 C)  */
 		FloatType lossFactor;                  /*  junction loss factor in (0 - 5 %)  */
-		FloatType apertureRadius;              /*  aperture scl. radius (3.05 - 12 cm)  */
-		FloatType mouthCoef;                   /*  mouth aperture coefficient  */
-		FloatType noseCoef;                    /*  nose aperture coefficient  */
 		// Set nasalRadius[N1] to 0.0, because it is not used.
 		std::array<FloatType, TOTAL_NASAL_SECTIONS> nasalRadius; /*  fixed nasal radii (0 - 3 cm)  */
 		FloatType throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
@@ -450,15 +447,12 @@ VocalTractModel5<FloatType, SectionDelay>::loadConfiguration(const Configuration
 	config_.length         = data.value<FloatType>("vocal_tract_length_offset") + data.value<FloatType>("vocal_tract_length");
 	config_.temperature    = data.value<FloatType>("temperature");
 	config_.lossFactor     = data.value<FloatType>("loss_factor");
-	config_.mouthCoef      = data.value<FloatType>("mouth_coefficient");
-	config_.noseCoef       = data.value<FloatType>("nose_coefficient");
 	config_.throatCutoff   = data.value<FloatType>("throat_cutoff");
 	config_.throatVol      = data.value<FloatType>("throat_volume");
 	config_.modulation     = data.value<int>("noise_modulation");
 	config_.mixOffset      = data.value<FloatType>("mix_offset");
 	const FloatType globalRadiusCoef      = data.value<FloatType>("global_radius_coef");
 	const FloatType globalNasalRadiusCoef = data.value<FloatType>("global_nasal_radius_coef");
-	config_.apertureRadius = data.value<FloatType>("aperture_radius") * globalRadiusCoef;
 	config_.nasalRadius[0] = 0.0;
 	config_.nasalRadius[1] = data.value<FloatType>("nasal_radius_1") * globalNasalRadiusCoef;
 	config_.nasalRadius[2] = data.value<FloatType>("nasal_radius_2") * globalNasalRadiusCoef;

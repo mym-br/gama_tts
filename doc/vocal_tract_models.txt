@@ -19,3 +19,8 @@
    3, 2, 4, 6, 6, 4, 2, 3 (sections).
 	Class: VocalTractModel4
 	Data directory: en/vtm0/
+
+5: Based on model 4, but uses flow equations and a pole-zero radiation
+   impedance.
+	Class: VocalTractModel5
+	Data directory: en/vtm5/
