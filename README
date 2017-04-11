@@ -2,15 +2,14 @@
 GamaTTS
 =======
 
-GamaTTS is a command-line articulatory synthesizer that converts text
-to speech.
+GamaTTS is an _experimental_ command-line articulatory synthesizer that
+converts text to speech.
 
-GamaTTS is a port to C++/C of the TTS_Server in the original Gnuspeech
-(http://www.gnu.org/software/gnuspeech/) source code written for NeXTSTEP,
+GamaTTS started as a C++/C port of the TTS_Server in the original Gnuspeech
+(http://www.gnu.org/software/gnuspeech/) system developed for NeXTSTEP,
 provided by David R. Hill, Leonard Manzara, Craig Schock and contributors.
-This project is based on code from Gnuspeech's Subversion repository,
-revision 672, downloaded in 2014-08-02. The source code was obtained
-from the directories:
+The base was the code on Gnuspeech's Subversion repository, revision 672,
+downloaded in 2014-08-02. The source code was obtained from the directories:
 nextstep/trunk/ObjectiveC/Monet.realtime
 nextstep/trunk/src/SpeechObject/postMonet/server.monet
 
@@ -22,6 +21,8 @@ for details.
 
 Status
 ------
+
+[pre-alpha]
 
 Only english is supported.
 
