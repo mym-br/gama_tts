@@ -60,6 +60,7 @@
 #include "MovingAverageFilter.h"
 #include "NoiseFilter.h"
 #include "NoiseSource.h"
+#include "ParameterLogger.h"
 #include "PoleZeroRadiationImpedance.h"
 #include "SampleRateConverter.h"
 #include "Text.h"
@@ -245,6 +246,9 @@ private:
 		PARAM_VELUM      = 15,
 		TOTAL_PARAMETERS = 16
 	};
+	enum LogParameters {
+		log_param_pitch
+	};
 
 	struct Configuration {
 		FloatType outputRate;                  /*  output sample rate (22.05, 44.1)  */
@@ -378,6 +382,7 @@ private:
 	void synthesizeForInputSequence();
 
 	bool interactive_;
+	bool logParameters_;
 	Configuration config_;
 
 	/*  DERIVED VALUES  */
@@ -418,6 +423,7 @@ private:
 	std::unique_ptr<NoiseSource>                           noiseSource_;
 	std::unique_ptr<InputFilters>                          inputFilters_;
 	DifferenceFilter<FloatType>                            outputDiffFilter_;
+	ParameterLogger<FloatType>                             paramLogger_;
 };
 
 
@@ -425,6 +431,7 @@ private:
 template<typename FloatType, unsigned int SectionDelay>
 VocalTractModel5<FloatType, SectionDelay>::VocalTractModel5(const ConfigurationData& data, bool interactive)
 		: interactive_ {interactive}
+		, logParameters_ {false}
 {
 	loadConfiguration(data);
 	reset();
@@ -467,6 +474,8 @@ VocalTractModel5<FloatType, SectionDelay>::loadConfiguration(const Configuration
 	config_.radiusCoef[5]  = data.value<FloatType>("radius_6_coef") * globalRadiusCoef;
 	config_.radiusCoef[6]  = data.value<FloatType>("radius_7_coef") * globalRadiusCoef;
 	config_.radiusCoef[7]  = data.value<FloatType>("radius_8_coef") * globalRadiusCoef;
+
+	logParameters_ = interactive_ ? false : data.value<bool>("log_parameters");
 }
 
 template<typename FloatType, unsigned int SectionDelay>
@@ -733,6 +742,8 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 	srConv_->dataFill(signal);
 
 	prevGlotAmplitude_ = ax;
+
+	if (logParameters_) GS_LOG_PARAMETER(paramLogger_, log_param_pitch, currentParameter_[PARAM_GLOT_PITCH]);
 }
 
 /******************************************************************************

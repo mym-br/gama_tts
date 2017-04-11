@@ -40,6 +40,7 @@ set(LIBRARY_FILES
     src/global.h
     src/Log.cpp
     src/Log.h
+    src/ParameterLogger.h
     src/Text.cpp
     src/Text.h
     src/VocalTractModelParameterValue.h

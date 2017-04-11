@@ -153,6 +153,13 @@ ConfigurationData::convertString<std::string>(const std::string& s)
 }
 
 template<>
+bool
+ConfigurationData::convertString<bool>(const std::string& s)
+{
+	return (s == "true") ? true : false;
+}
+
+template<>
 void
 ConfigurationData::convertValue<float>(const float& value, std::string& s)
 {
@@ -177,6 +184,13 @@ void
 ConfigurationData::convertValue<std::string>(const std::string& value, std::string& s)
 {
 	s = value;
+}
+
+template<>
+void
+ConfigurationData::convertValue<bool>(const bool& value, std::string& s)
+{
+	s = value ? "true" : "false";
 }
 
 void
