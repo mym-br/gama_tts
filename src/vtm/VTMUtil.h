@@ -38,14 +38,17 @@ template<typename FloatType>
 FloatType
 amplitude60dB(FloatType decibelLevel)
 {
+	constexpr FloatType p = 10.0;
+	constexpr FloatType k = 1.0 / 20.0;
+
 	/*  RANGE OF ALL VOLUME CONTROLS  */
-	const FloatType volMax60dB = 60.0;
+	constexpr FloatType volMax = 60.0;
 
 	/*  CONVERT 0-60 RANGE TO -60-0 RANGE  */
-	decibelLevel -= volMax60dB;
+	decibelLevel -= volMax;
 
 	/*  IF -60 OR LESS, RETURN AMPLITUDE OF 0  */
-	if (decibelLevel <= -volMax60dB) {
+	if (decibelLevel <= -volMax) {
 		return 0.0;
 	}
 
@@ -55,7 +58,7 @@ amplitude60dB(FloatType decibelLevel)
 	}
 
 	/*  ELSE RETURN INVERSE LOG VALUE  */
-	return std::pow(static_cast<FloatType>(10.0), decibelLevel / 20.0f);
+	return std::pow(p, decibelLevel * k);
 }
 
 //******************************************************************************
@@ -67,10 +70,12 @@ template<typename FloatType>
 FloatType
 frequency(FloatType pitch)
 {
-	const FloatType pitchBase = 220.0;
-	const FloatType pitchOffset = 3.0; /*  MIDDLE C = 0  */
+	constexpr FloatType pitchBase = 220.0;
+	constexpr FloatType pitchOffset = 3.0; /*  MIDDLE C = 0  */
+	constexpr FloatType p = 2.0;
+	constexpr FloatType k = 1.0 / 12.0;
 
-	return pitchBase * std::pow(static_cast<FloatType>(2.0), (pitch + pitchOffset) / 12.0f);
+	return pitchBase * std::pow(p, (pitch + pitchOffset) * k);
 }
 
 //******************************************************************************
@@ -81,7 +86,10 @@ template<typename FloatType>
 FloatType
 speedOfSound(FloatType temperature)
 {
-	return 331.4f + (0.6f * temperature);
+	constexpr FloatType c0 = 331.4;
+	constexpr FloatType c1 = 0.6;
+
+	return c0 + (c1 * temperature);
 }
 
 } /* namespace Util */
