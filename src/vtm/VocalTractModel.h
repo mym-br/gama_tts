@@ -33,6 +33,8 @@ namespace VTM {
 
 class VocalTractModel {
 public:
+	virtual ~VocalTractModel() {}
+
 	virtual double outputRate() const = 0;
 
 	// ----- Batch mode.
