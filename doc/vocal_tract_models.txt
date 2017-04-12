@@ -1,26 +1,26 @@
 0: Original from Gnuspeech, double precision.
 	The delay in each section is 1 period.
 	Class: VocalTractModel0
-	Data directory: en/vtm0/
+	Data directory: english/vtm0/
 
 1: Original from Gnuspeech, single precision.
 	Class: VocalTractModel0
-	Data directory: en/vtm0/
+	Data directory: english/vtm1/
 
 2: Equivalent to model 0, but the source code is easier to understand.
 	Class: VocalTractModel2
-	Data directory: en/vtm0/
+	Data directory: english/vtm2/
 
 3: Based on model 2, but the delay in each section is 3 periods.
 	Class: VocalTractModel2
-	Data directory: en/vtm0/
+	Data directory: english/vtm3/
 
 4: Based on model 2, but with 30 main sections. The size of the regions are:
    3, 2, 4, 6, 6, 4, 2, 3 (sections).
 	Class: VocalTractModel4
-	Data directory: en/vtm0/
+	Data directory: english/vtm4/
 
 5: Based on model 4, but uses flow equations and a pole-zero radiation
    impedance.
 	Class: VocalTractModel5
-	Data directory: en/vtm5/
+	Data directory: english/vtm5/
