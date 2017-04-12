@@ -247,7 +247,7 @@ private:
 		TOTAL_PARAMETERS = 16
 	};
 	enum LogParameters {
-		log_param_pitch
+		log_param_vtm5_pitch
 	};
 
 	struct Configuration {
@@ -743,7 +743,7 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 
 	prevGlotAmplitude_ = ax;
 
-	if (logParameters_) GS_LOG_PARAMETER(paramLogger_, log_param_pitch, currentParameter_[PARAM_GLOT_PITCH]);
+	if (logParameters_) GS_LOG_PARAMETER(paramLogger_, log_param_vtm5_pitch, currentParameter_[PARAM_GLOT_PITCH]);
 }
 
 /******************************************************************************
