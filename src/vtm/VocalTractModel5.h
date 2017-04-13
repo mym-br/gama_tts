@@ -373,7 +373,7 @@ private:
 	void calculateTubeCoefficients();
 	void initializeNasalCavity();
 	void parseInputStream(std::istream& in);
-	void setFricationTaps();
+	void setFricationTaps(FloatType f0);
 	FloatType vocalTract(FloatType input, FloatType frication);
 	void writeOutputToFile(const char* outputFile);
 	void writeOutputToBuffer(std::vector<float>& outputBuffer);
@@ -693,10 +693,10 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 {
 	/*  CONVERT PARAMETERS HERE  */
 	FloatType f0 = Util::frequency(currentParameter_[PARAM_GLOT_PITCH]);
-	FloatType ax = Util::amplitude60dB(currentParameter_[PARAM_GLOT_VOL]);
-	FloatType ah1 = Util::amplitude60dB(currentParameter_[PARAM_ASP_VOL]);
+	FloatType ax = Util::amplitude60dB(currentParameter_[PARAM_GLOT_VOL]) / f0;
+	FloatType ah1 = Util::amplitude60dB(currentParameter_[PARAM_ASP_VOL]) / f0;
 	calculateTubeCoefficients();
-	setFricationTaps();
+	setFricationTaps(f0);
 	bandpassFilter_->update(sampleRate_, currentParameter_[PARAM_FRIC_BW], currentParameter_[PARAM_FRIC_CF]);
 
 	/*  DO SYNTHESIS HERE  */
@@ -812,9 +812,9 @@ VocalTractModel5<FloatType, SectionDelay>::calculateTubeCoefficients()
 ******************************************************************************/
 template<typename FloatType, unsigned int SectionDelay>
 void
-VocalTractModel5<FloatType, SectionDelay>::setFricationTaps()
+VocalTractModel5<FloatType, SectionDelay>::setFricationTaps(FloatType f0)
 {
-	const FloatType fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]);
+	const FloatType fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]) / f0;
 
 	/*  CALCULATE POSITION REMAINDER AND COMPLEMENT  */
 	const int integerPart = static_cast<int>(currentParameter_[PARAM_FRIC_POS]);
