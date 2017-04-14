@@ -37,23 +37,23 @@ public:
 	~ReflectionFilter() {}
 
 	void reset();
-	FloatType filter(FloatType input);
+	FloatType filter(FloatType x);
 private:
 	ReflectionFilter(const ReflectionFilter&) = delete;
 	ReflectionFilter& operator=(const ReflectionFilter&) = delete;
 
-	const FloatType a10_;
-	const FloatType b11_;
-	FloatType reflectionY_;
+	const FloatType b0_;
+	const FloatType a1_;
+	FloatType y1_;
 };
 
 
 
 template<typename FloatType>
 ReflectionFilter<FloatType>::ReflectionFilter(FloatType apertureCoeff)
-		: a10_ {1.0f - std::abs(apertureCoeff)}
-		, b11_ {-apertureCoeff}
-		, reflectionY_ {}
+		: b0_ {1.0f - std::abs(apertureCoeff)}
+		, a1_ {-apertureCoeff}
+		, y1_ {}
 {
 }
 
@@ -61,16 +61,16 @@ template<typename FloatType>
 void
 ReflectionFilter<FloatType>::reset()
 {
-	reflectionY_ = 0.0;
+	y1_ = 0.0;
 }
 
 template<typename FloatType>
 FloatType
-ReflectionFilter<FloatType>::filter(FloatType input)
+ReflectionFilter<FloatType>::filter(FloatType x)
 {
-	const FloatType output = (a10_ * input) - (b11_ * reflectionY_);
-	reflectionY_ = output;
-	return output;
+	const FloatType y = b0_ * x - a1_ * y1_;
+	y1_ = y;
+	return y;
 }
 
 } /* namespace VTM */

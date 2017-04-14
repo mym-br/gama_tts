@@ -36,25 +36,25 @@ public:
 	~RadiationFilter() {}
 
 	void reset();
-	FloatType filter(FloatType input);
+	FloatType filter(FloatType x);
 private:
 	RadiationFilter(const RadiationFilter&) = delete;
 	RadiationFilter& operator=(const RadiationFilter&) = delete;
 
-	const FloatType a20_;
-	const FloatType a21_;
-	const FloatType b21_;
-	FloatType radiationX_;
-	FloatType radiationY_;
+	const FloatType b0_;
+	const FloatType b1_;
+	const FloatType a1_;
+	FloatType x1_;
+	FloatType y1_;
 };
 
 template<typename FloatType>
 RadiationFilter<FloatType>::RadiationFilter(FloatType apertureCoeff)
-		: a20_ {apertureCoeff}
-		, a21_ {-a20_}
-		, b21_ {-a20_}
-		, radiationX_ {}
-		, radiationY_ {}
+		: b0_ {apertureCoeff}
+		, b1_ {-b0_}
+		, a1_ {-b0_}
+		, x1_ {}
+		, y1_ {}
 {
 }
 
@@ -62,18 +62,18 @@ template<typename FloatType>
 void
 RadiationFilter<FloatType>::reset()
 {
-	radiationX_ = 0.0;
-	radiationY_ = 0.0;
+	x1_ = 0.0;
+	y1_ = 0.0;
 }
 
 template<typename FloatType>
 FloatType
-RadiationFilter<FloatType>::filter(FloatType input)
+RadiationFilter<FloatType>::filter(FloatType x)
 {
-	const FloatType output = (a20_ * input) + (a21_ * radiationX_) - (b21_ * radiationY_);
-	radiationX_ = input;
-	radiationY_ = output;
-	return output;
+	const FloatType y = b0_ * x + b1_ * x1_ - a1_ * y1_;
+	x1_ = x;
+	y1_ = y;
+	return y;
 }
 
 } /* namespace VTM */
