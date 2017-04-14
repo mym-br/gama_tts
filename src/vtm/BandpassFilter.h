@@ -28,6 +28,7 @@
 namespace GS {
 namespace VTM {
 
+// Bandpass filter, with variable center frequency and bandwidth.
 template<typename FloatType>
 class BandpassFilter {
 public:
@@ -36,31 +37,31 @@ public:
 
 	void reset();
 	void update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq);
-	FloatType filter(FloatType input);
+	FloatType filter(FloatType x);
 private:
 	BandpassFilter(const BandpassFilter&) = delete;
 	BandpassFilter& operator=(const BandpassFilter&) = delete;
 
-	FloatType bpAlpha_;
-	FloatType bpBeta_;
-	FloatType bpGamma_;
-	FloatType xn1_;
-	FloatType xn2_;
-	FloatType yn1_;
-	FloatType yn2_;
+	FloatType b0_;
+	FloatType a2_;
+	FloatType a1_;
+	FloatType x1_;
+	FloatType x2_;
+	FloatType y1_;
+	FloatType y2_;
 };
 
 
 
 template<typename FloatType>
 BandpassFilter<FloatType>::BandpassFilter()
-		: bpAlpha_ {}
-		, bpBeta_ {}
-		, bpGamma_ {}
-		, xn1_ {}
-		, xn2_ {}
-		, yn1_ {}
-		, yn2_ {}
+		: b0_ {}
+		, a2_ {}
+		, a1_ {}
+		, x1_ {}
+		, x2_ {}
+		, y1_ {}
+		, y2_ {}
 {
 }
 
@@ -68,43 +69,39 @@ template<typename FloatType>
 void
 BandpassFilter<FloatType>::reset()
 {
-	xn1_ = 0.0;
-	xn2_ = 0.0;
-	yn1_ = 0.0;
-	yn2_ = 0.0;
+	x1_ = 0.0;
+	x2_ = 0.0;
+	y1_ = 0.0;
+	y2_ = 0.0;
 }
 
 template<typename FloatType>
 void
 BandpassFilter<FloatType>::update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq)
 {
-	const FloatType tanValue = std::tan((static_cast<FloatType>(M_PI) * bandwidth) / sampleRate);
-	const FloatType cosValue = std::cos((2.0f * static_cast<FloatType>(M_PI) * centerFreq) / sampleRate);
-	bpBeta_ = (1.0f - tanValue) / (2.0f * (1.0f + tanValue));
-	bpGamma_ = (0.5f + bpBeta_) * cosValue;
-	bpAlpha_ = (0.5f - bpBeta_) / 2.0f;
+	constexpr FloatType pi = M_PI;
+	const FloatType tanValue = std::tan((pi * bandwidth) / sampleRate);
+	const FloatType cosValue = std::cos((2.0f * pi * centerFreq) / sampleRate);
+	a2_ = (1.0f - tanValue) / (2.0f * (1.0f + tanValue));
+	a1_ = -(0.5f + a2_) * cosValue;
+	// a0_ = 0.5
+	b0_ = (0.5f - a2_) / 2.0f;
+	// b1_ = 0.0
+	// b2_ = -b0_
 }
 
-/******************************************************************************
-*
-*  function:  bandpassFilter
-*
-*  purpose:   Frication bandpass filter, with variable center
-*             frequency and bandwidth.
-*
-******************************************************************************/
 template<typename FloatType>
 FloatType
-BandpassFilter<FloatType>::filter(FloatType input)
+BandpassFilter<FloatType>::filter(FloatType x)
 {
-	const FloatType output = 2.0f * ((bpAlpha_ * (input - xn2_)) + (bpGamma_ * yn1_) - (bpBeta_ * yn2_));
+	const FloatType y = 2.0f * (b0_ * (x - x2_) - a1_ * y1_ - a2_ * y2_);
 
-	xn2_ = xn1_;
-	xn1_ = input;
-	yn2_ = yn1_;
-	yn1_ = output;
+	x2_ = x1_;
+	x1_ = x;
+	y2_ = y1_;
+	y1_ = y;
 
-	return output;
+	return y;
 }
 
 } /* namespace VTM */
