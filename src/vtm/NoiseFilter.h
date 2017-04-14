@@ -34,18 +34,18 @@ public:
 	~NoiseFilter() {}
 
 	void reset();
-	FloatType filter(FloatType input);
+	FloatType filter(FloatType x);
 private:
 	NoiseFilter(const NoiseFilter&) = delete;
 	NoiseFilter& operator=(const NoiseFilter&) = delete;
 
-	FloatType noiseX_;
+	FloatType x1_;
 };
 
 
 
 template<typename FloatType>
-NoiseFilter<FloatType>::NoiseFilter() : noiseX_ {}
+NoiseFilter<FloatType>::NoiseFilter() : x1_ {}
 {
 }
 
@@ -53,16 +53,16 @@ template<typename FloatType>
 void
 NoiseFilter<FloatType>::reset()
 {
-	noiseX_ = 0.0;
+	x1_ = 0.0;
 }
 
 template<typename FloatType>
 FloatType
-NoiseFilter<FloatType>::filter(FloatType input)
+NoiseFilter<FloatType>::filter(FloatType x)
 {
-	const FloatType output = input + noiseX_;
-	noiseX_ = input;
-	return output;
+	const FloatType y = x + x1_;
+	x1_ = x;
+	return y;
 }
 
 } /* namespace VTM */

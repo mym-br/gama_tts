@@ -33,15 +33,15 @@ public:
 	~Throat() {}
 
 	void reset();
-	FloatType process(FloatType input);
+	FloatType process(FloatType x);
 private:
 	Throat(const Throat&) = delete;
 	Throat& operator=(const Throat&) = delete;
 
-	const FloatType ta0_;
-	const FloatType tb1_;
+	const FloatType b0_;
+	const FloatType a1_;
 	const FloatType throatGain_;
-	FloatType throatY_;
+	FloatType y1_;
 };
 
 
@@ -51,10 +51,10 @@ Throat<FloatType>::Throat(FloatType sampleRate, FloatType throatCutoff, FloatTyp
 		// Initializes the throat lowpass filter coefficients
 		// according to the throatCutoff value, and also the
 		// throatGain, according to the throatVol value.
-		: ta0_ {(throatCutoff * 2.0f) / sampleRate}
-		, tb1_ {1.0f - ta0_}
+		: b0_ {(throatCutoff * 2.0f) / sampleRate}
+		, a1_ {b0_ - 1.0f}
 		, throatGain_ {throatGain}
-		, throatY_ {}
+		, y1_ {}
 {
 }
 
@@ -62,7 +62,7 @@ template<typename FloatType>
 void
 Throat<FloatType>::reset()
 {
-	throatY_ = 0.0;
+	y1_ = 0.0;
 }
 
 /******************************************************************************
@@ -70,18 +70,16 @@ Throat<FloatType>::reset()
 *  function:  throat
 *
 *  purpose:   Simulates the radiation of sound through the walls
-*             of the throat. Note that this form of the filter
-*             uses addition instead of subtraction for the
-*             second term, since tb1 has reversed sign.
+*             of the throat.
 *
 ******************************************************************************/
 template<typename FloatType>
 FloatType
-Throat<FloatType>::process(FloatType input)
+Throat<FloatType>::process(FloatType x)
 {
-	const FloatType output = (ta0_ * input) + (tb1_ * throatY_);
-	throatY_ = output;
-	return output * throatGain_;
+	const FloatType y = b0_ * x - a1_ * y1_;
+	y1_ = y;
+	return y * throatGain_;
 }
 
 } /* namespace VTM */
