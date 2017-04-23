@@ -160,14 +160,14 @@ set(LIBRARY_FILES
     src/xml/StreamXMLWriter.h
 )
 
-#if(UNIX)
-#    add_library(gamatts SHARED ${LIBRARY_FILES})
-#    set_target_properties(gamatts PROPERTIES
-#        VERSION ${GAMA_TTS_VERSION_STRING}
-#        SOVERSION ${GAMA_TTS_VERSION_MAJOR})
-#else()
+if(UNIX)
+    add_library(gamatts SHARED ${LIBRARY_FILES})
+    set_target_properties(gamatts PROPERTIES
+        VERSION ${GAMA_TTS_VERSION_STRING}
+        SOVERSION ${GAMA_TTS_VERSION_MAJOR})
+else()
     add_library(gamatts STATIC ${LIBRARY_FILES})
-#endif()
+endif()
 
 add_executable(gama_tts
     src/main.cpp
