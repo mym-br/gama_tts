@@ -80,12 +80,12 @@ void
 BandpassFilter<FloatType>::update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq)
 {
 	constexpr FloatType pi = M_PI;
-	const FloatType tanValue = std::tan((pi * bandwidth) / sampleRate);
-	const FloatType cosValue = std::cos((2.0f * pi * centerFreq) / sampleRate);
-	a2_ = (1.0f - tanValue) / (2.0f * (1.0f + tanValue));
-	a1_ = -(0.5f + a2_) * cosValue;
-	// a0_ = 0.5
-	b0_ = (0.5f - a2_) / 2.0f;
+	const FloatType T = 1.0f / sampleRate;
+	const FloatType tanValue = std::tan(pi * bandwidth * T);
+	const FloatType cosValue = std::cos(2.0f * pi * centerFreq * T);
+	a2_ = (1.0f - tanValue) / (1.0f + tanValue);
+	a1_ = -(1.0f + a2_) * cosValue;
+	b0_ = 0.5f - 0.5f * a2_;
 	// b1_ = 0.0
 	// b2_ = -b0_
 }
@@ -94,13 +94,11 @@ template<typename FloatType>
 FloatType
 BandpassFilter<FloatType>::filter(FloatType x)
 {
-	const FloatType y = 2.0f * (b0_ * (x - x2_) - a1_ * y1_ - a2_ * y2_);
-
+	const FloatType y = b0_ * (x - x2_) - a1_ * y1_ - a2_ * y2_;
 	x2_ = x1_;
 	x1_ = x;
 	y2_ = y1_;
 	y1_ = y;
-
 	return y;
 }
 
