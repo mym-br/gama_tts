@@ -70,14 +70,7 @@
 
 #define GS_VTM5_MIN_RADIUS (0.01)
 #define GS_VTM5_INPUT_FILTER_PERIOD_SEC (50.0e-3)
-
-/*  SCALING CONSTANT FOR INPUT TO VOCAL TRACT & THROAT (MATCHES DSP)  */
-//#define GS_VTM5_VT_SCALE                  0.03125     /*  2^(-5)  */
-// this is a temporary fix only, to try to match dsp synthesizer
-#define GS_VTM5_VT_SCALE                  0.125     /*  2^(-3)  */
-
-/*  FINAL OUTPUT SCALING, SO THAT .SND FILES APPROX. MATCH DSP OUTPUT  */
-#define GS_VTM5_OUTPUT_SCALE              0.95
+#define GS_VTM5_OUTPUT_SCALE (0.95)
 
 
 
@@ -267,6 +260,7 @@ private:
 		std::array<FloatType, TOTAL_REGIONS> radiusCoef;
 		FloatType glottalNoiseCutoff;          // lowpass cutoff frequency (Hz)
 		FloatType fricationNoiseCutoff;        // lowpass cutoff frequency (Hz)
+		FloatType fricationFactor;
 	};
 
 	struct InputFilters {
@@ -476,6 +470,7 @@ VocalTractModel5<FloatType, SectionDelay>::loadConfiguration(const Configuration
 	config_.radiusCoef[7]  = data.value<FloatType>("radius_8_coef") * globalRadiusCoef;
 	config_.glottalNoiseCutoff   = data.value<FloatType>("glottal_noise_cutoff");
 	config_.fricationNoiseCutoff = data.value<FloatType>("frication_noise_cutoff");
+	config_.fricationFactor      = data.value<FloatType>("frication_factor");
 
 	logParameters_ = interactive_ ? false : data.value<bool>("log_parameters");
 }
@@ -720,28 +715,28 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
-	FloatType pulse = glottalSource_->getSample(f0);
+	const FloatType pulse = glottalSource_->getSample(f0);
 
 	/*  CREATE PULSED NOISE  */
 	const FloatType pulsedNoise = glottalNoise * pulse;
 
 	/*  CREATE NOISY GLOTTAL PULSE  */
-	pulse = glotAmplitude * (pulse * (1.0f - breathinessFactor_) + pulsedNoise * breathinessFactor_);
+	const FloatType noisyPulse = glotAmplitude * (pulse * (1.0f - breathinessFactor_) + pulsedNoise * breathinessFactor_);
 
 	FloatType fricationNoise = fricationNoiseFilter_->filter(noiseSample);
 	/*  CROSS-MIX PURE NOISE WITH PULSED NOISE  */
 	if (config_.modulation) {
 		FloatType crossmix = glotAmplitude * crossmixFactor_;
 		crossmix = (crossmix < 1.0f) ? crossmix : 1.0f;
-		fricationNoise = fricationNoise * (pulse * crossmix + (1.0f - crossmix));
+		fricationNoise = fricationNoise * (noisyPulse * crossmix + (1.0f - crossmix));
 	}
 
 	/*  PUT SIGNAL THROUGH VOCAL TRACT  */
-	FloatType signal = vocalTract((pulse + (aspAmplitude * fricationNoise)) * FloatType{GS_VTM5_VT_SCALE},
-					bandpassFilter_->filter(fricationNoise));
+	FloatType signal = vocalTract(noisyPulse + aspAmplitude * fricationNoise,
+					config_.fricationFactor * bandpassFilter_->filter(fricationNoise));
 
 	/*  PUT PULSE THROUGH THROAT  */
-	signal += config_.throatAmplitude * throatFilter_->filter(pulse * FloatType{GS_VTM5_VT_SCALE});
+	signal += config_.throatAmplitude * throatFilter_->filter(noisyPulse);
 
 	/*  OUTPUT SAMPLE HERE  */
 	srConv_->dataFill(signal / f0); // divide by f0 to compensate for the differentiation at the output
