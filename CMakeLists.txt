@@ -104,6 +104,8 @@ set(LIBRARY_FILES
     src/rapidxml/rapidxml.hpp
 
     src/vtm/BandpassFilter.h
+    src/vtm/Butterworth1LowpassFilter.h
+    src/vtm/Butterworth2LowpassFilter.h
     src/vtm/DifferenceFilter.h
     src/vtm/FIRFilter.h
     src/vtm/MovingAverageFilter.h
