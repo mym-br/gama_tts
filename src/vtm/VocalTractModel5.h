@@ -68,10 +68,6 @@
 #include "WAVEFileWriter.h"
 #include "WavetableGlottalSource.h"
 
-#define GS_VTM5_MIN_RADIUS (0.01)
-#define GS_VTM5_INPUT_FILTER_PERIOD_SEC (50.0e-3)
-#define GS_VTM5_OUTPUT_SCALE (0.95)
-
 
 
 namespace GS {
@@ -97,6 +93,9 @@ public:
 	std::size_t getOutputSamples(std::size_t n, float* buffer);
 
 private:
+	static constexpr FloatType MIN_RADIUS = 0.01;
+	static constexpr FloatType INPUT_FILTER_PERIOD_SEC = 50.0e-3;
+	static constexpr FloatType OUTPUT_SCALE = 0.95;
 	static constexpr FloatType MIN_FRIC_POS = 0.0;
 	static constexpr FloatType MAX_FRIC_POS = 7.0;
 
@@ -529,7 +528,7 @@ VocalTractModel5<FloatType, SectionDelay>::parseInputStream(std::istream& in)
 
 		// R1 - R8.
 		for (int i = 0; i < TOTAL_REGIONS; ++i) {
-			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], FloatType{GS_VTM5_MIN_RADIUS});
+			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], MIN_RADIUS);
 		}
 
 		inputData_.push_back(value);
@@ -608,7 +607,7 @@ VocalTractModel5<FloatType, SectionDelay>::initializeSynthesizer()
 	noiseSource_          = std::make_unique<NoiseSource>();
 
 	if (interactive_) {
-		inputFilters_ = std::make_unique<InputFilters>(sampleRate_, GS_VTM5_INPUT_FILTER_PERIOD_SEC);
+		inputFilters_ = std::make_unique<InputFilters>(sampleRate_, INPUT_FILTER_PERIOD_SEC);
 	}
 }
 
@@ -928,7 +927,7 @@ VocalTractModel5<FloatType, SectionDelay>::calculateOutputScale()
 		return 0.0;
 	}
 
-	const float scale = GS_VTM5_OUTPUT_SCALE / maxValue;
+	const float scale = OUTPUT_SCALE / maxValue;
 	LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
 }
@@ -958,7 +957,7 @@ VocalTractModel5<FloatType, SectionDelay>::loadSingleInput(const VocalTractModel
 	case PARAM_R8:
 		singleInput_[pv.index] = std::max(
 					pv.value * config_.radiusCoef[pv.index - PARAM_R1],
-					FloatType{GS_VTM5_MIN_RADIUS});
+					MIN_RADIUS);
 		break;
 	default:
 		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << pv.index << '.');
