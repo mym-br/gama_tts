@@ -30,7 +30,7 @@
 //                     |       |               |           |           |           |           |               |       |           |
 //           R1        | R2    | R3            | R4        | R4        | R5        | R5        | R6            | R7    | R8        |
 //                     J1      J2              J3          |           J4          |           J5              J6      J7          J8
-//                             FC1             FC2         FC3         FC4         FC5         FC6             FC7     FC8
+//                             FRIC 0.0                                                                                FRIC 7.0
 
 #ifndef VTM_VOCAL_TRACT_MODEL_5_H_
 #define VTM_VOCAL_TRACT_MODEL_5_H_
@@ -97,6 +97,9 @@ public:
 	std::size_t getOutputSamples(std::size_t n, float* buffer);
 
 private:
+	static constexpr FloatType MIN_FRIC_POS = 0.0;
+	static constexpr FloatType MAX_FRIC_POS = 7.0;
+
 	enum { /*  OROPHARYNX REGIONS  */
 		R1 = 0, /*  S1  - S3   */
 		R2 = 1, /*  S4  - S5   */
@@ -205,17 +208,6 @@ private:
 		NJ5 = 4, /*  N15 - N16  */
 		NJ6 = 5, /*  N18 - AIR  */
 		TOTAL_NASAL_JUNCTIONS = TOTAL_NASAL_SECTIONS / 3
-	};
-	enum { /*  FRICATION INJECTION COEFFICIENTS  */
-		FC1 = 0, /*  S6   */
-		FC2 = 1, /*  S10  */
-		FC3 = 2, /*  S13  */
-		FC4 = 3, /*  S16  */
-		FC5 = 4, /*  S19  */
-		FC6 = 5, /*  S22  */
-		FC7 = 6, /*  S26  */
-		FC8 = 7, /*  S28  */
-		TOTAL_FRIC_COEFFICIENTS = 8
 	};
 	enum ParameterIndex {
 		PARAM_GLOT_PITCH = 0,
@@ -332,28 +324,20 @@ private:
 	};
 
 	void propagate(Section& left, Section& right) {
-		// Simple copy.
-		right.top[  inPtr_] = left.top[    outPtr_];
-		left.bottom[inPtr_] = right.bottom[outPtr_];
-	}
-	void propagate(Section& left, Section& right, FloatType fricNoise) {
-		// With frication and damping.
-		right.top[  inPtr_] = left.top[    outPtr_] * dampingFactor_ + fricNoise;
+		right.top[  inPtr_] = left.top[    outPtr_] * dampingFactor_;
 		left.bottom[inPtr_] = right.bottom[outPtr_] * dampingFactor_;
 	}
-	void propagateJunction(Section& left, Junction2& junction, Section& right, FloatType fricNoise = 0.0) {
-		// With frication and damping.
+	void propagateJunction(Section& left, Junction2& junction, Section& right) {
 		// Flow equations.
 		const FloatType delta = junction.coeff * (left.top[outPtr_] + right.bottom[outPtr_]);
-		right.top[  inPtr_] = (left.top[    outPtr_] - delta) * dampingFactor_ + fricNoise;
+		right.top[  inPtr_] = (left.top[    outPtr_] - delta) * dampingFactor_;
 		left.bottom[inPtr_] = (right.bottom[outPtr_] + delta) * dampingFactor_;
 	}
-	void propagateJunction(Section& left, Junction3& junction, Section& right, Section& upper, FloatType fricNoise) {
-		// With frication and damping.
+	void propagateJunction(Section& left, Junction3& junction, Section& right, Section& upper) {
 		// Flow equations.
 		const FloatType partialInflux = left.top[outPtr_] + right.bottom[outPtr_] + upper.bottom[outPtr_];
 		left.bottom[inPtr_] = (right.bottom[outPtr_] + upper.bottom[outPtr_] + junction.leftCoeff  * partialInflux) * dampingFactor_;
-		right.top[  inPtr_] = ( left.top[   outPtr_] + upper.bottom[outPtr_] + junction.rightCoeff * partialInflux) * dampingFactor_ + fricNoise;
+		right.top[  inPtr_] = ( left.top[   outPtr_] + upper.bottom[outPtr_] + junction.rightCoeff * partialInflux) * dampingFactor_;
 		upper.top[  inPtr_] = ( left.top[   outPtr_] + right.bottom[outPtr_] + junction.upperCoeff * partialInflux) * dampingFactor_;
 	}
 
@@ -366,7 +350,6 @@ private:
 	void calculateTubeCoefficients();
 	void initializeNasalCavity();
 	void parseInputStream(std::istream& in);
-	void setFricationTaps();
 	FloatType vocalTract(FloatType input, FloatType frication);
 	void writeOutputToFile(const char* outputFile);
 	void writeOutputToBuffer(std::vector<float>& outputBuffer);
@@ -390,9 +373,6 @@ private:
 	Junction3 velumJunction_;
 	unsigned int inPtr_;
 	unsigned int outPtr_;
-
-	/*  MEMORY FOR FRICATION TAPS  */
-	std::array<FloatType, TOTAL_FRIC_COEFFICIENTS> fricationTap_;
 
 	FloatType dampingFactor_;               /*  calculated damping factor  */
 	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
@@ -698,7 +678,6 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 	const FloatType glotAmplitude = Util::amplitude60dB(currentParameter_[PARAM_GLOT_VOL]);
 	const FloatType aspAmplitude = Util::amplitude60dB(currentParameter_[PARAM_ASP_VOL]);
 	calculateTubeCoefficients();
-	setFricationTaps();
 	bandpassFilter_->update(sampleRate_, currentParameter_[PARAM_FRIC_BW], currentParameter_[PARAM_FRIC_CF]);
 
 	const FloatType noiseSample = noiseSource_->getSample();
@@ -804,46 +783,6 @@ VocalTractModel5<FloatType, SectionDelay>::calculateTubeCoefficients()
 
 /******************************************************************************
 *
-*  function:  setFricationTaps
-*
-*  purpose:   Sets the frication taps according to the current
-*             position and amplitude of frication.
-*
-******************************************************************************/
-template<typename FloatType, unsigned int SectionDelay>
-void
-VocalTractModel5<FloatType, SectionDelay>::setFricationTaps()
-{
-	const FloatType fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]);
-
-	/*  CALCULATE POSITION REMAINDER AND COMPLEMENT  */
-	const int integerPart = static_cast<int>(currentParameter_[PARAM_FRIC_POS]);
-	const FloatType complement = currentParameter_[PARAM_FRIC_POS] - integerPart;
-	const FloatType remainder = 1.0f - complement;
-
-	/*  SET THE FRICATION TAPS  */
-	for (int i = FC1; i < TOTAL_FRIC_COEFFICIENTS; i++) {
-		if (i == integerPart) {
-			fricationTap_[i] = remainder * fricationAmplitude;
-			if ((i + 1) < TOTAL_FRIC_COEFFICIENTS) {
-				fricationTap_[++i] = complement * fricationAmplitude;
-			}
-		} else {
-			fricationTap_[i] = 0.0;
-		}
-	}
-
-#if 0
-	/*  PRINT OUT  */
-	printf("fricationTaps:  ");
-	for (int i = FC1; i < TOTAL_FRIC_COEFFICIENTS; i++)
-		printf("%.6f  ", fricationTap_[i]);
-	printf("\n");
-#endif
-}
-
-/******************************************************************************
-*
 *  function:  vocalTract
 *
 *  purpose:   Updates the pressure wave throughout the vocal tract,
@@ -864,32 +803,32 @@ VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 	propagate(oropharynx_[S2], oropharynx_[S3]);
 	propagateJunction(oropharynx_[S3], oropharynxJunction_[J1], oropharynx_[S4]);
 	propagate(oropharynx_[S4], oropharynx_[S5]);
-	propagateJunction(oropharynx_[S5], oropharynxJunction_[J2], oropharynx_[S6], fricationTap_[FC1] * frication);
+	propagateJunction(oropharynx_[S5], oropharynxJunction_[J2], oropharynx_[S6]);
 	propagate(oropharynx_[S6], oropharynx_[S7]);
 	propagate(oropharynx_[S7], oropharynx_[S8]);
 	propagate(oropharynx_[S8], oropharynx_[S9]);
-	propagateJunction(oropharynx_[S9], oropharynxJunction_[J3], oropharynx_[S10], fricationTap_[FC2] * frication);
+	propagateJunction(oropharynx_[S9], oropharynxJunction_[J3], oropharynx_[S10]);
 	propagate(oropharynx_[S10], oropharynx_[S11]);
 	propagate(oropharynx_[S11], oropharynx_[S12]);
 
 	// 3-way junction between the middle of R4 and the nasal cavity.
-	propagateJunction(oropharynx_[S12], velumJunction_, oropharynx_[S13], nasal_[VELUM], fricationTap_[FC3] * frication);
+	propagateJunction(oropharynx_[S12], velumJunction_, oropharynx_[S13], nasal_[VELUM]);
 
 	propagate(oropharynx_[S13], oropharynx_[S14]);
 	propagate(oropharynx_[S14], oropharynx_[S15]);
-	propagateJunction(oropharynx_[S15], oropharynxJunction_[J4], oropharynx_[S16], fricationTap_[FC4] * frication);
+	propagateJunction(oropharynx_[S15], oropharynxJunction_[J4], oropharynx_[S16]);
 	propagate(oropharynx_[S16], oropharynx_[S17]);
 	propagate(oropharynx_[S17], oropharynx_[S18]);
-	propagate(oropharynx_[S18], oropharynx_[S19], fricationTap_[FC5] * frication);
+	propagate(oropharynx_[S18], oropharynx_[S19]);
 	propagate(oropharynx_[S19], oropharynx_[S20]);
 	propagate(oropharynx_[S20], oropharynx_[S21]);
-	propagateJunction(oropharynx_[S21], oropharynxJunction_[J5], oropharynx_[S22] , fricationTap_[FC6] * frication);
+	propagateJunction(oropharynx_[S21], oropharynxJunction_[J5], oropharynx_[S22]);
 	propagate(oropharynx_[S22], oropharynx_[S23]);
 	propagate(oropharynx_[S23], oropharynx_[S24]);
 	propagate(oropharynx_[S24], oropharynx_[S25]);
-	propagateJunction(oropharynx_[S25], oropharynxJunction_[J6], oropharynx_[S26] , fricationTap_[FC7] * frication);
+	propagateJunction(oropharynx_[S25], oropharynxJunction_[J6], oropharynx_[S26]);
 	propagate(oropharynx_[S26], oropharynx_[S27]);
-	propagateJunction(oropharynx_[S27], oropharynxJunction_[J7], oropharynx_[S28] , fricationTap_[FC8] * frication);
+	propagateJunction(oropharynx_[S27], oropharynxJunction_[J7], oropharynx_[S28]);
 	propagate(oropharynx_[S28], oropharynx_[S29]);
 	propagate(oropharynx_[S29], oropharynx_[S30]);
 
@@ -918,6 +857,18 @@ VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 	FloatType nasalOutputFlow;
 	nasalRadiationImpedance_->process(nasal_[N18].top[outPtr_], nasalOutputFlow, nasal_[N18].bottom[inPtr_]);
 	nasal_[N18].bottom[inPtr_] *= dampingFactor_;
+
+	// Add frication noise.
+	const FloatType fricOffset = (S28 - S6) * (currentParameter_[PARAM_FRIC_POS] / (MAX_FRIC_POS - MIN_FRIC_POS));
+	const int fricOffsetInt = fricOffset;
+	const FloatType fricRight = fricOffset - fricOffsetInt;
+	const FloatType fricLeft = 1.0f - fricRight;
+	const FloatType fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]);
+	const FloatType fricValue = fricationAmplitude * frication;
+	oropharynx_[S6 + fricOffsetInt].top[inPtr_] += fricValue * fricLeft;
+	if (S6 + fricOffsetInt < S28) {
+		oropharynx_[S6 + fricOffsetInt + 1].top[inPtr_] += fricValue * fricRight;
+	}
 
 	// Return summed output from mouth and nose.
 	return outputDiffFilter_.filter(mouthOutputFlow + nasalOutputFlow) * sampleRate_;
