@@ -49,6 +49,9 @@ private:
 	FloatType x2_;
 	FloatType y1_;
 	FloatType y2_;
+	FloatType prevSampleRate_;
+	FloatType prevBandwidth_;
+	FloatType prevCenterFreq_;
 };
 
 
@@ -62,6 +65,9 @@ BandpassFilter<FloatType>::BandpassFilter()
 		, x2_ {}
 		, y1_ {}
 		, y2_ {}
+		, prevSampleRate_ {-1.0}
+		, prevBandwidth_  {-1.0}
+		, prevCenterFreq_ {-1.0}
 {
 }
 
@@ -73,12 +79,23 @@ BandpassFilter<FloatType>::reset()
 	x2_ = 0.0;
 	y1_ = 0.0;
 	y2_ = 0.0;
+	prevSampleRate_ = -1.0;
+	prevBandwidth_  = -1.0;
+	prevCenterFreq_ = -1.0;
 }
 
 template<typename FloatType>
 void
 BandpassFilter<FloatType>::update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq)
 {
+	if (sampleRate == prevSampleRate_ && bandwidth == prevBandwidth_ && centerFreq == prevCenterFreq_) {
+		return;
+	} else {
+		prevSampleRate_ = sampleRate;
+		prevBandwidth_  = bandwidth;
+		prevCenterFreq_ = centerFreq;
+	}
+
 	constexpr FloatType pi = M_PI;
 	const FloatType T = 1.0f / sampleRate;
 	const FloatType tanValue = std::tan(pi * bandwidth * T);
