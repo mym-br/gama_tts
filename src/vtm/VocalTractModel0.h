@@ -283,8 +283,6 @@ private:
 	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
 	FloatType breathinessFactor_;
 
-	FloatType prevGlotAmplitude_;
-
 	std::vector<std::array<FloatType, TOTAL_PARAMETERS>> inputData_;
 	std::array<FloatType, TOTAL_PARAMETERS> currentParameter_;
 	std::array<FloatType, TOTAL_PARAMETERS> currentParameterDelta_;
@@ -364,7 +362,6 @@ VocalTractModel0<FloatType>::reset()
 	memset(&nasal_[0][0][0],      0, sizeof(FloatType) * TOTAL_NASAL_SECTIONS * 2 * 2);
 	currentPtr_ = 1;
 	prevPtr_    = 0;
-	prevGlotAmplitude_ = -1.0;
 	inputData_.clear();
 	singleInput_.fill(0.0);
 	outputData_.clear();
@@ -586,9 +583,7 @@ VocalTractModel0<FloatType>::synthesize()
 
 	/*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
 	if (config_.waveform == GLOTTAL_SOURCE_PULSE) {
-		if (ax != prevGlotAmplitude_) {
-			glottalSource_->updateWavetable(ax);
-		}
+		glottalSource_->updateWavetable(ax);
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
@@ -621,8 +616,6 @@ VocalTractModel0<FloatType>::synthesize()
 
 	/*  OUTPUT SAMPLE HERE  */
 	srConv_->dataFill(signal);
-
-	prevGlotAmplitude_ = ax;
 }
 
 /******************************************************************************

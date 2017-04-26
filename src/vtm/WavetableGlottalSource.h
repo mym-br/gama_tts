@@ -78,6 +78,7 @@ private:
 	FloatType currentPosition_;
 	std::vector<FloatType> wavetable_;
 	std::unique_ptr<FIRFilter<FloatType>> firFilter_;
+	FloatType prevAmplitude_;
 };
 
 
@@ -91,6 +92,7 @@ WavetableGlottalSource<FloatType>::WavetableGlottalSource(Type type, FloatType s
 		, firGamma_ {0.1}
 		, firCutoff_ {0.00000001}
 		, wavetable_(tableLength_)
+		, prevAmplitude_ {-1.0}
 {
 	// Calculates the initial glottal pulse and stores it
 	// in the wavetable, for use in the oscillator.
@@ -141,6 +143,7 @@ WavetableGlottalSource<FloatType>::reset()
 {
 	currentPosition_ = 0;
 	firFilter_->reset();
+	prevAmplitude_ = -1.0;
 }
 
 /******************************************************************************
@@ -155,6 +158,12 @@ template<typename FloatType>
 void
 WavetableGlottalSource<FloatType>::updateWavetable(FloatType amplitude)
 {
+	if (amplitude == prevAmplitude_) {
+		return;
+	} else {
+		prevAmplitude_ = amplitude;
+	}
+
 	/*  CALCULATE NEW CLOSURE POINT, BASED ON AMPLITUDE  */
 	const FloatType newDiv2 = std::max(tableDiv2_ - std::rint(amplitude * tnDelta_), FloatType {0.0});
 	const FloatType invNewTnLength = 1.0f / (newDiv2 - tableDiv1_);

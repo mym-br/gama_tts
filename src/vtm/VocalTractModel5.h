@@ -378,8 +378,6 @@ private:
 	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
 	FloatType breathinessFactor_;
 
-	FloatType prevGlotAmplitude_;
-
 	std::vector<std::array<FloatType, TOTAL_PARAMETERS>> inputData_;
 	std::array<FloatType, TOTAL_PARAMETERS> currentParameter_;
 	std::array<FloatType, TOTAL_PARAMETERS> currentParameterDelta_;
@@ -468,7 +466,6 @@ VocalTractModel5<FloatType, SectionDelay>::reset()
 	}
 	inPtr_  = 0;
 	outPtr_ = 1;
-	prevGlotAmplitude_ = -1.0;
 	inputData_.clear();
 	singleInput_.fill(0.0);
 	outputData_.clear();
@@ -689,9 +686,7 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 
 	/*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
 	if (config_.waveform == GLOTTAL_SOURCE_PULSE) {
-		if (glotAmplitude != prevGlotAmplitude_) {
-			glottalSource_->updateWavetable(glotAmplitude);
-		}
+		glottalSource_->updateWavetable(glotAmplitude);
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
@@ -726,8 +721,6 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 		/*  OUTPUT SAMPLE HERE  */
 		srConv_->dataFill(signal / f0); // divide by f0 to compensate for the differentiation at the output
 	}
-
-	prevGlotAmplitude_ = glotAmplitude;
 
 	if (logParameters_) GS_LOG_PARAMETER(paramLogger_, log_param_vtm5_pitch, currentParameter_[PARAM_GLOT_PITCH]);
 }
