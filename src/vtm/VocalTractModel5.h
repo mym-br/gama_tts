@@ -252,6 +252,7 @@ private:
 		FloatType glottalNoiseCutoff;          // lowpass cutoff frequency (Hz)
 		FloatType fricationNoiseCutoff;        // lowpass cutoff frequency (Hz)
 		FloatType fricationFactor;
+		int bypass;
 	};
 
 	struct InputFilters {
@@ -450,6 +451,7 @@ VocalTractModel5<FloatType, SectionDelay>::loadConfiguration(const Configuration
 	config_.glottalNoiseCutoff   = data.value<FloatType>("glottal_noise_cutoff");
 	config_.fricationNoiseCutoff = data.value<FloatType>("frication_noise_cutoff");
 	config_.fricationFactor      = data.value<FloatType>("frication_factor");
+	config_.bypass = data.value<int>("bypass");
 
 	logParameters_ = interactive_ ? false : data.value<bool>("log_parameters");
 }
@@ -709,15 +711,21 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 		fricationNoise = fricationNoise * (noisyPulse * crossmix + (1.0f - crossmix));
 	}
 
-	/*  PUT SIGNAL THROUGH VOCAL TRACT  */
-	FloatType signal = vocalTract(noisyPulse + aspAmplitude * fricationNoise,
-					config_.fricationFactor * bandpassFilter_->filter(fricationNoise));
+	if (config_.bypass == 1) {
+		// Get glottal waveform.
+		FloatType signal = noisyPulse + aspAmplitude * fricationNoise;
+		srConv_->dataFill(signal / f0); // divide by f0 to compensate for the differentiation at the output
+	} else {
+		/*  PUT SIGNAL THROUGH VOCAL TRACT  */
+		FloatType signal = vocalTract(noisyPulse + aspAmplitude * fricationNoise,
+						config_.fricationFactor * bandpassFilter_->filter(fricationNoise));
 
-	/*  PUT PULSE THROUGH THROAT  */
-	signal += config_.throatAmplitude * throatFilter_->filter(noisyPulse);
+		/*  PUT PULSE THROUGH THROAT  */
+		signal += config_.throatAmplitude * throatFilter_->filter(noisyPulse);
 
-	/*  OUTPUT SAMPLE HERE  */
-	srConv_->dataFill(signal / f0); // divide by f0 to compensate for the differentiation at the output
+		/*  OUTPUT SAMPLE HERE  */
+		srConv_->dataFill(signal / f0); // divide by f0 to compensate for the differentiation at the output
+	}
 
 	prevGlotAmplitude_ = glotAmplitude;
 
