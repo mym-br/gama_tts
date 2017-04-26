@@ -749,9 +749,6 @@ VocalTractModel5<FloatType, SectionDelay>::initializeNasalCavity()
 		nasalJunction_[i].configure(config_.nasalRadius[j], config_.nasalRadius[j + 1]);
 	}
 
-	//// Configure junction for the nose aperture.
-	//nasalJunction_[NJ6].configure(config_.nasalRadius[NR6], config_.apertureRadius);
-
 	const FloatType r = std::sqrt(0.5f * config_.nasalRadius[NR6] * config_.nasalRadius[NR6]);
 	nasalRadiationImpedance_->update(r * 1.0e-2f /* cm --> m */);
 }
@@ -774,9 +771,6 @@ VocalTractModel5<FloatType, SectionDelay>::calculateTubeCoefficients()
 	for (int i = J1, j = PARAM_R1; i < J8; ++i, ++j) {
 		oropharynxJunction_[i].configure(currentParameter_[j], currentParameter_[j + 1]);
 	}
-
-	//// Configure junction for the mouth aperture.
-	//oropharynxJunction_[J8].configure(currentParameter_[PARAM_R8], config_.apertureRadius);
 
 	mouthRadiationImpedance_->update(currentParameter_[PARAM_R8] * 1.0e-2f /* cm --> m */);
 
