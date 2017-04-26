@@ -91,6 +91,9 @@ public:
 	void update(FloatType radius /* m */);
 	void process(FloatType in /* flow */, FloatType& outT /* flow */, FloatType& outR /* flow */);
 private:
+	static constexpr FloatType TRANSITION_RADIUS = 0.5e-2;
+	static constexpr FloatType MIN_SAMPLE_RATE = 50000.0;
+
 	static FloatType transitionFrequency(FloatType radius /* m */);
 
 	FloatType samplePeriod_;
@@ -99,11 +102,7 @@ private:
 	FloatType outR1_; // the previous value
 	FloatType cT1_, cT2_, cT3_; // transmission coefficients
 	FloatType cR1_, cR2_, cR3_; // reflection coefficients
-	FloatType oldRadius_;
-
-	static constexpr FloatType TRANSITION_RADIUS = 0.5e-2;
-	//static constexpr FloatType MAX_RADIUS = 5.0e-2;
-	static constexpr FloatType MIN_SAMPLE_RATE = 50000.0;
+	FloatType prevRadius_;
 };
 
 
@@ -134,7 +133,7 @@ PoleZeroRadiationImpedance<FloatType>::reset()
 	cR1_ = 0.0;
 	cR2_ = 0.0;
 	cR3_ = 0.0;
-	oldRadius_ = -1.0;
+	prevRadius_ = -1.0;
 }
 
 template<typename FloatType>
@@ -143,17 +142,17 @@ PoleZeroRadiationImpedance<FloatType>::transitionFrequency(FloatType radius) {
 	if (radius < TRANSITION_RADIUS) {
 		radius = TRANSITION_RADIUS;
 	}
-	return FloatType{62.547840296135675} / radius + FloatType{321.9571845220485};
+	return FloatType{62.5478} / radius + FloatType{321.957};
 }
 
 template<typename FloatType>
 void
 PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
 {
-	if (radius == oldRadius_) {
+	if (radius == prevRadius_) {
 		return;
 	} else {
-		oldRadius_ = radius;
+		prevRadius_ = radius;
 	}
 
 	const FloatType transFreq = transitionFrequency(radius);
@@ -167,7 +166,7 @@ PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
 	const FloatType b = 2.0f * a - 1.0f;
 
 	if (radius < TRANSITION_RADIUS) {
-		a *= FloatType{40388.5882415607} * (radius * radius);
+		a *= FloatType{40388.6} * (radius * radius);
 	}
 
 	const FloatType coef = 1.0f / (a + 1.0f);
