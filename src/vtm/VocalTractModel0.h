@@ -851,7 +851,7 @@ VocalTractModel0<FloatType>::writeOutputToFile(const char* outputFile)
 	/*  BE SURE TO FLUSH SRC BUFFER  */
 	srConv_->flushBuffer();
 
-	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
+	if (!interactive_) LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
 	WAVEFileWriter fileWriter(outputFile, 1, srConv_->numberSamples(), config_.outputRate);
@@ -869,7 +869,7 @@ VocalTractModel0<FloatType>::writeOutputToBuffer(std::vector<float>& outputBuffe
 	/*  BE SURE TO FLUSH SRC BUFFER  */
 	srConv_->flushBuffer();
 
-	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
+	if (!interactive_) LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
 	outputBuffer.resize(srConv_->numberSamples());
@@ -890,7 +890,7 @@ VocalTractModel0<FloatType>::calculateOutputScale()
 	}
 
 	const float scale = GS_VTM0_OUTPUT_SCALE / maxValue;
-	LOG_DEBUG("\nScale: " << scale << '\n');
+	if (!interactive_) LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
 }
 

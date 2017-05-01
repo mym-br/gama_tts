@@ -557,7 +557,7 @@ VocalTractModel5<FloatType, SectionDelay>::initializeSynthesizer()
 		const FloatType c = Util::speedOfSound(config_.temperature);
 		controlPeriod_ = static_cast<int>(std::rint((c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / (config_.length * config_.controlRate)));
 		sampleRate_ = static_cast<int>(config_.controlRate * controlPeriod_);
-		LOG_DEBUG("[VocalTractModel5] Internal sample rate: " << sampleRate_);
+		if (!interactive_) LOG_DEBUG("[VocalTractModel5] Internal sample rate: " << sampleRate_);
 	} else {
 		THROW_EXCEPTION(VTMException, "Illegal tube length.\n");
 	}
@@ -884,7 +884,7 @@ VocalTractModel5<FloatType, SectionDelay>::writeOutputToFile(const char* outputF
 	/*  BE SURE TO FLUSH SRC BUFFER  */
 	srConv_->flushBuffer();
 
-	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
+	if (!interactive_) LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
 	WAVEFileWriter fileWriter(outputFile, 1, srConv_->numberSamples(), config_.outputRate);
@@ -902,7 +902,7 @@ VocalTractModel5<FloatType, SectionDelay>::writeOutputToBuffer(std::vector<float
 	/*  BE SURE TO FLUSH SRC BUFFER  */
 	srConv_->flushBuffer();
 
-	LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
+	if (!interactive_) LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
 			"\nMaximum sample value: " << srConv_->maximumSampleValue());
 
 	outputBuffer.resize(srConv_->numberSamples());
@@ -923,7 +923,7 @@ VocalTractModel5<FloatType, SectionDelay>::calculateOutputScale()
 	}
 
 	const float scale = OUTPUT_SCALE / maxValue;
-	LOG_DEBUG("\nScale: " << scale << '\n');
+	if (!interactive_) LOG_DEBUG("\nScale: " << scale << '\n');
 	return scale;
 }
 
