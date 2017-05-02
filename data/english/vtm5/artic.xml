@@ -17,6 +17,7 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************
+ 2017-05-02 Modified by Marcelo Y. Matuda.
 -->
 <root version="1">
   <categories>
@@ -4484,9 +4485,7 @@ s* >> qt* >> whistlehack</comment>
       <equation name="tetraNineTenth" formula="(rd - mark2) * 0.900000 + mark2"/>
     </equation-group>
     <equation-group name="Durations">
-      <equation name="Diphone"/>
       <equation name="Triphone" formula="qssb1 + transition2 + qssa2 + qssb2 + transition3 + qssa3"/>
-      <equation name="Tetraphone"/>
       <equation name="ToSilence" formula="qssb1 + 150.000000 + qssa1"/>
       <equation name="RuleDuration" formula="rd"/>
     </equation-group>
@@ -4538,14 +4537,12 @@ s* >> qt* >> whistlehack</comment>
       <equation name="endOfStopClosureOnset" formula="qssb1 / tempo1 + transition2 / tempo2"/>
       <equation name="startOfStopClosureOnset" formula="qssb1 / tempo1"/>
       <equation name="rdMinusOne" formula="rd - 1.000000"/>
-      <equation name="dud1" formula="rd - qssa3 / tempo3"/>
       <equation name="endOfStopClosureOffset" formula="rd - qssa3 / tempo3"/>
       <equation name="endOfVLessAspBurst" formula="rd - qssa3 / tempo3 / 2.000000">
         <comment>This is the one we are always looking for!!
 
 Namely rd - (qssa3/2)/tempo3</comment>
       </equation>
-      <equation name="dud11" formula="rd - qssa3 / tempo3"/>
       <equation name="startOfStopClosureOffset" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2"/>
       <equation name="VStopBurstStart" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2 - 14.000000"/>
       <equation name="VStopVTotalDur" formula="qssb1 / tempo1 + (transition2 * 2.000000 + qssa2 + qssb2) / tempo2 + qssa3 / tempo3"/>
@@ -5054,61 +5051,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           </slope-ratio>
         </point-or-slopes>
       </transition>
-      <transition name="dud1" type="triphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" free-time="0"/>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="0" time-expression="TenMS"/>
-              <point type="triphone" value="4.08163" time-expression="ThirtyMS"/>
-              <point type="triphone" value="95.9184" time-expression="RuleDurationMinusTwentyMS"/>
-              <point type="triphone" value="100" time-expression="TriphoneDefault"/>
-            </points>
-            <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud2" type="triphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" free-time="0"/>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="0" time-expression="TenMS"/>
-              <point type="triphone" value="4.08163" time-expression="ThirtyMS"/>
-              <point type="triphone" value="95.9184" time-expression="RuleDurationMinusTwentyMS"/>
-              <point type="triphone" value="100" time-expression="TriphoneDefault"/>
-            </points>
-            <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud4" type="triphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" time-expression="Zero"/>
-          <point type="triphone" value="0" time-expression="TenMS"/>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="0" time-expression="startOfStopClosureOnset"/>
-              <point type="triphone" value="80" time-expression="endOfStopClosureOffset"/>
-              <point type="triphone" value="94" time-expression="RuleDurationMinusTenMs"/>
-              <point type="triphone" value="100" time-expression="RuleDuration"/>
-            </points>
-            <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
       <transition name="voicedStopClosure" type="triphone">
         <comment>This is the same timing as the voicedStopClosure transition.  Stop closure onset at qssb1, onset ends at  qssb1 plus transition 2 (stop transition time).  The closure offset begins atqssb1 plus transition2 plus qssa/b2, and ends at qssb1 plus qssa/b2 plus 2 * transition2</comment>
         <point-or-slopes>
@@ -5299,38 +5241,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           </slope-ratio>
         </point-or-slopes>
       </transition>
-      <transition name="dud6" type="triphone">
-        <point-or-slopes>
-          <slope-ratio>
-            <points>
-              <point type="diphone" value="0" time-expression="Zero"/>
-              <point type="diphone" value="15.9236" time-expression="startOfStopClosureOnset"/>
-              <point type="diphone" value="77.0701" time-expression="endOfStopClosureOnset"/>
-              <point type="diphone" value="100" time-expression="Mark1"/>
-            </points>
-            <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="-0.5" time-expression="Mark1"/>
-              <point type="triphone" value="-0.5" time-expression="startOfStopClosureOffset"/>
-              <point type="triphone" value="100" time-expression="endOfStopClosureOffset"/>
-              <point type="triphone" value="100" time-expression="RuleDurationMinusTwentyMS"/>
-              <point type="triphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
-            </points>
-            <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
       <transition name="unvoicedStopClosure" type="triphone">
         <comment>This is the same timing as the voicedStopClosure transition.  Stop closure onset at qssb1, onset ends at  qssb1 plus transition 2 (stop transition time).  The closure offset begins atqssb1 plus transition2 plus qssa/b2, and ends at qssb1 plus qssa/b2 plus 2 * transition2.</comment>
         <point-or-slopes>
@@ -5358,37 +5268,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <slope slope="0" display-time="0"/>
               <slope slope="1" display-time="0"/>
               <slope slope="0.2" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud14" type="triphone">
-        <comment>This is the same timing as the voicedStopClosure transition.  Stop closure onset at qssb1, onset ends at  qssb1 plus transition 2 (stop transition time).  The closure offset begins atqssb1 plus transition2 plus qssa/b2, and ends at qssb1 plus qssa/b2 plus 2 * transition2.</comment>
-        <point-or-slopes>
-          <slope-ratio>
-            <points>
-              <point type="diphone" value="0" time-expression="Zero"/>
-              <point type="diphone" value="6.66667" time-expression="startOfStopClosureOnset"/>
-              <point type="diphone" value="86.6667" time-expression="endOfStopClosureOnset"/>
-              <point type="diphone" value="100" time-expression="Mark1"/>
-            </points>
-            <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="-0.5" time-expression="Mark1"/>
-              <point type="triphone" value="-0.5" time-expression="startOfStopClosureOffset"/>
-              <point type="triphone" value="88.8334" time-expression="endOfStopClosureOffset"/>
-              <point type="triphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
-            </points>
-            <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="8" display-time="0"/>
-              <slope slope="1" display-time="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -5462,26 +5341,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <slope slope="3" display-time="0"/>
               <slope slope="1" display-time="0"/>
               <slope slope="0" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud21" type="triphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" time-expression="Zero"/>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="0" time-expression="TenMS"/>
-              <point type="triphone" value="0" time-expression="startOfStopClosureOnset"/>
-              <point type="triphone" value="0" time-expression="endOfStopClosureOffset"/>
-              <point type="triphone" value="0" time-expression="RuleDurationMinusTenMs"/>
-              <point type="triphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
-            </points>
-            <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -5605,13 +5464,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
       </transition>
     </transition-group>
     <transition-group name="Fricatives">
-      <transition name="dudPlainTriphone" type="triphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" free-time="0"/>
-          <point type="diphone" value="100" time-expression="Mark1"/>
-          <point type="triphone" value="100" time-expression="RuleDuration"/>
-        </point-or-slopes>
-      </transition>
       <transition name="sOrzClosure" type="triphone">
         <comment>This is the same timing as the voicedStopClosure transition.  Stop closure onset at qssb1, onset ends at  qssb1 plus transition 2 (stop transition time).  The closure offset begins atqssb1 plus transition2 plus qssa/b2, and ends at qssb1 plus qssa/b2 plus 2 * transition2</comment>
         <point-or-slopes>
@@ -5802,37 +5654,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           </slope-ratio>
         </point-or-slopes>
       </transition>
-      <transition name="dud12" type="triphone">
-        <comment>This is the same timing as the voicedStopClosure transition.  Stop closure onset at qssb1, onset ends at  qssb1 plus transition 2 (stop transition time).  The closure offset begins atqssb1 plus transition2 plus qssa/b2, and ends at qssb1 plus qssa/b2 plus 2 * transition2</comment>
-        <point-or-slopes>
-          <slope-ratio>
-            <points>
-              <point type="diphone" value="0" time-expression="Zero"/>
-              <point type="diphone" value="19.6428" time-expression="startOfFricCharOnset"/>
-              <point type="diphone" value="100" time-expression="endOfFricCharOnset"/>
-              <point type="diphone" value="100" time-expression="Mark1"/>
-            </points>
-            <slopes>
-              <slope slope="0.2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="-0.5" time-expression="Mark1"/>
-              <point type="triphone" value="49.7502" time-expression="startOfFricCharOffset"/>
-              <point type="triphone" value="-101.001" time-expression="startOfStopClosureOffset"/>
-              <point type="triphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
-            </points>
-            <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="4" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
       <transition name="FricGlide" type="triphone">
         <point-or-slopes>
           <point type="diphone" value="0" time-expression="Zero"/>
@@ -5855,43 +5676,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
       </transition>
     </transition-group>
     <transition-group name="Nasals">
-      <transition name="dud17" type="triphone">
-        <comment>This is the same timing as the voicedStopClosure transition.  Stop closure onset at qssb1, onset ends at  qssb1 plus transition 2 (stop transition time).  The closure offset begins atqssb1 plus transition2 plus qssa/b2, and ends at qssb1 plus qssa/b2 plus 2 * transition2</comment>
-        <point-or-slopes>
-          <slope-ratio>
-            <points>
-              <point type="diphone" value="0" time-expression="Zero"/>
-              <point type="diphone" value="7.69231" time-expression="QssbOneByTwo"/>
-              <point type="diphone" value="100" time-expression="startOfStopClosureOnset"/>
-              <point type="diphone" value="100" time-expression="endOfStopClosureOnset"/>
-              <point type="diphone" value="100" time-expression="Mark1"/>
-            </points>
-            <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-          <slope-ratio>
-            <points>
-              <point type="triphone" value="-0.5" time-expression="Mark1"/>
-              <point type="triphone" value="-0.5" time-expression="startOfStopClosureOffset"/>
-              <point type="triphone" value="-0.5" time-expression="endOfStopClosureOffset"/>
-              <point type="triphone" value="-0.500186" time-expression="QssbTwoTrThree"/>
-              <point type="triphone" value="92.2692" time-expression="RdMinusQssa3ByTwo"/>
-              <point type="triphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
-            </points>
-            <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="4" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-            </slopes>
-          </slope-ratio>
-        </point-or-slopes>
-      </transition>
       <transition name="velarOpening" type="triphone">
         <comment>This is the same timing as the voicedStopClosure transition.  Stop closure onset at qssb1, onset ends at  qssb1 plus transition 2 (stop transition time).  The closure offset begins atqssb1 plus transition2 plus qssa/b2, and ends at qssb1 plus qssa/b2 plus 2 * transition2</comment>
         <point-or-slopes>
@@ -6178,31 +5962,12 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
       </transition>
     </transition-group>
     <transition-group name="Stopped">
-      <transition name="dud7" type="triphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" free-time="0"/>
-          <point type="diphone" value="17" time-expression="VlessStopFricOnset"/>
-          <point type="diphone" value="0" time-expression="VlessStopVolOnset1"/>
-          <point type="diphone" value="0" time-expression="QssbOne"/>
-        </point-or-slopes>
-      </transition>
       <transition name="kFric" type="diphone">
         <point-or-slopes>
           <point type="diphone" value="0" free-time="0"/>
           <point type="diphone" value="25" time-expression="VlessStopFricOnset"/>
           <point type="diphone" value="0" time-expression="VlessStopVolOnset1"/>
           <point type="diphone" value="0" time-expression="QssbOne"/>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud8" type="diphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" free-time="0"/>
-          <point type="diphone" value="0" time-expression="VlessStopFricOnset"/>
-          <point type="diphone" value="0" time-expression="VLessStopAspOffset2"/>
-          <point type="diphone" value="23" time-expression="VlessStopVolOnset1"/>
-          <point type="diphone" value="36" time-expression="QssbOneTrOne"/>
-          <point type="diphone" value="33" time-expression="VlessStopAspPeak"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
         </point-or-slopes>
       </transition>
       <transition name="tAsp" type="diphone">
@@ -6214,25 +5979,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           <point type="diphone" value="40" time-expression="QssbOneTrOne"/>
           <point type="diphone" value="40" time-expression="VlessStopAspPeak"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud8" type="triphone">
-        <point-or-slopes>
-          <point type="triphone" value="0" free-time="0"/>
-          <point type="triphone" value="0" time-expression="startOfStopClosureOffset"/>
-          <point type="triphone" value="30" time-expression="VStopBurstEnd"/>
-          <point type="triphone" value="30" time-expression="VStopBurstTipA"/>
-          <point type="triphone" value="0" time-expression="RuleDuration"/>
-          <point type="triphone" value="0" time-expression="RuleDurationMinusTwentyMS"/>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud5" type="triphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" time-expression="Zero"/>
-          <point type="triphone" value="0" time-expression="startOfStopClosureOffset"/>
-          <point type="triphone" value="20" time-expression="VStopBurstTipA"/>
-          <point type="triphone" value="0" time-expression="VStopBurstEnd"/>
-          <point type="triphone" value="0" time-expression="RuleDuration" is-phantom="yes"/>
         </point-or-slopes>
       </transition>
       <transition name="VStopFric" type="triphone">
@@ -6384,16 +6130,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
         </point-or-slopes>
       </transition>
-      <transition name="dud20" type="triphone">
-        <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
-          <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="0.15" time-expression="VStopBurstTipA"/>
-          <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
-        </point-or-slopes>
-      </transition>
       <transition name="tOrdFricFinalBurst" type="triphone">
         <point-or-slopes>
           <point type="triphone" value="0" time-expression="Zero"/>
@@ -6411,15 +6147,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           <point type="diphone" value="0.2" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="diphone" value="0.2" time-expression="RuleDurationMinusTenMs"/>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud15" type="triphone">
-        <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
-          <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="5" time-expression="VStopBurstTipA"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="5" time-expression="RuleDurationMinusTenMs"/>
         </point-or-slopes>
       </transition>
       <transition name="tTolFricBurst" type="triphone">
@@ -6455,30 +6182,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           <point type="triphone" value="30" time-expression="Mark1Plus10"/>
         </point-or-slopes>
       </transition>
-      <transition name="dud16" type="triphone">
-        <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
-          <point type="diphone" value="-12" time-expression="startOfStopClosureOnset"/>
-          <point type="triphone" value="30" time-expression="startOfStopClosureOffset"/>
-          <point type="triphone" value="0" time-expression="RuleDuration"/>
-          <point type="triphone" value="12" time-expression="endOfStopClosureOffset"/>
-          <point type="diphone" value="-3" time-expression="QssbOneByTwo"/>
-          <point type="diphone" value="-30" time-expression="endOfStopClosureOnset"/>
-          <point type="triphone" value="3" time-expression="endOfVLessAspBurst"/>
-          <point type="diphone" value="-30" time-expression="Mark1"/>
-          <point type="triphone" value="30" time-expression="Mark1Plus10"/>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud9" type="triphone">
-        <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
-          <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="2" time-expression="VStopBurstTipA"/>
-          <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
-        </point-or-slopes>
-      </transition>
       <transition name="finalBFric" type="triphone">
         <point-or-slopes>
           <point type="triphone" value="0" time-expression="Zero"/>
@@ -6497,11 +6200,6 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           <point type="diphone" value="1" time-expression="VStopBurstTipB"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
-        </point-or-slopes>
-      </transition>
-      <transition name="dud17" type="diphone">
-        <point-or-slopes>
-          <point type="diphone" value="0" free-time="0"/>
         </point-or-slopes>
       </transition>
     </transition-group>
