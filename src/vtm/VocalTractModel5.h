@@ -709,7 +709,7 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 	if (config_.bypass == 1) {
 		// Get glottal waveform.
 		FloatType signal = noisyPulse + aspAmplitude * fricationNoise;
-		srConv_->dataFill(signal / f0); // divide by f0 to compensate for the differentiation at the output
+		srConv_->dataFill(interactive_ ? signal / f0 : signal); // divide by f0 to compensate for the differentiation at the output
 	} else {
 		/*  PUT SIGNAL THROUGH VOCAL TRACT  */
 		FloatType signal = vocalTract(noisyPulse + aspAmplitude * fricationNoise,
