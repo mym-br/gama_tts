@@ -884,7 +884,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.25"/>
+        <target name="fricVol" value="40"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -920,7 +920,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.25"/>
+        <target name="fricVol" value="40"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -1217,7 +1217,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.5"/>
+        <target name="fricVol" value="25"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -1252,7 +1252,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.5"/>
+        <target name="fricVol" value="25"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -3409,7 +3409,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.8"/>
+        <target name="fricVol" value="25"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -3444,7 +3444,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.8"/>
+        <target name="fricVol" value="25"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -3479,7 +3479,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.4"/>
+        <target name="fricVol" value="20"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -3514,7 +3514,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.4"/>
+        <target name="fricVol" value="20"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -3620,7 +3620,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.25"/>
+        <target name="fricVol" value="25"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -3656,7 +3656,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.25"/>
+        <target name="fricVol" value="25"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -4022,7 +4022,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.2"/>
+        <target name="fricVol" value="38"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -4058,7 +4058,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.2"/>
+        <target name="fricVol" value="38"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -4296,7 +4296,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.8"/>
+        <target name="fricVol" value="30"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -4332,7 +4332,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.8"/>
+        <target name="fricVol" value="30"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -4368,7 +4368,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.4"/>
+        <target name="fricVol" value="27"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -4404,7 +4404,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="18.4"/>
+        <target name="fricVol" value="27"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -6073,12 +6073,12 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
       </transition>
       <transition name="pOrbFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="12" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="50" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="pInitFricBurst" type="triphone">
@@ -6093,69 +6093,69 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
       </transition>
       <transition name="kFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="3" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="20" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="kFinalFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="1.5" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="10" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="kTolrFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="0.72" time-expression="VStopBurstTipA"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="diphone" value="35" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="tFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="1" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="50" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="tOrdFricFinalBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="0.3" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="30" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="tTorFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="0.2" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="40" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="40" time-expression="RuleDurationMinusTenMs"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="0.2" time-expression="RuleDurationMinusTenMs"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="tTolFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="0.2" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="30" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="30" time-expression="RuleDurationMinusTenMs"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="0.2" time-expression="RuleDurationMinusTenMs"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="fricSpecEventParams" type="triphone">
@@ -6219,32 +6219,32 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
     <transition-group name="Affricates">
       <transition name="jFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
-          <point type="diphone" value="6" time-expression="Mark1Plus6"/>
-          <point type="diphone" value="3" time-expression="QssbTwo"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
           <point type="diphone" value="0" time-expression="Mark1"/>
+          <point type="diphone" value="40" time-expression="Mark1Plus6"/>
+          <point type="diphone" value="35" time-expression="QssbTwo"/>
+          <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="chFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
-          <point type="diphone" value="0.9" time-expression="Mark1Plus6"/>
-          <point type="diphone" value="2.1" time-expression="QssbTwo"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
           <point type="diphone" value="0" time-expression="Mark1"/>
+          <point type="diphone" value="5" time-expression="Mark1Plus6"/>
+          <point type="diphone" value="7" time-expression="QssbTwo"/>
+          <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="initChFricBurst" type="triphone">
         <point-or-slopes>
-          <point type="triphone" value="0" time-expression="Zero"/>
-          <point type="diphone" value="3" time-expression="Mark1Plus10"/>
-          <point type="diphone" value="2.1" time-expression="QssbTwo"/>
-          <point type="diphone" value="0" time-expression="RuleDuration"/>
-          <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
           <point type="diphone" value="0" time-expression="Mark1Plus6"/>
+          <point type="diphone" value="10" time-expression="Mark1Plus10"/>
+          <point type="diphone" value="15" time-expression="QssbTwo"/>
+          <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
+          <point type="diphone" value="0" time-expression="RuleDuration"/>
+          <point type="triphone" value="0" time-expression="Zero"/>
         </point-or-slopes>
       </transition>
       <transition name="chAspBurst" type="triphone">
