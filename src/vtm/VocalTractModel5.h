@@ -719,7 +719,7 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 		signal += config_.throatAmplitude * throatFilter_->filter(noisyPulse);
 
 		/*  OUTPUT SAMPLE HERE  */
-		srConv_->dataFill(signal / f0); // divide by f0 to compensate for the differentiation at the output
+		srConv_->dataFill(interactive_ ? signal / f0 : signal); // divide by f0 to compensate for the differentiation at the output
 	}
 
 	if (logParameters_) GS_LOG_PARAMETER(paramLogger_, log_param_vtm5_pitch, currentParameter_[PARAM_GLOT_PITCH]);
