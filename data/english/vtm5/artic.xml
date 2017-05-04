@@ -58,7 +58,7 @@ s* >> qt* >> whistlehack</comment>
     <parameter name="microInt" minimum="-10" maximum="10" default="0"/>
     <parameter name="glotVol" minimum="0" maximum="60" default="60"/>
     <parameter name="aspVol" minimum="0" maximum="60" default="0"/>
-    <parameter name="fricVol" minimum="0" maximum="10" default="0"/>
+    <parameter name="fricVol" minimum="0" maximum="60" default="0"/>
     <parameter name="fricPos" minimum="0" maximum="7" default="5.5"/>
     <parameter name="fricCF" minimum="100" maximum="20000" default="2500"/>
     <parameter name="fricBW" minimum="250" maximum="20000" default="500"/>
@@ -884,7 +884,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.25"/>
+        <target name="fricVol" value="18.25"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -920,7 +920,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.25"/>
+        <target name="fricVol" value="18.25"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -1217,7 +1217,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.5"/>
+        <target name="fricVol" value="18.5"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -1252,7 +1252,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.5"/>
+        <target name="fricVol" value="18.5"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -2690,7 +2690,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="24"/>
+        <target name="fricVol" value="42"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="864"/>
         <target name="fricBW" value="3587"/>
@@ -2724,7 +2724,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="24"/>
+        <target name="fricVol" value="42"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="864"/>
         <target name="fricBW" value="3587"/>
@@ -3409,7 +3409,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.8"/>
+        <target name="fricVol" value="18.8"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -3444,7 +3444,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.8"/>
+        <target name="fricVol" value="18.8"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -3479,7 +3479,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.4"/>
+        <target name="fricVol" value="18.4"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -3514,7 +3514,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.4"/>
+        <target name="fricVol" value="18.4"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -3620,7 +3620,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.25"/>
+        <target name="fricVol" value="18.25"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -3656,7 +3656,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.25"/>
+        <target name="fricVol" value="18.25"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -4022,7 +4022,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.2"/>
+        <target name="fricVol" value="18.2"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -4058,7 +4058,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.2"/>
+        <target name="fricVol" value="18.2"/>
         <target name="fricPos" value="7"/>
         <target name="fricCF" value="3300"/>
         <target name="fricBW" value="1000"/>
@@ -4160,7 +4160,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.5"/>
+        <target name="fricVol" value="18.5"/>
         <target name="fricPos" value="2"/>
         <target name="fricCF" value="1770"/>
         <target name="fricBW" value="900"/>
@@ -4192,7 +4192,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.5"/>
+        <target name="fricVol" value="18.5"/>
         <target name="fricPos" value="2"/>
         <target name="fricCF" value="1770"/>
         <target name="fricBW" value="900"/>
@@ -4296,7 +4296,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.8"/>
+        <target name="fricVol" value="18.8"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -4332,7 +4332,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.8"/>
+        <target name="fricVol" value="18.8"/>
         <target name="fricPos" value="5.8"/>
         <target name="fricCF" value="5500"/>
         <target name="fricBW" value="500"/>
@@ -4368,7 +4368,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.4"/>
+        <target name="fricVol" value="18.4"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -4404,7 +4404,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0.4"/>
+        <target name="fricVol" value="18.4"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -5517,8 +5517,8 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
           </slope-ratio>
           <slope-ratio>
             <points>
-              <point type="triphone" value="-0.5" time-expression="Mark1"/>
-              <point type="triphone" value="-0.5" time-expression="startOfStopClosureOffset"/>
+              <point type="triphone" value="0" time-expression="Mark1"/>
+              <point type="triphone" value="0" time-expression="startOfStopClosureOffset"/>
               <point type="triphone" value="100" time-expression="startOfFricCharOffset"/>
               <point type="triphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
             </points>
