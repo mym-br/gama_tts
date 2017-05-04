@@ -1421,7 +1421,7 @@ s* >> qt* >> whistlehack</comment>
       <parameter-targets>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
-        <target name="aspVol" value="10"/>
+        <target name="aspVol" value="14"/>
         <target name="fricVol" value="0"/>
         <target name="fricPos" value="5.5"/>
         <target name="fricCF" value="2500"/>
@@ -1454,7 +1454,7 @@ s* >> qt* >> whistlehack</comment>
       <parameter-targets>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
-        <target name="aspVol" value="10"/>
+        <target name="aspVol" value="14"/>
         <target name="fricVol" value="0"/>
         <target name="fricPos" value="5.5"/>
         <target name="fricCF" value="2500"/>
@@ -1486,7 +1486,7 @@ s* >> qt* >> whistlehack</comment>
       <parameter-targets>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
-        <target name="aspVol" value="10"/>
+        <target name="aspVol" value="14"/>
         <target name="fricVol" value="0"/>
         <target name="fricPos" value="1"/>
         <target name="fricCF" value="1000"/>
@@ -1518,7 +1518,7 @@ s* >> qt* >> whistlehack</comment>
       <parameter-targets>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="0"/>
-        <target name="aspVol" value="10"/>
+        <target name="aspVol" value="14"/>
         <target name="fricVol" value="0"/>
         <target name="fricPos" value="1"/>
         <target name="fricCF" value="1000"/>
@@ -1551,7 +1551,7 @@ s* >> qt* >> whistlehack</comment>
       <parameter-targets>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="42"/>
-        <target name="aspVol" value="10"/>
+        <target name="aspVol" value="20"/>
         <target name="fricVol" value="0"/>
         <target name="fricPos" value="5.5"/>
         <target name="fricCF" value="2500"/>
@@ -1584,7 +1584,7 @@ s* >> qt* >> whistlehack</comment>
       <parameter-targets>
         <target name="microInt" value="0"/>
         <target name="glotVol" value="42"/>
-        <target name="aspVol" value="10"/>
+        <target name="aspVol" value="20"/>
         <target name="fricVol" value="0"/>
         <target name="fricPos" value="5.5"/>
         <target name="fricCF" value="2500"/>
