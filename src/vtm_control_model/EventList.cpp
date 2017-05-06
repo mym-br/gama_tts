@@ -902,13 +902,13 @@ EventList::applyIntonationSmooth()
 		double denominator = x2 - x1;
 		denominator = denominator * denominator * denominator;
 
-//		double d = ( -(y2 * x13) + 3 * y2 * x12 * x2 + m2 * x13 * x2 + m1 * x12 * x22 - m2 * x12 * x22 - 3 * x1 * y1 * x22 - m1 * x1 * x23 + y1 * x23 )
+//		double d = ( -(y2 * x13) + 3.0 * y2 * x12 * x2 + m2 * x13 * x2 + m1 * x12 * x22 - m2 * x12 * x22 - 3.0 * x1 * y1 * x22 - m1 * x1 * x23 + y1 * x23 )
 //			/ denominator;
-		double c = ( -(m2 * x13) - 6 * y2 * x1 * x2 - 2 * m1 * x12 * x2 - m2 * x12 * x2 + 6 * x1 * y1 * x2 + m1 * x1 * x22 + 2 * m2 * x1 * x22 + m1 * x23 )
+		double c = ( -(m2 * x13) - 6.0 * y2 * x1 * x2 - 2.0 * m1 * x12 * x2 - m2 * x12 * x2 + 6.0 * x1 * y1 * x2 + m1 * x1 * x22 + 2.0 * m2 * x1 * x22 + m1 * x23 )
 			/ denominator;
-		double b = ( 3 * y2 * x1 + m1 * x12 + 2 * m2 * x12 - 3 * x1 * y1 + 3 * x2 * y2 + m1 * x1 * x2 - m2 * x1 * x2 - 3 * y1 * x2 - 2 * m1 * x22 - m2 * x22 )
+		double b = ( 3.0 * y2 * x1 + m1 * x12 + 2.0 * m2 * x12 - 3.0 * x1 * y1 + 3.0 * x2 * y2 + m1 * x1 * x2 - m2 * x1 * x2 - 3.0 * y1 * x2 - 2.0 * m1 * x22 - m2 * x22 )
 			/ denominator;
-		double a = ( -2 * y2 - m1 * x1 - m2 * x1 + 2 * y1 + m1 * x2 + m2 * x2) / denominator;
+		double a = ( -2.0 * y2 - m1 * x1 - m2 * x1 + 2.0 * y1 + m1 * x2 + m2 * x2) / denominator;
 
 		insertEvent(32, point1.absoluteTime(), point1.semitone());
 		//printf("Inserting Point %f\n", [point1 semitone]);
