@@ -22,6 +22,9 @@
 
 #include "Exception.h"
 
+#define GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS (0.5e-2)
+#define GS_VTM_POLE_ZERO_RAD_IMPED_MIN_SAMPLE_RATE (50000.0)
+
 
 
 namespace GS {
@@ -91,9 +94,6 @@ public:
 	void update(FloatType radius /* m */);
 	void process(FloatType in /* flow */, FloatType& outT /* flow */, FloatType& outR /* flow */);
 private:
-	static constexpr FloatType TRANSITION_RADIUS = 0.5e-2;
-	static constexpr FloatType MIN_SAMPLE_RATE = 50000.0;
-
 	static FloatType transitionFrequency(FloatType radius /* m */);
 
 	FloatType samplePeriod_;
@@ -113,8 +113,9 @@ PoleZeroRadiationImpedance<FloatType>::PoleZeroRadiationImpedance(FloatType samp
 {
 	reset();
 
-	if (sampleRate < MIN_SAMPLE_RATE) {
-		THROW_EXCEPTION(InvalidValueException, "[PoleZeroRadiationImpedance] Invalid sample rate: " << sampleRate << " (minimum: " << MIN_SAMPLE_RATE << ").");
+	if (sampleRate < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_MIN_SAMPLE_RATE}) {
+		THROW_EXCEPTION(InvalidValueException, "[PoleZeroRadiationImpedance] Invalid sample rate: " << sampleRate <<
+				" (minimum: " << GS_VTM_POLE_ZERO_RAD_IMPED_MIN_SAMPLE_RATE << ").");
 	} else {
 		samplePeriod_ = 1.0f / sampleRate;
 	}
@@ -139,8 +140,8 @@ PoleZeroRadiationImpedance<FloatType>::reset()
 template<typename FloatType>
 FloatType
 PoleZeroRadiationImpedance<FloatType>::transitionFrequency(FloatType radius) {
-	if (radius < TRANSITION_RADIUS) {
-		radius = TRANSITION_RADIUS;
+	if (radius < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
+		radius = GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS;
 	}
 	return FloatType{62.5478} / radius + FloatType{321.957};
 }
@@ -165,7 +166,7 @@ PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
 	FloatType a = (-qb - std::sqrt(delta)) / (2.0f * qa);
 	const FloatType b = 2.0f * a - 1.0f;
 
-	if (radius < TRANSITION_RADIUS) {
+	if (radius < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
 		a *= FloatType{40388.6} * (radius * radius);
 	}
 
