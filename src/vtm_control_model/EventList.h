@@ -21,6 +21,7 @@
 #ifndef VTM_CONTROL_MODEL_EVENT_LIST_H_
 #define VTM_CONTROL_MODEL_EVENT_LIST_H_
 
+#include <cassert>
 #include <limits> /* std::numeric_limits<double>::infinity() */
 #include <memory>
 #include <ostream>
@@ -36,8 +37,6 @@
 #define TONE_GROUP_TYPE_QUESTION     2
 #define TONE_GROUP_TYPE_CONTINUATION 3
 #define TONE_GROUP_TYPE_SEMICOLON    4
-
-#define GS_EVENTLIST_INVALID_EVENT_VALUE std::numeric_limits<double>::infinity()
 
 
 
@@ -98,23 +97,38 @@ struct RuleData {
 		, beat(0.0) {}
 };
 
+struct InterpolationData {
+	double a;
+	double b;
+	double c;
+	double d;
+};
+
 struct Event {
 	enum {
-		EVENTS_SIZE = 36
+		NUM_PARAMETERS = 32
 	};
-	Event();
+	static constexpr double EMPTY_PARAMETER = std::numeric_limits<double>::infinity();
 
-	void setValue(double value, int index) {
-		if (index < 0) return;
-		events[index] = value;
-	}
-	double getValue(int index) const {
-		return events[index];
+	Event() : time {}, flag {}, interpData {} {
+		for (int i = 0; i < NUM_PARAMETERS; ++i) {
+			parameters[i] = Event::EMPTY_PARAMETER;
+		}
 	}
 
+	void setParameter(int index, double value) {
+		assert(index >= 0 && index < NUM_PARAMETERS);
+		parameters[index] = value;
+	}
+	double getParameter(int index) const {
+		assert(index >= 0 && index < NUM_PARAMETERS);
+		return parameters[index];
+	}
+
+	double parameters[NUM_PARAMETERS];
 	int time;
-	int flag;
-	double events[EVENTS_SIZE];
+	int flag; // 1 when it is the first or the last event of the rule (this flag is used only for debug)
+	std::unique_ptr<InterpolationData> interpData;
 };
 typedef std::unique_ptr<Event> Event_ptr;
 
@@ -188,12 +202,12 @@ private:
 	void addIntonationPoint(double semitone, double offsetTime, double slope, int ruleIndex);
 	void setFullTimeScale();
 	void newPosture();
-	Event* insertEvent(int number, double time, double value);
+	Event* insertEvent(double time, int parameter, double value);
 	void setZeroRef(int newValue);
 	void applyRule(const Rule& rule, const std::vector<const Posture*>& postureList, const double* tempos, int postureIndex);
 	void printDataStructures();
 	double createSlopeRatioEvents(const Transition::SlopeRatio& slopeRatio,
-			double baseline, double parameterDelta, double min, double max, int eventIndex);
+			double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier);
 
 	Model& model_;
 
@@ -208,7 +222,6 @@ private:
 
 	double pitchMean_;
 	double globalTempo_;
-	double multiplier_;
 	float* intonParms_;
 
 	/* NOTE postureData and postureTempo are separate for optimization reasons */

@@ -38,13 +38,6 @@
 namespace GS {
 namespace VTMControlModel {
 
-Event::Event() : time(0), flag(0)
-{
-	for (int i = 0; i < EVENTS_SIZE; ++i) {
-		events[i] = GS_EVENTLIST_INVALID_EVENT_VALUE;
-	}
-}
-
 EventList::EventList(const char* configDirPath, Model& model)
 		: model_(model)
 		, macroFlag_(0)
@@ -81,7 +74,6 @@ EventList::setUp()
 	duration_ = 0;
 	timeQuantization_ = 4;
 
-	multiplier_ = 1.0;
 	intonParms_ = nullptr;
 
 	postureData_.clear();
@@ -332,9 +324,8 @@ EventList::setCurrentPostureSyllable()
 }
 
 Event*
-EventList::insertEvent(int number, double time, double value)
+EventList::insertEvent(double time, int parameter, double value)
 {
-	time = time * multiplier_;
 	if (time < 0.0) {
 		return nullptr;
 	}
@@ -351,8 +342,8 @@ EventList::insertEvent(int number, double time, double value)
 	if (list_.empty()) {
 		auto tempEvent = std::make_unique<Event>();
 		tempEvent->time = tempTime;
-		if (number >= 0) {
-			tempEvent->setValue(value, number);
+		if (parameter >= 0) {
+			tempEvent->setParameter(parameter, value);
 		}
 		list_.push_back(std::move(tempEvent));
 		return list_.back().get();
@@ -361,16 +352,16 @@ EventList::insertEvent(int number, double time, double value)
 	int i;
 	for (i = list_.size() - 1; i >= zeroIndex_; i--) {
 		if (list_[i]->time == tempTime) {
-			if (number >= 0) {
-				list_[i]->setValue(value, number);
+			if (parameter >= 0) {
+				list_[i]->setParameter(parameter, value);
 			}
 			return list_[i].get();
 		}
 		if (list_[i]->time < tempTime) {
 			auto tempEvent = std::make_unique<Event>();
 			tempEvent->time = tempTime;
-			if (number >= 0) {
-				tempEvent->setValue(value, number);
+			if (parameter >= 0) {
+				tempEvent->setParameter(parameter, value);
 			}
 			list_.insert(list_.begin() + (i + 1), std::move(tempEvent));
 			return list_[i + 1].get();
@@ -379,8 +370,8 @@ EventList::insertEvent(int number, double time, double value)
 
 	auto tempEvent = std::make_unique<Event>();
 	tempEvent->time = tempTime;
-	if (number >= 0) {
-		tempEvent->setValue(value, number);
+	if (parameter >= 0) {
+		tempEvent->setParameter(parameter, value);
 	}
 	list_.insert(list_.begin() + (i + 1), std::move(tempEvent));
 	return list_[i + 1].get();
@@ -407,7 +398,7 @@ EventList::setZeroRef(int newValue)
 double
 EventList::createSlopeRatioEvents(
 		const Transition::SlopeRatio& slopeRatio,
-		double baseline, double parameterDelta, double min, double max, int eventIndex)
+		double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier)
 {
 	double temp = 0.0, temp1 = 0.0, intervalTime = 0.0, sum = 0.0, factor = 0.0;
 	double baseTime = 0.0, endTime = 0.0, totalTime = 0.0, delta = 0.0;
@@ -470,7 +461,7 @@ EventList::createSlopeRatioEvents(
 			value = max;
 		}
 		if (!point.isPhantom) {
-			insertEvent(eventIndex, pointTime, value);
+			insertEvent(pointTime * timeMultiplier, eventIndex, value);
 		}
 	}
 
@@ -491,15 +482,15 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 
 	rule.evaluateExpressionSymbols(tempos, postureList, model_, ruleSymbols);
 
-	multiplier_ = 1.0 / (double) (postureData_[postureIndex].ruleTempo);
+	const double timeMultiplier = 1.0 / postureData_[postureIndex].ruleTempo;
 
 	int type = rule.numberOfExpressions();
-	setDuration((int) (ruleSymbols[0] * multiplier_));
+	setDuration((int) (ruleSymbols[0] * timeMultiplier));
 
 	ruleData_[currentRule_].firstPosture = postureIndex;
 	ruleData_[currentRule_].lastPosture = postureIndex + (type - 1);
-	ruleData_[currentRule_].beat = (ruleSymbols[1] * multiplier_) + (double) zeroRef_;
-	ruleData_[currentRule_++].duration = ruleSymbols[0] * multiplier_;
+	ruleData_[currentRule_].beat = (ruleSymbols[1] * timeMultiplier) + (double) zeroRef_;
+	ruleData_[currentRule_++].duration = ruleSymbols[0] * timeMultiplier;
 	ruleData_.push_back(RuleData());
 
 	switch (type) {
@@ -507,18 +498,18 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 	case 4:
 		if (postureList.size() == 4) {
 			postureData_[postureIndex + 3].onset = (double) zeroRef_ + ruleSymbols[1];
-			tempEvent = insertEvent(-1, ruleSymbols[3], 0.0);
+			tempEvent = insertEvent(ruleSymbols[3] * timeMultiplier, -1, 0.0);
 			if (tempEvent) tempEvent->flag = 1;
 		}
-	case 3:
+	case 3: // falls through
 		if (postureList.size() >= 3) {
 			postureData_[postureIndex + 2].onset = (double) zeroRef_ + ruleSymbols[1];
-			tempEvent = insertEvent(-1, ruleSymbols[2], 0.0);
+			tempEvent = insertEvent(ruleSymbols[2] * timeMultiplier, -1, 0.0);
 			if (tempEvent) tempEvent->flag = 1;
 		}
-	case 2:
+	case 2: // falls through
 		postureData_[postureIndex + 1].onset = (double) zeroRef_ + ruleSymbols[1];
-		tempEvent = insertEvent(-1, 0.0, 0.0);
+		tempEvent = insertEvent(0.0, -1, 0.0);
 		if (tempEvent) tempEvent->flag = 1;
 		break;
 	}
@@ -553,7 +544,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 			break;
 		}
 
-		insertEvent(i, 0.0, targets[0]);
+		insertEvent(0.0, i, targets[0]);
 
 		if (cont) {
 			currentType = DIPHONE;
@@ -579,7 +570,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 					}
 					value = createSlopeRatioEvents(
 							slopeRatio, targets[currentType - 2], currentValueDelta,
-							min_[i], max_[i], i);
+							min_[i], max_[i], i, timeMultiplier);
 				} else {
 					const auto& point = dynamic_cast<const Transition::Point&>(pointOrSlope);
 
@@ -593,7 +584,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 									targets[currentType - 2], currentValueDelta, min_[i], max_[i],
 									pointTime, value);
 					if (!point.isPhantom) {
-						insertEvent(i, pointTime, value);
+						insertEvent(pointTime * timeMultiplier, i, value);
 					}
 				}
 				lastValue = value;
@@ -620,13 +611,13 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 				//maxValue = value;
 
 				/* insert event into event list */
-				insertEvent(i + 16U, tempTime, value);
+				insertEvent(tempTime * timeMultiplier, i + 16U, value);
 			}
 		}
 	}
 
-	setZeroRef((int) (ruleSymbols[0] * multiplier_) + zeroRef_);
-	tempEvent = insertEvent(-1, 0.0, 0.0);
+	setZeroRef((int) (ruleSymbols[0] * timeMultiplier) + zeroRef_);
+	tempEvent = insertEvent(0.0, -1, 0.0);
 	if (tempEvent) tempEvent->flag = 1;
 }
 
@@ -873,56 +864,47 @@ void
 EventList::applyIntonationSmooth()
 {
 	setFullTimeScale();
-	//tempPoint = [[IntonationPoint alloc] initWithEventList: self];
-	//[tempPoint setSemitone: -20.0];
-	//[tempPoint setSemitone: -20.0];
-	//[tempPoint setRuleIndex: 0];
-	//[tempPoint setOffsetTime: 10.0 - [self getBeatAtIndex:(int) 0]];
-
-	//[intonationPoints insertObject: tempPoint at:0];
 
 	for (unsigned int j = 0; j < intonationPoints_.size() - 1; j++) {
 		const IntonationPoint& point1 = intonationPoints_[j];
 		const IntonationPoint& point2 = intonationPoints_[j + 1];
 
-		double x1 = point1.absoluteTime() / 4.0;
-		double y1 = point1.semitone() + 20.0;
-		double m1 = point1.slope();
+		const double x1 = point1.absoluteTime();
+		const double y1 = point1.semitone();
+		const double m1 = point1.slope();
 
-		double x2 = point2.absoluteTime() / 4.0;
-		double y2 = point2.semitone() + 20.0;
-		double m2 = point2.slope();
+		const double x2 = point2.absoluteTime();
+		const double y2 = point2.semitone();
+		const double m2 = point2.slope();
 
-		double x12 = x1 * x1;
-		double x13 = x12 * x1;
+		const double x12 = x1 * x1;
+		const double x13 = x12 * x1;
 
-		double x22 = x2 * x2;
-		double x23 = x22 * x2;
+		const double x22 = x2 * x2;
+		const double x23 = x22 * x2;
 
-		double denominator = x2 - x1;
-		denominator = denominator * denominator * denominator;
+		const double dx = x2 - x1;
+		const double coef = 1.0 / (dx * dx * dx);
 
-//		double d = ( -(y2 * x13) + 3.0 * y2 * x12 * x2 + m2 * x13 * x2 + m1 * x12 * x22 - m2 * x12 * x22 - 3.0 * x1 * y1 * x22 - m1 * x1 * x23 + y1 * x23 )
-//			/ denominator;
-		double c = ( -(m2 * x13) - 6.0 * y2 * x1 * x2 - 2.0 * m1 * x12 * x2 - m2 * x12 * x2 + 6.0 * x1 * y1 * x2 + m1 * x1 * x22 + 2.0 * m2 * x1 * x22 + m1 * x23 )
-			/ denominator;
-		double b = ( 3.0 * y2 * x1 + m1 * x12 + 2.0 * m2 * x12 - 3.0 * x1 * y1 + 3.0 * x2 * y2 + m1 * x1 * x2 - m2 * x1 * x2 - 3.0 * y1 * x2 - 2.0 * m1 * x22 - m2 * x22 )
-			/ denominator;
-		double a = ( -2.0 * y2 - m1 * x1 - m2 * x1 + 2.0 * y1 + m1 * x2 + m2 * x2) / denominator;
+		const double d = ( -(y2 * x13) + 3.0 * y2 * x12 * x2 + m2 * x13 * x2 + m1 * x12 * x22 - m2 * x12 * x22 - 3.0 * x1 * y1 * x22 - m1 * x1 * x23 + y1 * x23 )
+					* coef;
+		const double c = ( -(m2 * x13) - 6.0 * y2 * x1 * x2 - 2.0 * m1 * x12 * x2 - m2 * x12 * x2 + 6.0 * x1 * y1 * x2 + m1 * x1 * x22 + 2.0 * m2 * x1 * x22 + m1 * x23 )
+					* coef;
+		const double b = ( 3.0 * y2 * x1 + m1 * x12 + 2.0 * m2 * x12 - 3.0 * x1 * y1 + 3.0 * x2 * y2 + m1 * x1 * x2 - m2 * x1 * x2 - 3.0 * y1 * x2 - 2.0 * m1 * x22 - m2 * x22 )
+					* coef;
+		const double a = ( -2.0 * y2 - m1 * x1 - m2 * x1 + 2.0 * y1 + m1 * x2 + m2 * x2)
+					* coef;
 
-		insertEvent(32, point1.absoluteTime(), point1.semitone());
-		//printf("Inserting Point %f\n", [point1 semitone]);
-		double yTemp = (3.0 * a * x12) + (2.0 * b * x1) + c;
-		insertEvent(33, point1.absoluteTime(), yTemp);
-		yTemp = (6.0 * a * x1) + (2.0 * b);
-		insertEvent(34, point1.absoluteTime(), yTemp);
-		yTemp = 6.0 * a;
-		insertEvent(35, point1.absoluteTime(), yTemp);
+		auto interpData = std::make_unique<InterpolationData>();
+		interpData->a = a;
+		interpData->b = b;
+		interpData->c = c;
+		interpData->d = d;
+		Event* event = insertEvent(point1.absoluteTime(), -1, 0.0);
+		if (event) {
+			event->interpData = std::move(interpData);
+		}
 	}
-	//[intonationPoints removeObjectAt:0];
-
-	//[self insertEvent:32 atTime: 0.0 withValue: -20.0]; /* A value of -20.0 in bin 32 should produce a
-	//							    linear interp to -20.0 */
 }
 
 void
@@ -952,74 +934,68 @@ EventList::addIntonationPoint(double semitone, double offsetTime, double slope, 
 void
 EventList::generateOutput(std::ostream& vtmParamStream)
 {
-	double currentValues[36];
-	double currentDeltas[36];
-	double temp;
-	float table[16];
-
-	if (list_.empty()) {
+	if (list_.size() < 2) {
 		return;
 	}
 
+	double currentValues[32]; // hardcoded
+	double currentDeltas[32]; // hardcoded
+	double temp;
+	float table[16]; // hardcoded
+	double pa {}, pb {}, pc {}, pd {}; // coefficients for polynomial interpolation
+
 	for (int i = 0; i < 16; i++) {
+		currentValues[i] = list_[0]->getParameter(i);
 		unsigned int j = 1;
-		while ((temp = list_[j]->getValue(i)) == GS_EVENTLIST_INVALID_EVENT_VALUE) {
-			j++;
-			if (j >= list_.size()) break;
+		while ((temp = list_[j]->getParameter(i)) == Event::EMPTY_PARAMETER) {
+			if (++j >= list_.size()) break;
 		}
-		currentValues[i] = list_[0]->getValue(i);
 		if (j < list_.size()) {
 			currentDeltas[i] = ((temp - currentValues[i]) / (double) (list_[j]->time)) * 4.0;
 		} else {
 			currentDeltas[i] = 0.0;
 		}
 	}
-	for (int i = 16; i < 36; i++) {
+	for (int i = 16; i < 32; i++) {
 		currentValues[i] = currentDeltas[i] = 0.0;
 	}
 
-	if (smoothIntonation_) {
-		unsigned int j = 0;
-		while ((temp = list_[j]->getValue(32)) == GS_EVENTLIST_INVALID_EVENT_VALUE) {
-			j++;
-			if (j >= list_.size()) break;
+	if (smoothIntonation_) {//TODO: Change flag
+		unsigned int j = 0, size = list_.size();
+		for ( ; j < size; ++j) {
+			if (list_[j]->interpData) break;
 		}
-		if (j < list_.size()) {
-			currentValues[32] = list_[j]->getValue(32);
-		} else {
-			currentValues[32] = 0.0;
+		if (j < size) {
+			const double y1 = -20.0; // hardcoded initial pitch
+			const int x2 = list_[j]->time;
+			const InterpolationData& data = *list_[j]->interpData;
+			const double y2 = x2 * (x2 * (x2 * data.a + data.b) + data.c) + data.d;
+			// Straight line.
+			pa = 0.0;
+			pb = 0.0;
+			pc = (y2 - y1) / x2;
+			pd = y1;
 		}
-		currentDeltas[32] = 0.0;
-	} else {
-		unsigned int j = 1;
-		while ((temp = list_[j]->getValue(32)) == GS_EVENTLIST_INVALID_EVENT_VALUE) {
-			j++;
-			if (j >= list_.size()) break;
-		}
-		currentValues[32] = list_[0]->getValue(32);
-		if (j < list_.size()) {
-			currentDeltas[32] = ((temp - currentValues[32]) / (double) (list_[j]->time)) * 4.0;
-		} else {
-			currentDeltas[32] = 0.0;
-		}
-		currentValues[32] = -20.0;
 	}
 
-	unsigned int index = 1;
-	int currentTime = 0;
+	unsigned int targetIndex = 1; // stores the index of the next target event
+	int currentTime = 0; // absolute time in ms, multiple of 4
 	int nextTime = list_[1]->time;
-	while (index < list_.size()) {
+	while (targetIndex < list_.size()) {
 
 		for (int j = 0; j < 16; j++) {
 			table[j] = (float) currentValues[j] + (float) currentValues[j + 16];
 		}
 		if (!microFlag_) table[0] = 0.0;
 		if (driftFlag_)  table[0] += static_cast<float>(driftGenerator_.drift());
-		if (macroFlag_)  table[0] += static_cast<float>(currentValues[32]);
-
+		if (macroFlag_) {
+			const double x = currentTime;
+			const float intonation = x * (x * (x * pa + pb) + pc) + pd;
+			table[0] += intonation;
+		}
 		table[0] += static_cast<float>(pitchMean_);
 
-		//vtmParamStream << std::fixed << std::setprecision(3);
+		// Send the parameter values to the output stream.
 		vtmParamStream << table[0];
 		for (int k = 1; k < 16; ++k) {
 			vtmParamStream << ' ' << table[k];
@@ -1032,46 +1008,37 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 			}
 		}
 
-		if (smoothIntonation_) {
-			currentDeltas[34] += currentDeltas[35];
-			currentDeltas[33] += currentDeltas[34];
-			currentValues[32] += currentDeltas[33];
-		} else {
-			if (currentDeltas[32]) {
-				currentValues[32] += currentDeltas[32];
-			}
-		}
-		currentTime += 4;
+		currentTime += 4; // hardcoded - 250 Hz
 
 		if (currentTime >= nextTime) {
-			++index;
-			if (index == list_.size()) {
+			// Next interval.
+			++targetIndex;
+			if (targetIndex == list_.size()) {
 				break;
 			}
-			nextTime = list_[index]->time;
-			for (int j = 0; j < 33; j++) { /* 32? 33? */
-				if (list_[index - 1]->getValue(j) != GS_EVENTLIST_INVALID_EVENT_VALUE) {
-					unsigned int k = index;
-					while ((temp = list_[k]->getValue(j)) == GS_EVENTLIST_INVALID_EVENT_VALUE) {
-						if (k >= list_.size() - 1U) {
-							currentDeltas[j] = 0.0;
-							break;
-						}
-						k++;
+			nextTime = list_[targetIndex]->time;
+			for (int j = 0; j < 32; j++) {
+				if (list_[targetIndex - 1]->getParameter(j) != Event::EMPTY_PARAMETER) {
+					unsigned int k = targetIndex;
+					while ((temp = list_[k]->getParameter(j)) == Event::EMPTY_PARAMETER) {
+						if (++k >= list_.size()) break;
 					}
-					if (temp != GS_EVENTLIST_INVALID_EVENT_VALUE) {
-						currentDeltas[j] = (temp - currentValues[j]) /
-									(double) (list_[k]->time - currentTime) * 4.0;
+					if (temp != Event::EMPTY_PARAMETER) {
+						currentDeltas[j] = (temp - currentValues[j]) / (list_[k]->time - currentTime);
+						currentDeltas[j] *= 4.0; // hardcoded - 250 Hz
+					} else {
+						currentDeltas[j] = 0.0;
 					}
 				}
 			}
-			if (smoothIntonation_) {
-				if (list_[index - 1]->getValue(33) != GS_EVENTLIST_INVALID_EVENT_VALUE) {
-					currentValues[32] = list_[index - 1]->getValue(32);
-					currentDeltas[32] = 0.0;
-					currentDeltas[33] = list_[index - 1]->getValue(33);
-					currentDeltas[34] = list_[index - 1]->getValue(34);
-					currentDeltas[35] = list_[index - 1]->getValue(35);
+
+			if (smoothIntonation_) {//TODO: Change flag
+				if (list_[targetIndex - 1]->interpData) {
+					const InterpolationData& data = *list_[targetIndex - 1]->interpData;
+					pa = data.a;
+					pb = data.b;
+					pc = data.c;
+					pd = data.d;
 				}
 			}
 		}
@@ -1085,11 +1052,8 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 void
 EventList::clearMacroIntonation()
 {
-	for (unsigned int i = 0, size = list_.size(); i < size; ++i) {
-		auto& event = list_[i];
-		for (unsigned int j = 32; j < 36; ++j) {
-			event->setValue(GS_EVENTLIST_INVALID_EVENT_VALUE, j);
-		}
+	for (auto& event : list_) {
+		event->interpData.reset();
 	}
 }
 
