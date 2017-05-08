@@ -395,7 +395,9 @@ PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 				ruleTempo = atof(buffer);
 				break;
 			default:
-				THROW_EXCEPTION(InvalidValueException, "Unknown \"/\" escape sequence: " << string[index] << '.');
+				//THROW_EXCEPTION(InvalidValueException, "Unknown \"/\" escape sequence: " << string[index] << '.');
+				++index;
+				break;
 			}
 			break;
 		case '.': /* Syllable Marker */
