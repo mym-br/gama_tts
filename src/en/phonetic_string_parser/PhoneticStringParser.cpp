@@ -270,7 +270,7 @@ PhoneticStringParser::rewrite(const VTMControlModel::Posture& nextPosture, int w
 }
 
 int
-PhoneticStringParser::parseString(const char* string)
+PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 {
 	const VTMControlModel::Posture* tempPosture;
 	const VTMControlModel::Posture* tempPosture1;
@@ -286,7 +286,7 @@ PhoneticStringParser::parseString(const char* string)
 
 	length = strlen(string);
 
-	tempPosture = model_.postureList().find("^");
+	tempPosture = model_.postureList().find("^"); // hardcoded
 	eventList_.newPostureWithObject(*tempPosture);
 
 	while (index < length) {
@@ -381,7 +381,7 @@ PhoneticStringParser::parseString(const char* string)
 				footTempo = atof(buffer);
 				eventList_.setCurrentFootTempo(footTempo);
 				break;
-			case 'r': /* Foot tempo indicator */
+			case 'r': /* Rule tempo indicator */
 				index++;
 				while ((isspace(string[index]) || (string[index] == '_')) && (index < length)) {
 					index++;
@@ -395,9 +395,7 @@ PhoneticStringParser::parseString(const char* string)
 				ruleTempo = atof(buffer);
 				break;
 			default:
-				index++;
-				//printf("Unknown \"/\" escape sequence :%c\n", string[index]);
-				break;
+				THROW_EXCEPTION(InvalidValueException, "Unknown \"/\" escape sequence: " << string[index] << '.');
 			}
 			break;
 		case '.': /* Syllable Marker */
@@ -445,9 +443,9 @@ PhoneticStringParser::parseString(const char* string)
 				ruleTempo = 1.0;
 				wordMarker = 0;
 			} else {
-				//printf("Unknown character %c\n", string[index++]);
-				break;
+				THROW_EXCEPTION(InvalidValueException, "Unknown character: " << string[index] << '.');
 			}
+			break;
 		}
 	}
 	return 0;
