@@ -190,38 +190,11 @@ Controller::validPosture(const char* token)
 void
 Controller::setIntonation(int intonation)
 {
-	if (intonation & Configuration::INTONATION_MICRO) {
-		eventList_.setMicroIntonation(1);
-	} else {
-		eventList_.setMicroIntonation(0);
-	}
-
-	if (intonation & Configuration::INTONATION_MACRO) {
-		eventList_.setMacroIntonation(1);
-		eventList_.setSmoothIntonation(1); // Macro and not smooth is not working.
-	} else {
-		eventList_.setMacroIntonation(0);
-		eventList_.setSmoothIntonation(0); // Macro and not smooth is not working.
-	}
-
-	// Macro and not smooth is not working.
-//	if (intonation & Configuration::INTONATION_SMOOTH) {
-//		eventList_.setSmoothIntonation(1);
-//	} else {
-//		eventList_.setSmoothIntonation(0);
-//	}
-
-	if (intonation & Configuration::INTONATION_DRIFT) {
-		eventList_.setDrift(1);
-	} else {
-		eventList_.setDrift(0);
-	}
-
-	if (intonation & Configuration::INTONATION_RANDOMIZE) {
-		eventList_.setTgUseRandom(true);
-	} else {
-		eventList_.setTgUseRandom(false);
-	}
+	eventList_.setMicroIntonation( intonation & Configuration::INTONATION_MICRO);
+	eventList_.setMacroIntonation( intonation & Configuration::INTONATION_MACRO);
+	eventList_.setSmoothIntonation(intonation & Configuration::INTONATION_SMOOTH);
+	eventList_.setIntonationDrift( intonation & Configuration::INTONATION_DRIFT);
+	eventList_.setTgUseRandom(     intonation & Configuration::INTONATION_RANDOMIZE);
 }
 
 } /* namespace VTMControlModel */

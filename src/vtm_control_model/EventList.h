@@ -148,17 +148,17 @@ public:
 	void setGlobalTempo(double newTempo) { globalTempo_ = newTempo; }
 	double globalTempo() const { return globalTempo_; }
 
-	void setMacroIntonation(int newValue) { macroFlag_ = newValue; }
-	int macroIntonation() const { return macroFlag_; }
+	void setMacroIntonation(bool value) { macroIntonation_ = value; }
+	bool macroIntonation() const { return macroIntonation_; }
 
-	void setMicroIntonation(int newValue) { microFlag_ = newValue; }
-	int microIntonation() const { return microFlag_; }
+	void setMicroIntonation(bool value) { microIntonation_ = value; }
+	bool microIntonation() const { return microIntonation_; }
 
-	void setDrift(int newValue) { driftFlag_ = newValue; }
-	int drift() const { return driftFlag_; }
+	void setIntonationDrift(bool value) { intonationDrift_ = value; }
+	bool intonationDrift() const { return intonationDrift_; }
 
-	void setSmoothIntonation(int newValue) { smoothIntonation_ = newValue; }
-	int smoothIntonation() const { return smoothIntonation_; }
+	void setSmoothIntonation(bool value) { smoothIntonation_ = value; }
+	bool smoothIntonation() const { return smoothIntonation_; }
 
 	void setDuration(int newValue) { duration_ = newValue; }
 
@@ -179,7 +179,7 @@ public:
 	void newToneGroup();
 	void generateEventList();
 	void applyIntonation();
-	void applyIntonationSmooth();
+	void prepareMacroIntonationInterpolation();
 	void generateOutput(std::ostream& vtmParamStream);
 	void clearMacroIntonation();
 
@@ -215,10 +215,10 @@ private:
 	int zeroIndex_;
 	int duration_;
 	int timeQuantization_;
-	int macroFlag_;
-	int microFlag_;
-	int driftFlag_;
-	int smoothIntonation_;
+	bool macroIntonation_;
+	bool microIntonation_;
+	bool intonationDrift_;
+	bool smoothIntonation_;
 
 	double pitchMean_;
 	double globalTempo_;

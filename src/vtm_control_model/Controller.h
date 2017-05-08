@@ -144,10 +144,7 @@ Controller::synthesizePhoneticStringChunk(T& phoneticStringParser, const char* p
 	phoneticStringParser.parseString(phoneticStringChunk);
 
 	eventList_.generateEventList();
-
 	eventList_.applyIntonation();
-	eventList_.applyIntonationSmooth();
-
 	eventList_.generateOutput(vtmParamStream);
 }
 

@@ -39,15 +39,15 @@ namespace GS {
 namespace VTMControlModel {
 
 EventList::EventList(const char* configDirPath, Model& model)
-		: model_(model)
-		, macroFlag_(0)
-		, microFlag_(0)
-		, driftFlag_(0)
-		, smoothIntonation_(1)
-		, globalTempo_(1.0)
+		: model_ {model}
+		, macroIntonation_ {}
+		, microIntonation_ {}
+		, intonationDrift_ {}
+		, smoothIntonation_ {true}
+		, globalTempo_ {1.0}
 		, tgParameters_(5)
-		, useFixedIntonationParameters_(false)
-		, randSrc_(randDev_())
+		, useFixedIntonationParameters_ {false}
+		, randSrc_ {randDev_()}
 {
 	setUp();
 
@@ -858,52 +858,74 @@ EventList::applyIntonation()
 	}
 	addIntonationPoint(intonParms_[2] + intonParms_[1] + intonParms_[5],
 				0.0, 0.0, currentRule_ - 1);
+
+	if (macroIntonation_) prepareMacroIntonationInterpolation();
 }
 
 void
-EventList::applyIntonationSmooth()
+EventList::prepareMacroIntonationInterpolation()
 {
 	setFullTimeScale();
+
+	if (intonationPoints_.empty()) return;
+
+	Event* event1 = insertEvent(intonationPoints_[0].absoluteTime(), -1, 0.0);
+	if (!event1) return;
+	Event* event2 {};
 
 	for (unsigned int j = 0; j < intonationPoints_.size() - 1; j++) {
 		const IntonationPoint& point1 = intonationPoints_[j];
 		const IntonationPoint& point2 = intonationPoints_[j + 1];
 
-		const double x1 = point1.absoluteTime();
+		event2 = insertEvent(point2.absoluteTime(), -1, 0.0);
+		if (!event2) break;
+
+		const double x1 = event1->time;
 		const double y1 = point1.semitone();
-		const double m1 = point1.slope();
-
-		const double x2 = point2.absoluteTime();
+		const double x2 = event2->time;
 		const double y2 = point2.semitone();
-		const double m2 = point2.slope();
-
-		const double x12 = x1 * x1;
-		const double x13 = x12 * x1;
-
-		const double x22 = x2 * x2;
-		const double x23 = x22 * x2;
-
 		const double dx = x2 - x1;
-		const double coef = 1.0 / (dx * dx * dx);
-
-		const double d = ( -(y2 * x13) + 3.0 * y2 * x12 * x2 + m2 * x13 * x2 + m1 * x12 * x22 - m2 * x12 * x22 - 3.0 * x1 * y1 * x22 - m1 * x1 * x23 + y1 * x23 )
-					* coef;
-		const double c = ( -(m2 * x13) - 6.0 * y2 * x1 * x2 - 2.0 * m1 * x12 * x2 - m2 * x12 * x2 + 6.0 * x1 * y1 * x2 + m1 * x1 * x22 + 2.0 * m2 * x1 * x22 + m1 * x23 )
-					* coef;
-		const double b = ( 3.0 * y2 * x1 + m1 * x12 + 2.0 * m2 * x12 - 3.0 * x1 * y1 + 3.0 * x2 * y2 + m1 * x1 * x2 - m2 * x1 * x2 - 3.0 * y1 * x2 - 2.0 * m1 * x22 - m2 * x22 )
-					* coef;
-		const double a = ( -2.0 * y2 - m1 * x1 - m2 * x1 + 2.0 * y1 + m1 * x2 + m2 * x2)
-					* coef;
-
 		auto interpData = std::make_unique<InterpolationData>();
-		interpData->a = a;
-		interpData->b = b;
-		interpData->c = c;
-		interpData->d = d;
-		Event* event = insertEvent(point1.absoluteTime(), -1, 0.0);
-		if (event) {
-			event->interpData = std::move(interpData);
+
+		if (smoothIntonation_) { // cubic interpolation
+			const double m1 = point1.slope();
+			const double m2 = point2.slope();
+
+			const double x12 = x1 * x1;
+			const double x13 = x12 * x1;
+
+			const double x22 = x2 * x2;
+			const double x23 = x22 * x2;
+
+			const double coef = 1.0 / (dx * dx * dx);
+
+			const double d = ( -(y2 * x13) + 3.0 * y2 * x12 * x2 + m2 * x13 * x2 + m1 * x12 * x22 - m2 * x12 * x22 - 3.0 * x1 * y1 * x22 - m1 * x1 * x23 + y1 * x23 )
+						* coef;
+			const double c = ( -(m2 * x13) - 6.0 * y2 * x1 * x2 - 2.0 * m1 * x12 * x2 - m2 * x12 * x2 + 6.0 * x1 * y1 * x2 + m1 * x1 * x22 + 2.0 * m2 * x1 * x22 + m1 * x23 )
+						* coef;
+			const double b = ( 3.0 * y2 * x1 + m1 * x12 + 2.0 * m2 * x12 - 3.0 * x1 * y1 + 3.0 * x2 * y2 + m1 * x1 * x2 - m2 * x1 * x2 - 3.0 * y1 * x2 - 2.0 * m1 * x22 - m2 * x22 )
+						* coef;
+			const double a = ( -2.0 * y2 - m1 * x1 - m2 * x1 + 2.0 * y1 + m1 * x2 + m2 * x2)
+						* coef;
+			interpData->a = a;
+			interpData->b = b;
+			interpData->c = c;
+			interpData->d = d;
+		} else { // linear interpolation
+			const double dy = y2 - y1;
+			const double coef = dy / dx;
+
+			const double b = y1 - x1 * coef;
+			const double a = coef;
+			interpData->a = a;
+			interpData->b = b;
+			interpData->c = 0.0;
+			interpData->d = 0.0;
 		}
+
+		event1->interpData = std::move(interpData);
+
+		event1 = event2;
 	}
 }
 
@@ -960,21 +982,27 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 		currentValues[i] = currentDeltas[i] = 0.0;
 	}
 
-	if (smoothIntonation_) {//TODO: Change flag
+	if (macroIntonation_) {
 		unsigned int j = 0, size = list_.size();
 		for ( ; j < size; ++j) {
 			if (list_[j]->interpData) break;
 		}
 		if (j < size) {
 			const double y1 = -20.0; // hardcoded initial pitch
-			const int x2 = list_[j]->time;
+			const double x2 = list_[j]->time;
 			const InterpolationData& data = *list_[j]->interpData;
-			const double y2 = x2 * (x2 * (x2 * data.a + data.b) + data.c) + data.d;
 			// Straight line.
-			pa = 0.0;
-			pb = 0.0;
-			pc = (y2 - y1) / x2;
-			pd = y1;
+			if (smoothIntonation_) {
+				const double y2 = x2 * (x2 * (x2 * data.a + data.b) + data.c) + data.d;
+				pa = 0.0;
+				pb = 0.0;
+				pc = (y2 - y1) / x2;
+				pd = y1;
+			} else {
+				const double y2 = x2 * data.a + data.b;
+				pa = (y2 - y1) / x2;
+				pb = y1;
+			}
 		}
 	}
 
@@ -982,15 +1010,22 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	int currentTime = 0; // absolute time in ms, multiple of 4
 	int nextTime = list_[1]->time;
 	while (targetIndex < list_.size()) {
-
+		// Add normal parameters and special parameters.
 		for (int j = 0; j < 16; j++) {
 			table[j] = (float) currentValues[j] + (float) currentValues[j + 16];
 		}
-		if (!microFlag_) table[0] = 0.0;
-		if (driftFlag_)  table[0] += static_cast<float>(driftGenerator_.drift());
-		if (macroFlag_) {
+
+		// Intonation.
+		if (!microIntonation_) table[0] = 0.0;
+		if (intonationDrift_)  table[0] += static_cast<float>(driftGenerator_.drift());
+		if (macroIntonation_) {
 			const double x = currentTime;
-			const float intonation = x * (x * (x * pa + pb) + pc) + pd;
+			float intonation;
+			if (smoothIntonation_) {
+				intonation = x * (x * (x * pa + pb) + pc) + pd;
+			} else {
+				intonation = x * pa + pb;
+			}
 			table[0] += intonation;
 		}
 		table[0] += static_cast<float>(pitchMean_);
@@ -1002,6 +1037,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 		}
 		vtmParamStream << '\n';
 
+		// Linear interpolation of the parameters.
 		for (int j = 0; j < 32; j++) {
 			if (currentDeltas[j]) {
 				currentValues[j] += currentDeltas[j];
@@ -1024,6 +1060,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 						if (++k >= list_.size()) break;
 					}
 					if (temp != Event::EMPTY_PARAMETER) {
+						// Prepare linear interpolation.
 						currentDeltas[j] = (temp - currentValues[j]) / (list_[k]->time - currentTime);
 						currentDeltas[j] *= 4.0; // hardcoded - 250 Hz
 					} else {
@@ -1032,13 +1069,15 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 				}
 			}
 
-			if (smoothIntonation_) {//TODO: Change flag
+			if (macroIntonation_) {
 				if (list_[targetIndex - 1]->interpData) {
 					const InterpolationData& data = *list_[targetIndex - 1]->interpData;
 					pa = data.a;
 					pb = data.b;
-					pc = data.c;
-					pd = data.d;
+					if (smoothIntonation_) {
+						pc = data.c;
+						pd = data.d;
+					}
 				}
 			}
 		}

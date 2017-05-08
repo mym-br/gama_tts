@@ -60,9 +60,9 @@ Configuration::load(const std::string& configFilePath)
 	if (config.value<int>("macro_intonation") != 0) {
 		intonation += INTONATION_MACRO;
 	}
-//	if (config.value<int>("smooth_intonation") != 0) {
-//		intonation += INTONATION_SMOOTH;
-//	}
+	if (config.value<int>("smooth_intonation") != 0) {
+		intonation += INTONATION_SMOOTH;
+	}
 	if (config.value<int>("intonation_drift") != 0) {
 		intonation += INTONATION_DRIFT;
 	}
