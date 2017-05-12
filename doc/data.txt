@@ -2,8 +2,6 @@
 Contents of data/en/vtm0
 ------------------------
 
-It is recommended that users modify a copy of this directory, not the original.
-
 artic.xml
 	Contains the articulatory database.
 
@@ -35,10 +33,10 @@ vtm_control_model.config
 	Interesting parameters are:
 
 		voice_name
-			A value of EXAMPLE will load the voice file named
-			voice_EXAMPLE.config.
+			If it is set to EXAMPLE the voice file named
+			voice_EXAMPLE.config will be loaded.
 		tempo
-			Values greater than 1 will speed up the speech.
+			Values greater than 1.0 will speed up the speech.
 		pitch_offset
 			Modifies the voice pitch.
 
@@ -52,14 +50,6 @@ vtm_control_model.config
 		dictionary_3_file
 			Indicate the dictionaries (the dictionaries will be
 			searched in the order 1, 2, 3).
-
-	Note:
-		The following parameters are not being used at the moment:
-			notional_pitch
-			pretonic_range
-			pretonic_lift
-			tonic_range
-			tonic_movement
 
 voice_baby.config
 voice_female.config
@@ -84,15 +74,12 @@ voice_small_child.config
 			These parameters modify the glottal pulse shape.
 
 		reference_glottal_pitch
-			Modify the voice pitch.
+			Modifies the voice pitch.
 
 		breathiness
 
 vowelTransitions
 	Controls vowel transitions.
 
-	Normal users should not modify this file.
-
-vowelTransitions_2
+vowelTransitions_2 [not being used]
 	Alternative version of vowelTransitions.
-	It is not used.
