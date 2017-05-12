@@ -15,14 +15,6 @@ set(GAMA_TTS_VERSION_MINOR 1)
 set(GAMA_TTS_VERSION_PATCH 6)
 set(GAMA_TTS_VERSION_STRING ${GAMA_TTS_VERSION_MAJOR}.${GAMA_TTS_VERSION_MINOR}.${GAMA_TTS_VERSION_PATCH})
 
-if(MSVC)
-    # To have M_PI defined in <cmath>.
-    add_definitions(-D_USE_MATH_DEFINES)
-
-    # Disable warnings about strcpy_s, strcat_s, etc.
-    add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-endif()
-
 include_directories(
     src
     src/rapidxml

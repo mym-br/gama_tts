@@ -27,19 +27,10 @@
 #include <sstream>
 #include <string>
 
-// MSVC 2013
-#if defined(_MSC_VER) && defined(_NOEXCEPT)
-# define GS_EXCEPTION_NOEXCEPT _NOEXCEPT
-#else
-# define GS_EXCEPTION_NOEXCEPT noexcept
-#endif
-
 // __func__ is defined in C99/C++11.
 // __PRETTY_FUNCTION__ is a gcc extension.
 #ifdef __GNUC__
 # define GS_EXCEPTION_FUNCTION_NAME __PRETTY_FUNCTION__
-#elif defined (_MSC_VER)
-# define GS_EXCEPTION_FUNCTION_NAME __FUNCTION__
 #else
 # define GS_EXCEPTION_FUNCTION_NAME __func__
 #endif
@@ -62,17 +53,17 @@ namespace GS {
 // Note: string / vector default constructor may throw bad_alloc in C++11.
 class ExceptionString {
 public:
-	ExceptionString() GS_EXCEPTION_NOEXCEPT : str_(nullptr) {}
-	ExceptionString(const ExceptionString& o) GS_EXCEPTION_NOEXCEPT : str_(nullptr) {
+	ExceptionString() noexcept : str_(nullptr) {}
+	ExceptionString(const ExceptionString& o) noexcept : str_(nullptr) {
 		*this = o;
 	}
-	ExceptionString(ExceptionString&& o) GS_EXCEPTION_NOEXCEPT : str_(nullptr) {
+	ExceptionString(ExceptionString&& o) noexcept : str_(nullptr) {
 		*this = std::move(o);
 	}
-	~ExceptionString() GS_EXCEPTION_NOEXCEPT {
+	~ExceptionString() noexcept {
 		std::free(str_);
 	}
-	ExceptionString& operator=(const ExceptionString& o) GS_EXCEPTION_NOEXCEPT {
+	ExceptionString& operator=(const ExceptionString& o) noexcept {
 		if (this != &o) {
 			if (o.str_ == nullptr) {
 				std::free(str_);
@@ -91,17 +82,17 @@ public:
 		}
 		return *this;
 	}
-	ExceptionString& operator=(ExceptionString&& o) GS_EXCEPTION_NOEXCEPT {
+	ExceptionString& operator=(ExceptionString&& o) noexcept {
 		assert(this != &o);
 		std::free(str_);
 		str_ = o.str_;
 		o.str_ = nullptr;
 		return *this;
 	}
-	const char* str() const GS_EXCEPTION_NOEXCEPT {
+	const char* str() const noexcept {
 		return str_ ? str_ : "";
 	}
-	void setStr(const char* s) GS_EXCEPTION_NOEXCEPT {
+	void setStr(const char* s) noexcept {
 		if (s == nullptr) {
 			std::free(str_);
 			str_ = nullptr;
@@ -156,7 +147,7 @@ private:
  */
 class Exception : public std::exception {
 public:
-	virtual const char* what() const GS_EXCEPTION_NOEXCEPT {
+	virtual const char* what() const noexcept {
 		return message_.str();
 	}
 
