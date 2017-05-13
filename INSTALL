@@ -34,4 +34,4 @@
 
 - Test (Linux):
 
-  ./gama_tts -c $pkg_dir/data/en -p /tmp/test_param.txt -o /tmp/test.wav "Hello world." && aplay -q /tmp/test.wav
+  ./gama_tts -c $pkg_dir/data/english/vtm0 -p /tmp/test_param.txt -o /tmp/test.wav "Hello world." && aplay -q /tmp/test.wav
