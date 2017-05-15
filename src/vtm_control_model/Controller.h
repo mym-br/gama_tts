@@ -47,9 +47,18 @@ public:
 	Controller(const char* configDirPath, Model& model);
 	~Controller();
 
-	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, const char* outputFile);
-	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer);
+	// Synthesizes speech from phonetic string. Sends to file.
+	// The VTM parameters will be written to a file.
+	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString,
+								const char* vtmParamFile, const char* outputFile);
+	// Synthesizes speech from phonetic string. Sends to buffer.
+	// The VTM parameters will be written to a file.
+	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString,
+								const char* vtmParamFile, std::vector<float>& buffer);
+
+	// Synthesizes speech from data contained in the event list. Sends to file.
 	void synthesizeFromEventList(const char* vtmParamFile, const char* outputFile);
+	// Synthesizes speech from data contained in the event list. Sends to buffer.
 	void synthesizeFromEventList(const char* vtmParamFile, std::vector<float>& buffer);
 
 	template<typename T> void fillParameterStream(T& phoneticStringParser, const std::string& phoneticString, std::iostream& vtmParamStream);
@@ -67,6 +76,11 @@ private:
 	Controller& operator=(const Controller&) = delete;
 
 	void initUtterance();
+
+	// Chunks start with /c.
+	// The text parser generates one /c at the start and another at the end of the string.
+	// Text before the first /c will be ignored.
+	// A /c at the end will generate an empty chunk.
 	// Returns true if a valid chunk has been found.
 	bool nextChunk(const std::string& phoneticString, std::size_t& index, std::size_t& size);
 

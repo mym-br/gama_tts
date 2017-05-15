@@ -59,9 +59,6 @@ Controller::~Controller()
 {
 }
 
-/*******************************************************************************
- * This function synthesizes speech from data contained in the event list.
- */
 void
 Controller::synthesizeFromEventList(const char* vtmParamFile, const char* outputFile)
 {
@@ -132,10 +129,6 @@ Controller::initUtterance()
 	eventList_.setTgUseRandom(     vtmControlModelConfig_.intonation & Configuration::INTONATION_RANDOMIZE);
 }
 
-// Chunks start with /c.
-// The text parser generates one /c at the start and another at the end of the string.
-// Text before the first /c will be ignored.
-// A /c at the end will generate an empty chunk.
 bool
 Controller::nextChunk(const std::string& phoneticString, std::size_t& index, std::size_t& size)
 {
