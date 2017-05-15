@@ -46,7 +46,7 @@
 #include "en/text_parser/TextParser.h"
 
 #include <cmath>
-#include <ctype.h>
+#include <cctype> /* isprint */
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -259,7 +259,9 @@ print_stream(std::stringstream& stream, long stream_length)
 			printf("\\0");
 			break;
 		default:
-			printf("%c", c);
+			if (std::isprint(c)) {
+				printf("%c", c);
+			}
 			break;
 		}
 	}
