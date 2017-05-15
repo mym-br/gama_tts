@@ -1,0 +1,1 @@
+../vtm0/main_dictionary.txt
