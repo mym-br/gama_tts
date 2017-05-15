@@ -21,6 +21,7 @@
 #ifndef EN_PHONETIC_STRING_PARSER_H_
 #define EN_PHONETIC_STRING_PARSER_H_
 
+#include <cstddef> /* std::size_t */
 #include <memory>
 
 #include "Controller.h"
@@ -35,7 +36,7 @@ public:
 	PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller);
 	~PhoneticStringParser();
 
-	int parseString(const char* string);
+	void parseString(const char* string /* ASCII */, std::size_t size);
 private:
 	PhoneticStringParser(const PhoneticStringParser&) = delete;
 	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;

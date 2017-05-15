@@ -157,7 +157,7 @@ main(int argc, char* argv[])
 			std::cout << "Phonetic string: [" << phoneticString << ']' << std::endl;
 		}
 
-		vtmController->synthesizePhoneticString(*phoneticStringParser, phoneticString.c_str(), vtmParamFile, outputFile);
+		vtmController->synthesizePhoneticString(*phoneticStringParser, phoneticString, vtmParamFile, outputFile);
 
 	} catch (std::exception& e) {
 		std::cerr << "Caught an exception: " << e.what() << std::endl;

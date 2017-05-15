@@ -21,10 +21,12 @@
 #ifndef VTM_CONTROL_MODEL_CONTROLLER_H_
 #define VTM_CONTROL_MODEL_CONTROLLER_H_
 
+#include <cstddef> /* std::size_t */
 #include <cstdio>
 #include <fstream>
 #include <istream>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "ConfigurationData.h"
@@ -45,11 +47,12 @@ public:
 	Controller(const char* configDirPath, Model& model);
 	~Controller();
 
-	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* vtmParamFile, const char* outputFile);
-	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* vtmParamFile, std::vector<float>& buffer);
-	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, std::iostream& vtmParamStream);
+	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, const char* outputFile);
+	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer);
 	void synthesizeFromEventList(const char* vtmParamFile, const char* outputFile);
 	void synthesizeFromEventList(const char* vtmParamFile, std::vector<float>& buffer);
+
+	template<typename T> void fillParameterStream(T& phoneticStringParser, const std::string& phoneticString, std::iostream& vtmParamStream);
 
 	Model& model() { return model_; }
 	EventList& eventList() { return eventList_; }
@@ -63,16 +66,9 @@ private:
 	Controller(const Controller&) = delete;
 	Controller& operator=(const Controller&) = delete;
 
-	void loadConfiguration(const char* configDirPath);
 	void initUtterance();
-	int calcChunks(const char* string);
-	int nextChunk(const char* string);
-	void printVowelTransitions();
-
-	int validPosture(const char* token);
-	void setIntonation(int intonation);
-
-	template<typename T> void synthesizePhoneticStringChunk(T& phoneticStringParser, const char* phoneticStringChunk, std::ostream& vtmParamStream);
+	// Returns true if a valid chunk has been found.
+	bool nextChunk(const std::string& phoneticString, std::size_t& index, std::size_t& size);
 
 	Model& model_;
 	EventList eventList_;
@@ -84,14 +80,14 @@ private:
 
 template<typename T>
 void
-Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* vtmParamFile, const char* outputFile)
+Controller::synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, const char* outputFile)
 {
 	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
 	if (!vtmParamStream) {
 		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
 	}
 
-	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
+	fillParameterStream(phoneticStringParser, phoneticString, vtmParamStream);
 
 	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
 	vtm->synthesizeToFile(vtmParamStream, outputFile);
@@ -99,14 +95,14 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 template<typename T>
 void
-Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* vtmParamFile, std::vector<float>& buffer)
+Controller::synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer)
 {
 	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
 	if (!vtmParamStream) {
 		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
 	}
 
-	synthesizePhoneticString(phoneticStringParser, phoneticString, vtmParamStream);
+	fillParameterStream(phoneticStringParser, phoneticString, vtmParamStream);
 
 	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
 	vtm->synthesizeToBuffer(vtmParamStream, buffer);
@@ -114,38 +110,26 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 template<typename T>
 void
-Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, std::iostream& vtmParamStream)
+Controller::fillParameterStream(T& phoneticStringParser, const std::string& phoneticString, std::iostream& vtmParamStream)
 {
-	int chunks = calcChunks(phoneticString);
-
 	initUtterance();
 
-	int index = 0;
-	while (chunks > 0) {
-		if (Log::debugEnabled) {
-			printf("Speaking \"%s\"\n", &phoneticString[index]);
+	std::size_t index = 0, size = 0;
+	while (index < phoneticString.size()) {
+		if (nextChunk(phoneticString, index, size)) {
+			eventList_.setUp();
+
+			phoneticStringParser.parseString(&phoneticString[index], size);
+
+			eventList_.generateEventList();
+			eventList_.applyIntonation();
+			eventList_.generateOutput(vtmParamStream);
 		}
 
-		synthesizePhoneticStringChunk(phoneticStringParser, &phoneticString[index], vtmParamStream);
-
-		index += nextChunk(&phoneticString[index + 2]) + 2;
-		chunks--;
+		index += size;
 	}
 
 	vtmParamStream.seekg(0);
-}
-
-template<typename T>
-void
-Controller::synthesizePhoneticStringChunk(T& phoneticStringParser, const char* phoneticStringChunk, std::ostream& vtmParamStream)
-{
-	eventList_.setUp();
-
-	phoneticStringParser.parseString(phoneticStringChunk);
-
-	eventList_.generateEventList();
-	eventList_.applyIntonation();
-	eventList_.generateOutput(vtmParamStream);
 }
 
 } /* namespace VTMControlModel */

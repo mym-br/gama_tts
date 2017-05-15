@@ -269,14 +269,10 @@ PhoneticStringParser::rewrite(const VTMControlModel::Posture& nextPosture, int w
 	return returnValue;
 }
 
-int
-PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
+void
+PhoneticStringParser::parseString(const char* string, std::size_t size)
 {
-	const VTMControlModel::Posture* tempPosture;
-	const VTMControlModel::Posture* tempPosture1;
-	int length;
-	int index = 0, bufferIndex = 0;
-	int chunk = 0;
+	std::size_t index = 0, bufferIndex = 0;
 	char buffer[128];
 	int lastFoot = 0, markedFoot = 0, wordMarker = 0;
 	double footTempo = 1.0;
@@ -284,14 +280,15 @@ PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 	double postureTempo = 1.0;
 	RewriterData rewriterData;
 
-	length = strlen(string);
+	const auto* startEndPosture = model_.postureList().find("^"); // hardcoded
+	if (!startEndPosture) {
+		THROW_EXCEPTION(MissingValueException, "Posture \"^\" not found.");
+	}
+	eventList_.newPostureWithObject(*startEndPosture);
 
-	tempPosture = model_.postureList().find("^"); // hardcoded
-	eventList_.newPostureWithObject(*tempPosture);
-
-	while (index < length) {
-		while ((isspace(string[index]) || (string[index] == '_')) && (index<length)) index++;
-		if (index > length) break;
+	while (index < size) {
+		while ((index < size) && (isspace(string[index]) || (string[index] == '_'))) index++;
+		if (index >= size) break;
 
 		memset(buffer, 0, 128);
 		bufferIndex = 0;
@@ -347,17 +344,8 @@ PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 				eventList_.newToneGroup();
 				break;
 			case 'c': /* New Chunk */
-				if (chunk) {
-					tempPosture = model_.postureList().find("#");
-					eventList_.newPostureWithObject(*tempPosture);
-					tempPosture = model_.postureList().find("^");
-					eventList_.newPostureWithObject(*tempPosture);
-					index--;
-					return index;
-				} else {
-					chunk++;
-					index++;
-				}
+				// Ignore.
+				index++;
 				break;
 			case 'l': /* Last Foot in tone group marker */
 				index++;
@@ -369,10 +357,10 @@ PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 				break;
 			case 'f': /* Foot tempo indicator */
 				index++;
-				while ((isspace(string[index]) || (string[index] == '_')) && (index < length)) {
+				while ((index < size) && (isspace(string[index]) || (string[index] == '_'))) {
 					index++;
 				}
-				if (index > length) {
+				if (index >= size) {
 					break;
 				}
 				while (isdigit(string[index]) || (string[index] == '.')) {
@@ -383,10 +371,10 @@ PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 				break;
 			case 'r': /* Rule tempo indicator */
 				index++;
-				while ((isspace(string[index]) || (string[index] == '_')) && (index < length)) {
+				while ((index < size) && (isspace(string[index]) || (string[index] == '_'))) {
 					index++;
 				}
-				if (index > length) {
+				if (index >= size) {
 					break;
 				}
 				while (isdigit(string[index]) || (string[index] == '.')) {
@@ -424,23 +412,27 @@ PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 		default:
 			if (isalpha(string[index]) || (string[index] == '^') || (string[index] == '\'')
 					|| (string[index] == '#') ) {
-				while ( (isalpha(string[index])||(string[index] == '^')||(string[index] == '\'')
-						||(string[index] == '#')) && (index < length)) {
+				while ((index < size) && (isalpha(string[index])||(string[index] == '^')||(string[index] == '\'')
+						||(string[index] == '#'))) {
 					buffer[bufferIndex++] = string[index++];
 				}
 				if (markedFoot) {
 					strcat(buffer,"'");
 				}
-				tempPosture = model_.postureList().find(buffer);
-				if (tempPosture) {
-					tempPosture1 = rewrite(*tempPosture, wordMarker, rewriterData);
-					if (tempPosture1) {
-						eventList_.newPostureWithObject(*tempPosture1);
-					}
-					eventList_.newPostureWithObject(*tempPosture);
-					eventList_.setCurrentPostureTempo(postureTempo);
-					eventList_.setCurrentPostureRuleTempo((float) ruleTempo);
+				const auto* posture = model_.postureList().find(buffer);
+				if (!posture) {
+					THROW_EXCEPTION(MissingValueException, "Posture \"" << buffer << "\" not found.");
 				}
+
+				const auto* posture1 = rewrite(*posture, wordMarker, rewriterData);
+				if (posture1) {
+					eventList_.newPostureWithObject(*posture1);
+				}
+
+				eventList_.newPostureWithObject(*posture);
+				eventList_.setCurrentPostureTempo(postureTempo);
+				eventList_.setCurrentPostureRuleTempo(ruleTempo);
+
 				postureTempo = 1.0;
 				ruleTempo = 1.0;
 				wordMarker = 0;
@@ -450,7 +442,14 @@ PhoneticStringParser::parseString(const char* string) //TODO: Handle utf-8
 			break;
 		}
 	}
-	return 0;
+
+	const auto* posture = model_.postureList().find("#"); // hardcoded
+	if (!posture) {
+		THROW_EXCEPTION(MissingValueException, "Posture \"#\" not found.");
+	}
+	eventList_.newPostureWithObject(*posture);
+
+	eventList_.newPostureWithObject(*startEndPosture);
 }
 
 const VTMControlModel::Posture*

@@ -20,6 +20,7 @@
 
 #include "Controller.h"
 
+#include <cctype> /* isspace */
 #include <cstring>
 #include <sstream>
 
@@ -35,16 +36,6 @@ namespace VTMControlModel {
 Controller::Controller(const char* configDirPath, Model& model)
 		: model_(model)
 		, eventList_(configDirPath, model_)
-{
-	loadConfiguration(configDirPath);
-}
-
-Controller::~Controller()
-{
-}
-
-void
-Controller::loadConfiguration(const char* configDirPath)
 {
 	// Load VTMControlModel::Configuration.
 
@@ -62,6 +53,10 @@ Controller::loadConfiguration(const char* configDirPath)
 
 	vtmConfigData_ = std::make_unique<ConfigurationData>(voiceFilePath.str());
 	vtmConfigData_->insert(ConfigurationData(vtmConfigFilePath.str()));
+}
+
+Controller::~Controller()
+{
 }
 
 /*******************************************************************************
@@ -125,76 +120,54 @@ Controller::initUtterance()
 		printf("sampling Rate: %d\n", outputRate);
 	}
 
-	const float referenceGlottalPitch = vtmConfigData_->value<float>("reference_glottal_pitch");
-
-	eventList_.setPitchMean(vtmControlModelConfig_.pitchOffset + referenceGlottalPitch);
+	eventList_.setPitchMean(vtmControlModelConfig_.pitchOffset + vtmConfigData_->value<float>("reference_glottal_pitch"));
 	eventList_.setGlobalTempo(vtmControlModelConfig_.tempo);
-	setIntonation(vtmControlModelConfig_.intonation);
 	eventList_.setUpDriftGenerator(vtmControlModelConfig_.driftDeviation, vtmControlModelConfig_.controlRate, vtmControlModelConfig_.driftLowpassCutoff);
+
+	// Configure intonation.
+	eventList_.setMicroIntonation( vtmControlModelConfig_.intonation & Configuration::INTONATION_MICRO);
+	eventList_.setMacroIntonation( vtmControlModelConfig_.intonation & Configuration::INTONATION_MACRO);
+	eventList_.setSmoothIntonation(vtmControlModelConfig_.intonation & Configuration::INTONATION_SMOOTH);
+	eventList_.setIntonationDrift( vtmControlModelConfig_.intonation & Configuration::INTONATION_DRIFT);
+	eventList_.setTgUseRandom(     vtmControlModelConfig_.intonation & Configuration::INTONATION_RANDOMIZE);
 }
 
-// Chunks are separated by /c.
-// There is always one /c at the begin and another at the end of the string.
-int
-Controller::calcChunks(const char* string)
+// Chunks start with /c.
+// The text parser generates one /c at the start and another at the end of the string.
+// Text before the first /c will be ignored.
+// A /c at the end will generate an empty chunk.
+bool
+Controller::nextChunk(const std::string& phoneticString, std::size_t& index, std::size_t& size)
 {
-	int temp = 0, index = 0;
-	while (string[index] != '\0') {
-		if ((string[index] == '/') && (string[index + 1] == 'c')) {
-			temp++;
-			index += 2;
-		} else {
-			index++;
+	static const std::string token {"/c"};
+
+	const std::size_t startPos = phoneticString.find(token, index);
+	if (startPos == std::string::npos) {
+		index = phoneticString.size();
+		size = 0;
+		return false;
+	}
+	index = startPos;
+
+	const std::size_t endPos = phoneticString.find(token, startPos + token.size());
+	if (endPos == std::string::npos) {
+		size = phoneticString.size() - startPos;
+	} else {
+		size = endPos                - startPos;
+	}
+
+	for (std::size_t i = index + token.size(), end = index + size; i < end; ++i) {
+		if (!std::isspace(phoneticString[i])) {
+			LOG_DEBUG("[Controller::nextChunk] Phonetic string chunk: \"" <<
+					std::string(phoneticString.begin() + index, phoneticString.begin() + index + size) << '"');
+			return true;
 		}
 	}
-	temp--;
-	if (temp < 0) temp = 0;
-	return temp;
-}
 
-// Returns the position of the next /c (the position of the /).
-int
-Controller::nextChunk(const char* string)
-{
-	int index = 0;
-	while (string[index] != '\0') {
-		if ((string[index] == '/') && (string[index + 1] == 'c')) {
-			return index;
-		} else {
-			index++;
-		}
-	}
-	return 0;
-}
+	LOG_DEBUG("[Controller::nextChunk] Empty chunk.");
 
-int
-Controller::validPosture(const char* token)
-{
-	switch(token[0]) {
-	case '0':
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
-		return 1;
-	default:
-		return (model_.postureList().find(token) != nullptr);
-	}
-}
-
-void
-Controller::setIntonation(int intonation)
-{
-	eventList_.setMicroIntonation( intonation & Configuration::INTONATION_MICRO);
-	eventList_.setMacroIntonation( intonation & Configuration::INTONATION_MACRO);
-	eventList_.setSmoothIntonation(intonation & Configuration::INTONATION_SMOOTH);
-	eventList_.setIntonationDrift( intonation & Configuration::INTONATION_DRIFT);
-	eventList_.setTgUseRandom(     intonation & Configuration::INTONATION_RANDOMIZE);
+	// The chunk contains only spaces or is empty.
+	return false;
 }
 
 } /* namespace VTMControlModel */
