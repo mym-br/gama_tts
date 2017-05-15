@@ -31,7 +31,8 @@
 
 
 
-#define VOWEL_TRANSITIONS_CONFIG_FILE_NAME "/vowelTransitions"
+#define CONFIG_DIR "/phonetic_string_parser/"
+#define VOWEL_TRANSITIONS_CONFIG_FILE_NAME "vowel_transitions.txt"
 
 
 
@@ -105,7 +106,7 @@ PhoneticStringParser::initVowelTransitions(const char* configDirPath)
 
 	memset(vowelTransitions_, 0, 13 * 13 * sizeof(int));
 	std::ostringstream path;
-	path << configDirPath << VOWEL_TRANSITIONS_CONFIG_FILE_NAME;
+	path << configDirPath << CONFIG_DIR VOWEL_TRANSITIONS_CONFIG_FILE_NAME;
 	FILE* fp = fopen(path.str().c_str(), "rb");
 	if (fp == NULL) {
 		THROW_EXCEPTION(IOException, "Could not open the file " << path.str().c_str() << '.');
