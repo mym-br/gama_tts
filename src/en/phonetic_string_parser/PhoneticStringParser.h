@@ -36,7 +36,7 @@ public:
 	PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller);
 	~PhoneticStringParser();
 
-	void parseString(const char* string /* ASCII */, std::size_t size);
+	void parse(const char* string /* ASCII */, std::size_t size);
 private:
 	PhoneticStringParser(const PhoneticStringParser&) = delete;
 	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;

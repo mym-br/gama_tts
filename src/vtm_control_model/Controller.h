@@ -119,7 +119,7 @@ Controller::fillParameterStream(T& phoneticStringParser, const std::string& phon
 		if (nextChunk(phoneticString, index, size)) {
 			eventList_.setUp();
 
-			phoneticStringParser.parseString(&phoneticString[index], size);
+			phoneticStringParser.parse(&phoneticString[index], size);
 
 			eventList_.generateEventList();
 			eventList_.applyIntonation();
