@@ -1,6 +1,7 @@
 /***************************************************************************
  *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
  *    David R. Hill, Leonard Manzara, Craig Schock                         *
+ *  Copyright 2017 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -21,10 +22,7 @@
 #include "en/phonetic_string_parser/PhoneticStringParser.h"
 
 #include <cctype> /* isalpha, isdigit, isspace */
-#include <cstring>
 #include <sstream>
-#include <string>
-#include <vector>
 
 #include "Exception.h"
 #include "Log.h"
@@ -32,9 +30,27 @@
 
 
 #define CONFIG_DIR "/phonetic_string_parser/"
-#define VOWEL_TRANSITIONS_CONFIG_FILE_NAME "vowel_transitions.txt"
+#define REWRITE_CONFIG_FILE_NAME "rewrite.txt"
 
+namespace {
 
+const char SEPARATOR_CHAR = '>';
+const char COMMENT_CHAR = '#';
+
+void
+throwException(const std::string& filePath, int lineNumber, const char* message)
+{
+	THROW_EXCEPTION(GS::ParsingException, "[PhoneticStringParser] Error in file " << filePath << " (line " << lineNumber << "): " << message << '.');
+}
+
+template<typename T>
+void
+throwException(const std::string& filePath, int lineNumber, const char* message, const T& complement)
+{
+	THROW_EXCEPTION(GS::ParsingException, "[PhoneticStringParser] Error in file " << filePath << " (line " << lineNumber << "): " << message << complement << '.');
+}
+
+} /* namespace */
 
 namespace GS {
 namespace En {
@@ -43,35 +59,9 @@ PhoneticStringParser::PhoneticStringParser(const char* configDirPath, VTMControl
 		: model_(controller.model())
 		, eventList_(controller.eventList())
 {
-	category_[0] = getCategory("stopped");
-	category_[1] = getCategory("affricate");
-	category_[2] = getCategory("hlike");
-	category_[3] = getCategory("vocoid");
-
-	const std::vector<const char*> postureList = {"h", "h'", "hv", "hv'", "ll", "ll'", "s", "s'", "z", "z'"};
-	for (unsigned int i = 0; i < postureList.size(); ++i) {
-		const char* posture = postureList[i];
-		const VTMControlModel::Posture* tempPosture = getPosture(posture);
-		category_[i + 4U] = tempPosture->findCategory(posture);
-		if (!category_[i + 4U]) {
-			THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << posture << "\".");
-		}
-	}
-
-	category_[14] = getCategory("whistlehack");
-	category_[15] = getCategory("lhack");
-	category_[16] = getCategory("whistlehack");
-	category_[17] = getCategory("whistlehack");
-
-	returnPhone_[0] = getPosture("qc");
-	returnPhone_[1] = getPosture("qt");
-	returnPhone_[2] = getPosture("qp");
-	returnPhone_[3] = getPosture("qk");
-	returnPhone_[4] = getPosture("gs");
-	returnPhone_[5] = getPosture("qs");
-	returnPhone_[6] = getPosture("qz");
-
-	initVowelTransitions(configDirPath);
+	std::ostringstream rewriteFilePath;
+	rewriteFilePath << configDirPath << CONFIG_DIR REWRITE_CONFIG_FILE_NAME;
+	loadRewriterConfiguration(rewriteFilePath.str());
 }
 
 PhoneticStringParser::~PhoneticStringParser()
@@ -81,11 +71,20 @@ PhoneticStringParser::~PhoneticStringParser()
 std::shared_ptr<VTMControlModel::Category>
 PhoneticStringParser::getCategory(const char* name)
 {
-	const std::shared_ptr<VTMControlModel::Category> category = model_.findCategory(name);
-	if (!category) {
-		THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << name << "\".");
+	const VTMControlModel::Posture* posture = model_.postureList().find(name);
+	if (posture) {
+		std::shared_ptr<VTMControlModel::Category> category = posture->findCategory(name);
+		if (!category) {
+			THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << name << "\".");
+		}
+		return category;
+	} else {
+		std::shared_ptr<VTMControlModel::Category> category = model_.findCategory(name);
+		if (!category) {
+			THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << name << "\".");
+		}
+		return category;
 	}
-	return category;
 }
 
 const VTMControlModel::Posture*
@@ -99,177 +98,46 @@ PhoneticStringParser::getPosture(const char* name)
 }
 
 void
-PhoneticStringParser::initVowelTransitions(const char* configDirPath)
+PhoneticStringParser::rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterState& state)
 {
-	char dummy[24], line[256];
-	int i = 0;
-
-	memset(vowelTransitions_, 0, 13 * 13 * sizeof(int));
-	std::ostringstream path;
-	path << configDirPath << CONFIG_DIR VOWEL_TRANSITIONS_CONFIG_FILE_NAME;
-	FILE* fp = fopen(path.str().c_str(), "rb");
-	if (fp == NULL) {
-		THROW_EXCEPTION(IOException, "Could not open the file " << path.str().c_str() << '.');
+	if (state.lastPosture == nullptr) {
+		state.lastPosture = &nextPosture;
+		return;
 	}
-	while (fgets(line, 256, fp)) {
-		if (i == 13) break;
 
-		if ((line[0] == '#') || (line[0] == ' ')) {
-			// Skip.
-		} else {
-			sscanf(line, "%s %d %d %d %d %d %d %d %d %d %d %d %d %d", dummy,
-				&vowelTransitions_[i][0], &vowelTransitions_[i][1],  &vowelTransitions_[i][2],
-				&vowelTransitions_[i][3], &vowelTransitions_[i][4],  &vowelTransitions_[i][5],
-				&vowelTransitions_[i][6], &vowelTransitions_[i][7],  &vowelTransitions_[i][8],
-				&vowelTransitions_[i][9], &vowelTransitions_[i][10], &vowelTransitions_[i][11],
-				&vowelTransitions_[i][12]);
-			i++;
-
-//			int temp = (int) dummy[0];
-//			if (dummy[1] != '\'') {
-//				temp += (int) dummy[1];
-//			}
-//			printf("%s %d %d\n", dummy, i, temp);
+	for (RewriterData& data : rewriterData_) {
+		if (nextPosture.isMemberOfCategory(*data.category2)) {
+			// Next posture is in category 2.
+			for (RewriterCommand& command : data.commandList) {
+				if (state.lastPosture->isMemberOfCategory(*command.category1)) {
+					// Last posture is in category 1.
+					switch (command.type) {
+					case REWRITER_COMMAND_INSERT:
+						LOG_DEBUG("REWRITER_COMMAND_INSERT");
+						eventList_.newPostureWithObject(*command.posture);
+						break;
+					case REWRITER_COMMAND_INSERT_IF_WORD_START:
+						LOG_DEBUG("REWRITER_COMMAND_INSERT_IF_WORD_START");
+						if (wordMarker) {
+							eventList_.newPostureWithObject(*command.posture);
+						}
+						break;
+					case REWRITER_COMMAND_REPLACE_FIRST:
+						LOG_DEBUG("REWRITER_COMMAND_REPLACE_FIRST");
+						eventList_.replaceCurrentPostureWith(*command.posture);
+						break;
+					case REWRITER_COMMAND_NOP:
+						LOG_DEBUG("REWRITER_COMMAND_REPLACE_NOP");
+						break;
+					}
+					state.lastPosture = &nextPosture;
+					return;
+				}
+			}
 		}
 	}
-	fclose(fp);
 
-	if (Log::debugEnabled) {
-		printVowelTransitions();
-	}
-}
-
-void
-PhoneticStringParser::printVowelTransitions()
-{
-	printf("===== Transitions configuration:\n");
-	for (int i = 0; i < 13; i++) {
-		printf("Transition %d: %d %d %d %d %d %d %d %d %d %d %d %d %d\n", i,
-				vowelTransitions_[i][0], vowelTransitions_[i][1], vowelTransitions_[i][2],
-				vowelTransitions_[i][3], vowelTransitions_[i][4], vowelTransitions_[i][5],
-				vowelTransitions_[i][6], vowelTransitions_[i][7], vowelTransitions_[i][8],
-				vowelTransitions_[i][9], vowelTransitions_[i][10], vowelTransitions_[i][11],
-				vowelTransitions_[i][12]);
-	}
-}
-
-const VTMControlModel::Posture*
-PhoneticStringParser::rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data)
-{
-	const VTMControlModel::Posture* tempPosture;
-	int transitionMade = 0;
-	const char* temp;
-	const VTMControlModel::Posture* returnValue = nullptr;
-
-	static const int stateTable[19][18] = {
-		{ 1,  9,  0,  7,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 0 */
-		{ 3,  9,  0,  7,  2,  2,  2,  2,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 1 */
-		{ 1,  9,  0,  7,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 2 */
-		{ 4,  9,  0,  7,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 3 */
-		{ 1,  9,  0,  7,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 4 */
-		{ 1,  9,  0,  6,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 5 */
-		{ 1,  9,  0,  8,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 6 */
-		{ 1,  9,  0,  8,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 7 */
-		{ 1,  9,  0,  8,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 8 */
-		{10, 12, 12,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 9 */
-		{11, 11, 11,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 10 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 11 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 12 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15, 14,  0,  0, 17},		/* State 13 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 14 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15, 16,  0,  0, 17},		/* State 15 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 16 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0, 18, 17},		/* State 17 */
-		{ 1,  9,  0,  0,  0,  0,  0,  0,  5,  5, 13, 13, 15, 15,  0,  0,  0, 17},		/* State 18 */
-	};
-
-	for (int i = 0; i < 18; i++) {
-		if (nextPosture.isMemberOfCategory(*category_[i])) {
-			//printf("Found %s %s state %d -> %d\n", nextPhone.name().c_str(), category_[i]->name.c_str(),
-			//	data.currentState, stateTable[data.currentState][i]);
-			data.currentState = stateTable[data.currentState][i];
-			transitionMade = 1;
-			break;
-		}
-	}
-	if (transitionMade) {
-		switch (data.currentState) {
-			default:
-			case 0:
-			case 1:
-			case 3:
-			case 5:
-			case 7:
-			case 9:
-				//printf("No rewrite\n");
-				break;
-			case 2:
-			case 4:
-			case 11:
-				temp = data.lastPosture->name().c_str();
-				switch (temp[0]) {
-					case 'd':
-					case 't': returnValue = returnPhone_[1];
-						break;
-					case 'p':
-					case 'b': returnValue = returnPhone_[2];
-						break;
-					case 'k':
-					case 'g': returnValue = returnPhone_[3];
-						break;
-				}
-				break;
-			case 6:
-				if (strchr(nextPosture.name().c_str(), '\'')) {
-					tempPosture = model_.postureList().find("l'");
-				} else {
-					tempPosture = model_.postureList().find("l");
-				}
-
-				eventList_.replaceCurrentPostureWith(*tempPosture);
-
-				break;
-			case 8:
-				if (wordMarker) {
-					returnValue = calcVowelTransition(nextPosture, data);
-				}
-
-				break;
-			case 10:
-				returnValue = returnPhone_[0];
-				break;
-			case 12:
-				returnValue = returnPhone_[0];
-				break;
-			case 14:
-				returnValue = returnPhone_[5];
-				break;
-			case 16:
-				returnValue = returnPhone_[6];
-				break;
-			case 18:
-				//printf("Case 18\n");
-				if (!wordMarker) {
-					break;
-				}
-
-				if (strchr(nextPosture.name().c_str(), '\'')) {
-					tempPosture = model_.postureList().find("ll'");
-				} else {
-					tempPosture = model_.postureList().find("ll");
-				}
-
-				//printf("Replacing with ll\n");
-				eventList_.replaceCurrentPostureWith(*tempPosture);
-
-				break;
-		}
-		data.lastPosture = &nextPosture;
-	} else {
-		data.currentState = 0;
-		data.lastPosture = nullptr;
-	}
-	return returnValue;
+	state.lastPosture = &nextPosture;
 }
 
 void
@@ -283,7 +151,7 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 	int wordMarker = 0;
 	double ruleTempo = 1.0;
 	double postureTempo = 1.0;
-	RewriterData rewriterData;
+	RewriterState rewriterState;
 
 	auto skipSeparators = [&]() {
 		while ((index < size) && (std::isspace(string[index]) || (string[index] == '_'))) {
@@ -446,10 +314,7 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 				THROW_EXCEPTION(MissingValueException, "Posture \"" << buffer << "\" not found.");
 			}
 
-			const auto* posture1 = rewrite(*posture, wordMarker, rewriterData);
-			if (posture1) {
-				eventList_.newPostureWithObject(*posture1);
-			}
+			rewrite(*posture, wordMarker, rewriterState);
 
 			eventList_.newPostureWithObject(*posture);
 			eventList_.setCurrentPostureTempo(postureTempo);
@@ -472,53 +337,111 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 	eventList_.newPostureWithObject(*startEndPosture);
 }
 
-const VTMControlModel::Posture*
-PhoneticStringParser::calcVowelTransition(const VTMControlModel::Posture& nextPosture, RewriterData& data)
+void
+PhoneticStringParser::loadRewriterConfiguration(const std::string& filePath)
 {
-	int vowelHash[13] = { 194, 201, 97, 101, 105, 111, 221, 117, 211, 216, 202, 215, 234 };
-	int lastValue, nextValue, i, action;
-	const char* temp;
+	std::ifstream in(filePath.c_str(), std::ios_base::binary);
+	if (!in) THROW_EXCEPTION(IOException, "Could not open the file: " << filePath << '.');
+	std::string::iterator iter;
+	std::string line;
 
-	temp = data.lastPosture->name().c_str();
-	lastValue = (int) temp[0];
-	if (temp[1] != '\'') {
-		lastValue += (int) temp[1];
-	}
-
-	for (i = 0; i < 13; i++) {
-		if (lastValue == vowelHash[i]) {
-			lastValue = i;
-			break;
+	auto skipSpaces = [&]() {
+		while (iter != line.end() && std::isspace(*iter)) ++iter;
+	};
+	auto getText = [&]() {
+		while (iter != line.end() && !std::isspace(*iter) && *iter != SEPARATOR_CHAR) {
+			++iter;
 		}
-	}
-	if (i == 13) {
-		return nullptr;
-	}
+	};
 
-	temp = nextPosture.name().c_str();
-	nextValue = (int) temp[0];
-	if (temp[1] != '\'') {
-		nextValue += (int) temp[1];
-	}
+	int lineNum = 0;
+	while (getline(in, line)) {
+		++lineNum;
 
-	for (i = 0; i < 13; i++) {
-		if (nextValue == vowelHash[i]) {
-			nextValue = i;
-			break;
+		if (line.empty()) continue;
+
+		iter = line.begin();
+
+		// Comment (must start at the beginning of the line).
+		if (*iter == COMMENT_CHAR) {
+			continue;
 		}
-	}
-	if (i == 13) {
-		return nullptr;
-	}
 
-	action = vowelTransitions_[lastValue][nextValue];
+		// Read first category.
+		skipSpaces();
+		auto baseIter = iter;
+		getText();
+		if (iter == line.end()) throwException(filePath, lineNum, "First category not found");
+		std::string firstCategory(baseIter, iter);
+		if (firstCategory.empty()) throwException(filePath, lineNum, "Empty first category");
 
-	switch (action) {
-	default:
-	case 0:
-		return nullptr;
-	case 1: return model_.postureList().find("gs");
-	case 2: return model_.postureList().find("r");
+		// Read second category.
+		skipSpaces();
+		baseIter = iter;
+		getText();
+		if (iter == line.end()) throwException(filePath, lineNum, "Second category not found");
+		std::string secondCategory(baseIter, iter);
+		if (secondCategory.empty()) throwException(filePath, lineNum, "Empty second category");
+
+		// Separator.
+		skipSpaces();
+		if (iter == line.end() || *iter != SEPARATOR_CHAR) throwException(filePath, lineNum, "Missing separator");
+		++iter;
+
+		// Read command.
+		skipSpaces();
+		baseIter = iter;
+		getText();
+		if (iter == line.end()) throwException(filePath, lineNum, "Command not found");
+		std::string commandName(baseIter, iter);
+		if (commandName.empty()) throwException(filePath, lineNum, "Empty command");
+
+		// Read posture.
+		skipSpaces();
+		baseIter = iter;
+		getText();
+		std::string postureName(baseIter, iter);
+		if (postureName.empty()) throwException(filePath, lineNum, "Empty posture");
+
+		std::shared_ptr<VTMControlModel::Category> cat1 = getCategory(firstCategory.c_str());
+		std::shared_ptr<VTMControlModel::Category> cat2 = getCategory(secondCategory.c_str());
+		const VTMControlModel::Posture* posture = getPosture(postureName.c_str());
+
+		RewriterData* data {};
+		for (RewriterData& item : rewriterData_) {
+			if (item.category2 == cat2.get()) {
+				data = &item;
+				break;
+			}
+		}
+		if (data == nullptr) {
+			rewriterData_.emplace_back();
+			data = &rewriterData_.back();
+			data->category2 = cat2.get();
+		}
+
+		for (RewriterCommand& item : data->commandList) {
+			if (item.category1 == cat1.get()) {
+				throwException(filePath, lineNum, "Duplicate category pair");
+			}
+		}
+		data->commandList.emplace_back();
+		RewriterCommand* command = &data->commandList.back();
+		command->category1 = cat1.get();
+
+		command->posture = posture;
+
+		if (commandName == "insert") {
+			command->type = REWRITER_COMMAND_INSERT;
+		} else if (commandName == "insert_if_word_start") {
+			command->type = REWRITER_COMMAND_INSERT_IF_WORD_START;
+		} else if (commandName == "replace_first") {
+			command->type = REWRITER_COMMAND_REPLACE_FIRST;
+		} else if (commandName == "nop") {
+			command->type = REWRITER_COMMAND_NOP;
+		} else {
+			throwException(filePath, lineNum, "Invalid command", commandName);
+		}
 	}
 }
 

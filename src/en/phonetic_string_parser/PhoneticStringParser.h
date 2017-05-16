@@ -1,6 +1,7 @@
 /***************************************************************************
  *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
  *    David R. Hill, Leonard Manzara, Craig Schock                         *
+ *  Copyright 2017 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -23,6 +24,8 @@
 
 #include <cstddef> /* std::size_t */
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "Controller.h"
 
@@ -41,24 +44,39 @@ private:
 	PhoneticStringParser(const PhoneticStringParser&) = delete;
 	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;
 
-	struct RewriterData {
-		int currentState;
-		const VTMControlModel::Posture* lastPosture;
-		RewriterData() : currentState(0), lastPosture(nullptr) {}
+	enum RewriterCommandType {
+		REWRITER_COMMAND_NOP,
+		REWRITER_COMMAND_INSERT,
+		REWRITER_COMMAND_INSERT_IF_WORD_START,
+		REWRITER_COMMAND_REPLACE_FIRST
 	};
 
-	void initVowelTransitions(const char* configDirPath);
-	void printVowelTransitions();
-	const VTMControlModel::Posture* rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterData& data);
-	const VTMControlModel::Posture* calcVowelTransition(const VTMControlModel::Posture& nextPosture, RewriterData& data);
+	struct RewriterCommand {
+		const VTMControlModel::Category* category1;
+		RewriterCommandType type;
+		const VTMControlModel::Posture* posture;
+		RewriterCommand() : category1 {}, type {REWRITER_COMMAND_NOP}, posture {} {}
+	};
+
+	struct RewriterData {
+		const VTMControlModel::Category* category2;
+		std::vector<RewriterCommand> commandList;
+		RewriterData() : category2 {} {}
+	};
+
+	struct RewriterState {
+		const VTMControlModel::Posture* lastPosture;
+		RewriterState() : lastPosture {} {}
+	};
+
+	void loadRewriterConfiguration(const std::string& filePath);
+	void rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterState& state);
 	std::shared_ptr<VTMControlModel::Category> getCategory(const char* name);
 	const VTMControlModel::Posture* getPosture(const char* name);
 
 	const VTMControlModel::Model& model_;
 	VTMControlModel::EventList& eventList_;
-	std::shared_ptr<const VTMControlModel::Category> category_[18];
-	const VTMControlModel::Posture* returnPhone_[7];
-	int vowelTransitions_[13][13];
+	std::vector<RewriterData> rewriterData_;
 };
 
 } /* namespace En */

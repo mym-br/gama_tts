@@ -1,0 +1,368 @@
+# Format:
+# category_1 category_2 > command posture
+#
+# Lines that start with # are ignored.
+#
+# The rewriter checks if the new posture is in category_2 and the
+# previous posture is in category_1.
+#
+# Commands:
+#
+# insert
+#   Inserts the posture between the previous posture and the new posture.
+# insert_if_word_start
+#   Inserts the posture between the previous posture and the new posture,
+#   if the new posture is the start of a word.
+# replace_first
+#   Replaces the previous posture.
+
+#-------------------------------------------------------------------------------
+# stopped stopped
+
+#d   stopped > insert qt
+#d'  stopped > insert qt
+#dx  stopped > insert qt
+#dx' stopped > insert qt
+#t   stopped > insert qt
+#t'  stopped > insert qt
+#tx  stopped > insert qt
+#tx' stopped > insert qt
+#p   stopped > insert qp
+#p'  stopped > insert qp
+#px  stopped > insert qp
+#px' stopped > insert qp
+#b   stopped > insert qp
+#b'  stopped > insert qp
+#bx  stopped > insert qp
+#bx' stopped > insert qp
+#k   stopped > insert qk
+#k'  stopped > insert qk
+#kx  stopped > insert qk
+#kx' stopped > insert qk
+#g   stopped > insert qk
+#g'  stopped > insert qk
+#gs  stopped > insert qk
+#gs' stopped > insert qk
+
+#-------------------------------------------------------------------------------
+
+affricate stopped > insert qc
+
+#-------------------------------------------------------------------------------
+# stopped affricate
+
+#d   affricate > insert qt
+#d'  affricate > insert qt
+#dx  affricate > insert qt
+#dx' affricate > insert qt
+#t   affricate > insert qt
+#t'  affricate > insert qt
+#tx  affricate > insert qt
+#tx' affricate > insert qt
+#p   affricate > insert qp
+#p'  affricate > insert qp
+#px  affricate > insert qp
+#px' affricate > insert qp
+#b   affricate > insert qp
+#b'  affricate > insert qp
+#bx  affricate > insert qp
+#bx' affricate > insert qp
+#k   affricate > insert qk
+#k'  affricate > insert qk
+#kx  affricate > insert qk
+#kx' affricate > insert qk
+#g   affricate > insert qk
+#g'  affricate > insert qk
+#gs  affricate > insert qk
+#gs' affricate > insert qk
+
+#-------------------------------------------------------------------------------
+
+affricate affricate > insert qc
+
+#-------------------------------------------------------------------------------
+# stopped hlike
+
+#d   hlike > insert qt
+#d'  hlike > insert qt
+#dx  hlike > insert qt
+#dx' hlike > insert qt
+#t   hlike > insert qt
+#t'  hlike > insert qt
+#tx  hlike > insert qt
+#tx' hlike > insert qt
+#p   hlike > insert qp
+#p'  hlike > insert qp
+#px  hlike > insert qp
+#px' hlike > insert qp
+#b   hlike > insert qp
+#b'  hlike > insert qp
+#bx  hlike > insert qp
+#bx' hlike > insert qp
+#k   hlike > insert qk
+#k'  hlike > insert qk
+#kx  hlike > insert qk
+#kx' hlike > insert qk
+#g   hlike > insert qk
+#g'  hlike > insert qk
+#gs  hlike > insert qk
+#gs' hlike > insert qk
+
+#-------------------------------------------------------------------------------
+
+affricate hlike > insert qc
+
+#-------------------------------------------------------------------------------
+# vocoid vocoid
+
+aa aa > insert_if_word_start gs
+ah aa > insert_if_word_start gs
+a  aa > insert_if_word_start gs
+e  aa > insert_if_word_start gs
+o  aa > insert_if_word_start gs
+uh aa > insert_if_word_start gs
+ar aa > insert_if_word_start r
+aw aa > insert_if_word_start r
+er aa > insert_if_word_start r
+
+aa ah > insert_if_word_start gs
+ah ah > insert_if_word_start gs
+a  ah > insert_if_word_start gs
+e  ah > insert_if_word_start gs
+o  ah > insert_if_word_start gs
+uh ah > insert_if_word_start gs
+ar ah > insert_if_word_start r
+aw ah > insert_if_word_start r
+er ah > insert_if_word_start r
+
+aa a  > insert_if_word_start gs
+ah a  > insert_if_word_start gs
+a  a  > insert_if_word_start gs
+e  a  > insert_if_word_start gs
+o  a  > insert_if_word_start gs
+uh a  > insert_if_word_start gs
+ar a  > insert_if_word_start r
+aw a  > insert_if_word_start r
+er a  > insert_if_word_start r
+
+aa e  > insert_if_word_start gs
+ah e  > insert_if_word_start gs
+a  e  > insert_if_word_start gs
+e  e  > insert_if_word_start gs
+o  e  > insert_if_word_start gs
+uh e  > insert_if_word_start gs
+ar e  > insert_if_word_start r
+aw e  > insert_if_word_start r
+er e  > insert_if_word_start r
+
+aa i  > insert_if_word_start gs
+ah i  > insert_if_word_start gs
+a  i  > insert_if_word_start gs
+e  i  > insert_if_word_start gs
+o  i  > insert_if_word_start gs
+uh i  > insert_if_word_start gs
+ar i  > insert_if_word_start r
+aw i  > insert_if_word_start r
+er i  > insert_if_word_start r
+
+aa o  > insert_if_word_start gs
+ah o  > insert_if_word_start gs
+a  o  > insert_if_word_start gs
+e  o  > insert_if_word_start gs
+o  o  > insert_if_word_start gs
+uh o  > insert_if_word_start gs
+ar o  > insert_if_word_start r
+aw o  > insert_if_word_start r
+er o  > insert_if_word_start r
+
+aa uh > insert_if_word_start gs
+ah uh > insert_if_word_start gs
+a  uh > insert_if_word_start gs
+e  uh > insert_if_word_start gs
+o  uh > insert_if_word_start gs
+uh uh > insert_if_word_start gs
+ar uh > insert_if_word_start r
+aw uh > insert_if_word_start r
+er uh > insert_if_word_start r
+
+aa u  > insert_if_word_start gs
+ah u  > insert_if_word_start gs
+a  u  > insert_if_word_start gs
+e  u  > insert_if_word_start gs
+o  u  > insert_if_word_start gs
+uh u  > insert_if_word_start gs
+ar u  > insert_if_word_start r
+aw u  > insert_if_word_start r
+er u  > insert_if_word_start r
+
+aa ar > insert_if_word_start gs
+ah ar > insert_if_word_start gs
+a  ar > insert_if_word_start gs
+e  ar > insert_if_word_start gs
+o  ar > insert_if_word_start gs
+uh ar > insert_if_word_start gs
+ar ar > insert_if_word_start r
+aw ar > insert_if_word_start r
+er ar > insert_if_word_start r
+
+aa aw > insert_if_word_start gs
+ah aw > insert_if_word_start gs
+a  aw > insert_if_word_start gs
+e  aw > insert_if_word_start gs
+o  aw > insert_if_word_start gs
+uh aw > insert_if_word_start gs
+ar aw > insert_if_word_start r
+aw aw > insert_if_word_start r
+er aw > insert_if_word_start r
+
+aa ee > insert_if_word_start gs
+ah ee > insert_if_word_start gs
+a  ee > insert_if_word_start gs
+e  ee > insert_if_word_start gs
+o  ee > insert_if_word_start gs
+uh ee > insert_if_word_start gs
+ar ee > insert_if_word_start r
+aw ee > insert_if_word_start r
+er ee > insert_if_word_start r
+
+aa er > insert_if_word_start gs
+ah er > insert_if_word_start gs
+a  er > insert_if_word_start gs
+e  er > insert_if_word_start gs
+o  er > insert_if_word_start gs
+uh er > insert_if_word_start gs
+ar er > insert_if_word_start r
+aw er > insert_if_word_start r
+er er > insert_if_word_start r
+
+aa uu > insert_if_word_start gs
+ah uu > insert_if_word_start gs
+a  uu > insert_if_word_start gs
+e  uu > insert_if_word_start gs
+o  uu > insert_if_word_start gs
+uh uu > insert_if_word_start gs
+ar uu > insert_if_word_start r
+aw uu > insert_if_word_start r
+er uu > insert_if_word_start r
+uu uu > insert_if_word_start gs
+
+#-------------------------------------------------------------------------------
+
+ll  vocoid > replace_first l
+ll' vocoid > replace_first l'
+
+#-------------------------------------------------------------------------------
+# stopped h
+
+#d   h > insert qt
+#d'  h > insert qt
+#dx  h > insert qt
+#dx' h > insert qt
+#t   h > insert qt
+#t'  h > insert qt
+#tx  h > insert qt
+#tx' h > insert qt
+#p   h > insert qp
+#p'  h > insert qp
+#px  h > insert qp
+#px' h > insert qp
+#b   h > insert qp
+#b'  h > insert qp
+#bx  h > insert qp
+#bx' h > insert qp
+#k   h > insert qk
+#k'  h > insert qk
+#kx  h > insert qk
+#kx' h > insert qk
+#g   h > insert qk
+#g'  h > insert qk
+#gs  h > insert qk
+#gs' h > insert qk
+
+# stopped h'
+
+#d   h' > insert qt
+#d'  h' > insert qt
+#dx  h' > insert qt
+#dx' h' > insert qt
+#t   h' > insert qt
+#t'  h' > insert qt
+#tx  h' > insert qt
+#tx' h' > insert qt
+#p   h' > insert qp
+#p'  h' > insert qp
+#px  h' > insert qp
+#px' h' > insert qp
+#b   h' > insert qp
+#b'  h' > insert qp
+#bx  h' > insert qp
+#bx' h' > insert qp
+#k   h' > insert qk
+#k'  h' > insert qk
+#kx  h' > insert qk
+#kx' h' > insert qk
+#g   h' > insert qk
+#g'  h' > insert qk
+#gs  h' > insert qk
+#gs' h' > insert qk
+
+# stopped hv
+
+#d   hv > insert qt
+#d'  hv > insert qt
+#dx  hv > insert qt
+#dx' hv > insert qt
+#t   hv > insert qt
+#t'  hv > insert qt
+#tx  hv > insert qt
+#tx' hv > insert qt
+#p   hv > insert qp
+#p'  hv > insert qp
+#px  hv > insert qp
+#px' hv > insert qp
+#b   hv > insert qp
+#b'  hv > insert qp
+#bx  hv > insert qp
+#bx' hv > insert qp
+#k   hv > insert qk
+#k'  hv > insert qk
+#kx  hv > insert qk
+#kx' hv > insert qk
+#g   hv > insert qk
+#g'  hv > insert qk
+#gs  hv > insert qk
+#gs' hv > insert qk
+
+# stopped hv'
+
+#d   hv' > insert qt
+#d'  hv' > insert qt
+#dx  hv' > insert qt
+#dx' hv' > insert qt
+#t   hv' > insert qt
+#t'  hv' > insert qt
+#tx  hv' > insert qt
+#tx' hv' > insert qt
+#p   hv' > insert qp
+#p'  hv' > insert qp
+#px  hv' > insert qp
+#px' hv' > insert qp
+#b   hv' > insert qp
+#b'  hv' > insert qp
+#bx  hv' > insert qp
+#bx' hv' > insert qp
+#k   hv' > insert qk
+#k'  hv' > insert qk
+#kx  hv' > insert qk
+#kx' hv' > insert qk
+#g   hv' > insert qk
+#g'  hv' > insert qk
+#gs  hv' > insert qk
+#gs' hv' > insert qk
+
+#-------------------------------------------------------------------------------
+
+s  whistlehack > insert qs
+s' whistlehack > insert qs
+z  whistlehack > insert qz
+z' whistlehack > insert qz

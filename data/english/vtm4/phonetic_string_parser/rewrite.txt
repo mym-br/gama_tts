@@ -1,0 +1,1 @@
+../../vtm0/phonetic_string_parser/rewrite.txt
