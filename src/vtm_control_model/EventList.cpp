@@ -1113,7 +1113,7 @@ EventList::printDataStructures()
 
 	printf("\nPostures %d\n", currentPosture_);
 	for (unsigned int i = 0; i < currentPosture_; i++) {
-		printf("%u  \"%s\" tempo: %f syllable: %d onset: %f ruleTempo: %f\n",
+		printf("DEBUG_POSTURE %u  \"%s\" tempo: %f syllable: %d onset: %f ruleTempo: %f\n",
 			 i, postureData_[i].posture->name().c_str(), postureTempo_[i], postureData_[i].syllable, postureData_[i].onset, postureData_[i].ruleTempo);
 	}
 
