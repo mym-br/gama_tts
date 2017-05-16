@@ -19,7 +19,7 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/phonetic_string_parser/PhoneticStringParser.h"
+#include "PhoneticStringParser.h"
 
 #include <cctype> /* isalpha, isdigit, isspace */
 #include <sstream>
@@ -53,9 +53,9 @@ throwException(const std::string& filePath, int lineNumber, const char* message,
 } /* namespace */
 
 namespace GS {
-namespace En {
+namespace VTMControlModel {
 
-PhoneticStringParser::PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller)
+PhoneticStringParser::PhoneticStringParser(const char* configDirPath, Controller& controller)
 		: model_(controller.model())
 		, eventList_(controller.eventList())
 {
@@ -68,18 +68,18 @@ PhoneticStringParser::~PhoneticStringParser()
 {
 }
 
-std::shared_ptr<VTMControlModel::Category>
+std::shared_ptr<Category>
 PhoneticStringParser::getCategory(const char* name)
 {
-	const VTMControlModel::Posture* posture = model_.postureList().find(name);
+	const Posture* posture = model_.postureList().find(name);
 	if (posture) {
-		std::shared_ptr<VTMControlModel::Category> category = posture->findCategory(name);
+		std::shared_ptr<Category> category = posture->findCategory(name);
 		if (!category) {
 			THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << name << "\".");
 		}
 		return category;
 	} else {
-		std::shared_ptr<VTMControlModel::Category> category = model_.findCategory(name);
+		std::shared_ptr<Category> category = model_.findCategory(name);
 		if (!category) {
 			THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"" << name << "\".");
 		}
@@ -87,10 +87,10 @@ PhoneticStringParser::getCategory(const char* name)
 	}
 }
 
-const VTMControlModel::Posture*
+const Posture*
 PhoneticStringParser::getPosture(const char* name)
 {
-	const VTMControlModel::Posture* posture = model_.postureList().find(name);
+	const Posture* posture = model_.postureList().find(name);
 	if (!posture) {
 		THROW_EXCEPTION(UnavailableResourceException, "Could not find the posture \"" << name << "\".");
 	}
@@ -98,7 +98,7 @@ PhoneticStringParser::getPosture(const char* name)
 }
 
 void
-PhoneticStringParser::rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterState& state)
+PhoneticStringParser::rewrite(const Posture& nextPosture, int wordMarker, RewriterState& state)
 {
 	if (state.lastPosture == nullptr) {
 		state.lastPosture = &nextPosture;
@@ -403,9 +403,9 @@ PhoneticStringParser::loadRewriterConfiguration(const std::string& filePath)
 		std::string postureName(baseIter, iter);
 		if (postureName.empty()) throwException(filePath, lineNum, "Empty posture");
 
-		std::shared_ptr<VTMControlModel::Category> cat1 = getCategory(firstCategory.c_str());
-		std::shared_ptr<VTMControlModel::Category> cat2 = getCategory(secondCategory.c_str());
-		const VTMControlModel::Posture* posture = getPosture(postureName.c_str());
+		std::shared_ptr<Category> cat1 = getCategory(firstCategory.c_str());
+		std::shared_ptr<Category> cat2 = getCategory(secondCategory.c_str());
+		const Posture* posture = getPosture(postureName.c_str());
 
 		RewriterData* data {};
 		for (RewriterData& item : rewriterData_) {
@@ -445,5 +445,5 @@ PhoneticStringParser::loadRewriterConfiguration(const std::string& filePath)
 	}
 }
 
-} /* namespace En */
+} /* namespace VTMControlModel */
 } /* namespace GS */

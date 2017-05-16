@@ -19,8 +19,8 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_PHONETIC_STRING_PARSER_H_
-#define EN_PHONETIC_STRING_PARSER_H_
+#ifndef VTM_CONTROL_MODEL_PHONETIC_STRING_PARSER_H_
+#define VTM_CONTROL_MODEL_PHONETIC_STRING_PARSER_H_
 
 #include <cstddef> /* std::size_t */
 #include <memory>
@@ -32,11 +32,11 @@
 
 
 namespace GS {
-namespace En {
+namespace VTMControlModel {
 
 class PhoneticStringParser {
 public:
-	PhoneticStringParser(const char* configDirPath, VTMControlModel::Controller& controller);
+	PhoneticStringParser(const char* configDirPath, Controller& controller);
 	~PhoneticStringParser();
 
 	void parse(const char* string /* ASCII */, std::size_t size);
@@ -52,34 +52,34 @@ private:
 	};
 
 	struct RewriterCommand {
-		const VTMControlModel::Category* category1;
+		const Category* category1;
 		RewriterCommandType type;
-		const VTMControlModel::Posture* posture;
+		const Posture* posture;
 		RewriterCommand() : category1 {}, type {REWRITER_COMMAND_NOP}, posture {} {}
 	};
 
 	struct RewriterData {
-		const VTMControlModel::Category* category2;
+		const Category* category2;
 		std::vector<RewriterCommand> commandList;
 		RewriterData() : category2 {} {}
 	};
 
 	struct RewriterState {
-		const VTMControlModel::Posture* lastPosture;
+		const Posture* lastPosture;
 		RewriterState() : lastPosture {} {}
 	};
 
 	void loadRewriterConfiguration(const std::string& filePath);
-	void rewrite(const VTMControlModel::Posture& nextPosture, int wordMarker, RewriterState& state);
-	std::shared_ptr<VTMControlModel::Category> getCategory(const char* name);
-	const VTMControlModel::Posture* getPosture(const char* name);
+	void rewrite(const Posture& nextPosture, int wordMarker, RewriterState& state);
+	std::shared_ptr<Category> getCategory(const char* name);
+	const Posture* getPosture(const char* name);
 
-	const VTMControlModel::Model& model_;
-	VTMControlModel::EventList& eventList_;
+	const Model& model_;
+	EventList& eventList_;
 	std::vector<RewriterData> rewriterData_;
 };
 
-} /* namespace En */
+} /* namespace VTMControlModel */
 } /* namespace GS */
 
-#endif /* EN_PHONETIC_STRING_PARSER_H_ */
+#endif /* VTM_CONTROL_MODEL_PHONETIC_STRING_PARSER_H_ */

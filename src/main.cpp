@@ -28,7 +28,7 @@
 #include "global.h"
 #include "Log.h"
 #include "Model.h"
-#include "en/phonetic_string_parser/PhoneticStringParser.h"
+#include "PhoneticStringParser.h"
 #include "en/text_parser/TextParser.h"
 #include "VTMControlModelConfiguration.h"
 
@@ -150,7 +150,7 @@ main(int argc, char* argv[])
 									vtmControlConfig.dictionary1File,
 									vtmControlConfig.dictionary2File,
 									vtmControlConfig.dictionary3File);
-		auto phoneticStringParser = std::make_unique<GS::En::PhoneticStringParser>(configDirPath, *vtmController);
+		auto phoneticStringParser = std::make_unique<GS::VTMControlModel::PhoneticStringParser>(configDirPath, *vtmController);
 
 		std::string phoneticString = textParser->parseText(inputText.c_str());
 		if (GS::Log::debugEnabled) {

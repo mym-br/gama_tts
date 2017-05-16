@@ -83,9 +83,6 @@ set(LIBRARY_FILES
 
     src/en/number_pronunciations.h
 
-    src/en/phonetic_string_parser/PhoneticStringParser.cpp
-    src/en/phonetic_string_parser/PhoneticStringParser.h
-
     src/en/text_parser/abbreviations.h
     src/en/text_parser/NumberParser.cpp
     src/en/text_parser/NumberParser.h
@@ -133,6 +130,8 @@ set(LIBRARY_FILES
     src/vtm_control_model/Model.cpp
     src/vtm_control_model/Model.h
     src/vtm_control_model/Parameter.h
+    src/vtm_control_model/PhoneticStringParser.cpp
+    src/vtm_control_model/PhoneticStringParser.h
     src/vtm_control_model/Posture.h
     src/vtm_control_model/PostureList.cpp
     src/vtm_control_model/PostureList.h
