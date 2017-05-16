@@ -696,6 +696,8 @@ EventList::setFullTimeScale()
 void
 EventList::applyIntonation()
 {
+	if (list_.empty()) return;
+
 	int tgRandom;
 	int firstFoot, endFoot;
 	int ruleIndex = 0, postureIndex;
@@ -856,8 +858,10 @@ EventList::applyIntonation()
 			offsetTime = -40.0;
 		}
 	}
-	addIntonationPoint(intonParms_[2] + intonParms_[1] + intonParms_[5],
-				0.0, 0.0, currentRule_ - 1);
+	if (intonParms_) {
+		addIntonationPoint(intonParms_[2] + intonParms_[1] + intonParms_[5],
+					0.0, 0.0, currentRule_ - 1);
+	}
 
 	if (macroIntonation_) prepareMacroIntonationInterpolation();
 }
