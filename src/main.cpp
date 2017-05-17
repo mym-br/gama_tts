@@ -152,7 +152,7 @@ main(int argc, char* argv[])
 									vtmControlConfig.dictionary3File);
 		auto phoneticStringParser = std::make_unique<GS::VTMControlModel::PhoneticStringParser>(configDirPath, *vtmController);
 
-		std::string phoneticString = textParser->parseText(inputText.c_str());
+		std::string phoneticString = textParser->parse(inputText.c_str());
 		if (GS::Log::debugEnabled) {
 			std::cout << "Phonetic string: [" << phoneticString << ']' << std::endl;
 		}

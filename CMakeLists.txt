@@ -79,7 +79,6 @@ set(LIBRARY_FILES
 
     src/en/dictionary/DictionarySearch.cpp
     src/en/dictionary/DictionarySearch.h
-    src/en/dictionary/suffix_list.h
 
     src/en/number_pronunciations.h
 

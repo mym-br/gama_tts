@@ -22,6 +22,8 @@
 #define EN_DICTIONARY_SEARCH_H_
 
 #include <array>
+#include <string>
+#include <vector>
 
 #include "Dictionary.h"
 
@@ -35,7 +37,7 @@ public:
 	DictionarySearch();
 	~DictionarySearch();
 
-	void load(const char* dictionaryPath);
+	void load(const char* dictionaryPath, const char* suffixListPath);
 
 	// The returned string is invalidated if the dictionary is changed.
 	const char* getEntry(const char* word);
@@ -47,6 +49,12 @@ private:
 		MAXLEN = 1024
 	};
 
+	struct SuffixInfo {
+		std::string suffix;
+		std::string replacement;
+		std::string pronunciation;
+	};
+
 	DictionarySearch(const DictionarySearch&) = delete;
 	DictionarySearch& operator=(const DictionarySearch&) = delete;
 
@@ -56,6 +64,7 @@ private:
 	Dictionary dict_;
 	std::array<char, MAXLEN> buffer_;
 	std::array<char, 32> wordTypeBuffer_;
+	std::vector<SuffixInfo> suffixInfoList_;
 };
 
 } /* namespace En */

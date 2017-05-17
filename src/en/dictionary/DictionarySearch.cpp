@@ -20,13 +20,21 @@
 
 #include "DictionarySearch.h"
 
+#include <cctype> /* isspace */
+#include <cstddef> /* std::size_t */
 #include <cstring>
+#include <fstream>
 
-#include "en/dictionary/suffix_list.h"
+#include "Exception.h"
+#include "Log.h"
 
 
 
 namespace {
+
+const char SUFFIX_SEPARATOR = '|';
+const char SUFFIX_COMMENT = '#';
+const char* SUFFIX_END_CHARS = " \t#";
 
 /**************************************************************************
 *
@@ -37,7 +45,7 @@ namespace {
 *
 **************************************************************************/
 const char*
-word_has_suffix(const char* word, const char* suffix)
+wordHasSuffix(const char* word, const char* suffix)
 {
 	int word_length, suffix_length;
 	const char* suffix_position;
@@ -86,9 +94,46 @@ DictionarySearch::~DictionarySearch()
 }
 
 void
-DictionarySearch::load(const char* dictionaryPath)
+DictionarySearch::load(const char* dictionaryPath, const char* suffixListPath)
 {
+	// Load the dictionary.
 	dict_.load(dictionaryPath);
+
+	// Load the suffix list.
+	std::ifstream in(suffixListPath, std::ios_base::binary);
+	if (!in) {
+		THROW_EXCEPTION(IOException, "Could not open the file " << suffixListPath << '.');
+	}
+	std::string line;
+	std::size_t lineNumber = 0;
+	while (std::getline(in, line)) {
+		++lineNumber;
+		if (line.empty() || line[0] == SUFFIX_COMMENT) continue;
+
+		std::size_t div1Pos = line.find_first_of(SUFFIX_SEPARATOR);
+		if (div1Pos == std::string::npos) {
+			THROW_EXCEPTION(IOException, "Could not find a separator (file: " << suffixListPath << " line: " << lineNumber << ").");
+		}
+		std::size_t div2Pos = line.find_first_of(SUFFIX_SEPARATOR, div1Pos + 1);
+		if (div2Pos == std::string::npos) {
+			THROW_EXCEPTION(IOException, "Could not find a separator (file: " << suffixListPath << " line: " << lineNumber << ").");
+		}
+
+		std::size_t endPos = line.find_first_of(SUFFIX_END_CHARS, div2Pos + 1);
+		if (endPos == std::string::npos) {
+			endPos = line.size();
+		}
+
+		SuffixInfo info;
+		info.suffix        = std::string(line.begin()              , line.begin() + div1Pos);
+		info.replacement   = std::string(line.begin() + div1Pos + 1, line.begin() + div2Pos);
+		info.pronunciation = std::string(line.begin() + div2Pos + 1, line.begin() + endPos);
+		if (info.suffix.empty()) {
+			THROW_EXCEPTION(IOException, "Empty suffix (file: " << suffixListPath << " line: " << lineNumber << ").");
+		}
+		LOG_DEBUG("suffix: |" << info.suffix << '|' << info.replacement << '|' << info.pronunciation <<'|');
+		suffixInfoList_.push_back(std::move(info));
+	}
 }
 
 const char*
@@ -122,7 +167,6 @@ DictionarySearch::augmentedSearch(const char* orthography)
 	const char* word;
 	const char* pt;
 	char* word_type_pos;
-	const suffix_list_t* list_ptr;
 
 	clearBuffers();
 
@@ -132,12 +176,12 @@ DictionarySearch::augmentedSearch(const char* orthography)
 	}
 
 	/*  LOOP THROUGH SUFFIX LIST  */
-	for (list_ptr = suffix_list; list_ptr->suffix; list_ptr++) {
-		if ( (pt = word_has_suffix(orthography, list_ptr->suffix)) ) {
+	for (const SuffixInfo& suffixInfo : suffixInfoList_) {
+		if ( (pt = wordHasSuffix(orthography, suffixInfo.suffix.c_str())) ) {
 			/*  TACK ON REPLACEMENT ENDING  */
 			strcpy(&buffer_[0], orthography);
 			*(&buffer_[0] + (pt - orthography)) = '\0';
-			strcat(&buffer_[0], list_ptr->replacement);
+			strcat(&buffer_[0], suffixInfo.replacement.c_str());
 
 			/*  IF WORD FOUND WITH REPLACEMENT ENDING  */
 			if ( (word = dict_.getEntry(&buffer_[0])) ) {
@@ -153,7 +197,7 @@ DictionarySearch::augmentedSearch(const char* orthography)
 
 				/*  APPEND SUFFIX PRONUNCIATION TO WORD  */
 				*word_type_pos = '\0';
-				strcat(&buffer_[0], list_ptr->pronunciation);
+				strcat(&buffer_[0], suffixInfo.pronunciation.c_str());
 
 				/*  AND PUT BACK THE WORD TYPE  */
 				strcat(&buffer_[0], &wordTypeBuffer_[0]);

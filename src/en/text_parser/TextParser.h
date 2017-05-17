@@ -23,7 +23,6 @@
 
 #include <memory>
 #include <string>
-#include <sstream>
 #include <vector>
 
 #include "en/dictionary/DictionarySearch.h"
@@ -36,14 +35,25 @@ namespace En {
 
 class TextParser {
 public:
+	enum Mode {
+		MODE_UNDEFINED,
+		MODE_NORMAL,
+		MODE_RAW,
+		MODE_LETTER,
+		MODE_EMPHASIS,
+		MODE_TAGGING,
+		MODE_SILENCE
+	};
+
 	TextParser(const char* configDirPath,
 			const std::string& dictionary1Path,
 			const std::string& dictionary2Path,
 			const std::string& dictionary3Path);
 	~TextParser();
 
-	std::string parseText(const char* text);
+	std::string parse(const char* text);
 
+	void setMode(Mode mode) { mode_ = mode; }
 private:
 	enum {
 		DICTIONARY_ORDER_SIZE = 6
@@ -52,25 +62,19 @@ private:
 	TextParser(const TextParser&) = delete;
 	TextParser& operator=(const TextParser&) = delete;
 
-	void init_parser_module();
-	int set_escape_code(char new_escape_code);
-	const char* lookup_word(const char* word, short* dict);
-	void condition_input(const char* input, char* output, int length, int* output_length);
-	int mark_modes(const char* input, char *output, int length, int *output_length);
-	void expand_word(char* word, int is_tonic, std::stringstream& stream);
-	int final_conversion(std::stringstream& stream1, long stream1_length,
-				std::stringstream& stream2, long* stream2_length);
+	const char* lookupWord(const char* word);
+	void conditionInput(const char* input, std::size_t inputLength, char* output, std::size_t* outputLength);
+	void expandWord(char* word, int is_tonic, std::stringstream& stream);
+	void finalConversion(std::stringstream& stream1, std::size_t stream1Length,
+				std::stringstream& stream2, std::size_t* stream2Length);
 
 	std::unique_ptr<DictionarySearch> dict1_;
 	std::unique_ptr<DictionarySearch> dict2_;
 	std::unique_ptr<DictionarySearch> dict3_;
-
-	char escape_character_;
 	short dictionaryOrder_[DICTIONARY_ORDER_SIZE];
-
-	std::stringstream auxStream_;
 	std::vector<char> pronunciation_;
 	NumberParser numberParser_;
+	Mode mode_;
 };
 
 } /* namespace En */
