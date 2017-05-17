@@ -179,6 +179,7 @@ void safetyCheck(std::stringstream& stream, std::size_t* streamLength);
 void insertChunkMarker(std::stringstream& stream, long insert_point, char tg_type);
 void checkTonic(std::stringstream& stream, long start_pos, long end_pos);
 void stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength, TextParser::Mode mode);
+void conditionInput(const char* input, std::size_t inputLength, char* output, std::size_t* outputLength);
 
 
 
@@ -1631,6 +1632,55 @@ stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, st
 	*streamLength = stream.tellp();
 }
 
+/******************************************************************************
+*
+*       function:       condition_input
+*
+*       purpose:        Converts all non-printable characters (except escape
+*                       character to blanks.  Also connects words hyphenated
+*                       over a newline.
+*
+******************************************************************************/
+void
+conditionInput(const char* input, std::size_t inputLength, char* output, std::size_t* outputLength)
+{
+	std::size_t j = 0;
+
+	for (std::size_t i = 0; i < inputLength; i++) {
+		if ((input[i] == '-') && (i > 0) && isalpha(input[i-1])) {
+			/*  CONNECT HYPHENATED WORD OVER NEWLINE  */
+			std::size_t ii = i;
+			/*  IGNORE ANY WHITE SPACE UP TO NEWLINE  */
+			while (((ii+1) < inputLength) && (input[ii+1] != '\n') && isspace(input[ii+1])) {
+				ii++;
+			}
+			/*  IF NEWLINE, THEN CONCATENATE WORD  */
+			if (((ii+1) < inputLength) && input[ii+1] == '\n') {
+				i = ++ii;
+				/*  IGNORE ANY WHITE SPACE  */
+				while (((i+1) < inputLength) && isspace(input[i+1])) {
+					i++;
+				}
+			} else { /*  ELSE, OUTPUT HYPHEN  */
+				output[j++] = input[i];
+			}
+		//} else if ( !isascii(input[i]) ) {
+		//TODO: Complete UTF-8 support.
+		// Temporary solution to allow UTF-8 characters.
+		} else if (isascii(input[i]) && !isprint(input[i])) {
+			/*  CONVERT NONPRINTABLE CHARACTERS TO SPACE  */
+			output[j++] = ' ';
+		} else {
+			/*  PASS EVERYTHING ELSE THROUGH  */
+			output[j++] = input[i];
+		}
+	}
+
+	/*  BE SURE TO APPEND NULL TO STRING  */
+	output[j] = '\0';
+	*outputLength = j;
+}
+
 } /* namespace */
 
 //==============================================================================
@@ -1809,55 +1859,6 @@ TextParser::lookupWord(const char* word)
 	}
 
 	return nullptr;
-}
-
-/******************************************************************************
-*
-*       function:       condition_input
-*
-*       purpose:        Converts all non-printable characters (except escape
-*                       character to blanks.  Also connects words hyphenated
-*                       over a newline.
-*
-******************************************************************************/
-void
-TextParser::conditionInput(const char* input, std::size_t inputLength, char* output, std::size_t* outputLength)
-{
-	std::size_t j = 0;
-
-	for (std::size_t i = 0; i < inputLength; i++) {
-		if ((input[i] == '-') && (i > 0) && isalpha(input[i-1])) {
-			/*  CONNECT HYPHENATED WORD OVER NEWLINE  */
-			std::size_t ii = i;
-			/*  IGNORE ANY WHITE SPACE UP TO NEWLINE  */
-			while (((ii+1) < inputLength) && (input[ii+1] != '\n') && isspace(input[ii+1])) {
-				ii++;
-			}
-			/*  IF NEWLINE, THEN CONCATENATE WORD  */
-			if (((ii+1) < inputLength) && input[ii+1] == '\n') {
-				i = ++ii;
-				/*  IGNORE ANY WHITE SPACE  */
-				while (((i+1) < inputLength) && isspace(input[i+1])) {
-					i++;
-				}
-			} else { /*  ELSE, OUTPUT HYPHEN  */
-				output[j++] = input[i];
-			}
-		//} else if ( !isascii(input[i]) ) {
-		//TODO: Complete UTF-8 support.
-		// Temporary solution to allow UTF-8 characters.
-		} else if (isascii(input[i]) && !isprint(input[i])) {
-			/*  CONVERT NONPRINTABLE CHARACTERS TO SPACE  */
-			output[j++] = ' ';
-		} else {
-			/*  PASS EVERYTHING ELSE THROUGH  */
-			output[j++] = input[i];
-		}
-	}
-
-	/*  BE SURE TO APPEND NULL TO STRING  */
-	output[j] = '\0';
-	*outputLength = j;
 }
 
 /******************************************************************************

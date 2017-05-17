@@ -63,7 +63,6 @@ private:
 	TextParser& operator=(const TextParser&) = delete;
 
 	const char* lookupWord(const char* word);
-	void conditionInput(const char* input, std::size_t inputLength, char* output, std::size_t* outputLength);
 	void expandWord(char* word, int is_tonic, std::stringstream& stream);
 	void finalConversion(std::stringstream& stream1, std::size_t stream1Length,
 				std::stringstream& stream2, std::size_t* stream2Length);
