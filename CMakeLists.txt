@@ -86,7 +86,6 @@ set(LIBRARY_FILES
 
     src/en/text_parser/NumberParser.cpp
     src/en/text_parser/NumberParser.h
-    src/en/text_parser/special_acronyms.h
     src/en/text_parser/TextParser.cpp
     src/en/text_parser/TextParser.h
 

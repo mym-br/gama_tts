@@ -54,7 +54,6 @@
 #include <vector>
 
 #include "en/letter_to_sound/letter_to_sound.h"
-#include "en/text_parser/special_acronyms.h"
 #include "Exception.h"
 #include "Log.h"
 
@@ -143,6 +142,7 @@
 #define SUFFIX_LIST_FILE "suffix_list.txt"
 #define ABBREVIATIONS_FILE "abbreviations.txt"
 #define ABBREVIATIONS_WITH_NUMBER_FILE "abbreviations_with_number.txt"
+#define SPECIAL_ACRONYMS_FILE "special_acronyms.txt"
 
 
 
@@ -171,7 +171,6 @@ int wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParse
 void expandLetterMode(const char* buffer, std::size_t length, std::stringstream& stream);
 int isAllUpperCase(const char* word);
 char* toLowerCase(char* word);
-const char* isSpecialAcronym(const char* word);
 int containsPrimaryStress(const char* pronunciation);
 int convertedStress(char* pronunciation);
 int isPossessive(char* word);
@@ -1057,31 +1056,6 @@ toLowerCase(char* word)
 
 /******************************************************************************
 *
-*       function:       is_special_acronym
-*
-*       purpose:        Returns a pointer to the pronunciation of a special
-*                       acronym if it is defined in the list.  Otherwise,
-*                       NULL is returned.
-*
-******************************************************************************/
-const char*
-isSpecialAcronym(const char* word)
-{
-	const char* acronym;
-
-	/*  LOOP THROUGH LIST UNTIL MATCH FOUND, RETURN PRONUNCIATION  */
-	for (int i = 0; (acronym = special_acronym[i][WORD]); i++) {
-		if (strcmp(word, acronym) == 0) {
-			return special_acronym[i][PRONUNCIATION];
-		}
-	}
-
-	/*  IF HERE, NO SPECIAL ACRONYM FOUND, RETURN NULL  */
-	return nullptr;
-}
-
-/******************************************************************************
-*
 *       function:       contains_primary_stress
 *
 *       purpose:        Returns 1 if the pronunciation contains '.
@@ -1413,7 +1387,7 @@ TextParser::TextParser(const char* configDirPath,
 		: mode_{MODE_NORMAL}
 {
 	std::ostringstream suffixFilePathStream;
-	suffixFilePathStream << configDirPath << TEXT_PARSER_DIR << SUFFIX_LIST_FILE;
+	suffixFilePathStream << configDirPath << TEXT_PARSER_DIR SUFFIX_LIST_FILE;
 	std::string suffixFilePath = suffixFilePathStream.str();
 
 	if (dictionary1Path != "none") {
@@ -1443,12 +1417,16 @@ TextParser::TextParser(const char* configDirPath,
 	dictionaryOrder_[5] = TTS_EMPTY;
 
 	std::ostringstream abbrevFilePath;
-	abbrevFilePath << configDirPath << TEXT_PARSER_DIR << ABBREVIATIONS_FILE;
+	abbrevFilePath << configDirPath << TEXT_PARSER_DIR ABBREVIATIONS_FILE;
 	abbrevMap_.load(abbrevFilePath.str().c_str());
 
 	std::ostringstream abbrevWithNumberFilePath;
-	abbrevWithNumberFilePath << configDirPath << TEXT_PARSER_DIR << ABBREVIATIONS_WITH_NUMBER_FILE;
+	abbrevWithNumberFilePath << configDirPath << TEXT_PARSER_DIR ABBREVIATIONS_WITH_NUMBER_FILE;
 	abbrevWithNumberMap_.load(abbrevWithNumberFilePath.str().c_str());
+
+	std::ostringstream specialAcronymsFilePath;
+	specialAcronymsFilePath << configDirPath << TEXT_PARSER_DIR SPECIAL_ACRONYMS_FILE;
+	specialAcronymsMap_.load(specialAcronymsFilePath.str().c_str());
 }
 
 TextParser::~TextParser()
@@ -2177,6 +2155,21 @@ TextParser::stripPunctuation(char* buffer, std::size_t length, std::stringstream
 
 	/*  SET STREAM LENGTH  */
 	*streamLength = stream.tellp();
+}
+
+/******************************************************************************
+*
+*       function:       is_special_acronym
+*
+*       purpose:        Returns a pointer to the pronunciation of a special
+*                       acronym if it is defined in the list.  Otherwise,
+*                       NULL is returned.
+*
+******************************************************************************/
+const char*
+TextParser::isSpecialAcronym(const char* word)
+{
+	return specialAcronymsMap_.getEntry(word);
 }
 
 } /* namespace En */

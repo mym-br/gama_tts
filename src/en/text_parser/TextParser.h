@@ -69,6 +69,7 @@ private:
 				std::stringstream& stream2, std::size_t* stream2Length);
 	int expandAbbreviation(char* buffer, std::size_t length, std::size_t i, std::stringstream& stream);
 	void stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength);
+	const char* isSpecialAcronym(const char* word);
 
 	std::unique_ptr<DictionarySearch> dict1_;
 	std::unique_ptr<DictionarySearch> dict2_;
@@ -79,6 +80,7 @@ private:
 	Mode mode_;
 	StringMap abbrevMap_;
 	StringMap abbrevWithNumberMap_;
+	StringMap specialAcronymsMap_;
 };
 
 } /* namespace En */
