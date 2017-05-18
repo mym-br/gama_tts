@@ -33,6 +33,8 @@ set(LIBRARY_FILES
     src/Log.cpp
     src/Log.h
     src/ParameterLogger.h
+    src/StringMap.cpp
+    src/StringMap.h
     src/Text.cpp
     src/Text.h
     src/VocalTractModelParameterValue.h
@@ -82,7 +84,6 @@ set(LIBRARY_FILES
 
     src/en/number_pronunciations.h
 
-    src/en/text_parser/abbreviations.h
     src/en/text_parser/NumberParser.cpp
     src/en/text_parser/NumberParser.h
     src/en/text_parser/special_acronyms.h

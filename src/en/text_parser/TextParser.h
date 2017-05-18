@@ -27,6 +27,7 @@
 
 #include "en/dictionary/DictionarySearch.h"
 #include "en/text_parser/NumberParser.h"
+#include "StringMap.h"
 
 
 
@@ -66,6 +67,8 @@ private:
 	void expandWord(char* word, int is_tonic, std::stringstream& stream);
 	void finalConversion(std::stringstream& stream1, std::size_t stream1Length,
 				std::stringstream& stream2, std::size_t* stream2Length);
+	int expandAbbreviation(char* buffer, std::size_t length, std::size_t i, std::stringstream& stream);
+	void stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength);
 
 	std::unique_ptr<DictionarySearch> dict1_;
 	std::unique_ptr<DictionarySearch> dict2_;
@@ -74,6 +77,8 @@ private:
 	std::vector<char> pronunciation_;
 	NumberParser numberParser_;
 	Mode mode_;
+	StringMap abbrevMap_;
+	StringMap abbrevWithNumberMap_;
 };
 
 } /* namespace En */

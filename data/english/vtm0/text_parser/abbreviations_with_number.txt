@@ -1,5 +1,5 @@
 # These abbreviations are expanded only if followed by a number.
 
-Fig figure
+Fig  figure
 Figs figures
-No number
+No   number

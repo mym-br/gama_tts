@@ -54,7 +54,6 @@
 #include <vector>
 
 #include "en/letter_to_sound/letter_to_sound.h"
-#include "en/text_parser/abbreviations.h"
 #include "en/text_parser/special_acronyms.h"
 #include "Exception.h"
 #include "Log.h"
@@ -142,6 +141,8 @@
 
 #define TEXT_PARSER_DIR "/text_parser/"
 #define SUFFIX_LIST_FILE "suffix_list.txt"
+#define ABBREVIATIONS_FILE "abbreviations.txt"
+#define ABBREVIATIONS_WITH_NUMBER_FILE "abbreviations_with_number.txt"
 
 
 
@@ -167,7 +168,6 @@ int convertDash(char* buffer, std::size_t length, std::size_t* i);
 int isTelephoneNumber(char* buffer, std::size_t length, std::size_t i);
 int isPunctuation(char c);
 int wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode);
-int expandAbbreviation(char* buffer, std::size_t length, std::size_t i, std::stringstream& stream);
 void expandLetterMode(const char* buffer, std::size_t length, std::stringstream& stream);
 int isAllUpperCase(const char* word);
 char* toLowerCase(char* word);
@@ -178,7 +178,6 @@ int isPossessive(char* word);
 void safetyCheck(std::stringstream& stream, std::size_t* streamLength);
 void insertChunkMarker(std::stringstream& stream, long insert_point, char tg_type);
 void checkTonic(std::stringstream& stream, long start_pos, long end_pos);
-void stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength, TextParser::Mode mode);
 void conditionInput(const char* input, std::size_t inputLength, char* output, std::size_t* outputLength);
 
 
@@ -898,99 +897,6 @@ wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::M
 
 /******************************************************************************
 *
-*       function:       expand_abbreviation
-*
-*       purpose:        Expands listed abbreviations.  Two lists are used (see
-*                       abbreviations.h):  one list expands unconditionally,
-*                       the other only if the abbreviation is followed by a
-*                       number.  The abbreviation p. is expanded to page.
-*                       Single alphabetic characters have periods deleted, but
-*                       no expansion is made.  They are also capitalized.
-*                       Returns 1 if expansion made (i.e. period is deleted),
-*                       0 otherwise.
-*
-******************************************************************************/
-int
-expandAbbreviation(char* buffer, std::size_t length, std::size_t i, std::stringstream& stream)
-{
-	/*  DELETE PERIOD AFTER SINGLE CHARACTER (EXCEPT p.)  */
-	if ( (i == 1) || ( (i >= 2) &&
-				( (buffer[i-2] == ' ') || (buffer[i-2] == '.') )
-				) ) {
-		if (isalpha(buffer[i-1])) {
-			if ((buffer[i-1] == 'p') && ((i == 1) || ((i >= 2) && (buffer[i-2] != '.')) ) ) {
-				/*  EXPAND p. TO page  */
-				stream.seekp(-1, std::ios_base::cur);
-				stream << "page ";
-			} else {
-				/*  ELSE, CAPITALIZE CHARACTER IF NECESSARY, BLANK OUT PERIOD  */
-				stream.seekp(-1, std::ios_base::cur);
-				if (islower(buffer[i-1])) {
-					buffer[i-1] = toupper(buffer[i-1]);
-				}
-				stream << buffer[i-1] << ' ';
-			}
-			/*  INDICATE ABBREVIATION EXPANDED  */
-			return 1;
-		}
-	}
-
-	std::size_t word_length = 0;
-
-	/*  GET LENGTH OF PRECEDING ISOLATED STRING, UP TO 4 CHARACTERS  */
-	for (std::size_t j = 2; j <= 4; j++) {
-		if ( (i == j) ||
-				((i >= j + 1) && (buffer[i-(j+1)] == ' ')) ) {
-			if (isalpha(buffer[i-j]) && isalpha(buffer[i-j+1])) {
-				word_length = j;
-				break;
-			}
-		}
-	}
-
-	char word[5];
-
-	/*  IS ABBREVIATION ONLY IF WORD LENGTH IS 2, 3, OR 4 CHARACTERS  */
-	if ((word_length >= 2) && (word_length <= 4)) {
-		/*  GET ABBREVIATION  */
-		std::size_t k, j;
-		for (k = 0, j = i - word_length; k < word_length; k++) {
-			word[k] = buffer[j++];
-		}
-		word[k] = '\0';
-
-		/*  EXPAND THESE ABBREVIATIONS ONLY IF FOLLOWED BY NUMBER  */
-		for (j = 0; abbr_with_number[j][ABBREVIATION] != NULL; j++) {
-			if (!strcmp(abbr_with_number[j][ABBREVIATION], word)) {
-				/*  IGNORE WHITE SPACE  */
-				while (((i+1) < length) && (buffer[i+1] == ' ')) {
-					i++;
-				}
-				/*  EXPAND ONLY IF NUMBER FOLLOWS  */
-				if (numberFollows(buffer, length, i)) {
-					stream.seekp(-word_length, std::ios_base::cur);
-					stream << abbr_with_number[j][EXPANSION] << ' ';
-					return 1;
-				}
-			}
-		}
-
-		/*  EXPAND THESE ABBREVIATIONS UNCONDITIONALLY  */
-		for (j = 0; abbreviation[j][ABBREVIATION] != NULL; j++) {
-			if (!strcmp(abbreviation[j][ABBREVIATION],word)) {
-				stream.seekp(-word_length, std::ios_base::cur);
-				stream << abbreviation[j][EXPANSION] << ' ';
-				return 1;
-			}
-		}
-	}
-
-	/*  IF HERE, THEN NO EXPANSION MADE  */
-	return 0;
-}
-
-/******************************************************************************
-*
 *       function:       expand_letter_mode
 *
 *       purpose:        Expands contents of letter mode string to word or
@@ -1446,194 +1352,6 @@ checkTonic(std::stringstream& stream, long start_pos, long end_pos)
 
 /******************************************************************************
 *
-*       function:       strip_punctuation
-*
-*       purpose:        Deletes unnecessary punctuation, and converts some
-*                       punctuation to another form.
-*
-******************************************************************************/
-void
-stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength, TextParser::Mode mode)
-{
-	/*  DELETE OR CONVERT PUNCTUATION  */
-
-	if ((mode == TextParser::MODE_NORMAL) || (mode == TextParser::MODE_EMPHASIS)) {
-		for (std::size_t i = 0; i < length; i++) {
-			switch (buffer[i]) {
-			case '[':
-				buffer[i] = '(';
-				break;
-			case ']':
-				buffer[i] = ')';
-				break;
-			case '-':
-				if (!convertDash(buffer, length, &i) &&
-						!numberFollows(buffer, length, i) &&
-						!isIsolated(buffer, length, i)) {
-					buffer[i] = ' ';
-				}
-				break;
-			case '+':
-				if (!partOfNumber(buffer, length, i) && !isIsolated(buffer, length, i)) {
-					buffer[i] = ' ';
-				}
-				break;
-			case '\'':
-				if (!((i > 0) && isalpha(buffer[i-1]) && ((i+1) < length) && isalpha(buffer[i+1]))) {
-					buffer[i] = ' ';
-				}
-				break;
-			case '.':
-				deleteEllipsis(buffer, length, &i);
-				break;
-			case '/':
-			case '$':
-			case '%':
-				if (!partOfNumber(buffer, length, i)) {
-					buffer[i] = ' ';
-				}
-				break;
-			case '<':
-			case '>':
-			case '&':
-			case '=':
-			case '@':
-				if (!isIsolated(buffer, length, i)) {
-					buffer[i] = ' ';
-				}
-				break;
-			case '"':
-			case '`':
-			case '#':
-			case '*':
-			case '\\':
-			case '^':
-			case '_':
-			case '|':
-			case '~':
-			case '{':
-			case '}':
-				buffer[i] = ' ';
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-	/*  SECOND PASS  */
-	stream.str("");
-	int status = PUNCTUATION;
-
-	if ((mode == TextParser::MODE_NORMAL) || (mode == TextParser::MODE_EMPHASIS)) {
-		for (std::size_t i = 0; i < length; i++) {
-			switch (buffer[i]) {
-			case '(':
-				/*  CONVERT (?) AND (!) TO BLANKS  */
-				if ( ((i+2) < length) && (buffer[i+2] == ')') &&
-						((buffer[i+1] == '!') || (buffer[i+1] == '?')) ) {
-					buffer[i] = buffer[i+1] = buffer[i+2] = ' ';
-					stream << "   ";
-					i += 2;
-					continue;
-				}
-				/*  ALLOW TELEPHONE NUMBER WITH AREA CODE:  (403)274-3877  */
-				if (isTelephoneNumber(buffer, length, i)) {
-					int j;
-					for (j = 0; j < 12; j++) {
-						stream << buffer[i++];
-					}
-					status = WORD;
-					continue;
-				}
-				/*  CONVERT TO COMMA IF PRECEDED BY WORD, FOLLOWED BY WORD  */
-				if ((status == WORD) && wordFollows(buffer, length, i, mode)) {
-					buffer[i] = ' ';
-					stream << ", ";
-					status = PUNCTUATION;
-				} else {
-					buffer[i] = ' ';
-					stream << ' ';
-				}
-				break;
-			case ')':
-				/*  CONVERT TO COMMA IF PRECEDED BY WORD, FOLLOWED BY WORD  */
-				if ((status == WORD) && wordFollows(buffer, length, i, mode)) {
-					buffer[i] = ',';
-					stream << ", ";
-					status = PUNCTUATION;
-				} else {
-					buffer[i] = ' ';
-					stream << ' ';
-				}
-				break;
-			case '&':
-				stream << AND;
-				status = WORD;
-				break;
-			case '+':
-				if (isIsolated(buffer, length, i)) {
-					stream << PLUS;
-				} else {
-					stream << '+';
-				}
-				status = WORD;
-				break;
-			case '<':
-				stream << IS_LESS_THAN;
-				status = WORD;
-				break;
-			case '>':
-				stream << IS_GREATER_THAN;
-				status = WORD;
-				break;
-			case '=':
-				stream << EQUALS;
-				status = WORD;
-				break;
-			case '-':
-				if (isIsolated(buffer, length, i)) {
-					stream << MINUS;
-				} else {
-					stream << '-';
-				}
-				status = WORD;
-				break;
-			case '@':
-				stream << AT;
-				status = WORD;
-				break;
-			case '.':
-				if (!expandAbbreviation(buffer, length, i, stream)) {
-					stream << buffer[i];
-					status = PUNCTUATION;
-				}
-				break;
-			default:
-				stream << buffer[i];
-				if (isPunctuation(buffer[i])) {
-					status = PUNCTUATION;
-				} else if (isalnum(buffer[i])) {
-					status = WORD;
-				}
-				break;
-			}
-		}
-	} else if (mode == TextParser::MODE_LETTER) {
-		/*  EXPAND LETTER MODE CONTENTS TO PLAIN WORDS OR SINGLE LETTERS  */
-		expandLetterMode(buffer, length, stream);
-	} else { /*  ELSE PASS CHARACTERS STRAIGHT THROUGH  */
-		for (std::size_t i = 0; i < length; i++) {
-			stream << buffer[i];
-		}
-	}
-
-	/*  SET STREAM LENGTH  */
-	*streamLength = stream.tellp();
-}
-
-/******************************************************************************
-*
 *       function:       condition_input
 *
 *       purpose:        Converts all non-printable characters (except escape
@@ -1723,6 +1441,14 @@ TextParser::TextParser(const char* configDirPath,
 	dictionaryOrder_[3] = TTS_DICTIONARY_3;
 	dictionaryOrder_[4] = TTS_LETTER_TO_SOUND;
 	dictionaryOrder_[5] = TTS_EMPTY;
+
+	std::ostringstream abbrevFilePath;
+	abbrevFilePath << configDirPath << TEXT_PARSER_DIR << ABBREVIATIONS_FILE;
+	abbrevMap_.load(abbrevFilePath.str().c_str());
+
+	std::ostringstream abbrevWithNumberFilePath;
+	abbrevWithNumberFilePath << configDirPath << TEXT_PARSER_DIR << ABBREVIATIONS_WITH_NUMBER_FILE;
+	abbrevWithNumberMap_.load(abbrevWithNumberFilePath.str().c_str());
 }
 
 TextParser::~TextParser()
@@ -1767,7 +1493,7 @@ TextParser::parse(const char* text)
 	std::stringstream stream1;
 
 	/*  STRIP OUT OR CONVERT UNESSENTIAL PUNCTUATION  */
-	stripPunctuation(&buffer[0], buffer_length, stream1, &stream1_length, mode_);
+	stripPunctuation(&buffer[0], buffer_length, stream1, &stream1_length);
 
 	if (Log::debugEnabled) {
 		printf("\nSTREAM 1\n");
@@ -2172,6 +1898,285 @@ TextParser::expandWord(char* word, int is_tonic, std::stringstream& stream)
 		stream << TONIC_BEGIN;
 		stream.seekp(temporaryPosition);
 	}
+}
+
+/******************************************************************************
+*
+*       function:       expand_abbreviation
+*
+*       purpose:        Expands listed abbreviations.  Two lists are used (see
+*                       abbreviations.h):  one list expands unconditionally,
+*                       the other only if the abbreviation is followed by a
+*                       number.  The abbreviation p. is expanded to page.
+*                       Single alphabetic characters have periods deleted, but
+*                       no expansion is made.  They are also capitalized.
+*                       Returns 1 if expansion made (i.e. period is deleted),
+*                       0 otherwise.
+*
+******************************************************************************/
+int
+TextParser::expandAbbreviation(char* buffer, std::size_t length, std::size_t i, std::stringstream& stream)
+{
+	/*  DELETE PERIOD AFTER SINGLE CHARACTER (EXCEPT p.)  */
+	if ( (i == 1) || ( (i >= 2) &&
+				( (buffer[i-2] == ' ') || (buffer[i-2] == '.') )
+				) ) {
+		if (isalpha(buffer[i-1])) {
+			if ((buffer[i-1] == 'p') && ((i == 1) || ((i >= 2) && (buffer[i-2] != '.')) ) ) {
+				/*  EXPAND p. TO page  */
+				stream.seekp(-1, std::ios_base::cur);
+				stream << "page ";
+			} else {
+				/*  ELSE, CAPITALIZE CHARACTER IF NECESSARY, BLANK OUT PERIOD  */
+				stream.seekp(-1, std::ios_base::cur);
+				if (islower(buffer[i-1])) {
+					buffer[i-1] = toupper(buffer[i-1]);
+				}
+				stream << buffer[i-1] << ' ';
+			}
+			/*  INDICATE ABBREVIATION EXPANDED  */
+			return 1;
+		}
+	}
+
+	std::size_t word_length = 0;
+
+	/*  GET LENGTH OF PRECEDING ISOLATED STRING, UP TO 4 CHARACTERS  */
+	for (std::size_t j = 2; j <= 4; j++) {
+		if ( (i == j) ||
+				((i >= j + 1) && (buffer[i-(j+1)] == ' ')) ) {
+			if (isalpha(buffer[i-j]) && isalpha(buffer[i-j+1])) {
+				word_length = j;
+				break;
+			}
+		}
+	}
+
+	char word[5];
+
+	/*  IS ABBREVIATION ONLY IF WORD LENGTH IS 2, 3, OR 4 CHARACTERS  */
+	if ((word_length >= 2) && (word_length <= 4)) {
+		/*  GET ABBREVIATION  */
+		std::size_t k, j;
+		for (k = 0, j = i - word_length; k < word_length; k++) {
+			word[k] = buffer[j++];
+		}
+		word[k] = '\0';
+
+		/*  EXPAND THESE ABBREVIATIONS ONLY IF FOLLOWED BY NUMBER  */
+		const char* entry = abbrevWithNumberMap_.getEntry(word);
+		if (entry) {
+			/*  IGNORE WHITE SPACE  */
+			while (((i+1) < length) && (buffer[i+1] == ' ')) {
+				i++;
+			}
+			/*  EXPAND ONLY IF NUMBER FOLLOWS  */
+			if (numberFollows(buffer, length, i)) {
+				stream.seekp(-word_length, std::ios_base::cur);
+				stream << entry << ' ';
+				return 1;
+			}
+		}
+
+		/*  EXPAND THESE ABBREVIATIONS UNCONDITIONALLY  */
+		entry = abbrevMap_.getEntry(word);
+		if (entry) {
+			stream.seekp(-word_length, std::ios_base::cur);
+			stream << entry << ' ';
+			return 1;
+		}
+	}
+
+	/*  IF HERE, THEN NO EXPANSION MADE  */
+	return 0;
+}
+
+/******************************************************************************
+*
+*       function:       strip_punctuation
+*
+*       purpose:        Deletes unnecessary punctuation, and converts some
+*                       punctuation to another form.
+*
+******************************************************************************/
+void
+TextParser::stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength)
+{
+	/*  DELETE OR CONVERT PUNCTUATION  */
+
+	if ((mode_ == MODE_NORMAL) || (mode_ == MODE_EMPHASIS)) {
+		for (std::size_t i = 0; i < length; i++) {
+			switch (buffer[i]) {
+			case '[':
+				buffer[i] = '(';
+				break;
+			case ']':
+				buffer[i] = ')';
+				break;
+			case '-':
+				if (!convertDash(buffer, length, &i) &&
+						!numberFollows(buffer, length, i) &&
+						!isIsolated(buffer, length, i)) {
+					buffer[i] = ' ';
+				}
+				break;
+			case '+':
+				if (!partOfNumber(buffer, length, i) && !isIsolated(buffer, length, i)) {
+					buffer[i] = ' ';
+				}
+				break;
+			case '\'':
+				if (!((i > 0) && isalpha(buffer[i-1]) && ((i+1) < length) && isalpha(buffer[i+1]))) {
+					buffer[i] = ' ';
+				}
+				break;
+			case '.':
+				deleteEllipsis(buffer, length, &i);
+				break;
+			case '/':
+			case '$':
+			case '%':
+				if (!partOfNumber(buffer, length, i)) {
+					buffer[i] = ' ';
+				}
+				break;
+			case '<':
+			case '>':
+			case '&':
+			case '=':
+			case '@':
+				if (!isIsolated(buffer, length, i)) {
+					buffer[i] = ' ';
+				}
+				break;
+			case '"':
+			case '`':
+			case '#':
+			case '*':
+			case '\\':
+			case '^':
+			case '_':
+			case '|':
+			case '~':
+			case '{':
+			case '}':
+				buffer[i] = ' ';
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	/*  SECOND PASS  */
+	stream.str("");
+	int status = PUNCTUATION;
+
+	if ((mode_ == MODE_NORMAL) || (mode_ == MODE_EMPHASIS)) {
+		for (std::size_t i = 0; i < length; i++) {
+			switch (buffer[i]) {
+			case '(':
+				/*  CONVERT (?) AND (!) TO BLANKS  */
+				if ( ((i+2) < length) && (buffer[i+2] == ')') &&
+						((buffer[i+1] == '!') || (buffer[i+1] == '?')) ) {
+					buffer[i] = buffer[i+1] = buffer[i+2] = ' ';
+					stream << "   ";
+					i += 2;
+					continue;
+				}
+				/*  ALLOW TELEPHONE NUMBER WITH AREA CODE:  (403)274-3877  */
+				if (isTelephoneNumber(buffer, length, i)) {
+					int j;
+					for (j = 0; j < 12; j++) {
+						stream << buffer[i++];
+					}
+					status = WORD;
+					continue;
+				}
+				/*  CONVERT TO COMMA IF PRECEDED BY WORD, FOLLOWED BY WORD  */
+				if ((status == WORD) && wordFollows(buffer, length, i, mode_)) {
+					buffer[i] = ' ';
+					stream << ", ";
+					status = PUNCTUATION;
+				} else {
+					buffer[i] = ' ';
+					stream << ' ';
+				}
+				break;
+			case ')':
+				/*  CONVERT TO COMMA IF PRECEDED BY WORD, FOLLOWED BY WORD  */
+				if ((status == WORD) && wordFollows(buffer, length, i, mode_)) {
+					buffer[i] = ',';
+					stream << ", ";
+					status = PUNCTUATION;
+				} else {
+					buffer[i] = ' ';
+					stream << ' ';
+				}
+				break;
+			case '&':
+				stream << AND;
+				status = WORD;
+				break;
+			case '+':
+				if (isIsolated(buffer, length, i)) {
+					stream << PLUS;
+				} else {
+					stream << '+';
+				}
+				status = WORD;
+				break;
+			case '<':
+				stream << IS_LESS_THAN;
+				status = WORD;
+				break;
+			case '>':
+				stream << IS_GREATER_THAN;
+				status = WORD;
+				break;
+			case '=':
+				stream << EQUALS;
+				status = WORD;
+				break;
+			case '-':
+				if (isIsolated(buffer, length, i)) {
+					stream << MINUS;
+				} else {
+					stream << '-';
+				}
+				status = WORD;
+				break;
+			case '@':
+				stream << AT;
+				status = WORD;
+				break;
+			case '.':
+				if (!expandAbbreviation(buffer, length, i, stream)) {
+					stream << buffer[i];
+					status = PUNCTUATION;
+				}
+				break;
+			default:
+				stream << buffer[i];
+				if (isPunctuation(buffer[i])) {
+					status = PUNCTUATION;
+				} else if (isalnum(buffer[i])) {
+					status = WORD;
+				}
+				break;
+			}
+		}
+	} else if (mode_ == MODE_LETTER) {
+		/*  EXPAND LETTER MODE CONTENTS TO PLAIN WORDS OR SINGLE LETTERS  */
+		expandLetterMode(buffer, length, stream);
+	} else { /*  ELSE PASS CHARACTERS STRAIGHT THROUGH  */
+		for (std::size_t i = 0; i < length; i++) {
+			stream << buffer[i];
+		}
+	}
+
+	/*  SET STREAM LENGTH  */
+	*streamLength = stream.tellp();
 }
 
 } /* namespace En */
