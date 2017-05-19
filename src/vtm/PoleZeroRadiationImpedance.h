@@ -128,12 +128,6 @@ PoleZeroRadiationImpedance<FloatType>::reset()
 	in1_ = 0.0;
 	outT1_ = 0.0;
 	outR1_ = 0.0;
-	cT1_ = 0.0;
-	cT2_ = 0.0;
-	cT3_ = 0.0;
-	cR1_ = 0.0;
-	cR2_ = 0.0;
-	cR3_ = 0.0;
 	prevRadius_ = -1.0;
 }
 
