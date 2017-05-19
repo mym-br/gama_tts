@@ -22,8 +22,6 @@
 #define VTM_CONTROL_MODEL_CONTROLLER_H_
 
 #include <cstddef> /* std::size_t */
-#include <cstdio>
-#include <fstream>
 #include <istream>
 #include <memory>
 #include <string>
@@ -31,11 +29,10 @@
 
 #include "ConfigurationData.h"
 #include "EventList.h"
-#include "Exception.h"
-#include "Log.h"
 #include "Model.h"
-#include "VTMControlModelConfiguration.h"
+#include "PhoneticStringParser.h"
 #include "VocalTractModel.h"
+#include "VTMControlModelConfiguration.h"
 
 
 
@@ -47,23 +44,20 @@ public:
 	Controller(const char* configDirPath, Model& model);
 	~Controller();
 
+	void fillParameterStream(const std::string& phoneticString, std::iostream& vtmParamStream);
+
 	// Synthesizes speech from phonetic string. Sends to file.
 	// The VTM parameters will be written to a file.
-	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString,
-								const char* vtmParamFile, const char* outputFile);
+	void synthesizePhoneticString(const std::string& phoneticString, const char* vtmParamFile, const char* outputFile);
 	// Synthesizes speech from phonetic string. Sends to buffer.
 	// The VTM parameters will be written to a file.
-	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString,
-								const char* vtmParamFile, std::vector<float>& buffer);
+	void synthesizePhoneticString(const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer);
 
 	// Synthesizes speech from data contained in the event list. Sends to file.
 	void synthesizeFromEventList(const char* vtmParamFile, const char* outputFile);
 	// Synthesizes speech from data contained in the event list. Sends to buffer.
 	void synthesizeFromEventList(const char* vtmParamFile, std::vector<float>& buffer);
 
-	template<typename T> void fillParameterStream(T& phoneticStringParser, const std::string& phoneticString, std::iostream& vtmParamStream);
-
-	Model& model() { return model_; }
 	EventList& eventList() { return eventList_; }
 	Configuration& vtmControlModelConfiguration() { return vtmControlModelConfig_; }
 	const ConfigurationData& vtmConfigurationData() const { return *vtmConfigData_; }
@@ -86,65 +80,11 @@ private:
 
 	Model& model_;
 	EventList eventList_;
+	PhoneticStringParser phoneticStringParser_;
 	Configuration vtmControlModelConfig_;
 	std::unique_ptr<ConfigurationData> vtmConfigData_;
+	std::unique_ptr<VTM::VocalTractModel> vtm_;
 };
-
-
-
-template<typename T>
-void
-Controller::synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, const char* outputFile)
-{
-	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
-	if (!vtmParamStream) {
-		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
-	}
-
-	fillParameterStream(phoneticStringParser, phoneticString, vtmParamStream);
-
-	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
-	vtm->synthesizeToFile(vtmParamStream, outputFile);
-}
-
-template<typename T>
-void
-Controller::synthesizePhoneticString(T& phoneticStringParser, const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer)
-{
-	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
-	if (!vtmParamStream) {
-		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
-	}
-
-	fillParameterStream(phoneticStringParser, phoneticString, vtmParamStream);
-
-	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
-	vtm->synthesizeToBuffer(vtmParamStream, buffer);
-}
-
-template<typename T>
-void
-Controller::fillParameterStream(T& phoneticStringParser, const std::string& phoneticString, std::iostream& vtmParamStream)
-{
-	initUtterance();
-
-	std::size_t index = 0, size = 0;
-	while (index < phoneticString.size()) {
-		if (nextChunk(phoneticString, index, size)) {
-			eventList_.setUp();
-
-			phoneticStringParser.parse(&phoneticString[index], size);
-
-			eventList_.generateEventList();
-			eventList_.applyIntonation();
-			eventList_.generateOutput(vtmParamStream);
-		}
-
-		index += size;
-	}
-
-	vtmParamStream.seekg(0);
-}
 
 } /* namespace VTMControlModel */
 } /* namespace GS */

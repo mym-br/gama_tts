@@ -27,16 +27,19 @@
 #include <string>
 #include <vector>
 
-#include "Controller.h"
-
 
 
 namespace GS {
 namespace VTMControlModel {
 
+class Category;
+class EventList;
+class Model;
+class Posture;
+
 class PhoneticStringParser {
 public:
-	PhoneticStringParser(const char* configDirPath, Controller& controller);
+	PhoneticStringParser(const char* configDirPath, const Model& model, EventList& eventList);
 	~PhoneticStringParser();
 
 	void parse(const char* string /* ASCII */, std::size_t size);

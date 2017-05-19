@@ -21,8 +21,12 @@
 #include "Controller.h"
 
 #include <cctype> /* isspace */
-#include <cstring>
+#include <cstdio>
+#include <fstream>
 #include <sstream>
+
+#include "Exception.h"
+#include "Log.h"
 
 #define VTM_CONTROL_MODEL_CONFIG_FILE_NAME "/vtm_control_model.config"
 #define VTM_CONFIG_FILE_NAME "/vtm.config"
@@ -34,65 +38,29 @@ namespace GS {
 namespace VTMControlModel {
 
 Controller::Controller(const char* configDirPath, Model& model)
-		: model_(model)
-		, eventList_(configDirPath, model_)
+		: model_{model}
+		, eventList_{configDirPath, model_}
+		, phoneticStringParser_{configDirPath, model_, eventList_}
 {
 	// Load VTMControlModel::Configuration.
-
 	std::ostringstream vtmControlModelConfigFilePath;
 	vtmControlModelConfigFilePath << configDirPath << VTM_CONTROL_MODEL_CONFIG_FILE_NAME;
 	vtmControlModelConfig_.load(vtmControlModelConfigFilePath.str());
 
 	// Load VTM::Configuration.
-
-	std::ostringstream vtmConfigFilePath;
-	vtmConfigFilePath << configDirPath << VTM_CONFIG_FILE_NAME;
-
 	std::ostringstream voiceFilePath;
 	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << vtmControlModelConfig_.voiceName << ".config";
-
 	vtmConfigData_ = std::make_unique<ConfigurationData>(voiceFilePath.str());
+	std::ostringstream vtmConfigFilePath;
+	vtmConfigFilePath << configDirPath << VTM_CONFIG_FILE_NAME;
 	vtmConfigData_->insert(ConfigurationData(vtmConfigFilePath.str()));
+
+	// Get the vocal tract model instance.
+	vtm_ = VTM::VocalTractModel::getInstance(*vtmConfigData_);
 }
 
 Controller::~Controller()
 {
-}
-
-void
-Controller::synthesizeFromEventList(const char* vtmParamFile, const char* outputFile)
-{
-	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
-	if (!vtmParamStream) {
-		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
-	}
-
-	initUtterance();
-
-	eventList_.generateOutput(vtmParamStream);
-
-	vtmParamStream.seekg(0);
-
-	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
-	vtm->synthesizeToFile(vtmParamStream, outputFile);
-}
-
-void
-Controller::synthesizeFromEventList(const char* vtmParamFile, std::vector<float>& buffer)
-{
-	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
-	if (!vtmParamStream) {
-		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
-	}
-
-	initUtterance();
-
-	eventList_.generateOutput(vtmParamStream);
-
-	vtmParamStream.seekg(0);
-
-	auto vtm = VTM::VocalTractModel::getInstance(*vtmConfigData_);
-	vtm->synthesizeToBuffer(vtmParamStream, buffer);
 }
 
 void
@@ -132,7 +100,7 @@ Controller::initUtterance()
 bool
 Controller::nextChunk(const std::string& phoneticString, std::size_t& index, std::size_t& size)
 {
-	static const std::string token {"/c"};
+	static const std::string token{"/c"};
 
 	const std::size_t startPos = phoneticString.find(token, index);
 	if (startPos == std::string::npos) {
@@ -161,6 +129,93 @@ Controller::nextChunk(const std::string& phoneticString, std::size_t& index, std
 
 	// The chunk contains only spaces or is empty.
 	return false;
+}
+
+void
+Controller::fillParameterStream(const std::string& phoneticString, std::iostream& vtmParamStream)
+{
+	initUtterance();
+
+	std::size_t index = 0, size = 0;
+	while (index < phoneticString.size()) {
+		if (nextChunk(phoneticString, index, size)) {
+			eventList_.setUp();
+
+			phoneticStringParser_.parse(&phoneticString[index], size);
+
+			eventList_.generateEventList();
+			eventList_.applyIntonation();
+			eventList_.generateOutput(vtmParamStream);
+		}
+
+		index += size;
+	}
+
+	vtmParamStream.seekg(0);
+}
+
+void
+Controller::synthesizePhoneticString(const std::string& phoneticString, const char* vtmParamFile, const char* outputFile)
+{
+	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+	if (!vtmParamStream) {
+		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
+	}
+
+	fillParameterStream(phoneticString, vtmParamStream);
+
+	vtm_->synthesizeToFile(vtmParamStream, outputFile);
+}
+
+void
+Controller::synthesizePhoneticString(const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer)
+{
+	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+	if (!vtmParamStream) {
+		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
+	}
+
+	fillParameterStream(phoneticString, vtmParamStream);
+
+	vtm_->synthesizeToBuffer(vtmParamStream, buffer);
+}
+
+void
+Controller::synthesizeFromEventList(const char* vtmParamFile, const char* outputFile)
+{
+	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+	if (!vtmParamStream) {
+		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
+	}
+
+	initUtterance();
+
+	eventList_.clearMacroIntonation();
+	eventList_.prepareMacroIntonationInterpolation();
+	eventList_.generateOutput(vtmParamStream);
+
+	vtmParamStream.seekg(0);
+
+	vtm_->synthesizeToFile(vtmParamStream, outputFile);
+}
+
+void
+Controller::synthesizeFromEventList(const char* vtmParamFile, std::vector<float>& buffer)
+{
+	std::fstream vtmParamStream(vtmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+	if (!vtmParamStream) {
+		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
+	}
+
+	initUtterance();
+
+	eventList_.clearMacroIntonation();
+	eventList_.prepareMacroIntonationInterpolation();
+	eventList_.generateOutput(vtmParamStream);
+
+	vtmParamStream.seekg(0);
+
+	vtm_->synthesizeToBuffer(vtmParamStream, buffer);
 }
 
 } /* namespace VTMControlModel */

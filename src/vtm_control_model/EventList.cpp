@@ -39,15 +39,15 @@ namespace GS {
 namespace VTMControlModel {
 
 EventList::EventList(const char* configDirPath, Model& model)
-		: model_ {model}
-		, macroIntonation_ {}
-		, microIntonation_ {}
-		, intonationDrift_ {}
-		, smoothIntonation_ {true}
-		, globalTempo_ {1.0}
+		: model_{model}
+		, macroIntonation_{}
+		, microIntonation_{}
+		, intonationDrift_{}
+		, smoothIntonation_{true}
+		, globalTempo_{1.0}
 		, tgParameters_(5)
-		, useFixedIntonationParameters_ {false}
-		, randSrc_ {randDev_()}
+		, useFixedIntonationParameters_{false}
+		, randSrc_{randDev_()}
 {
 	setUp();
 
@@ -93,6 +93,8 @@ EventList::setUp()
 	ruleData_.clear();
 	ruleData_.push_back(RuleData());
 	currentRule_ = 0;
+
+	intonationPoints_.clear();
 }
 
 void
@@ -708,8 +710,6 @@ EventList::applyIntonation()
 	zeroRef_ = 0;
 	zeroIndex_ = 0;
 	duration_ = list_.back()->time + 100;
-
-	intonationPoints_.clear();
 
 	std::shared_ptr<const Category> vocoidCategory = model_.findCategory("vocoid");
 	if (!vocoidCategory) {

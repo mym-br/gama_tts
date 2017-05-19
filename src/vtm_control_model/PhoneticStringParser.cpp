@@ -22,10 +22,15 @@
 #include "PhoneticStringParser.h"
 
 #include <cctype> /* isalpha, isdigit, isspace */
+#include <fstream>
 #include <sstream>
 
+#include "Category.h"
+#include "EventList.h"
 #include "Exception.h"
 #include "Log.h"
+#include "Model.h"
+#include "Posture.h"
 
 
 
@@ -55,9 +60,9 @@ throwException(const std::string& filePath, int lineNumber, const char* message,
 namespace GS {
 namespace VTMControlModel {
 
-PhoneticStringParser::PhoneticStringParser(const char* configDirPath, Controller& controller)
-		: model_(controller.model())
-		, eventList_(controller.eventList())
+PhoneticStringParser::PhoneticStringParser(const char* configDirPath, const Model& model, EventList& eventList)
+		: model_{model}
+		, eventList_{eventList}
 {
 	std::ostringstream rewriteFilePath;
 	rewriteFilePath << configDirPath << CONFIG_DIR REWRITE_CONFIG_FILE_NAME;
