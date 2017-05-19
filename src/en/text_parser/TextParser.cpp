@@ -1391,19 +1391,19 @@ TextParser::TextParser(const char* configDirPath,
 	std::string suffixFilePath = suffixFilePathStream.str();
 
 	if (dictionary1Path != "none") {
-		dict1_ = std::make_unique<DictionarySearch>();
+		dict1_ = std::make_unique<VTMControlModel::DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << configDirPath << TEXT_PARSER_DIR << dictionary1Path;
 		dict1_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 	if (dictionary2Path != "none") {
-		dict2_ = std::make_unique<DictionarySearch>();
+		dict2_ = std::make_unique<VTMControlModel::DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << configDirPath << TEXT_PARSER_DIR << dictionary2Path;
 		dict2_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 	if (dictionary3Path != "none") {
-		dict3_ = std::make_unique<DictionarySearch>();
+		dict3_ = std::make_unique<VTMControlModel::DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << configDirPath << TEXT_PARSER_DIR << dictionary3Path;
 		dict3_->load(filePath.str().c_str(), suffixFilePath.c_str());

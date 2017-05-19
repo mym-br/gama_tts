@@ -18,8 +18,8 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_DICTIONARY_SEARCH_H_
-#define EN_DICTIONARY_SEARCH_H_
+#ifndef VTM_CONTROL_MODEL_DICTIONARY_SEARCH_H_
+#define VTM_CONTROL_MODEL_DICTIONARY_SEARCH_H_
 
 #include <array>
 #include <string>
@@ -30,7 +30,7 @@
 
 
 namespace GS {
-namespace En {
+namespace VTMControlModel {
 
 class DictionarySearch {
 public:
@@ -67,7 +67,7 @@ private:
 	std::vector<SuffixInfo> suffixInfoList_;
 };
 
-} /* namespace En */
+} /* namespace VTMControlModel */
 } /* namespace GS */
 
-#endif /* EN_DICTIONARY_SEARCH_H_ */
+#endif /* VTM_CONTROL_MODEL_DICTIONARY_SEARCH_H_ */

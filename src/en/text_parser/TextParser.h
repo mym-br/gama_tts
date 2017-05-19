@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "en/dictionary/DictionarySearch.h"
+#include "DictionarySearch.h"
 #include "en/text_parser/NumberParser.h"
 #include "StringMap.h"
 
@@ -71,9 +71,9 @@ private:
 	void stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength);
 	const char* isSpecialAcronym(const char* word);
 
-	std::unique_ptr<DictionarySearch> dict1_;
-	std::unique_ptr<DictionarySearch> dict2_;
-	std::unique_ptr<DictionarySearch> dict3_;
+	std::unique_ptr<VTMControlModel::DictionarySearch> dict1_;
+	std::unique_ptr<VTMControlModel::DictionarySearch> dict2_;
+	std::unique_ptr<VTMControlModel::DictionarySearch> dict3_;
 	short dictionaryOrder_[DICTIONARY_ORDER_SIZE];
 	std::vector<char> pronunciation_;
 	NumberParser numberParser_;

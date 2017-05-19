@@ -79,9 +79,6 @@ set(LIBRARY_FILES
     src/en/letter_to_sound/word_to_patphone.cpp
     src/en/letter_to_sound/word_to_patphone.h
 
-    src/en/dictionary/DictionarySearch.cpp
-    src/en/dictionary/DictionarySearch.h
-
     src/en/number_pronunciations.h
 
     src/en/text_parser/NumberParser.cpp
@@ -114,6 +111,8 @@ set(LIBRARY_FILES
     src/vtm/WavetableGlottalSource.h
 
     src/vtm_control_model/Category.h
+    src/vtm_control_model/DictionarySearch.cpp
+    src/vtm_control_model/DictionarySearch.h
     src/vtm_control_model/DriftGenerator.cpp
     src/vtm_control_model/DriftGenerator.h
     src/vtm_control_model/Controller.cpp

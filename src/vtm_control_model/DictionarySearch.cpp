@@ -20,9 +20,8 @@
 
 #include "DictionarySearch.h"
 
-#include <cctype> /* isspace */
 #include <cstddef> /* std::size_t */
-#include <cstring>
+#include <cstring> /* strcat, strcmp, stdlen, strcpy */
 #include <fstream>
 
 #include "Exception.h"
@@ -51,8 +50,8 @@ wordHasSuffix(const char* word, const char* suffix)
 	const char* suffix_position;
 
 	/*  GET LENGTH OF WORD AND SUFFIX  */
-	word_length = strlen(word);
-	suffix_length = strlen(suffix);
+	word_length = std::strlen(word);
+	suffix_length = std::strlen(suffix);
 
 	/*  DON'T ALLOW SUFFIX TO BE LONGER THAN THE WORD, OR THE WHOLE WORD  */
 	if (suffix_length >= word_length) {
@@ -63,7 +62,7 @@ wordHasSuffix(const char* word, const char* suffix)
 	suffix_position = word + word_length - suffix_length;
 
 	/*  RETURN SUFFIX POSITION IF THE SUFFIX MATCHES, ELSE RETURN NULL  */
-	if (!strcmp(suffix_position, suffix)) {
+	if (!std::strcmp(suffix_position, suffix)) {
 		return suffix_position;
 	} else {
 		return nullptr;
@@ -75,7 +74,7 @@ wordHasSuffix(const char* word, const char* suffix)
 //==============================================================================
 
 namespace GS {
-namespace En {
+namespace VTMControlModel {
 
 void
 DictionarySearch::clearBuffers()
@@ -179,28 +178,28 @@ DictionarySearch::augmentedSearch(const char* orthography)
 	for (const SuffixInfo& suffixInfo : suffixInfoList_) {
 		if ( (pt = wordHasSuffix(orthography, suffixInfo.suffix.c_str())) ) {
 			/*  TACK ON REPLACEMENT ENDING  */
-			strcpy(&buffer_[0], orthography);
+			std::strcpy(&buffer_[0], orthography);
 			*(&buffer_[0] + (pt - orthography)) = '\0';
-			strcat(&buffer_[0], suffixInfo.replacement.c_str());
+			std::strcat(&buffer_[0], suffixInfo.replacement.c_str());
 
 			/*  IF WORD FOUND WITH REPLACEMENT ENDING  */
 			if ( (word = dict_.getEntry(&buffer_[0])) ) {
 				/*  PUT THE FOUND PRONUNCIATION IN THE BUFFER  */
-				strcpy(&buffer_[0], word);
+				std::strcpy(&buffer_[0], word);
 
 				/*  FIND THE WORD-TYPE INFO  */
 				for (word_type_pos = &buffer_[0]; *word_type_pos && (*word_type_pos != '%'); word_type_pos++)
 					;
 
 				/*  SAVE IT INTO WORD TYPE BUFFER  */
-				strcpy(&wordTypeBuffer_[0], word_type_pos);
+				std::strcpy(&wordTypeBuffer_[0], word_type_pos);
 
 				/*  APPEND SUFFIX PRONUNCIATION TO WORD  */
 				*word_type_pos = '\0';
-				strcat(&buffer_[0], suffixInfo.pronunciation.c_str());
+				std::strcat(&buffer_[0], suffixInfo.pronunciation.c_str());
 
 				/*  AND PUT BACK THE WORD TYPE  */
-				strcat(&buffer_[0], &wordTypeBuffer_[0]);
+				std::strcat(&buffer_[0], &wordTypeBuffer_[0]);
 
 				/*  RETURN WORD WITH SUFFIX AND ORIGINAL WORD TYPE  */
 				return &buffer_[0];
@@ -212,5 +211,5 @@ DictionarySearch::augmentedSearch(const char* orthography)
 	return nullptr;
 }
 
-} /* namespace En */
+} /* namespace VTMControlModel */
 } /* namespace GS */
