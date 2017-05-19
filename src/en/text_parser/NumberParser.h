@@ -22,6 +22,7 @@
 #define EN_NUMBER_PARSER_H_
 
 #include <array>
+#include <string>
 
 
 
@@ -78,7 +79,6 @@ public:
 		NEGATIVE_MAX          = 3,    /*  MAX # OF NEGATIVE SIGNS (-)     */
 		COMMAS_MAX            = 33,   /*  MAX # OF COMMAS                 */
 		INTEGER_DIGITS_MAX    = 100,  /*  MAX # OF INTEGER DIGITS         */
-		OUTPUT_MAX            = 8192  /*  OUTPUT BUFFER SIZE IN CHARS     */
 	};
 	enum {
 		FRACTIONAL_DIGITS_MAX = 100   /*  MAX # OF FRACTIONAL DIGITS      */
@@ -87,19 +87,22 @@ public:
 	NumberParser();
 	~NumberParser();
 
-	const char* parseNumber(const char* word, Mode mode);
+	const char* parse(const char* word, Mode mode);
 	const char* degenerateString(const char* word);
 private:
 	NumberParser(const NumberParser&) = delete;
 	NumberParser& operator=(const NumberParser&) = delete;
 
+	void processDigit(char digit, int ordinal, int ordinal_plural, int special_flag);
+	int processTriad(const char* triad, int pause, int ordinal, int right_zero_pad, int ordinal_plural, int special_flag);
 	int errorCheck(Mode mode);
 	void initialParse();
-	char* processWord(Mode mode);
+	const char* processWord(Mode mode);
+	void appendToOutput(const char* s);
 
 	/*  INPUT AND OUTPUT VARIABLES  */
 	const char* word_;
-	std::array<char, OUTPUT_MAX> output_;        /*  STORAGE FOR OUTPUT  */
+	std::string output_;        /*  STORAGE FOR OUTPUT  */
 
 	/*  PARSING STATISTIC VARIABLES  */
 	int wordLength_;
@@ -140,7 +143,6 @@ private:
 	std::array<int, FRACTIONAL_DIGITS_MAX> fractionalDigitsPos_;
 	std::array<int, 2> ordinalPos_;
 	std::array<int, CLOCK_MAX> clockPos_;
-	int slashPos_;
 	int leftParenPos_;
 	int rightParenPos_;
 	int blankPos_;

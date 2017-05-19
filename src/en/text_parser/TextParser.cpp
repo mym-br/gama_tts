@@ -1518,7 +1518,7 @@ TextParser::lookupWord(const char* word)
 			break;
 		case TTS_NUMBER_PARSER:
 			{
-				const char* pron = numberParser_.parseNumber(word, NumberParser::NORMAL);
+				const char* pron = numberParser_.parse(word, NumberParser::NORMAL);
 				if (pron != nullptr) {
 					return pron;
 				}

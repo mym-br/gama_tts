@@ -132,13 +132,12 @@
 *
 *	Library functions:	<string.h>	strlen
 *                                               strcmp
-*                                               strcat
 *                               <stdlib.h>      atoi
 *
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include "en/text_parser/NumberParser.h"
 #include "en/number_pronunciations.h"
@@ -167,242 +166,23 @@
 
 namespace {
 
-void process_digit(char digit, char* output, int ordinal, int ordinal_plural, int special_flag);
-int process_triad(char* triad, char* output, int pause, int ordinal, int right_zero_pad, int ordinal_plural, int special_flag);
-
-
-
 /*  VARIABLES PERTAINING TO TRIADS AND TRIAD NAMES  */
 const char* triad_name[3][TRIADS_MAX] = {
-  {NULL_STRING, THOUSAND, MILLION, BILLION, TRILLION, QUADRILLION, QUINTILLION,
-   SEXTILLION, SEPTILLION, OCTILLION, NONILLION, DECILLION, UNDECILLION,
-   DUODECILLION, TREDECILLION, QUATTUORDECILLION, QUINDECILLION, SEXDECILLION,
-   SEPTENDECILLION, OCTODECILLION, NOVEMDECILLION, VIGINTILLION},
-  {NULL_STRING, THOUSANDTH, MILLIONTH, BILLIONTH, TRILLIONTH, QUADRILLIONTH,
-   QUINTILLIONTH, SEXTILLIONTH, SEPTILLIONTH, OCTILLIONTH, NONILLIONTH,
-   DECILLIONTH, UNDECILLIONTH, DUODECILLIONTH, TREDECILLIONTH,
-   QUATTUORDECILLIONTH, QUINDECILLIONTH, SEXDECILLIONTH, SEPTENDECILLIONTH,
-   OCTODECILLIONTH, NOVEMDECILLIONTH, VIGINTILLIONTH},
-  {NULL_STRING, THOUSANDTHS, MILLIONTHS, BILLIONTHS, TRILLIONTHS,
-   QUADRILLIONTHS, QUINTILLIONTHS, SEXTILLIONTHS, SEPTILLIONTHS, OCTILLIONTHS,
-   NONILLIONTHS, DECILLIONTHS, UNDECILLIONTHS, DUODECILLIONTHS,
-   TREDECILLIONTHS, QUATTUORDECILLIONTHS, QUINDECILLIONTHS, SEXDECILLIONTHS,
-   SEPTENDECILLIONTHS, OCTODECILLIONTHS, NOVEMDECILLIONTHS, VIGINTILLIONTHS}
+	{NULL_STRING, THOUSAND, MILLION, BILLION, TRILLION, QUADRILLION, QUINTILLION,
+	 SEXTILLION, SEPTILLION, OCTILLION, NONILLION, DECILLION, UNDECILLION,
+	 DUODECILLION, TREDECILLION, QUATTUORDECILLION, QUINDECILLION, SEXDECILLION,
+	 SEPTENDECILLION, OCTODECILLION, NOVEMDECILLION, VIGINTILLION},
+	{NULL_STRING, THOUSANDTH, MILLIONTH, BILLIONTH, TRILLIONTH, QUADRILLIONTH,
+	 QUINTILLIONTH, SEXTILLIONTH, SEPTILLIONTH, OCTILLIONTH, NONILLIONTH,
+	 DECILLIONTH, UNDECILLIONTH, DUODECILLIONTH, TREDECILLIONTH,
+	 QUATTUORDECILLIONTH, QUINDECILLIONTH, SEXDECILLIONTH, SEPTENDECILLIONTH,
+	 OCTODECILLIONTH, NOVEMDECILLIONTH, VIGINTILLIONTH},
+	{NULL_STRING, THOUSANDTHS, MILLIONTHS, BILLIONTHS, TRILLIONTHS,
+	 QUADRILLIONTHS, QUINTILLIONTHS, SEXTILLIONTHS, SEPTILLIONTHS, OCTILLIONTHS,
+	 NONILLIONTHS, DECILLIONTHS, UNDECILLIONTHS, DUODECILLIONTHS,
+	 TREDECILLIONTHS, QUATTUORDECILLIONTHS, QUINDECILLIONTHS, SEXDECILLIONTHS,
+	 SEPTENDECILLIONTHS, OCTODECILLIONTHS, NOVEMDECILLIONTHS, VIGINTILLIONTHS}
 };
-
-
-
-/******************************************************************************
-*
-*	function:	process_triad
-*
-*	purpose:	Appends to output the appropriate pronunciation for the
-*                       input triad (i.e. hundreds, tens, and ones).  If the
-*                       pause flag is set, then a pause is inserted before the
-*                       triad proper.  If the ordinal flag is set, ordinal
-*                       pronunciations are used.  If the ordinal_plural flag is
-*                       set, then plural ordinal pronunciations are used.  The
-*                       special flag is not used in this function, but is
-*                       passed on to the process_digit() function.  The
-*                       right_zero_pad is the pad for the whole word being
-*                       parsed, NOT the pad for the input triad.
-*
-******************************************************************************/
-int
-process_triad(char* triad, char* output, int pause, int ordinal, int right_zero_pad,
-		int ordinal_plural, int special_flag)
-{
-	/*  IF TRIAD IS 000, RETURN ZERO  */
-	if ((*(triad) == '0') && (*(triad + 1) == '0') && (*(triad + 2) == '0')) {
-		return 0;
-	}
-
-	/*  APPEND PAUSE IF FLAG SET  */
-	if (pause) {
-		strcat(output, PAUSE);
-	}
-
-	/*  PROCESS HUNDREDS  */
-	if (*triad >= '1') {
-		process_digit(*(triad), output, NO, NO, NO);
-		if (ordinal_plural && (right_zero_pad == 2)) {
-			strcat(output, HUNDREDTHS);
-		} else if (ordinal && (right_zero_pad == 2)) {
-			strcat(output, HUNDREDTH);
-		} else {
-			strcat(output, HUNDRED);
-		}
-		if ((*(triad + 1) != '0') || (*(triad + 2) != '0')) {
-			strcat(output, AND);
-		}
-	}
-
-	/*  PROCESS TENS  */
-	if (*(triad + 1) == '1') {
-		if (ordinal_plural && (right_zero_pad == 1) && (*(triad + 2) == '0')) {
-			strcat(output, TENTHS);
-		} else if (ordinal && (right_zero_pad == 1) && (*(triad + 2) == '0')) {
-			strcat(output, TENTH);
-		} else if (ordinal_plural && (right_zero_pad == 0)) {
-			switch (*(triad + 2)) {
-			case '1': strcat(output, ELEVENTHS);    break;
-			case '2': strcat(output, TWELFTHS);     break;
-			case '3': strcat(output, THIRTEENTHS);  break;
-			case '4': strcat(output, FOURTEENTHS);  break;
-			case '5': strcat(output, FIFTEENTHS);   break;
-			case '6': strcat(output, SIXTEENTHS);   break;
-			case '7': strcat(output, SEVENTEENTHS); break;
-			case '8': strcat(output, EIGHTEENTHS);  break;
-			case '9': strcat(output, NINETEENTHS);  break;
-			}
-		} else if (ordinal && (right_zero_pad == 0)) {
-			switch (*(triad + 2)) {
-			case '1': strcat(output, ELEVENTH);     break;
-			case '2': strcat(output, TWELFTH);      break;
-			case '3': strcat(output, THIRTEENTH);   break;
-			case '4': strcat(output, FOURTEENTH);   break;
-			case '5': strcat(output, FIFTEENTH);    break;
-			case '6': strcat(output, SIXTEENTH);    break;
-			case '7': strcat(output, SEVENTEENTH);  break;
-			case '8': strcat(output, EIGHTEENTH);   break;
-			case '9': strcat(output, NINETEENTH);   break;
-			}
-		} else {
-			switch (*(triad + 2)) {
-			case '0': strcat(output, TEN);          break;
-			case '1': strcat(output, ELEVEN);       break;
-			case '2': strcat(output, TWELVE);       break;
-			case '3': strcat(output, THIRTEEN);     break;
-			case '4': strcat(output, FOURTEEN);     break;
-			case '5': strcat(output, FIFTEEN);      break;
-			case '6': strcat(output, SIXTEEN);      break;
-			case '7': strcat(output, SEVENTEEN);    break;
-			case '8': strcat(output, EIGHTEEN);     break;
-			case '9': strcat(output, NINETEEN);     break;
-			}
-		}
-	} else if (*(triad + 1) >= '2') {
-		if (ordinal_plural && (right_zero_pad == 1)) {
-			switch (*(triad + 1)) {
-			case '2': strcat(output, TWENTIETHS);   break;
-			case '3': strcat(output, THIRTIETHS);   break;
-			case '4': strcat(output, FORTIETHS);    break;
-			case '5': strcat(output, FIFTIETHS);    break;
-			case '6': strcat(output, SIXTIETHS);    break;
-			case '7': strcat(output, SEVENTIETHS);  break;
-			case '8': strcat(output, EIGHTIETHS);   break;
-			case '9': strcat(output, NINETIETHS);   break;
-			}
-		} else if (ordinal && (right_zero_pad == 1)) {
-			switch (*(triad + 1)) {
-			case '2': strcat(output, TWENTIETH);    break;
-			case '3': strcat(output, THIRTIETH);    break;
-			case '4': strcat(output, FORTIETH);     break;
-			case '5': strcat(output, FIFTIETH);     break;
-			case '6': strcat(output, SIXTIETH);     break;
-			case '7': strcat(output, SEVENTIETH);   break;
-			case '8': strcat(output, EIGHTIETH);    break;
-			case '9': strcat(output, NINETIETH);    break;
-			}
-		} else {
-			switch (*(triad + 1)) {
-			case '2': strcat(output, TWENTY);       break;
-			case '3': strcat(output, THIRTY);       break;
-			case '4': strcat(output, FORTY);        break;
-			case '5': strcat(output, FIFTY);        break;
-			case '6': strcat(output, SIXTY);        break;
-			case '7': strcat(output, SEVENTY);      break;
-			case '8': strcat(output, EIGHTY);       break;
-			case '9': strcat(output, NINETY);       break;
-			}
-		}
-	}
-	/*  PROCESS ONES  */
-	if (*(triad + 1) != '1' && *(triad + 2) >= '1') {
-		process_digit(*(triad + 2), output, (ordinal && (right_zero_pad == 0)),
-				(ordinal_plural && (right_zero_pad == 0)), special_flag);
-	}
-
-	/*  RETURN WITH NONZERO VALUE  */
-	return NONZERO;
-}
-
-/******************************************************************************
-*
-*	function:	process_digit
-*
-*	purpose:	Appends to output the pronunciation for the input
-*                       digit.  If the special_flag is set, the appropriate
-*                       special pronunciation is used.  If the ordinal_plural
-*                       flag is set, the plural ordinal pronunciations are
-*                       used.  If the ordinal flag is set, ordinal 
-*                       pronunciations are used.  Otherwise standard digit
-*                       pronunciations are used.
-*
-******************************************************************************/
-void
-process_digit(char digit, char* output, int ordinal, int ordinal_plural, int special_flag)
-{
-	/*  DO SPECIAL PROCESSING IF FLAG SET  */
-	if (special_flag == HALF_FLAG) {
-		if (ordinal_plural) {
-			strcat(output, HALVES);
-		} else {
-			strcat(output, HALF);
-		}
-	} else if (special_flag == SECONDTH_FLAG) {
-		if (ordinal_plural) {
-			strcat(output, SECONDTHS);
-		} else {
-			strcat(output, SECONDTH);
-		}
-	} else if (special_flag == QUARTER_FLAG) {
-		if (ordinal_plural) {
-			strcat(output, QUARTERS);
-		} else {
-			strcat(output, QUARTER);
-		}
-	} else if (ordinal_plural) {
-		/*  DO PLURAL ORDINALS  */
-		switch (digit) {
-		case '3': strcat(output, THIRDS);   break;
-		case '4': strcat(output, FOURTHS);  break;
-		case '5': strcat(output, FIFTHS);   break;
-		case '6': strcat(output, SIXTHS);   break;
-		case '7': strcat(output, SEVENTHS); break;
-		case '8': strcat(output, EIGHTHS);  break;
-		case '9': strcat(output, NINTHS);   break;
-		}
-	} else if (ordinal) {
-		/*  DO SINGULAR ORDINALS  */
-		switch (digit) {
-		case '0': strcat(output, ZEROETH); break;
-		case '1': strcat(output, FIRST);   break;
-		case '2': strcat(output, SECOND);  break;
-		case '3': strcat(output, THIRD);   break;
-		case '4': strcat(output, FOURTH);  break;
-		case '5': strcat(output, FIFTH);   break;
-		case '6': strcat(output, SIXTH);   break;
-		case '7': strcat(output, SEVENTH); break;
-		case '8': strcat(output, EIGHTH);  break;
-		case '9': strcat(output, NINTH);   break;
-		}
-	} else {
-		/*  DO ORDINARY DIGITS  */
-		switch (digit) {
-		case '0': strcat(output, ZERO);  break;
-		case '1': strcat(output, ONE);   break;
-		case '2': strcat(output, TWO);   break;
-		case '3': strcat(output, THREE); break;
-		case '4': strcat(output, FOUR);  break;
-		case '5': strcat(output, FIVE);  break;
-		case '6': strcat(output, SIX);   break;
-		case '7': strcat(output, SEVEN); break;
-		case '8': strcat(output, EIGHT); break;
-		case '9': strcat(output, NINE);  break;
-		}
-	}
-}
 
 } /* namespace */
 
@@ -412,47 +192,45 @@ namespace GS {
 namespace En {
 
 NumberParser::NumberParser()
-		: word_(nullptr)
-		, wordLength_(0)
-		, degenerate_(0)
-		, integerDigits_(0)
-		, fractionalDigits_(0)
-		, commas_(0)
-		, decimal_(0)
-		, dollar_(0)
-		, percent_(0)
-		, negative_(0)
-		, positive_(0)
-		, ordinal_(0)
-		, clock_(0)
-		, slash_(0)
-		, leftParen_(0)
-		, rightParen_(0)
-		, blank_(0)
-		, dollarPlural_(0)
-		, dollarNonzero_(0)
-		, centsPlural_(0)
-		, centsNonzero_(0)
-		, telephone_(0)
-		, leftZeroPad_(0)
-		, rightZeroPad_(0)
-		, ordinalPlural_(0)
-		, fracLeftZeroPad_(0)
-		, fracRightZeroPad_(0)
-		, fracOrdinalTriad_(0)
-		, decimalPos_(0)
-		, dollarPos_(0)
-		, percentPos_(0)
-		, positivePos_(0)
-		, slashPos_(0)
-		, leftParenPos_(0)
-		, rightParenPos_(0)
-		, blankPos_(0)
-		, ordinalTriad_(0)
-		, military_(0)
-		, seconds_(0)
+		: word_{}
+		, wordLength_{}
+		, degenerate_{}
+		, integerDigits_{}
+		, fractionalDigits_{}
+		, commas_{}
+		, decimal_{}
+		, dollar_{}
+		, percent_{}
+		, negative_{}
+		, positive_{}
+		, ordinal_{}
+		, clock_{}
+		, slash_{}
+		, leftParen_{}
+		, rightParen_{}
+		, blank_{}
+		, dollarPlural_{}
+		, dollarNonzero_{}
+		, centsPlural_{}
+		, centsNonzero_{}
+		, telephone_{}
+		, leftZeroPad_{}
+		, rightZeroPad_{}
+		, ordinalPlural_{}
+		, fracLeftZeroPad_{}
+		, fracRightZeroPad_{}
+		, fracOrdinalTriad_{}
+		, decimalPos_{}
+		, dollarPos_{}
+		, percentPos_{}
+		, positivePos_{}
+		, leftParenPos_{}
+		, rightParenPos_{}
+		, blankPos_{}
+		, ordinalTriad_{}
+		, military_{}
+		, seconds_{}
 {
-	output_.fill('\0');
 	commasPos_.fill(0);
 	negativePos_.fill(0);
 	integerDigitsPos_.fill(0);
@@ -472,6 +250,218 @@ NumberParser::~NumberParser()
 
 /******************************************************************************
 *
+*	function:	process_digit
+*
+*	purpose:	Appends to output the pronunciation for the input
+*                       digit.  If the special_flag is set, the appropriate
+*                       special pronunciation is used.  If the ordinal_plural
+*                       flag is set, the plural ordinal pronunciations are
+*                       used.  If the ordinal flag is set, ordinal
+*                       pronunciations are used.  Otherwise standard digit
+*                       pronunciations are used.
+*
+******************************************************************************/
+void
+NumberParser::processDigit(char digit, int ordinal, int ordinal_plural, int special_flag)
+{
+	/*  DO SPECIAL PROCESSING IF FLAG SET  */
+	if (special_flag == HALF_FLAG) {
+		if (ordinal_plural) {
+			appendToOutput(HALVES);
+		} else {
+			appendToOutput(HALF);
+		}
+	} else if (special_flag == SECONDTH_FLAG) {
+		if (ordinal_plural) {
+			appendToOutput(SECONDTHS);
+		} else {
+			appendToOutput(SECONDTH);
+		}
+	} else if (special_flag == QUARTER_FLAG) {
+		if (ordinal_plural) {
+			appendToOutput(QUARTERS);
+		} else {
+			appendToOutput(QUARTER);
+		}
+	} else if (ordinal_plural) {
+		/*  DO PLURAL ORDINALS  */
+		switch (digit) {
+		case '3': appendToOutput(THIRDS);   break;
+		case '4': appendToOutput(FOURTHS);  break;
+		case '5': appendToOutput(FIFTHS);   break;
+		case '6': appendToOutput(SIXTHS);   break;
+		case '7': appendToOutput(SEVENTHS); break;
+		case '8': appendToOutput(EIGHTHS);  break;
+		case '9': appendToOutput(NINTHS);   break;
+		}
+	} else if (ordinal) {
+		/*  DO SINGULAR ORDINALS  */
+		switch (digit) {
+		case '0': appendToOutput(ZEROETH); break;
+		case '1': appendToOutput(FIRST);   break;
+		case '2': appendToOutput(SECOND);  break;
+		case '3': appendToOutput(THIRD);   break;
+		case '4': appendToOutput(FOURTH);  break;
+		case '5': appendToOutput(FIFTH);   break;
+		case '6': appendToOutput(SIXTH);   break;
+		case '7': appendToOutput(SEVENTH); break;
+		case '8': appendToOutput(EIGHTH);  break;
+		case '9': appendToOutput(NINTH);   break;
+		}
+	} else {
+		/*  DO ORDINARY DIGITS  */
+		switch (digit) {
+		case '0': appendToOutput(ZERO);  break;
+		case '1': appendToOutput(ONE);   break;
+		case '2': appendToOutput(TWO);   break;
+		case '3': appendToOutput(THREE); break;
+		case '4': appendToOutput(FOUR);  break;
+		case '5': appendToOutput(FIVE);  break;
+		case '6': appendToOutput(SIX);   break;
+		case '7': appendToOutput(SEVEN); break;
+		case '8': appendToOutput(EIGHT); break;
+		case '9': appendToOutput(NINE);  break;
+		}
+	}
+}
+
+/******************************************************************************
+*
+*	function:	process_triad
+*
+*	purpose:	Appends to output the appropriate pronunciation for the
+*                       input triad (i.e. hundreds, tens, and ones).  If the
+*                       pause flag is set, then a pause is inserted before the
+*                       triad proper.  If the ordinal flag is set, ordinal
+*                       pronunciations are used.  If the ordinal_plural flag is
+*                       set, then plural ordinal pronunciations are used.  The
+*                       special flag is not used in this function, but is
+*                       passed on to the process_digit() function.  The
+*                       right_zero_pad is the pad for the whole word being
+*                       parsed, NOT the pad for the input triad.
+*
+******************************************************************************/
+int
+NumberParser::processTriad(const char* triad, int pause, int ordinal, int right_zero_pad,
+				int ordinal_plural, int special_flag)
+{
+	/*  IF TRIAD IS 000, RETURN ZERO  */
+	if ((triad[0] == '0') && (triad[1] == '0') && (triad[2] == '0')) {
+		return 0;
+	}
+
+	/*  APPEND PAUSE IF FLAG SET  */
+	if (pause) {
+		appendToOutput(PAUSE);
+	}
+
+	/*  PROCESS HUNDREDS  */
+	if (triad[0] >= '1') {
+		processDigit(triad[0], NO, NO, NO);
+		if (ordinal_plural && (right_zero_pad == 2)) {
+			appendToOutput(HUNDREDTHS);
+		} else if (ordinal && (right_zero_pad == 2)) {
+			appendToOutput(HUNDREDTH);
+		} else {
+			appendToOutput(HUNDRED);
+		}
+		if ((triad[1] != '0') || (triad[2] != '0')) {
+			appendToOutput(AND);
+		}
+	}
+
+	/*  PROCESS TENS  */
+	if (triad[1] == '1') {
+		if (ordinal_plural && (right_zero_pad == 1) && (triad[2] == '0')) {
+			appendToOutput(TENTHS);
+		} else if (ordinal && (right_zero_pad == 1) && (triad[2] == '0')) {
+			appendToOutput(TENTH);
+		} else if (ordinal_plural && (right_zero_pad == 0)) {
+			switch (triad[2]) {
+			case '1': appendToOutput(ELEVENTHS);    break;
+			case '2': appendToOutput(TWELFTHS);     break;
+			case '3': appendToOutput(THIRTEENTHS);  break;
+			case '4': appendToOutput(FOURTEENTHS);  break;
+			case '5': appendToOutput(FIFTEENTHS);   break;
+			case '6': appendToOutput(SIXTEENTHS);   break;
+			case '7': appendToOutput(SEVENTEENTHS); break;
+			case '8': appendToOutput(EIGHTEENTHS);  break;
+			case '9': appendToOutput(NINETEENTHS);  break;
+			}
+		} else if (ordinal && (right_zero_pad == 0)) {
+			switch (triad[2]) {
+			case '1': appendToOutput(ELEVENTH);     break;
+			case '2': appendToOutput(TWELFTH);      break;
+			case '3': appendToOutput(THIRTEENTH);   break;
+			case '4': appendToOutput(FOURTEENTH);   break;
+			case '5': appendToOutput(FIFTEENTH);    break;
+			case '6': appendToOutput(SIXTEENTH);    break;
+			case '7': appendToOutput(SEVENTEENTH);  break;
+			case '8': appendToOutput(EIGHTEENTH);   break;
+			case '9': appendToOutput(NINETEENTH);   break;
+			}
+		} else {
+			switch (triad[2]) {
+			case '0': appendToOutput(TEN);          break;
+			case '1': appendToOutput(ELEVEN);       break;
+			case '2': appendToOutput(TWELVE);       break;
+			case '3': appendToOutput(THIRTEEN);     break;
+			case '4': appendToOutput(FOURTEEN);     break;
+			case '5': appendToOutput(FIFTEEN);      break;
+			case '6': appendToOutput(SIXTEEN);      break;
+			case '7': appendToOutput(SEVENTEEN);    break;
+			case '8': appendToOutput(EIGHTEEN);     break;
+			case '9': appendToOutput(NINETEEN);     break;
+			}
+		}
+	} else if (triad[1] >= '2') {
+		if (ordinal_plural && (right_zero_pad == 1)) {
+			switch (triad[1]) {
+			case '2': appendToOutput(TWENTIETHS);   break;
+			case '3': appendToOutput(THIRTIETHS);   break;
+			case '4': appendToOutput(FORTIETHS);    break;
+			case '5': appendToOutput(FIFTIETHS);    break;
+			case '6': appendToOutput(SIXTIETHS);    break;
+			case '7': appendToOutput(SEVENTIETHS);  break;
+			case '8': appendToOutput(EIGHTIETHS);   break;
+			case '9': appendToOutput(NINETIETHS);   break;
+			}
+		} else if (ordinal && (right_zero_pad == 1)) {
+			switch (triad[1]) {
+			case '2': appendToOutput(TWENTIETH);    break;
+			case '3': appendToOutput(THIRTIETH);    break;
+			case '4': appendToOutput(FORTIETH);     break;
+			case '5': appendToOutput(FIFTIETH);     break;
+			case '6': appendToOutput(SIXTIETH);     break;
+			case '7': appendToOutput(SEVENTIETH);   break;
+			case '8': appendToOutput(EIGHTIETH);    break;
+			case '9': appendToOutput(NINETIETH);    break;
+			}
+		} else {
+			switch (triad[1]) {
+			case '2': appendToOutput(TWENTY);       break;
+			case '3': appendToOutput(THIRTY);       break;
+			case '4': appendToOutput(FORTY);        break;
+			case '5': appendToOutput(FIFTY);        break;
+			case '6': appendToOutput(SIXTY);        break;
+			case '7': appendToOutput(SEVENTY);      break;
+			case '8': appendToOutput(EIGHTY);       break;
+			case '9': appendToOutput(NINETY);       break;
+			}
+		}
+	}
+	/*  PROCESS ONES  */
+	if (triad[1] != '1' && triad[2] >= '1') {
+		processDigit(triad[2], (ordinal && (right_zero_pad == 0)),
+				(ordinal_plural && (right_zero_pad == 0)), special_flag);
+	}
+
+	/*  RETURN WITH NONZERO VALUE  */
+	return NONZERO;
+}
+
+/******************************************************************************
+*
 *	function:	initial_parse
 *
 *	purpose:	Finds positions of numbers, commas, and other symbols
@@ -482,18 +472,17 @@ void
 NumberParser::initialParse()
 {
 	/*  PUT NULL BYTE INTO output;  FIND LENGTH OF INPUT WORD  */
-	output_[0] = '\0';
-	wordLength_ = strlen(word_);
+	wordLength_ = std::strlen(word_);
 
 	/*  INITIALIZE PARSING VARIABLES  */
 	degenerate_ = integerDigits_ = fractionalDigits_ = commas_ = decimal_ = 0;
 	dollar_ = percent_ = negative_ = positive_ = ordinal_ = clock_ = slash_ = 0;
-	telephone_ = leftParen_ = rightParen_ = blank_ = 0;
+	leftParen_ = rightParen_ = blank_ = telephone_ = 0;
 	ordinalPlural_ = YES;
 
 	/*  FIND THE POSITION OF THE FOLLOWING CHARACTERS  */
 	for (int i = 0; i < wordLength_; i++) {
-		switch (*(word_ + i)) {
+		switch (word_[i]) {
 		case ',':
 			if (++commas_ > COMMAS_MAX) {
 				degenerate_++;
@@ -533,7 +522,6 @@ NumberParser::initialParse()
 			break;
 		case '/':
 			slash_++;
-			slashPos_ = i;
 			break;
 		case '(':
 			leftParen_++;
@@ -586,7 +574,7 @@ NumberParser::initialParse()
 			if (++ordinal_ > 2) {
 				degenerate_++;
 			} else {
-				char c = *(word_ + i);
+				char c = word_[i];
 				ordinalPos_[ordinal_ - 1] = i;
 				/*  CONVERT TO UPPER CASE IF NECESSARY  */
 				ordinalBuffer_[ordinal_ - 1] = ((c >= 'a') && (c <= 'z')) ? c + ('A' - 'a') : c;
@@ -602,7 +590,7 @@ NumberParser::initialParse()
 	/*  FIND LEFT ZERO PAD FOR INTEGER PART OF WORD  */
 	leftZeroPad_ = 0;
 	for (int i = 0; i < integerDigits_; i++) {
-		if (*(word_ + integerDigitsPos_[i]) == '0') {
+		if (word_[integerDigitsPos_[i]] == '0') {
 			leftZeroPad_++;
 		} else {
 			break;
@@ -611,19 +599,19 @@ NumberParser::initialParse()
 	/*  FIND RIGHT ZERO PAD FOR INTEGER PART OF WORD  */
 	rightZeroPad_ = 0;
 	for (int i = integerDigits_ - 1; i >= 0; i--) {
-		if (*(word_ + integerDigitsPos_[i]) == '0') {
+		if (word_[integerDigitsPos_[i]] == '0') {
 			rightZeroPad_++;
 		} else {
 			break;
 		}
 	}
 	/*  DETERMINE RIGHT MOST TRIAD TO RECEIVE ORDINAL NAME  */
-	ordinalTriad_ = (int) (rightZeroPad_ / 3.0);
+	ordinalTriad_ = static_cast<int>(rightZeroPad_ / 3.0);
 
 	/*  FIND LEFT ZERO PAD FOR FRACTIONS  */
 	fracLeftZeroPad_ = 0;
 	for (int i = 0; i < fractionalDigits_; i++) {
-		if (*(word_ + fractionalDigitsPos_[i]) == '0') {
+		if (word_[fractionalDigitsPos_[i]] == '0') {
 			fracLeftZeroPad_++;
 		} else {
 			break;
@@ -632,14 +620,14 @@ NumberParser::initialParse()
 	/*  FIND RIGHT ZERO PAD FOR FRACTIONS  */
 	fracRightZeroPad_ = 0;
 	for (int i = (fractionalDigits_ - 1); i >= 0; i--) {
-		if (*(word_ + fractionalDigitsPos_[i]) == '0') {
+		if (word_[fractionalDigitsPos_[i]] == '0') {
 			fracRightZeroPad_++;
 		} else {
 			break;
 		}
 	}
 	/*  DETERMINE RIGHT MOST TRIAD TO RECEIVE ORDINAL NAME FOR FRACTIONS  */
-	fracOrdinalTriad_ = (int) (fracRightZeroPad_ / 3.0);
+	fracOrdinalTriad_ = static_cast<int>(fracRightZeroPad_ / 3.0);
 }
 
 /******************************************************************************
@@ -800,10 +788,10 @@ NumberParser::errorCheck(Mode mode)
 		}
 		{
 			int minutes = 0, hours = 0, secs = 0;
-			minutes = atoi(&minute_[0]);
-			hours = atoi(&hour_[0]);
+			minutes = std::atoi(&minute_[0]);
+			hours = std::atoi(&hour_[0]);
 			if (seconds_) {
-				secs = atoi(&second_[0]);
+				secs = std::atoi(&second_[0]);
 			}
 			if (hours > 24 || minutes > 59 || secs > 59) {
 				return DEGENERATE;
@@ -892,19 +880,19 @@ NumberParser::errorCheck(Mode mode)
 			return DEGENERATE;
 		}
 
-		if (!strcmp(&ordinalBuffer_[0], "ST")) {
+		if (std::strcmp(&ordinalBuffer_[0], "ST") == 0) {
 			if ((ones_digit != '1') || (tens_digit == '1')) {
 				return DEGENERATE;
 			}
-		} else if (!strcmp(&ordinalBuffer_[0], "ND")) {
+		} else if (std::strcmp(&ordinalBuffer_[0], "ND") == 0) {
 			if ((ones_digit != '2') || (tens_digit == '1')) {
 				return DEGENERATE;
 			}
-		} else if (!strcmp(&ordinalBuffer_[0], "RD")) {
+		} else if (std::strcmp(&ordinalBuffer_[0], "RD") == 0) {
 			if ((ones_digit != '3') || (tens_digit == '1')) {
 				return DEGENERATE;
 			}
-		} else if (!strcmp(&ordinalBuffer_[0], "TH")) {
+		} else if (std::strcmp(&ordinalBuffer_[0], "TH") == 0) {
 			if (((ones_digit == '1') || (ones_digit == '2') ||
 					(ones_digit == '3')) && (tens_digit != '1')) {
 				return DEGENERATE;
@@ -927,113 +915,115 @@ NumberParser::errorCheck(Mode mode)
 *                       which contains the corresponding pronunciation.
 *
 ******************************************************************************/
-char*
+const char*
 NumberParser::processWord(Mode mode)
 {
+	output_.clear();
+
 	/*  SPECIAL PROCESSING OF WORD;  EACH RETURNS IMMEDIATELY  */
 	/*  PROCESS CLOCK TIMES  */
 	if (clock_) {
 		/*  HOUR  */
 		if (leftZeroPad_) {
-			strcat(&output_[0], OH);
+			appendToOutput(OH);
 		}
-		process_triad(&hour_[0], &output_[0], NO, NO, NO, NO, NO);
+		processTriad(&hour_[0], NO, NO, NO, NO, NO);
 		/*  MINUTE  */
 		if ((minute_[1] == '0') && (minute_[2] == '0')) {
 			if (military_) {
-				strcat(&output_[0], HUNDRED);
+				appendToOutput(HUNDRED);
 			} else if (!seconds_) {
-				strcat(&output_[0], OCLOCK);
+				appendToOutput(OCLOCK);
 			}
 		} else {
 			if ((minute_[1] == '0') && (minute_[2] != '0')) {
-				strcat(&output_[0], OH);
+				appendToOutput(OH);
 			}
-			process_triad(&minute_[0], &output_[0], NO, NO, NO, NO, NO);
+			processTriad(&minute_[0], NO, NO, NO, NO, NO);
 		}
 		/*  SECOND  */
 		if (seconds_) {
-			strcat(&output_[0], AND);
+			appendToOutput(AND);
 			if ((second_[1] == '0') && (second_[2] == '0')) {
-				strcat(&output_[0], ZERO);
+				appendToOutput(ZERO);
 			} else {
-				process_triad(&second_[0], &output_[0], NO, NO, NO, NO, NO);
+				processTriad(&second_[0], NO, NO, NO, NO, NO);
 			}
 
 			if ((second_[1] == '0') && (second_[2] == '1')) {
-				strcat(&output_[0], SECOND);
+				appendToOutput(SECOND);
 			} else {
-				strcat(&output_[0], SECONDS);
+				appendToOutput(SECONDS);
 			}
 		}
-		return &output_[0];
+		return output_.c_str();
 	}
 	/*  PROCESS TELEPHONE NUMBERS  */
 	if (telephone_ == SEVEN_DIGIT_CODE) {
 		for (int i = 0; i < 3; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		strcat(&output_[0], PAUSE);
+		appendToOutput(PAUSE);
 		for (int i = 3; i < 7; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		return &output_[0];
+		return output_.c_str();
 	} else if (telephone_ == TEN_DIGIT_CODE) {
 		for (int i = 0; i < 3; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		strcat(&output_[0], PAUSE);
+		appendToOutput(PAUSE);
 		for (int i = 3; i < 6; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		strcat(&output_[0], PAUSE);
+		appendToOutput(PAUSE);
 		for (int i = 6; i < 10; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		return &output_[0];
+		return output_.c_str();
 	} else if (telephone_ == ELEVEN_DIGIT_CODE) {
-		process_digit(word_[integerDigitsPos_[0]], &output_[0], NO, NO, NO);
+		processDigit(word_[integerDigitsPos_[0]], NO, NO, NO);
 		if ((word_[integerDigitsPos_[1]] != '0') &&
 				(word_[integerDigitsPos_[2]] == '0') &&
 				(word_[integerDigitsPos_[3]] == '0')) {
-			process_digit(word_[integerDigitsPos_[1]], &output_[0], NO, NO, NO);
-			strcat(&output_[0], HUNDRED);
+			processDigit(word_[integerDigitsPos_[1]], NO, NO, NO);
+			appendToOutput(HUNDRED);
 		} else {
-			strcat(&output_[0], PAUSE);
+			appendToOutput(PAUSE);
 			for (int i = 1; i < 4; i++) {
-				process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+				processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 			}
 		}
-		strcat(&output_[0], PAUSE);
+		appendToOutput(PAUSE);
 		for (int i = 4; i < 7; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		strcat(&output_[0], PAUSE);
+		appendToOutput(PAUSE);
 		for (int i = 7; i < 11; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		return &output_[0];
+		return output_.c_str();
 	} else if (telephone_ == AREA_CODE) {
-		strcat(&output_[0], AREA);
-		strcat(&output_[0], CODE);
+		appendToOutput(AREA);
+		appendToOutput(CODE);
 		for (int i = 0; i < 3; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		strcat(&output_[0], PAUSE);
+		appendToOutput(PAUSE);
 		for (int i = 3; i < 6; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		strcat(&output_[0], PAUSE);
+		appendToOutput(PAUSE);
 		for (int i = 6; i < 10; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
-		return &output_[0];
+		return output_.c_str();
 	}
 	/*  PROCESS ZERO DOLLARS AND ZERO CENTS  */
 	if (dollar_ && (!dollarNonzero_) && (!centsNonzero_)) {
-		strcat(&output_[0], ZERO);
-		strcat(&output_[0], DOLLARS);
-		return &output_[0];
+		appendToOutput(ZERO);
+		appendToOutput(DOLLARS);
+		return output_.c_str();
 	}
 	/*  PROCESS FOR YEAR IF INTEGER IN RANGE 1000 TO 1999  */
 	if ((integerDigits_ == 4) && (wordLength_ == 4) &&
@@ -1041,27 +1031,27 @@ NumberParser::processWord(Mode mode)
 		triad_[0] = '0';
 		triad_[1] = word_[integerDigitsPos_[0]];
 		triad_[2] = word_[integerDigitsPos_[1]];
-		process_triad(&triad_[0], &output_[0], NO, NO, NO, NO, NO);
+		processTriad(&triad_[0], NO, NO, NO, NO, NO);
 		if ((word_[integerDigitsPos_[2]] == '0') && (word_[integerDigitsPos_[3]] == '0')) {
-			strcat(&output_[0], HUNDRED);
+			appendToOutput(HUNDRED);
 		} else if (word_[integerDigitsPos_[2]] == '0') {
-			strcat(&output_[0], OH);
-			process_digit(word_[integerDigitsPos_[3]], &output_[0], NO, NO, NO);
+			appendToOutput(OH);
+			processDigit(word_[integerDigitsPos_[3]], NO, NO, NO);
 		} else {
 			triad_[0] = '0';
 			triad_[1] = word_[integerDigitsPos_[2]];
 			triad_[2] = word_[integerDigitsPos_[3]];
-			process_triad(&triad_[0], &output_[0], NO, NO, NO, NO, NO);
+			processTriad(&triad_[0], NO, NO, NO, NO, NO);
 		}
-		return &output_[0];
+		return output_.c_str();
 	}
 
 	/*  ORDINARY SEQUENTIAL PROCESSING  */
 	/*  APPEND POSITIVE OR NEGATIVE IF INDICATED  */
 	if (positive_) {
-		strcat(&output_[0], POSITIVE);
+		appendToOutput(POSITIVE);
 	} else if (negative_) {
-		strcat(&output_[0], NEGATIVE);
+		appendToOutput(NEGATIVE);
 	}
 
 	/*  PROCESS SINGLE INTEGER DIGIT  */
@@ -1069,39 +1059,36 @@ NumberParser::processWord(Mode mode)
 		if ((word_[integerDigitsPos_[0]] == '0') && dollar_) {
 			;
 		} else {
-			process_digit(word_[integerDigitsPos_[0]], &output_[0], ordinal_, NO, NO);
+			processDigit(word_[integerDigitsPos_[0]], ordinal_, NO, NO);
 		}
 		ordinalPlural_ = (word_[integerDigitsPos_[0]] == '1') ? NO : YES;
 	} else if ((integerDigits_ >= 2) && (integerDigits_ <= (TRIADS_MAX * 3))) {
 		/*  PROCESS INTEGERS AS TRIADS, UP TO MAX LENGTH  */
-
-		int digit_index = 0, num_digits, triad_index, index, pause_flag = NO;
 		for (int i = 0; i < 3; i++) {
 			triad_[i] = '0';
 		}
-		index = (int) ((integerDigits_ - 1) / 3.0);
-		num_digits = integerDigits_ - (index * 3);
-		triad_index = 3 - num_digits;
-
+		int digit_index = 0;
+		int index = static_cast<int>((integerDigits_ - 1) / 3.0);
+		int num_digits = integerDigits_ - (index * 3);
+		int triad_index = 3 - num_digits;
+		int pause_flag = NO;
 		for (int i = index; i >= 0; i--) {
 			while (num_digits--) {
 				triad_[triad_index++] = word_[integerDigitsPos_[digit_index++]];
 			}
-
-			if (process_triad(&triad_[0], &output_[0], pause_flag,
-					(ordinal_ && (ordinalTriad_ == i)),
+			if (processTriad(&triad_[0], pause_flag, (ordinal_ && (ordinalTriad_ == i)),
 					rightZeroPad_, NO, NO) == NONZERO) {
 				if (ordinal_ && (ordinalTriad_ == i)) {
-					strcat(&output_[0], triad_name[1][i]);
+					appendToOutput(triad_name[1][i]);
 				} else {
-					strcat(&output_[0], triad_name[0][i]);
+					appendToOutput(triad_name[0][i]);
 				}
 				pause_flag = YES;
 			}
 			if ((i == 1) && (word_[integerDigitsPos_[digit_index]] == '0') &&
 					((word_[integerDigitsPos_[digit_index + 1]] != '0') ||
 					(word_[integerDigitsPos_[digit_index + 2]] != '0'))) {
-				strcat(&output_[0], AND);
+				appendToOutput(AND);
 				pause_flag = NO;
 			}
 			triad_index = 0;
@@ -1109,9 +1096,8 @@ NumberParser::processWord(Mode mode)
 		}
 	} else if ((integerDigits_ > (TRIADS_MAX * 3)) && (!commas_) && (!ordinal_)) {
 		/*  PROCESS EXTREMELY LARGE NUMBERS AS STREAM OF SINGLE DIGITS  */
-
 		for (int i = 0; i < integerDigits_; i++) {
-			process_digit(*(word_ + integerDigitsPos_[i]), &output_[0], NO, NO, NO);
+			processDigit(word_[integerDigitsPos_[i]], NO, NO, NO);
 		}
 	}
 
@@ -1120,12 +1106,12 @@ NumberParser::processWord(Mode mode)
 		if (fractionalDigits_ && (fractionalDigits_ != 2)) {
 			;
 		} else if (dollarPlural_) {
-			strcat(&output_[0], DOLLARS);
+			appendToOutput(DOLLARS);
 		} else if (!dollarPlural_) {
-			strcat(&output_[0], DOLLAR);
+			appendToOutput(DOLLAR);
 		}
 		if (centsNonzero_ && (fractionalDigits_ == 2)) {
-			strcat(&output_[0], AND);
+			appendToOutput(AND);
 		}
 	}
 
@@ -1133,9 +1119,9 @@ NumberParser::processWord(Mode mode)
 		AND IF NOT .00 DOLLAR FORMAT  */
 	if (fractionalDigits_ && (!slash_) &&
 			((!dollar_) || (dollar_ && (fractionalDigits_ != 2)))) {
-		strcat(&output_[0], POINT);
+		appendToOutput(POINT);
 		for (int i = 0; i < fractionalDigits_; i++) {
-			process_digit(word_[fractionalDigitsPos_[i]], &output_[0], NO, NO, NO);
+			processDigit(word_[fractionalDigitsPos_[i]], NO, NO, NO);
 		}
 	} else if (slash_) {
 		/*  PROCESS DENOMINATOR OF FRACTIONS  */
@@ -1144,7 +1130,7 @@ NumberParser::processWord(Mode mode)
 
 		if (((integerDigits_ >= 3) && (fractionalDigits_ >= 3)) ||
 				(word_[integerDigitsPos_[integerDigits_ - 1]] == '0')) {
-			strcat(&output_[0], PAUSE);
+			appendToOutput(PAUSE);
 		}
 
 		ones_digit = word_[fractionalDigitsPos_[fractionalDigits_ - 1]];
@@ -1156,7 +1142,7 @@ NumberParser::processWord(Mode mode)
 		int special_flag = NO;
 		if ((ones_digit == '0' && tens_digit == '\0') ||
 				(ones_digit == '1' && tens_digit != '1')) {
-			strcat(&output_[0], OVER);
+			appendToOutput(OVER);
 			ordinal_ = ordinalPlural_ = NO;
 		} else if (ones_digit == '2') {
 			if (tens_digit == '\0') {
@@ -1169,32 +1155,31 @@ NumberParser::processWord(Mode mode)
 		}
 
 		if (fractionalDigits_ == 1) {
-			process_digit(ones_digit, &output_[0], ordinal_, ordinalPlural_, special_flag);
+			processDigit(ones_digit, ordinal_, ordinalPlural_, special_flag);
 		} else if (fractionalDigits_ >= 2 && (fractionalDigits_ <= (TRIADS_MAX * 3))) {
-			int digit_index = 0, num_digits, triad_index, index, pause_flag = NO;
 			for (int i = 0; i < 3; i++) {
 				triad_[i] = '0';
 			}
-			index = (int) ((fractionalDigits_ - 1) / 3.0);
-			num_digits = fractionalDigits_ - (index * 3);
-			triad_index = 3 - num_digits;
-
+			int digit_index = 0;
+			int index = static_cast<int>((fractionalDigits_ - 1) / 3.0);
+			int num_digits = fractionalDigits_ - (index * 3);
+			int triad_index = 3 - num_digits;
+			int pause_flag = NO;
 			for (int i = index; i >= 0; i--) {
 				while (num_digits--) {
 					triad_[triad_index++] = word_[fractionalDigitsPos_[digit_index++]];
 				}
-
-				if (process_triad(&triad_[0], &output_[0], pause_flag,
+				if (processTriad(&triad_[0], pause_flag,
 						(ordinal_ && (fracOrdinalTriad_ == i)),
 						fracRightZeroPad_,
 						(ordinalPlural_ && (fracOrdinalTriad_ == i)),
 						(special_flag && (fracOrdinalTriad_ == i))) == NONZERO) {
 					if (ordinalPlural_ && (fracOrdinalTriad_ == i)) {
-						strcat(&output_[0], triad_name[2][i]);
+						appendToOutput(triad_name[2][i]);
 					} else if (ordinal_ && (fracOrdinalTriad_ == i)) {
-						strcat(&output_[0], triad_name[1][i]);
+						appendToOutput(triad_name[1][i]);
 					} else {
-						strcat(&output_[0], triad_name[0][i]);
+						appendToOutput(triad_name[0][i]);
 					}
 					pause_flag = YES;
 				}
@@ -1202,7 +1187,7 @@ NumberParser::processWord(Mode mode)
 						(word_[fractionalDigitsPos_[digit_index]] == '0') &&
 						((word_[fractionalDigitsPos_[digit_index + 1]] != '0') ||
 						(word_[fractionalDigitsPos_[digit_index + 2]] != '0'))) {
-					strcat(&output_[0], AND);
+					appendToOutput(AND);
 					pause_flag = NO;
 				}
 				triad_index = 0;
@@ -1215,27 +1200,33 @@ NumberParser::processWord(Mode mode)
 		triad_[0] = '0';
 		triad_[1] = word_[fractionalDigitsPos_[0]];
 		triad_[2] = word_[fractionalDigitsPos_[1]];
-		if (process_triad(&triad_[0], &output_[0], NO, NO, NO, NO, NO) == NONZERO) {
+		if (processTriad(&triad_[0], NO, NO, NO, NO, NO) == NONZERO) {
 			if (centsPlural_) {
-				strcat(&output_[0], CENTS);
+				appendToOutput(CENTS);
 			} else {
-				strcat(&output_[0], CENT);
+				appendToOutput(CENT);
 			}
 		}
 	}
 
 	/*  APPEND DOLLARS IF NOT $.00 FORMAT  */
 	if (dollar_ && fractionalDigits_ && (fractionalDigits_ != 2)) {
-		strcat(&output_[0], DOLLARS);
+		appendToOutput(DOLLARS);
 	}
 
 	/*  APPEND PERCENT IF NECESSARY  */
 	if (percent_) {
-		strcat(&output_[0], PERCENT);
+		appendToOutput(PERCENT);
 	}
 
 	/*  RETURN OUTPUT TO CALLER  */
-	return &output_[0];
+	return output_.c_str();
+}
+
+void
+NumberParser::appendToOutput(const char* s)
+{
+	output_.append(s);
 }
 
 /******************************************************************************
@@ -1248,7 +1239,7 @@ NumberParser::processWord(Mode mode)
 *
 ******************************************************************************/
 const char*
-NumberParser::parseNumber(const char* word, Mode mode)
+NumberParser::parse(const char* word, Mode mode)
 {
 	/*  MAKE POINTER TO WORD TO BE PARSED GLOBAL TO THIS FILE  */
 	word_ = word;
@@ -1286,112 +1277,111 @@ NumberParser::parseNumber(const char* word, Mode mode)
 const char*
 NumberParser::degenerateString(const char* word)
 {
-	/*  APPEND NULL BYTE TO OUTPUT;  DETERMINE WORD LENGTH  */
-	output_[0] = '\0';
-	int wordLength = strlen(word);
+	output_.clear();
+	int wordLength = std::strlen(word);
 
 	/*  APPEND PROPER PRONUNCIATION FOR EACH CHARACTER  */
 	for (int i = 0; i < wordLength; i++) {
-		switch (*(word + i)) {
-		case ' ': strcat(&output_[0], BLANK);               break;
-		case '!': strcat(&output_[0], EXCLAMATION_POINT);   break;
-		case '"': strcat(&output_[0], DOUBLE_QUOTE);        break;
-		case '#': strcat(&output_[0], NUMBER_SIGN);         break;
-		case '$': strcat(&output_[0], DOLLAR_SIGN);         break;
-		case '%': strcat(&output_[0], PERCENT_SIGN);        break;
-		case '&': strcat(&output_[0], AMPERSAND);           break;
-		case '\'':strcat(&output_[0], SINGLE_QUOTE);        break;
-		case '(': strcat(&output_[0], OPEN_PARENTHESIS);    break;
-		case ')': strcat(&output_[0], CLOSE_PARENTHESIS);   break;
-		case '*': strcat(&output_[0], ASTERISK);            break;
-		case '+': strcat(&output_[0], PLUS_SIGN);           break;
-		case ',': strcat(&output_[0], COMMA);               break;
-		case '-': strcat(&output_[0], HYPHEN);              break;
-		case '.': strcat(&output_[0], PERIOD);              break;
-		case '/': strcat(&output_[0], SLASH);               break;
-		case '0': strcat(&output_[0], ZERO);                break;
-		case '1': strcat(&output_[0], ONE);                 break;
-		case '2': strcat(&output_[0], TWO);                 break;
-		case '3': strcat(&output_[0], THREE);               break;
-		case '4': strcat(&output_[0], FOUR);                break;
-		case '5': strcat(&output_[0], FIVE);                break;
-		case '6': strcat(&output_[0], SIX);                 break;
-		case '7': strcat(&output_[0], SEVEN);               break;
-		case '8': strcat(&output_[0], EIGHT);               break;
-		case '9': strcat(&output_[0], NINE);                break;
-		case ':': strcat(&output_[0], COLON);               break;
-		case ';': strcat(&output_[0], SEMICOLON);           break;
-		case '<': strcat(&output_[0], OPEN_ANGLE_BRACKET);  break;
-		case '=': strcat(&output_[0], EQUAL_SIGN);          break;
-		case '>': strcat(&output_[0], CLOSE_ANGLE_BRACKET); break;
-		case '?': strcat(&output_[0], QUESTION_MARK);       break;
-		case '@': strcat(&output_[0], AT_SIGN);             break;
+		switch (word[i]) {
+		case ' ': appendToOutput(BLANK);               break;
+		case '!': appendToOutput(EXCLAMATION_POINT);   break;
+		case '"': appendToOutput(DOUBLE_QUOTE);        break;
+		case '#': appendToOutput(NUMBER_SIGN);         break;
+		case '$': appendToOutput(DOLLAR_SIGN);         break;
+		case '%': appendToOutput(PERCENT_SIGN);        break;
+		case '&': appendToOutput(AMPERSAND);           break;
+		case '\'':appendToOutput(SINGLE_QUOTE);        break;
+		case '(': appendToOutput(OPEN_PARENTHESIS);    break;
+		case ')': appendToOutput(CLOSE_PARENTHESIS);   break;
+		case '*': appendToOutput(ASTERISK);            break;
+		case '+': appendToOutput(PLUS_SIGN);           break;
+		case ',': appendToOutput(COMMA);               break;
+		case '-': appendToOutput(HYPHEN);              break;
+		case '.': appendToOutput(PERIOD);              break;
+		case '/': appendToOutput(SLASH);               break;
+		case '0': appendToOutput(ZERO);                break;
+		case '1': appendToOutput(ONE);                 break;
+		case '2': appendToOutput(TWO);                 break;
+		case '3': appendToOutput(THREE);               break;
+		case '4': appendToOutput(FOUR);                break;
+		case '5': appendToOutput(FIVE);                break;
+		case '6': appendToOutput(SIX);                 break;
+		case '7': appendToOutput(SEVEN);               break;
+		case '8': appendToOutput(EIGHT);               break;
+		case '9': appendToOutput(NINE);                break;
+		case ':': appendToOutput(COLON);               break;
+		case ';': appendToOutput(SEMICOLON);           break;
+		case '<': appendToOutput(OPEN_ANGLE_BRACKET);  break;
+		case '=': appendToOutput(EQUAL_SIGN);          break;
+		case '>': appendToOutput(CLOSE_ANGLE_BRACKET); break;
+		case '?': appendToOutput(QUESTION_MARK);       break;
+		case '@': appendToOutput(AT_SIGN);             break;
 		case 'A':
-		case 'a': strcat(&output_[0], A);                   break;
+		case 'a': appendToOutput(A);                   break;
 		case 'B':
-		case 'b': strcat(&output_[0], B);                   break;
+		case 'b': appendToOutput(B);                   break;
 		case 'C':
-		case 'c': strcat(&output_[0], C);                   break;
+		case 'c': appendToOutput(C);                   break;
 		case 'D':
-		case 'd': strcat(&output_[0], D);                   break;
+		case 'd': appendToOutput(D);                   break;
 		case 'E':
-		case 'e': strcat(&output_[0], E);                   break;
+		case 'e': appendToOutput(E);                   break;
 		case 'F':
-		case 'f': strcat(&output_[0], F);                   break;
+		case 'f': appendToOutput(F);                   break;
 		case 'G':
-		case 'g': strcat(&output_[0], G);                   break;
+		case 'g': appendToOutput(G);                   break;
 		case 'H':
-		case 'h': strcat(&output_[0], H);                   break;
+		case 'h': appendToOutput(H);                   break;
 		case 'I':
-		case 'i': strcat(&output_[0], I);                   break;
+		case 'i': appendToOutput(I);                   break;
 		case 'J':
-		case 'j': strcat(&output_[0], J);                   break;
+		case 'j': appendToOutput(J);                   break;
 		case 'K':
-		case 'k': strcat(&output_[0], K);                   break;
+		case 'k': appendToOutput(K);                   break;
 		case 'L':
-		case 'l': strcat(&output_[0], L);                   break;
+		case 'l': appendToOutput(L);                   break;
 		case 'M':
-		case 'm': strcat(&output_[0], M);                   break;
+		case 'm': appendToOutput(M);                   break;
 		case 'N':
-		case 'n': strcat(&output_[0], N);                   break;
+		case 'n': appendToOutput(N);                   break;
 		case 'O':
-		case 'o': strcat(&output_[0], O);                   break;
+		case 'o': appendToOutput(O);                   break;
 		case 'P':
-		case 'p': strcat(&output_[0], P);                   break;
+		case 'p': appendToOutput(P);                   break;
 		case 'Q':
-		case 'q': strcat(&output_[0], Q);                   break;
+		case 'q': appendToOutput(Q);                   break;
 		case 'R':
-		case 'r': strcat(&output_[0], R);                   break;
+		case 'r': appendToOutput(R);                   break;
 		case 'S':
-		case 's': strcat(&output_[0], S);                   break;
+		case 's': appendToOutput(S);                   break;
 		case 'T':
-		case 't': strcat(&output_[0], T);                   break;
+		case 't': appendToOutput(T);                   break;
 		case 'U':
-		case 'u': strcat(&output_[0], U);                   break;
+		case 'u': appendToOutput(U);                   break;
 		case 'V':
-		case 'v': strcat(&output_[0], V);                   break;
+		case 'v': appendToOutput(V);                   break;
 		case 'W':
-		case 'w': strcat(&output_[0], W);                   break;
+		case 'w': appendToOutput(W);                   break;
 		case 'X':
-		case 'x': strcat(&output_[0], X);                   break;
+		case 'x': appendToOutput(X);                   break;
 		case 'Y':
-		case 'y': strcat(&output_[0], Y);                   break;
+		case 'y': appendToOutput(Y);                   break;
 		case 'Z':
-		case 'z': strcat(&output_[0], Z);                   break;
-		case '[': strcat(&output_[0], OPEN_SQUARE_BRACKET); break;
-		case '\\':strcat(&output_[0], BACKSLASH);           break;
-		case ']': strcat(&output_[0], CLOSE_SQUARE_BRACKET);break;
-		case '^': strcat(&output_[0], CARET);               break;
-		case '_': strcat(&output_[0], UNDERSCORE);          break;
-		case '`': strcat(&output_[0], GRAVE_ACCENT);        break;
-		case '{': strcat(&output_[0], OPEN_BRACE);          break;
-		case '|': strcat(&output_[0], VERTICAL_BAR);        break;
-		case '}': strcat(&output_[0], CLOSE_BRACE);         break;
-		case '~': strcat(&output_[0], TILDE);               break;
-		default:  strcat(&output_[0], UNKNOWN);             break;
+		case 'z': appendToOutput(Z);                   break;
+		case '[': appendToOutput(OPEN_SQUARE_BRACKET); break;
+		case '\\':appendToOutput(BACKSLASH);           break;
+		case ']': appendToOutput(CLOSE_SQUARE_BRACKET);break;
+		case '^': appendToOutput(CARET);               break;
+		case '_': appendToOutput(UNDERSCORE);          break;
+		case '`': appendToOutput(GRAVE_ACCENT);        break;
+		case '{': appendToOutput(OPEN_BRACE);          break;
+		case '|': appendToOutput(VERTICAL_BAR);        break;
+		case '}': appendToOutput(CLOSE_BRACE);         break;
+		case '~': appendToOutput(TILDE);               break;
+		default:  appendToOutput(UNKNOWN);             break;
 		}
 	}
-	return &output_[0];
+	return output_.c_str();
 }
 
 } /* namespace En */
