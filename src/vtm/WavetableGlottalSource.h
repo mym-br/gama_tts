@@ -87,13 +87,13 @@ private:
 template<typename FloatType>
 WavetableGlottalSource<FloatType>::WavetableGlottalSource(Type type, FloatType sampleRate,
 			FloatType tp, FloatType tnMin, FloatType tnMax)
-		: tableLength_ {512}
-		, tableModulus_ {tableLength_ - 1}
-		, firBeta_ {0.2}
-		, firGamma_ {0.1}
-		, firCutoff_ {0.00000001}
+		: tableLength_{512}
+		, tableModulus_{tableLength_ - 1}
+		, firBeta_{0.2}
+		, firGamma_{0.1}
+		, firCutoff_{0.00000001}
 		, wavetable_(tableLength_)
-		, prevAmplitude_ {-1.0}
+		, prevAmplitude_{-1.0}
 {
 	// Calculates the initial glottal pulse and stores it
 	// in the wavetable, for use in the oscillator.
@@ -166,7 +166,7 @@ WavetableGlottalSource<FloatType>::updateWavetable(FloatType amplitude)
 	}
 
 	/*  CALCULATE NEW CLOSURE POINT, BASED ON AMPLITUDE  */
-	const FloatType newDiv2 = std::max(tableDiv2_ - std::rint(amplitude * tnDelta_), FloatType {0.0});
+	const FloatType newDiv2 = std::max(tableDiv2_ - std::rint(amplitude * tnDelta_), FloatType{0.0});
 	const FloatType invNewTnLength = 1.0f / (newDiv2 - tableDiv1_);
 
 	/*  RECALCULATE THE FALLING PORTION OF THE GLOTTAL PULSE  */
@@ -209,7 +209,7 @@ template<typename FloatType>
 FloatType
 WavetableGlottalSource<FloatType>::getSample(FloatType frequency)  /*  2X OVERSAMPLING OSCILLATOR  */
 {
-	FloatType output {};
+	FloatType output{};
 
 	for (int i = 0; i < 2; i++) {
 		/*  FIRST INCREMENT THE TABLE POSITION, DEPENDING ON FREQUENCY  */

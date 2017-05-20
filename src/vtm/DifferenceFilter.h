@@ -41,7 +41,7 @@ private:
 
 
 template<typename FloatType>
-DifferenceFilter<FloatType>::DifferenceFilter() : x1_ {}
+DifferenceFilter<FloatType>::DifferenceFilter() : x1_{}
 {
 }
 

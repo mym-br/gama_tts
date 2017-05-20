@@ -49,10 +49,10 @@ private:
 
 template<typename FloatType>
 Butterworth1LowPassFilter<FloatType>::Butterworth1LowPassFilter()
-		: b0_ {}
-		, a1_ {}
-		, x1_ {}
-		, y1_ {}
+		: b0_{}
+		, a1_{}
+		, x1_{}
+		, y1_{}
 {
 }
 

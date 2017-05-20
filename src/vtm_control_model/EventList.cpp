@@ -968,7 +968,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	double currentDeltas[32]; // hardcoded
 	double temp;
 	float table[16]; // hardcoded
-	double pa {}, pb {}, pc {}, pd {}; // coefficients for polynomial interpolation
+	double pa{}, pb{}, pc{}, pd{}; // coefficients for polynomial interpolation
 
 	for (int i = 0; i < 16; i++) {
 		currentValues[i] = list_[0]->getParameter(i);

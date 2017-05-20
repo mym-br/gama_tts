@@ -412,7 +412,7 @@ PhoneticStringParser::loadRewriterConfiguration(const std::string& filePath)
 		std::shared_ptr<Category> cat2 = getCategory(secondCategory.c_str());
 		const Posture* posture = getPosture(postureName.c_str());
 
-		RewriterData* data {};
+		RewriterData* data{};
 		for (RewriterData& item : rewriterData_) {
 			if (item.category2 == cat2.get()) {
 				data = &item;

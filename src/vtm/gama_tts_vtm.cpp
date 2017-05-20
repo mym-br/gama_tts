@@ -58,13 +58,13 @@ main(int argc, char* argv[])
 		return 1;
 	}
 
-	std::ifstream inputStream(paramFile, std::ios_base::in | std::ios_base::binary);
+	std::ifstream inputStream(paramFile, std::ios_base::binary);
 	if (!inputStream) {
 		std::cerr << "Could not open the file " << paramFile << '.' << std::endl;
 		return 1;
 	}
 
-	ConfigurationData vtmConfigData {voiceFile};
+	ConfigurationData vtmConfigData{voiceFile};
 	vtmConfigData.insert(ConfigurationData(configFile));
 
 	auto vtm = VTM::VocalTractModel::getInstance(vtmConfigData);

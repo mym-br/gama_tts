@@ -99,22 +99,22 @@ private:
 
 template<typename FloatType>
 SampleRateConverter<FloatType>::SampleRateConverter(int sampleRate, float outputRate, std::vector<float>& outputData)
-		: sampleRateRatio_ {}
-		, fillPtr_ {}
-		, emptyPtr_ {}
-		, padSize_ {}
-		, fillSize_ {}
-		, timeRegisterIncrement_ {}
-		, filterIncrement_ {}
-		, phaseIncrement_ {}
-		, timeRegister_ {}
-		, fillCounter_ {}
-		, maximumSampleValue_ {}
-		, numberSamples_ {}
+		: sampleRateRatio_{}
+		, fillPtr_{}
+		, emptyPtr_{}
+		, padSize_{}
+		, fillSize_{}
+		, timeRegisterIncrement_{}
+		, filterIncrement_{}
+		, phaseIncrement_{}
+		, timeRegister_{}
+		, fillCounter_{}
+		, maximumSampleValue_{}
+		, numberSamples_{}
 		, h_(FILTER_LENGTH)
 		, deltaH_(FILTER_LENGTH)
 		, buffer_(BUFFER_SIZE)
-		, outputData_ {outputData}
+		, outputData_{outputData}
 {
 	initializeConversion(sampleRate, outputRate);
 }
@@ -236,8 +236,8 @@ template<typename FloatType>
 void
 SampleRateConverter<FloatType>::initializeFilter()
 {
-	const FloatType beta {5.658};         /*  kaiser window parameter  */
-	const FloatType lpCutoff {11.0/13.0}; /*  (0.846 OF NYQUIST)  */
+	const FloatType beta{5.658};         /*  kaiser window parameter  */
+	const FloatType lpCutoff{11.0/13.0}; /*  (0.846 OF NYQUIST)  */
 
 	/*  INITIALIZE THE FILTER IMPULSE RESPONSE  */
 	h_[0] = lpCutoff;
@@ -318,7 +318,7 @@ SampleRateConverter<FloatType>::dataEmpty()
 	if (sampleRateRatio_ >= 1.0f) {
 		while (emptyPtr_ < endPtr) {
 			/*  RESET ACCUMULATOR TO ZERO  */
-			FloatType output {};
+			FloatType output{};
 
 			/*  CALCULATE INTERPOLATION VALUE (STATIC WHEN UPSAMPLING)  */
 			FloatType interpolation = static_cast<FloatType>(mValue(timeRegister_)) / M_RANGE;
@@ -381,7 +381,7 @@ SampleRateConverter<FloatType>::dataEmpty()
 		while (emptyPtr_ < endPtr) {
 
 			/*  RESET ACCUMULATOR TO ZERO  */
-			FloatType output {};
+			FloatType output{};
 
 			/*  COMPUTE P PRIME  */
 			unsigned int phaseIndex = static_cast<unsigned int>(std::rint(fractionValue(timeRegister_) * sampleRateRatio_));

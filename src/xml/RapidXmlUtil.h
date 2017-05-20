@@ -33,7 +33,7 @@ inline
 std::string
 readXMLFile(const std::string& filePath)
 {
-	std::ifstream in(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
+	std::ifstream in(filePath.c_str(), std::ios_base::binary);
 	if (!in) {
 		THROW_EXCEPTION(XMLException, "Could not open the file: " << filePath << '.');
 	}

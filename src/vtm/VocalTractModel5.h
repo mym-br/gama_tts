@@ -257,7 +257,7 @@ private:
 		std::array<MovingAverageFilter<FloatType>, TOTAL_PARAMETERS> filter;
 
 		InputFilters(FloatType sampleRate, FloatType period)
-			: filter {
+			: filter{
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
@@ -282,7 +282,7 @@ private:
 	};
 
 	struct Junction2 {
-		FloatType coeff {};
+		FloatType coeff{};
 		void configure(FloatType leftRadius, FloatType rightRadius) {
 			const FloatType r0_2 =  leftRadius *  leftRadius;
 			const FloatType r1_2 = rightRadius * rightRadius;
@@ -290,9 +290,9 @@ private:
 		}
 	};
 	struct Junction3 {
-		FloatType leftCoeff  {};
-		FloatType rightCoeff {};
-		FloatType upperCoeff {};
+		FloatType leftCoeff{};
+		FloatType rightCoeff{};
+		FloatType upperCoeff{};
 		void configure(FloatType leftRadius, FloatType rightRadius, FloatType upperRadius) {
 			// Flow equations.
 			const FloatType r0_2 =  leftRadius *  leftRadius;
@@ -305,8 +305,8 @@ private:
 		}
 	};
 	struct Section {
-		std::array<FloatType, SectionDelay + 1> top    {};
-		std::array<FloatType, SectionDelay + 1> bottom {};
+		std::array<FloatType, SectionDelay + 1> top{};
+		std::array<FloatType, SectionDelay + 1> bottom{};
 		void reset() {
 			top.fill(0.0);
 			bottom.fill(0.0);
@@ -399,8 +399,8 @@ private:
 
 template<typename FloatType, unsigned int SectionDelay>
 VocalTractModel5<FloatType, SectionDelay>::VocalTractModel5(const ConfigurationData& data, bool interactive)
-		: interactive_ {interactive}
-		, logParameters_ {false}
+		: interactive_{interactive}
+		, logParameters_{false}
 {
 	loadConfiguration(data);
 	reset();

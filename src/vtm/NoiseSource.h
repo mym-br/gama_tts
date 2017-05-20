@@ -29,9 +29,9 @@ namespace VTM {
 class NoiseSource {
 public:
 	NoiseSource()
-		: initialSeed_ {0.7892347}
-		, factor_ {377.0}
-		, seed_ {initialSeed_} {}
+		: initialSeed_{0.7892347}
+		, factor_{377.0}
+		, seed_{initialSeed_} {}
 	~NoiseSource() {}
 
 	void reset() {

@@ -217,7 +217,7 @@ private:
 		std::array<MovingAverageFilter<FloatType>, TOTAL_PARAMETERS> filter;
 
 		InputFilters(FloatType sampleRate, FloatType period)
-			: filter {
+			: filter{
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
@@ -306,7 +306,7 @@ private:
 
 template<typename FloatType>
 VocalTractModel0<FloatType>::VocalTractModel0(const ConfigurationData& data, bool interactive)
-		: interactive_ {interactive}
+		: interactive_{interactive}
 {
 	loadConfiguration(data);
 	reset();

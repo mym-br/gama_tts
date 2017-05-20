@@ -50,11 +50,11 @@ private:
 
 template<typename FloatType>
 RadiationFilter<FloatType>::RadiationFilter(FloatType apertureCoeff)
-		: b0_ {apertureCoeff}
-		, b1_ {-b0_}
-		, a1_ {-b0_}
-		, x1_ {}
-		, y1_ {}
+		: b0_{apertureCoeff}
+		, b1_{-b0_}
+		, a1_{-b0_}
+		, x1_{}
+		, y1_{}
 {
 }
 

@@ -53,7 +53,7 @@ ConfigurationData::ConfigurationData(const std::string& filePath)
 	typedef Map::iterator MI;
 	typedef Map::value_type VT;
 
-	std::ifstream in(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
+	std::ifstream in(filePath.c_str(), std::ios_base::binary);
 	if (!in) THROW_EXCEPTION(IOException, "Could not open the file: " << filePath << '.');
 
 	std::string line;

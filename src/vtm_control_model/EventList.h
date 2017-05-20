@@ -110,7 +110,7 @@ struct Event {
 	};
 	static constexpr double EMPTY_PARAMETER = std::numeric_limits<double>::infinity();
 
-	Event() : time {}, flag {}, interpData {} {
+	Event() : time{}, flag{}, interpData{} {
 		for (int i = 0; i < NUM_PARAMETERS; ++i) {
 			parameters[i] = Event::EMPTY_PARAMETER;
 		}

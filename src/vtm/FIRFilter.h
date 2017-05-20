@@ -160,7 +160,7 @@ FIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatType gamma, int* np, Fl
 	}
 
 	/*  CALCULATE THE RATIONAL APPROXIMATION TO THE CUT-OFF POINT  */
-	const FloatType ac = (1.0f + std::cos((2.0f * FloatType {M_PI}) * beta)) / 2.0f;
+	const FloatType ac = (1.0f + std::cos((2.0f * FloatType{M_PI}) * beta)) / 2.0f;
 	rationalApproximation(ac, &nt, &numerator, np);
 
 	/*  CALCULATE FILTER ORDER  */
@@ -174,7 +174,7 @@ FIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatType gamma, int* np, Fl
 	const int ll = nt - numerator;
 
 	for (int i = 2; i <= *np; i++) {
-		c[i] = std::cos((2.0f * FloatType {M_PI}) * (static_cast<FloatType>(i - 1) / n));
+		c[i] = std::cos((2.0f * FloatType{M_PI}) * (static_cast<FloatType>(i - 1) / n));
 		const FloatType x = (1.0f - c[i]) / 2.0f;
 		FloatType y = x;
 
@@ -274,7 +274,7 @@ template<typename FloatType>
 FloatType FIRFilter<FloatType>::filter(FloatType input, int needOutput)
 {
 	if (needOutput) {
-		FloatType output {};
+		FloatType output{};
 
 		/*  PUT INPUT SAMPLE INTO DATA BUFFER  */
 		data_[ptr_] = input;

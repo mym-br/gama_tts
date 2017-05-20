@@ -58,7 +58,7 @@ XMLConfigFileWriter::~XMLConfigFileWriter()
 void
 XMLConfigFileWriter::saveModel()
 {
-	std::ofstream out(filePath_, std::ios_base::out | std::ios_base::binary);
+	std::ofstream out(filePath_, std::ios_base::binary);
 	if (!out) {
 		THROW_EXCEPTION(IOException, "The output file " << filePath_ << " could not be created.");
 	}

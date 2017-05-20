@@ -59,7 +59,7 @@ ParameterLogger<T>::~ParameterLogger()
 			std::cerr << "[GS::ParameterLogger] Empty file name (parameter " << i << ")." << std::endl;
 			continue;
 		}
-		std::ofstream out(param.first);
+		std::ofstream out(param.first, std::ios_base::binary);
 		if (!out) {
 			std::cerr << "[GS::ParameterLogger] Could not open the file " << param.first << '.' << std::endl;
 			continue;
