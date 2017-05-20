@@ -139,9 +139,9 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "en/text_parser/NumberParser.h"
-#include "en/NumberPronunciations.h"
-/*  #incude "number_pronunciations_english.h"  (use this for plain english)  */
+#include "english/NumberParser.h"
+#include "english/NumberPronunciations.h"
+/*  #include "NumberPronunciations_english.h"  (use this for plain english)  */
 
 /*  SYMBOLIC CONSTANTS  ******************************************************/
 
@@ -189,7 +189,7 @@ const char* triad_name[3][TRIADS_MAX] = {
 //==============================================================================
 
 namespace GS {
-namespace En {
+namespace English {
 
 NumberParser::NumberParser()
 		: word_{}
@@ -1384,5 +1384,5 @@ NumberParser::degenerateString(const char* word)
 	return output_.c_str();
 }
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */

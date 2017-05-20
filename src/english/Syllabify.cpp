@@ -18,7 +18,7 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/Syllabify.h"
+#include "english/Syllabify.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -350,7 +350,7 @@ checkCluster(const char* p, const char** match_array)
 //==============================================================================
 
 namespace GS {
-namespace En {
+namespace English {
 
 /******************************************************************************
 *
@@ -404,5 +404,5 @@ syllabify(char* word)
 	return number_of_syllables ? number_of_syllables : 1;
 }
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */

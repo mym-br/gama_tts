@@ -41,21 +41,19 @@ set(LIBRARY_FILES
     src/WAVEFileWriter.cpp
     src/WAVEFileWriter.h
 
-    src/en/letter_to_sound/ApplyStress.cpp
-    src/en/letter_to_sound/ApplyStress.h
-    src/en/letter_to_sound/IspTrans.cpp
-    src/en/letter_to_sound/IspTrans.h
-    src/en/letter_to_sound/LetterToSound.cpp
-    src/en/letter_to_sound/LetterToSound.h
-    src/en/letter_to_sound/Syllabify.cpp
-    src/en/letter_to_sound/Syllabify.h
-
-    src/en/NumberPronunciations.h
-
-    src/en/text_parser/NumberParser.cpp
-    src/en/text_parser/NumberParser.h
-    src/en/text_parser/TextParser.cpp
-    src/en/text_parser/TextParser.h
+    src/english/ApplyStress.cpp
+    src/english/ApplyStress.h
+    src/english/EnglishTextParser.cpp
+    src/english/EnglishTextParser.h
+    src/english/IspTrans.cpp
+    src/english/IspTrans.h
+    src/english/LetterToSound.cpp
+    src/english/LetterToSound.h
+    src/english/NumberParser.cpp
+    src/english/NumberParser.h
+    src/english/NumberPronunciations.h
+    src/english/Syllabify.cpp
+    src/english/Syllabify.h
 
     src/rapidxml/rapidxml.hpp
 
@@ -107,6 +105,8 @@ set(LIBRARY_FILES
     src/vtm_control_model/Rule.cpp
     src/vtm_control_model/Rule.h
     src/vtm_control_model/Symbol.h
+    src/vtm_control_model/TextParser.cpp
+    src/vtm_control_model/TextParser.h
     src/vtm_control_model/Transition.cpp
     src/vtm_control_model/Transition.h
     src/vtm_control_model/VTMControlModelConfiguration.cpp

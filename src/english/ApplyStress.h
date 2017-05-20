@@ -18,15 +18,15 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_SYLLABIFY_H_
-#define EN_SYLLABIFY_H_
+#ifndef ENGLISH_APPLY_STRESS_H_
+#define ENGLISH_APPLY_STRESS_H_
 
 namespace GS {
-namespace En {
+namespace English {
 
-int syllabify(char* word);
+int applyStress(char* buffer, const char* orthography);
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */
 
-#endif /* EN_SYLLABIFY_H_ */
+#endif /* ENGLISH_APPLY_STRESS_H_ */

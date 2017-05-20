@@ -1,6 +1,5 @@
 /***************************************************************************
- *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
- *    David R. Hill, Leonard Manzara, Craig Schock                         *
+ *  Copyright 2017 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,55 +14,28 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-// 2014-10
-// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef VTM_CONTROL_MODEL_CONFIGURATION_H_
-#define VTM_CONTROL_MODEL_CONFIGURATION_H_
+#include "TextParser.h"
 
-#include <string>
-
-
+#include "Exception.h"
+#include "english/EnglishTextParser.h"
 
 namespace GS {
 namespace VTMControlModel {
 
-struct Configuration {
-	enum Intonation {
-		INTONATION_NONE      = 0x00,
-		INTONATION_MICRO     = 0x01,
-		INTONATION_MACRO     = 0x02,
-		INTONATION_SMOOTH    = 0x04,
-		INTONATION_DRIFT     = 0x08,
-		INTONATION_RANDOMIZE = 0x10
-	};
-
-	Configuration();
-
-	void load(const std::string& configFilePath);
-
-	double controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
-	double tempo;
-	double pitchOffset;
-	double driftDeviation;
-	double driftLowpassCutoff;
-	int    intonation;
-
-	// Intonation parameters.
-	double notionalPitch;
-	double pretonicRange;
-	double pretonicLift;
-	double tonicRange;
-	double tonicMovement;
-
-	std::string language;
-	std::string voiceName;
-	std::string dictionary1File;
-	std::string dictionary2File;
-	std::string dictionary3File;
-};
+std::unique_ptr<TextParser>
+TextParser::getInstance(const std::string& language,
+		const std::string& configDirPath,
+		const std::string& dictionary1Path,
+		const std::string& dictionary2Path,
+		const std::string& dictionary3Path)
+{
+	if (language == "english") {
+		return std::make_unique<English::EnglishTextParser>(configDirPath, dictionary1Path, dictionary2Path, dictionary3Path);
+	} else {
+		THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << language << '.');
+	}
+}
 
 } /* namespace VTMControlModel */
 } /* namespace GS */
-
-#endif /* VTM_CONTROL_MODEL_CONFIGURATION_H_ */

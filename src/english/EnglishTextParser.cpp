@@ -43,7 +43,7 @@
 *
 ******************************************************************************/
 
-#include "en/text_parser/TextParser.h"
+#include "english/EnglishTextParser.h"
 
 #include <cmath>
 #include <cctype> /* isprint */
@@ -55,7 +55,7 @@
 
 #include "Exception.h"
 #include "Log.h"
-#include "en/letter_to_sound/LetterToSound.h"
+#include "english/LetterToSound.h"
 
 
 
@@ -148,7 +148,7 @@
 
 namespace {
 
-using namespace GS::En;
+using namespace GS::VTMControlModel;
 
 void printStream(std::stringstream& stream, std::size_t streamLength);
 void getState(const char* buffer, std::size_t length, std::size_t* i, TextParser::Mode mode,
@@ -191,7 +191,7 @@ void conditionInput(const char* input, std::size_t inputLength, char* output, st
 void
 printStream(std::stringstream& stream, std::size_t streamLength)
 {
-	printf("streamLength = %-ld\n<begin>", streamLength);
+	printf("stream length = %-ld\n<begin>", streamLength);
 
 	/*  REWIND STREAM TO BEGINNING  */
 	stream.seekg(0);
@@ -1378,9 +1378,10 @@ conditionInput(const char* input, std::size_t inputLength, char* output, std::si
 //==============================================================================
 
 namespace GS {
-namespace En {
+namespace English {
 
-TextParser::TextParser(const char* configDirPath,
+EnglishTextParser::EnglishTextParser(
+			const std::string& configDirPath,
 			const std::string& dictionary1Path,
 			const std::string& dictionary2Path,
 			const std::string& dictionary3Path)
@@ -1429,7 +1430,7 @@ TextParser::TextParser(const char* configDirPath,
 	specialAcronymsMap_.load(specialAcronymsFilePath.str().c_str());
 }
 
-TextParser::~TextParser()
+EnglishTextParser::~EnglishTextParser()
 {
 }
 
@@ -1448,14 +1449,14 @@ TextParser::~TextParser()
 *
 ******************************************************************************/
 std::string
-TextParser::parse(const char* text)
+EnglishTextParser::parse(const char* text)
 {
 	std::size_t buffer_length, stream1_length, stream2_length;
 
 	const std::size_t input_length = strlen(text);
 
 	if (Log::debugEnabled) {
-		printf("text=[%s]\n", text);
+		printf("PHONETIC STRING INPUT [%s]\n", text);
 	}
 
 	std::vector<char> buffer(input_length + 1);
@@ -1465,7 +1466,7 @@ TextParser::parse(const char* text)
 	conditionInput(text, input_length, &buffer[0], &buffer_length);
 
 	if (Log::debugEnabled) {
-		printf("buffer=%s\n", &buffer[0]);
+		printf("PHONETIC STRING BUFFER [%s]\n", &buffer[0]);
 	}
 
 	std::stringstream stream1;
@@ -1474,7 +1475,7 @@ TextParser::parse(const char* text)
 	stripPunctuation(&buffer[0], buffer_length, stream1, &stream1_length);
 
 	if (Log::debugEnabled) {
-		printf("\nSTREAM 1\n");
+		printf("\nPHONETIC STRING STREAM 1\n");
 		printStream(stream1, stream1_length);
 	}
 
@@ -1487,7 +1488,7 @@ TextParser::parse(const char* text)
 	safetyCheck(stream2, &stream2_length);
 
 	if (Log::debugEnabled) {
-		printf("STREAM 2\n");
+		printf("PHONETIC STRING STREAM 2\n");
 		printStream(stream2, stream2_length);
 	}
 
@@ -1505,7 +1506,7 @@ TextParser::parse(const char* text)
 *
 ******************************************************************************/
 const char*
-TextParser::lookupWord(const char* word)
+EnglishTextParser::lookupWord(const char* word)
 {
 	if (Log::debugEnabled) {
 		printf("lookupWord word: [%s]\n", word);
@@ -1575,7 +1576,7 @@ TextParser::lookupWord(const char* word)
 *
 ******************************************************************************/
 void
-TextParser::finalConversion(std::stringstream& stream1, std::size_t stream1Length,
+EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t stream1Length,
 				std::stringstream& stream2, std::size_t* stream2Length)
 {
 	long last_word_end = UNDEFINED_POSITION;
@@ -1765,7 +1766,7 @@ TextParser::finalConversion(std::stringstream& stream1, std::size_t stream1Lengt
 *
 ******************************************************************************/
 void
-TextParser::expandWord(char* word, int is_tonic, std::stringstream& stream)
+EnglishTextParser::expandWord(char* word, int is_tonic, std::stringstream& stream)
 {
 	const char* pronunciation;
 	int possessive = TTS_NO;
@@ -1893,7 +1894,7 @@ TextParser::expandWord(char* word, int is_tonic, std::stringstream& stream)
 *
 ******************************************************************************/
 int
-TextParser::expandAbbreviation(char* buffer, std::size_t length, std::size_t i, std::stringstream& stream)
+EnglishTextParser::expandAbbreviation(char* buffer, std::size_t length, std::size_t i, std::stringstream& stream)
 {
 	/*  DELETE PERIOD AFTER SINGLE CHARACTER (EXCEPT p.)  */
 	if ( (i == 1) || ( (i >= 2) &&
@@ -1978,7 +1979,7 @@ TextParser::expandAbbreviation(char* buffer, std::size_t length, std::size_t i, 
 *
 ******************************************************************************/
 void
-TextParser::stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength)
+EnglishTextParser::stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength)
 {
 	/*  DELETE OR CONVERT PUNCTUATION  */
 
@@ -2167,10 +2168,10 @@ TextParser::stripPunctuation(char* buffer, std::size_t length, std::stringstream
 *
 ******************************************************************************/
 const char*
-TextParser::isSpecialAcronym(const char* word)
+EnglishTextParser::isSpecialAcronym(const char* word)
 {
 	return specialAcronymsMap_.getEntry(word);
 }
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */

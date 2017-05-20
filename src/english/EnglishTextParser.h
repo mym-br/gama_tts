@@ -18,50 +18,39 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_TEXT_PARSER_H_
-#define EN_TEXT_PARSER_H_
+#ifndef ENGLISH_TEXT_PARSER_H_
+#define ENGLISH_TEXT_PARSER_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "DictionarySearch.h"
-#include "en/text_parser/NumberParser.h"
 #include "StringMap.h"
-
-
+#include "TextParser.h"
+#include "english/NumberParser.h"
 
 namespace GS {
-namespace En {
+namespace English {
 
-class TextParser {
+class EnglishTextParser : public VTMControlModel::TextParser {
 public:
-	enum Mode {
-		MODE_UNDEFINED,
-		MODE_NORMAL,
-		MODE_RAW,
-		MODE_LETTER,
-		MODE_EMPHASIS,
-		MODE_TAGGING,
-		MODE_SILENCE
-	};
+	EnglishTextParser(
+		const std::string& configDirPath,
+		const std::string& dictionary1Path,
+		const std::string& dictionary2Path,
+		const std::string& dictionary3Path);
+	~EnglishTextParser();
 
-	TextParser(const char* configDirPath,
-			const std::string& dictionary1Path,
-			const std::string& dictionary2Path,
-			const std::string& dictionary3Path);
-	~TextParser();
-
-	std::string parse(const char* text);
-
-	void setMode(Mode mode) { mode_ = mode; }
+	virtual std::string parse(const char* text);
+	virtual void setMode(Mode mode) { mode_ = mode; }
 private:
 	enum {
 		DICTIONARY_ORDER_SIZE = 6
 	};
 
-	TextParser(const TextParser&) = delete;
-	TextParser& operator=(const TextParser&) = delete;
+	EnglishTextParser(const EnglishTextParser&) = delete;
+	EnglishTextParser& operator=(const EnglishTextParser&) = delete;
 
 	const char* lookupWord(const char* word);
 	void expandWord(char* word, int is_tonic, std::stringstream& stream);
@@ -83,7 +72,7 @@ private:
 	StringMap specialAcronymsMap_;
 };
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */
 
-#endif /* EN_TEXT_PARSER_H_ */
+#endif /* ENGLISH_TEXT_PARSER_H_ */

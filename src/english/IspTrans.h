@@ -18,17 +18,15 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_APPLY_STRESS_H_
-#define EN_APPLY_STRESS_H_
-
-
+#ifndef ENGLISH_ISP_TRANS_H_
+#define ENGLISH_ISP_TRANS_H_
 
 namespace GS {
-namespace En {
+namespace English {
 
-int applyStress(char* buffer, const char* orthography);
+void ispTrans(char* string, char* result);
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */
 
-#endif /* EN_APPLY_STRESS_H_ */
+#endif /* ENGLISH_ISP_TRANS_H_ */

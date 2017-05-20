@@ -80,6 +80,10 @@ Model::load(const char* configDirPath, const char* configFileName)
 		LOG_DEBUG("Loading xml configuration: " << filePath);
 		XMLConfigFileReader cfg(*this, filePath);
 		cfg.loadModel();
+
+		if (Log::debugEnabled) {
+			printInfo();
+		}
 	} catch (...) {
 		clear();
 		throw;

@@ -18,7 +18,7 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/IspTrans.h"
+#include "english/IspTrans.h"
 
 #include <string.h>
 
@@ -853,7 +853,7 @@ const pktrie trie[TRIE_NODES] = {
 //==============================================================================
 
 namespace GS {
-namespace En {
+namespace English {
 
 void
 ispTrans(char *string, char *result)
@@ -909,5 +909,5 @@ ispTrans(char *string, char *result)
 	}
 }
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */

@@ -18,7 +18,7 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/LetterToSound.h"
+#include "english/LetterToSound.h"
 
 #include <array>
 #include <cctype> /* tolower */
@@ -26,10 +26,10 @@
 #include <cstdio> /* sprintf */
 #include <cstring> /* strcat, strcmp, strcpy, strlen */
 
-#include "en/NumberPronunciations.h"
-#include "en/letter_to_sound/ApplyStress.h"
-#include "en/letter_to_sound/IspTrans.h"
-#include "en/letter_to_sound/Syllabify.h"
+#include "english/ApplyStress.h"
+#include "english/IspTrans.h"
+#include "english/NumberPronunciations.h"
+#include "english/Syllabify.h"
 
 /*  LOCAL DEFINES  ***********************************************************/
 #define WORD_TYPE_UNKNOWN          "j"
@@ -754,7 +754,7 @@ medialS(char* in, char** eow)
 //==============================================================================
 
 namespace GS {
-namespace En {
+namespace English {
 
 /******************************************************************************
 *
@@ -800,5 +800,5 @@ letterToSound(const char* word, std::vector<char>& pronunciation)
 	}
 }
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */

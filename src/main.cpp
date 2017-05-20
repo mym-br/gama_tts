@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2014 Marcelo Y. Matuda                                       *
+ *  Copyright 2014, 2017 Marcelo Y. Matuda                                 *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -28,7 +28,7 @@
 #include "global.h"
 #include "Log.h"
 #include "Model.h"
-#include "en/text_parser/TextParser.h"
+#include "TextParser.h"
 #include "VTMControlModelConfiguration.h"
 
 
@@ -116,9 +116,9 @@ main(int argc, char* argv[])
 	}
 
 	if (inputFile != nullptr) {
-		std::ifstream in(inputFile, std::ios_base::in | std::ios_base::binary);
+		std::ifstream in(inputFile, std::ios_base::binary);
 		if (!in) {
-			std::cerr << "Could not open the file " << inputFile << '.' << std::endl;
+			std::cerr << "Error: Could not open the file " << inputFile << '.' << std::endl;
 			return 1;
 		}
 		std::string line;
@@ -128,39 +128,34 @@ main(int argc, char* argv[])
 	}
 	std::string inputText = inputTextStream.str();
 	if (inputText.empty()) {
-		std::cerr << "Empty input text." << std::endl;
+		std::cerr << "Error: Empty input text." << std::endl;
 		return 1;
 	}
 	if (GS::Log::debugEnabled) {
-		std::cout << "inputText=[" << inputText << ']' << std::endl;
+		std::cout << "INPUT TEXT [" << inputText << ']' << std::endl;
 	}
 
 	try {
 		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
 		vtmControlModel->load(configDirPath, VTM_CONTROL_MODEL_CONFIG_FILE);
-		if (GS::Log::debugEnabled) {
-			vtmControlModel->printInfo();
-		}
 
 		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(configDirPath, *vtmControlModel);
 		const GS::VTMControlModel::Configuration& vtmControlConfig = vtmController->vtmControlModelConfiguration();
 
-		auto textParser = std::make_unique<GS::En::TextParser>(configDirPath,
+		auto textParser = GS::VTMControlModel::TextParser::getInstance(vtmControlConfig.language,
+									configDirPath,
 									vtmControlConfig.dictionary1File,
 									vtmControlConfig.dictionary2File,
 									vtmControlConfig.dictionary3File);
 		std::string phoneticString = textParser->parse(inputText.c_str());
-		if (GS::Log::debugEnabled) {
-			std::cout << "Phonetic string: [" << phoneticString << ']' << std::endl;
-		}
 
 		vtmController->synthesizePhoneticString(phoneticString, vtmParamFile, outputFile);
 
 	} catch (std::exception& e) {
-		std::cerr << "Caught an exception: " << e.what() << std::endl;
+		std::cerr << "Exception: " << e.what() << std::endl;
 		return 1;
 	} catch (...) {
-		std::cerr << "Caught an unknown exception." << std::endl;
+		std::cerr << "Unknown exception." << std::endl;
 		return 1;
 	}
 

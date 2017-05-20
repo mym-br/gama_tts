@@ -76,7 +76,8 @@ Configuration::load(const std::string& configFilePath)
 	tonicRange    = config.value<double>("tonic_range");
 	tonicMovement = config.value<double>("tonic_movement");
 
-	voiceName = config.value<std::string>("voice_name");
+	language        = config.value<std::string>("language");
+	voiceName       = config.value<std::string>("voice_name");
 	dictionary1File = config.value<std::string>("dictionary_1_file");
 	dictionary2File = config.value<std::string>("dictionary_2_file");
 	dictionary3File = config.value<std::string>("dictionary_3_file");

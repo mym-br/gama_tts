@@ -15,55 +15,20 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-// 2014-10
+// 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef VTM_CONTROL_MODEL_CONFIGURATION_H_
-#define VTM_CONTROL_MODEL_CONFIGURATION_H_
+#ifndef ENGLISH_LETTER_TO_SOUND_H_
+#define ENGLISH_LETTER_TO_SOUND_H_
 
-#include <string>
-
-
+#include <vector>
 
 namespace GS {
-namespace VTMControlModel {
+namespace English {
 
-struct Configuration {
-	enum Intonation {
-		INTONATION_NONE      = 0x00,
-		INTONATION_MICRO     = 0x01,
-		INTONATION_MACRO     = 0x02,
-		INTONATION_SMOOTH    = 0x04,
-		INTONATION_DRIFT     = 0x08,
-		INTONATION_RANDOMIZE = 0x10
-	};
+void letterToSound(const char* word, std::vector<char>& pronunciation);
 
-	Configuration();
-
-	void load(const std::string& configFilePath);
-
-	double controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
-	double tempo;
-	double pitchOffset;
-	double driftDeviation;
-	double driftLowpassCutoff;
-	int    intonation;
-
-	// Intonation parameters.
-	double notionalPitch;
-	double pretonicRange;
-	double pretonicLift;
-	double tonicRange;
-	double tonicMovement;
-
-	std::string language;
-	std::string voiceName;
-	std::string dictionary1File;
-	std::string dictionary2File;
-	std::string dictionary3File;
-};
-
-} /* namespace VTMControlModel */
+} /* namespace English */
 } /* namespace GS */
 
-#endif /* VTM_CONTROL_MODEL_CONFIGURATION_H_ */
+#endif /* ENGLISH_LETTER_TO_SOUND_H_ */

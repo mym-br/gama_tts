@@ -18,16 +18,14 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_NUMBER_PARSER_H_
-#define EN_NUMBER_PARSER_H_
+#ifndef ENGLISH_NUMBER_PARSER_H_
+#define ENGLISH_NUMBER_PARSER_H_
 
 #include <array>
 #include <string>
 
-
-
 namespace GS {
-namespace En {
+namespace English {
 
 /********************************************************************
 number_parser() RETURNS A POINTER TO A NULL TERMINATED CHARACTER
@@ -161,7 +159,7 @@ private:
 	int seconds_;
 };
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */
 
-#endif /* EN_NUMBER_PARSER_H_ */
+#endif /* ENGLISH_NUMBER_PARSER_H_ */

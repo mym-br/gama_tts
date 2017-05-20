@@ -18,17 +18,15 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_ISP_TRANS_H_
-#define EN_ISP_TRANS_H_
-
-
+#ifndef ENGLISH_SYLLABIFY_H_
+#define ENGLISH_SYLLABIFY_H_
 
 namespace GS {
-namespace En {
+namespace English {
 
-void ispTrans(char* string, char* result);
+int syllabify(char* word);
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */
 
-#endif /* EN_ISP_TRANS_H_ */
+#endif /* ENGLISH_SYLLABIFY_H_ */

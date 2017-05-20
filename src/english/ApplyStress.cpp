@@ -18,7 +18,7 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/ApplyStress.h"
+#include "english/ApplyStress.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -225,7 +225,7 @@ prefix(const char* orthography)
 //==============================================================================
 
 namespace GS {
-namespace En {
+namespace English {
 
 /******************************************************************************
 *
@@ -315,5 +315,5 @@ applyStress(char* buffer, const char* orthography)
 	return 0;
 }
 
-} /* namespace En */
+} /* namespace English */
 } /* namespace GS */

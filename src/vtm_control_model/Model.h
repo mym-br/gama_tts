@@ -54,7 +54,6 @@ public:
 	void clear();
 	void load(const char* configDirPath, const char* configFileName);
 	void save(const char* configDirPath, const char* configFileName);
-	void printInfo() const;
 	void clearFormulaSymbolList();
 	void setFormulaSymbolValue(FormulaSymbol::Code symbol, float value);
 	float getFormulaSymbolValue(FormulaSymbol::Code symbol) const;
@@ -107,6 +106,8 @@ public:
 	std::shared_ptr<Category> findCategory(const std::string& name);
 	bool findCategoryName(const std::string& name) const;
 private:
+	void printInfo() const;
+
 	std::vector<std::shared_ptr<Category>> categoryList_;
 	std::vector<Parameter> parameterList_;
 	std::vector<Symbol> symbolList_;

@@ -1,6 +1,5 @@
 /***************************************************************************
- *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
- *    David R. Hill, Leonard Manzara, Craig Schock                         *
+ *  Copyright 2017 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,22 +14,41 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-// 2014-09
-// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_LETTER_TO_SOUND_H_
-#define EN_LETTER_TO_SOUND_H_
+#ifndef VTM_CONTROL_MODEL_TEXT_PARSER_H_
+#define VTM_CONTROL_MODEL_TEXT_PARSER_H_
 
-#include <vector>
-
-
+#include <memory>
+#include <string>
 
 namespace GS {
-namespace En {
+namespace VTMControlModel {
 
-void letterToSound(const char* word, std::vector<char>& pronunciation);
+class TextParser {
+public:
+	enum Mode {
+		MODE_UNDEFINED,
+		MODE_NORMAL,
+		MODE_RAW,
+		MODE_LETTER,
+		MODE_EMPHASIS,
+		MODE_TAGGING,
+		MODE_SILENCE
+	};
 
-} /* namespace En */
+	virtual ~TextParser() {}
+
+	virtual std::string parse(const char* text) = 0;
+	virtual void setMode(Mode mode) = 0;
+
+	static std::unique_ptr<TextParser> getInstance(const std::string& language,
+						const std::string& configDirPath,
+						const std::string& dictionary1Path,
+						const std::string& dictionary2Path,
+						const std::string& dictionary3Path);
+};
+
+} /* namespace VTMControlModel */
 } /* namespace GS */
 
-#endif /* EN_LETTER_TO_SOUND_H_ */
+#endif /* VTM_CONTROL_MODEL_TEXT_PARSER_H_ */
