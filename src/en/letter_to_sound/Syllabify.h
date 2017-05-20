@@ -18,42 +18,15 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/vowel_before.h"
-
-#include "en/letter_to_sound/member.h"
-
-
+#ifndef EN_SYLLABIFY_H_
+#define EN_SYLLABIFY_H_
 
 namespace GS {
 namespace En {
 
-/******************************************************************************
-*
-*       function:     vowel_before
-*
-*       purpose:      Return the position of a vowel prior to 'position'.
-*                     If no vowel prior return 0.
-*
-*       arguments:    start, position
-*
-*       internal
-*       functions:    member
-*
-*       library
-*       functions:    none
-*
-******************************************************************************/
-const char*
-vowel_before(const char* start, const char* position)
-{
-	position--;
-	while (position >= start) {
-		if (member(*position, "aeiouyAEIOUY"))
-			return position;
-		position--;
-	}
-	return nullptr;
-}
+int syllabify(char* word);
 
 } /* namespace En */
 } /* namespace GS */
+
+#endif /* EN_SYLLABIFY_H_ */

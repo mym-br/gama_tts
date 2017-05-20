@@ -18,17 +18,17 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef EN_SUFFIX_H_
-#define EN_SUFFIX_H_
+#ifndef EN_APPLY_STRESS_H_
+#define EN_APPLY_STRESS_H_
 
 
 
 namespace GS {
 namespace En {
 
-const char* suffix(const char* in, const char* end, const char* suflist);
+int applyStress(char* buffer, const char* orthography);
 
 } /* namespace En */
 } /* namespace GS */
 
-#endif /* EN_SUFFIX_H_ */
+#endif /* EN_APPLY_STRESS_H_ */

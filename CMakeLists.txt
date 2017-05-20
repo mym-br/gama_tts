@@ -41,45 +41,16 @@ set(LIBRARY_FILES
     src/WAVEFileWriter.cpp
     src/WAVEFileWriter.h
 
-    src/en/letter_to_sound/apply_stress.cpp
-    src/en/letter_to_sound/apply_stress.h
-    src/en/letter_to_sound/check_word_list.cpp
-    src/en/letter_to_sound/check_word_list.h
-    src/en/letter_to_sound/clusters.h
-    src/en/letter_to_sound/ends_with.cpp
-    src/en/letter_to_sound/ends_with.h
-    src/en/letter_to_sound/final_s.cpp
-    src/en/letter_to_sound/final_s.h
-    src/en/letter_to_sound/ie_to_y.cpp
-    src/en/letter_to_sound/ie_to_y.h
-    src/en/letter_to_sound/insert_mark.cpp
-    src/en/letter_to_sound/insert_mark.h
-    src/en/letter_to_sound/isp_trans.cpp
-    src/en/letter_to_sound/isp_trans.h
-    src/en/letter_to_sound/letter_to_sound.cpp
-    src/en/letter_to_sound/letter_to_sound.h
-    src/en/letter_to_sound/long_medial_vowels.cpp
-    src/en/letter_to_sound/long_medial_vowels.h
-    src/en/letter_to_sound/mark_final_e.cpp
-    src/en/letter_to_sound/mark_final_e.h
-    src/en/letter_to_sound/medial_s.cpp
-    src/en/letter_to_sound/medial_s.h
-    src/en/letter_to_sound/medial_silent_e.cpp
-    src/en/letter_to_sound/medial_silent_e.h
-    src/en/letter_to_sound/member.cpp
-    src/en/letter_to_sound/member.h
-    src/en/letter_to_sound/stresstables.h
-    src/en/letter_to_sound/suffix.cpp
-    src/en/letter_to_sound/suffix.h
-    src/en/letter_to_sound/syllabify.cpp
-    src/en/letter_to_sound/syllabify.h
-    src/en/letter_to_sound/tail.h
-    src/en/letter_to_sound/vowel_before.cpp
-    src/en/letter_to_sound/vowel_before.h
-    src/en/letter_to_sound/word_to_patphone.cpp
-    src/en/letter_to_sound/word_to_patphone.h
+    src/en/letter_to_sound/ApplyStress.cpp
+    src/en/letter_to_sound/ApplyStress.h
+    src/en/letter_to_sound/IspTrans.cpp
+    src/en/letter_to_sound/IspTrans.h
+    src/en/letter_to_sound/LetterToSound.cpp
+    src/en/letter_to_sound/LetterToSound.h
+    src/en/letter_to_sound/Syllabify.cpp
+    src/en/letter_to_sound/Syllabify.h
 
-    src/en/number_pronunciations.h
+    src/en/NumberPronunciations.h
 
     src/en/text_parser/NumberParser.cpp
     src/en/text_parser/NumberParser.h

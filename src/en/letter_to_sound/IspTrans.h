@@ -18,43 +18,17 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/medial_s.h"
-
-#include "en/letter_to_sound/member.h"
+#ifndef EN_ISP_TRANS_H_
+#define EN_ISP_TRANS_H_
 
 
 
 namespace GS {
 namespace En {
 
-/******************************************************************************
-*
-*	function:	medial_s
-*
-*	purpose:
-*
-*
-*       arguments:      in, eow
-*
-*	internal
-*	functions:	member
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-void
-medial_s(char *in, char **eow)
-{
-    char      *end = *eow;
-
-    while (in < end - 1) {
-	if ((member(*in | 040, "aeiouy")) && (in[1] == 's')
-	    && (member(in[2], "AEIOUYaeiouym")))
-	    in[1] &= 0xdf;
-	in++;
-    }
-}
+void ispTrans(char* string, char* result);
 
 } /* namespace En */
 } /* namespace GS */
+
+#endif /* EN_ISP_TRANS_H_ */

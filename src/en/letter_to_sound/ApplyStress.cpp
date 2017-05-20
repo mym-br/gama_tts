@@ -18,32 +18,140 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/apply_stress.h"
+#include "en/letter_to_sound/ApplyStress.h"
 
 #include <stdio.h>
 #include <string.h>
 
-#include "en/letter_to_sound/stresstables.h"
+/*  LOCAL DEFINES  ***********************************************************/
+#define MAX_SYLLS      100
+#define isvowel(c)     (((c)=='a') || ((c)=='e') || ((c)=='i') || ((c)=='o') || ((c)=='u') )
+
+/*  SUFFIX TYPES  */
+#define AUTOSTRESSED   0
+#define PRESTRESS1     1
+#define PRESTRESS2     2
+#define PRESTRESS3     3	/* actually prestressed 1/2, but can't use '/' in identifier */
+#define NEUTRAL        4
 
 
 
 namespace {
 
-int stress_suffix(const char* orthography, int* type);
+/*  DATA TYPES  **************************************************************/
+struct suff_data {
+	const char* suff;
+	int         type;
+	int         sylls;
+};
+
+/*  GLOBAL VARIABLES (LOCAL TO THIS FILE)  ***********************************/
+const struct suff_data suffix_list[] = {
+/*  AUTOSTRESSED: (2nd entry 0)  */
+	{"ade", 0, 1},
+	{"aire", 0, 1},
+	{"aise", 0, 1},
+	{"arian", 0, 1},
+	{"arium", 0, 1},
+	{"cidal", 0, 2},
+	{"cratic", 0, 2},
+	{"ee", 0, 1},
+	{"een", 0, 1},
+	{"eer", 0, 1},
+	{"elle", 0, 1},
+	{"enne", 0, 1},
+	{"ential", 0, 2},
+	{"esce", 0, 1},
+	{"escence", 0, 2},
+	{"escent", 0, 2},
+	{"ese", 0, 1},
+	{"esque", 0, 1},
+	{"esse", 0, 1},
+	{"et", 0, 1},
+	{"ette", 0, 1},
+	{"eur", 0, 1},
+	{"faction", 0, 2},
+	{"ician", 0, 2},
+	{"icious", 0, 2},
+	{"icity", 0, 3},
+	{"ation", 0, 2},
+	{"self", 0, 1},
+/* PRESTRESS1: (2nd entry 1) */
+	{"cracy", 1, 2},
+	{"erie", 1, 2},
+	{"ety", 1, 2},
+	{"ic", 1, 1},
+	{"ical", 1, 2},
+	{"ssion", 1, 1},
+	{"ia", 1, 1},
+	{"metry", 1, 2},
+/* PRESTRESS2: (2nd entry 2) */
+	{"able", 2, 1},   /*  NOTE: McIl GIVES WRONG SYLL. CT. */
+	{"ast", 2, 1},
+	{"ate", 2, 1},
+	{"atory", 2, 3},
+	{"cide", 2, 1},
+	{"ene", 2, 1},
+	{"fy", 2, 1},
+	{"gon", 2, 1},
+	{"tude", 2, 1},
+	{"gram", 2, 1},
+/* PRESTRESS 1/2: (2nd entry 3) */
+	{"ad", 3, 1},
+	{"al", 3, 1},
+	{"an", 3, 1},	   /*  OMIT?  */
+	{"ancy", 3, 2},
+	{"ant", 3, 1},
+	{"ar", 3, 1},
+	{"ary", 3, 2},
+	{"ative", 3, 2},
+	{"ator", 3, 2},
+	{"ature", 3, 2},
+	{"ence", 3, 1},
+	{"ency", 3, 2},
+	{"ent", 3, 1},
+	{"ery", 3, 2},
+	{"ible", 3, 1},   /*  BUG  */
+	{"is", 3, 1},
+/* STRESS NEUTRAL: (2nd entry 4) */
+	{"acy", 4, 2},
+	{"age", 4, 1},
+	{"ance", 4, 1},
+	{"edly", 4, 2},
+	{"edness", 4, 2},
+	{"en", 4, 1},
+	{"er", 4, 1},
+	{"ess", 4, 1},
+	{"ful", 4, 1},
+	{"hood", 4, 1},
+	{"less", 4, 1},
+	{"ness", 4, 1},
+	{"ish", 4, 1},
+	{"dom", 4, 1},
+	{0, 0, 0}	   /*  END MARKER  */
+};
+
+/*  STRESS REPELLENT PREFICES  */
+const char* prefices[] = {
+	"ex",
+	"ac",
+	"af",
+	"de",
+	"in",
+	"non",
+	0
+};
+
+
+
+int stressSuffix(const char* orthography, int* type);
 int light(const char* sb);
 int prefix(const char* orthography);
 
 
 
-/******************************************************************************
-*
-*	function:	stress_suffix
-*
-*	purpose:
-*
-******************************************************************************/
 int
-stress_suffix(const char* orthography, int* type)
+stressSuffix(const char* orthography, int* type)
 {
 	int t = 0, a, c;
 	const char* b;
@@ -52,7 +160,7 @@ stress_suffix(const char* orthography, int* type)
 	while (suffix_list[t].suff) {
 		b = suffix_list[t].suff;
 		a = strlen(b);
-		if ((a <= c) && !strcmp(b, orthography + c - a)) {
+		if ((a <= c) && strcmp(b, orthography + c - a) == 0) {
 			*type = suffix_list[t].type;
 			return suffix_list[t].sylls;
 		}
@@ -74,27 +182,21 @@ light(const char* sb)
 	while (!isvowel(*sb)) {
 		sb++;
 	}
-
 	while (isvowel(*sb) || (*sb == '_') || (*sb == '.')) {
 		sb++;
 	}
-
 	if (!*sb) {
 		return 1;
 	}
-
 	while ((*sb != '_') && (*sb != '.') && *sb) {
 		sb++;
 	}
-
 	if (!*sb) {
 		return 1;
 	}
-
 	while (((*sb == '_') || (*sb == '.')) && *sb) {
 		sb++;
 	}
-
 	if (!*sb) {
 		return 1;
 	}
@@ -102,13 +204,6 @@ light(const char* sb)
 	return isvowel(*sb);
 }
 
-/******************************************************************************
-*
-*	function:	prefix
-*
-*	purpose:
-*
-******************************************************************************/
 int
 prefix(const char* orthography)
 {
@@ -117,7 +212,7 @@ prefix(const char* orthography)
 
 	m = strlen(orthography);
 	while ( (a = prefices[t++]) ) {
-		if (((l = strlen(a)) <= m) && !strncmp(a, orthography, l)) {
+		if (((l = strlen(a)) <= m) && strncmp(a, orthography, l) == 0) {
 			return 1;
 		}
 	}
@@ -146,7 +241,7 @@ namespace En {
 *
 ******************************************************************************/
 int
-apply_stress(char* buffer, const char* orthography)
+applyStress(char* buffer, const char* orthography)
 {
 	char* syll_array[MAX_SYLLS];
 	char* spt;
@@ -171,7 +266,7 @@ apply_stress(char* buffer, const char* orthography)
 
 	/*  RETURNS SYLLABLE NO. (FROM THE END) THAT IS THE START OF A STRESS-AFFECTING
 	SUFFIX, 0 IF NONE; AND TYPE  */
-	t = stress_suffix(orthography, &type);
+	t = stressSuffix(orthography, &type);
 	if (t) {
 		if (type == AUTOSTRESSED) {
 			syll = index - t;

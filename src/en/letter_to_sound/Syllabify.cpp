@@ -18,14 +18,12 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/syllabify.h"
+#include "en/letter_to_sound/Syllabify.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
-
-#include "en/letter_to_sound/clusters.h"
 
 
 
@@ -39,15 +37,165 @@
 
 namespace {
 
+/*  LIST OF PHONEME PATTERNS THAT CAN BEGIN A SYLLABLE  */
+
+const char* begin_syllable[] = {
+	"s_p_l",
+	"s_p_r",
+	"s_p_y",
+	"s_p",
+	"s_t_r",
+	"s_t_y",
+	"s_t",
+	"s_k_l",
+	"s_k_r",
+	"s_k_y",
+	"s_k_w",
+	"s_k",
+	"p_l",
+	"p_r",
+	"p_y",
+	"t_r",
+	"k_l",
+	"k_r",
+	"k_y",
+	"k_w",
+	"sh_r",
+	"sh_l",
+	"sh",
+	"b_l",
+	"b_r",
+	"b_y",
+	"b_w",
+	"d_r",
+	"d_y",
+	"d_w",
+	"g_l",
+	"g_r",
+	"g_y",
+	"g_w",
+	"d_r",
+	"d_y",
+	"d_w",
+	"dh",
+	"b",
+	"d",
+	"f",
+	"g",
+	"h",
+	"j",
+	"k",
+	"l",
+	"m",
+	"n",
+	"p",
+	"r",
+	"s",
+	"t",
+	"v",
+	"w",
+	"y",
+	"z",
+	0
+};
+
+/*  LIST OF PHONEME PATTERNS THAT CAN END A SYLLABLE  */
+const char* end_syllable[] = {
+	"b",
+	"d",
+	"er",
+	"f",
+	"g",
+	"h",
+	"j",
+	"k",
+	"l",
+	"m",
+	"n",
+	"p",
+	"r",
+	"s",
+	"f_t",
+	"s_k",
+	"s_p",
+	"r_b",
+	"r_d",
+	"r_g",
+	"l_b",
+	"l_d",
+	"n_d",
+	"ng_k",
+	"ng_z",
+	"n_z",
+	"l_f",
+	"r_f",
+	"l_v",
+	"r_v",
+	"l_th",
+	"r_th",
+	"m_th",
+	"ng_th",
+	"r_dh",
+	"p_s",
+	"t_s",
+	"l_p",
+	"r_p",
+	"m_p",
+	"l_ch",
+	"r_ch",
+	"n_ch",
+	"l_k",
+	"r_k",
+	"ng_k",
+	"l_j",
+	"r_j",
+	"n_j",
+	"r_l",
+	"r_l_d",
+	"r_n_d",
+	"r_n_t",
+	"r_l_z",
+	"r_n_z",
+	"r_m_z",
+	"r_m_th",
+	"r_n",
+	"r_m",
+	"r_s",
+	"l_s",
+	"l_th",
+	"r_f",
+	"r_t",
+	"l_t",
+	"r_k",
+	"k_s",
+	"d_z",
+	"t_th",
+	"k_t",
+	"p_t",
+	"r_k",
+	"s_t",
+	"th",
+	"sh",
+	"zh",
+	"t",
+	"v",
+	"w",
+	"y",
+	"z",
+	0
+};
+
+
+
 /*  DATA TYPES  **************************************************************/
 typedef char phone_type;
 
-int syllable_break(const char* cluster);
-void create_cv_signature(char *ptr, phone_type *arr);
-char *add_1_phone(char *t);
-void extract_consonant_cluster(char* ptr, phone_type* type, std::vector<char>& cluster);
-int next_consonant_cluster(phone_type *pt);
-int check_cluster(const char* p, const char** match_array);
+int syllableBreak(const char* cluster);
+void createCvSignature(char* ptr, phone_type* arr);
+char* add1Phone(char* t);
+void extractConsonantCluster(char* ptr, phone_type* type, std::vector<char>& cluster);
+int nextConsonantCluster(phone_type* pt);
+int checkCluster(const char* p, const char** match_array);
 
 
 
@@ -57,18 +205,9 @@ int check_cluster(const char* p, const char** match_array);
 *
 *	purpose:	Returns -2 if could not break the cluster.
 *
-*
-*       arguments:      cluster
-*
-*	internal
-*	functions:	check_cluster
-*
-*	library
-*	functions:	strlen, strcpy
-*
 ******************************************************************************/
 int
-syllable_break(const char* cluster)
+syllableBreak(const char* cluster)
 {
 	const char* left_cluster;
 	const char* right_cluster;
@@ -79,17 +218,17 @@ syllable_break(const char* cluster)
 	length = strlen(cluster);
 
 	/*  INITIALLY WE SHALL RETURN THE FIRST 'POSSIBLE' MATCH  */
-	for (offset = -1; (offset <= length); offset++) {
+	for (offset = -1; offset <= length; offset++) {
 		if (offset == -1 || offset == length || cluster[offset] == '_' || cluster[offset] == '.') {
 			strcpy(temp, cluster);
 			if (offset >= 0) {
 				temp[offset] = 0;
 			}
-			left_cluster = (offset < 0 ? temp : offset == length ? temp + length : temp + (offset + 1));
+			left_cluster = (offset < 0) ? temp : (offset == length ? temp + length : temp + (offset + 1));
 			/*  POINTS TO BEGINNING OR NULL  */
-			right_cluster = (offset >= 0 ? temp : temp + length);
+			right_cluster = (offset >= 0) ? temp : temp + length;
 			/*  NOW THEY POINT TO EITHER A LEFT/RIGHT HANDED CLUSTER OR A NULL STRING  */
-			if (check_cluster(left_cluster, LEFT) && check_cluster(right_cluster, RIGHT)) {
+			if (checkCluster(left_cluster, LEFT) && checkCluster(right_cluster, RIGHT)) {
 				/*  IF THIS IS A POSSIBLE BREAK */
 				/*  TEMPORARY:  WILL STORE LIST OF POSSIBLES AND PICK A 'BEST' ONE  */
 				return offset;
@@ -101,76 +240,41 @@ syllable_break(const char* cluster)
 	return -2;
 }
 
-/******************************************************************************
-*
-*	function:	create_cv_signature
-*
-*	purpose:
-*
-*
-*       arguments:      ptr, arr
-*
-*	internal
-*	functions:	(isvowel), add_1_phone
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 void
-create_cv_signature(char *ptr, phone_type *arr)
+createCvSignature(char* ptr, phone_type* arr)
 {
-    phone_type         *arr_next;
+	phone_type* arr_next;
 
-    arr_next = arr;
-    while (*ptr) {
-	*arr_next++ = isvowel(*ptr) ? 'v' : 'c';
-	ptr = add_1_phone(ptr);
-    }
-    *arr_next = 0;
+	arr_next = arr;
+	while (*ptr) {
+		*arr_next++ = isvowel(*ptr) ? 'v' : 'c';
+		ptr = add1Phone(ptr);
+	}
+	*arr_next = 0;
 }
 
-/******************************************************************************
-*
-*	function:	add_1_phone
-*
-*	purpose:
-*
-*
-*       arguments:      t
-*
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 char*
-add_1_phone(char *t)
+add1Phone(char *t)
 {
-    while (*t && *t != '_' && *t != '.')
-	t++;
+	while (*t && *t != '_' && *t != '.') {
+		t++;
+	}
 
-    while (*t == '_' || *t == '.')
-	t++;
+	while (*t == '_' || *t == '.') {
+		t++;
+	}
 
-    return(t);
+	return t;
 }
 
-/******************************************************************************
-*
-*	function:	extract_consonant_cluster
-*
-******************************************************************************/
 void
-extract_consonant_cluster(char* ptr, phone_type* type, std::vector<char>& cluster)
+extractConsonantCluster(char* ptr, phone_type* type, std::vector<char>& cluster)
 {
 	char* newptr = ptr;
 
 	while (*type == 'c') {
 		type++;
-		newptr = add_1_phone(newptr);
+		newptr = add1Phone(newptr);
 	}
 
 	cluster.assign(strlen(ptr) + 1, '\0');
@@ -195,35 +299,25 @@ extract_consonant_cluster(char* ptr, phone_type* type, std::vector<char>& cluste
 *                       second-last cluster and the word doesn't end with a
 *                       vowel. Basically, 0 means to stop.)
 *
-*       arguments:      pt
-*
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
 ******************************************************************************/
 int
-next_consonant_cluster(phone_type *pt)
+nextConsonantCluster(phone_type *pt)
 {
-    phone_type         *pt_var, *pt_temp;
+	phone_type* pt_var;
+	phone_type* pt_temp;
 
-    pt_var = pt;
-    while (*pt_var == 'c')
-	pt_var++;
+	pt_var = pt;
+	while (*pt_var == 'c') pt_var++;
 
-    while (*pt_var == 'v')
-	pt_var++;
+	while (*pt_var == 'v') pt_var++;
 
-   /*  CHECK TO SEE IF WE ARE NOW ON THE FINAL CLUSTER OF THE WORD WHICH IS AT
-       THE END OF THE WORD  */
-    pt_temp = pt_var;
+	/*  CHECK TO SEE IF WE ARE NOW ON THE FINAL CLUSTER OF THE WORD WHICH IS AT
+		THE END OF THE WORD  */
+	pt_temp = pt_var;
 
-    while (*pt_temp == 'c')
-	pt_temp++;
+	while (*pt_temp == 'c') pt_temp++;
 
-    return (*pt_var && *pt_temp ? pt_var - pt : 0);
+	return (*pt_var && *pt_temp) ? pt_var - pt : 0;
 }
 
 /******************************************************************************
@@ -232,29 +326,20 @@ next_consonant_cluster(phone_type *pt)
 *
 *	purpose:	Returns 1 if it is a possible match, 0 otherwise.
 *
-*
-*       arguments:      p, match_array
-*
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	strcmp
-*
 ******************************************************************************/
 int
-check_cluster(const char *p, const char** match_array)
+checkCluster(const char* p, const char** match_array)
 {
 	const char** i;
 
 	/*  EMPTY COUNTS AS A MATCH  */
-	if (!*p)
-		return 1;
+	if (!*p) return 1;
 
 	i = match_array;
 	while (*i) {
-		if (!strcmp(*i, p))
+		if (strcmp(*i, p) == 0) {
 			return 1;
+		}
 		i++;
 	}
 	return 0;
@@ -277,31 +362,22 @@ namespace En {
 *                       (again taking the longest possible.)  Changes '_' to
 *                       '.' where it occurs between syllable end and start.
 *
-*       arguments:      word
-*                       
-*	internal
-*	functions:	create_cv_signature, next_consonant_cluster,
-*                       add_1_phone, extract_consonant_cluster, syllable_break
-*
-*	library
-*	functions:	none
-*
 ******************************************************************************/
 int
 syllabify(char* word)
 {
-	int        i, n, temp, number_of_syllables = 0;
+	int i, n, temp, number_of_syllables = 0;
 	phone_type cv_signature[MAX_LEN], *current_type;
 	char *ptr;
 	std::vector<char> cluster;
 
 	/*  INITIALIZE THIS ARRAY TO 'c' (CONSONANT), 'v' (VOWEL), 0 (END)  */
 	ptr = word;
-	create_cv_signature(ptr, cv_signature);
+	createCvSignature(ptr, cv_signature);
 	current_type = cv_signature;
 
 	/*  WHILE THERE IS ANOTHER CONSONANT CLUSTER (NOT THE LAST)  */
-	while ( (temp = next_consonant_cluster(current_type)) ) {
+	while ( (temp = nextConsonantCluster(current_type)) ) {
 		number_of_syllables++;
 
 		/*  UPDATE CURRENT TYPE POINTER  */
@@ -309,14 +385,14 @@ syllabify(char* word)
 
 		/*  MOVE PTR TO POINT TO THAT CLUSTER  */
 		for (i = 0; i < temp; i++) {
-			ptr = add_1_phone(ptr);
+			ptr = add1Phone(ptr);
 		}
 
 		/*  EXTRACT THE CLUSTER INTO A SEPARATE STRING  */
-		extract_consonant_cluster(ptr, current_type, cluster);
+		extractConsonantCluster(ptr, current_type, cluster);
 
 		/*  DETERMINE WHERE THE PERIOD GOES (OFFSET FROM PTR, WHICH COULD BE -1)  */
-		n = syllable_break(&cluster[0]);
+		n = syllableBreak(&cluster[0]);
 
 		/*  MARK THE SYLLABLE IF POSSIBLE  */
 		if (n != -2) {

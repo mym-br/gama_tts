@@ -53,9 +53,9 @@
 #include <string.h>
 #include <vector>
 
-#include "en/letter_to_sound/letter_to_sound.h"
 #include "Exception.h"
 #include "Log.h"
+#include "en/letter_to_sound/LetterToSound.h"
 
 
 
@@ -1550,7 +1550,7 @@ TextParser::lookupWord(const char* word)
 			break;
 		case TTS_LETTER_TO_SOUND:
 			/*  THIS IS GUARANTEED TO FIND A PRONUNCIATION OF SOME SORT  */
-			letter_to_sound(word, pronunciation_);
+			letterToSound(word, pronunciation_);
 			if (!pronunciation_.empty()) {
 				return &pronunciation_[0];
 			} else {

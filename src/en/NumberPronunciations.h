@@ -21,8 +21,7 @@
 #ifndef EN_NUMBER_PRONUNCIATIONS_H_
 #define EN_NUMBER_PRONUNCIATIONS_H_
 
-/*  number_pronunciations.h CONTAINS PRONUNCIATIONS FOR
-    number_parser() AND degenerate_string()  */
+// Contains pronunciations for NumberParser AND LetterToSound.
 
 /*  CARDINAL NUMBER NAMES  */
 #define OH                     "'uh_uu "
@@ -79,7 +78,6 @@
 #define OCTODECILLION          "\"o_k.t_uh_uu.d_e.'s_i_l.i_uh_n "
 #define NOVEMDECILLION         "\"n_uh_uu.v_e_m.d_e.'s_i_l.i_uh_n "
 #define VIGINTILLION           "\"v_i.j_i_n.'t_i_l.i_uh_n "
-
 
 /*  ORDINAL NUMBER NAMES  */
 #define ZEROETH                "'z_i_r.uh_uu.e_th "
@@ -191,7 +189,6 @@
 #define OCTODECILLIONTHS       "\"o_k.t_uh_uu.d_e.'s_i_l.i_uh_n_th_s "
 #define NOVEMDECILLIONTHS      "\"n_uh_uu.v_e_m.d_e.'s_i_l.i_uh_n_th_s "
 #define VIGINTILLIONTHS        "\"v_i.j_i_n.'t_i_l.i_uh_n_th_s "
-
 
 /*  MISCELLANEOUS SYMBOL NAMES  */
 #define AND                    "aa_n_d "

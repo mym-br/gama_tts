@@ -18,51 +18,19 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#include "en/letter_to_sound/insert_mark.h"
+#ifndef EN_LETTER_TO_SOUND_H_
+#define EN_LETTER_TO_SOUND_H_
+
+#include <vector>
 
 
 
 namespace GS {
 namespace En {
 
-/******************************************************************************
-*
-*	function:	insert_mark
-*
-*	purpose:
-*
-*
-*       arguments:      end, at
-*
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-void
-insert_mark(char **end, char *at)
-{
-    char      *temp = *end;
-
-    at++;
-
-    if (*at == 'e')
-	at++;
-
-    if (*at == '|')
-	return;
-
-    while (temp >= at) {
-	//temp[1] = *temp--;
-	temp[1] = *temp; //TODO: check
-	--temp;
-    }
-
-    *at = '|';
-    (*end)++;
-}
+void letterToSound(const char* word, std::vector<char>& pronunciation);
 
 } /* namespace En */
 } /* namespace GS */
+
+#endif /* EN_LETTER_TO_SOUND_H_ */
