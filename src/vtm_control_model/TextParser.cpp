@@ -18,22 +18,33 @@
 #include "TextParser.h"
 
 #include "Exception.h"
+#include "VTMControlModelConfiguration.h"
 #include "english/EnglishTextParser.h"
 
 namespace GS {
 namespace VTMControlModel {
 
 std::unique_ptr<TextParser>
-TextParser::getInstance(const std::string& language,
-		const std::string& configDirPath,
-		const std::string& dictionary1Path,
-		const std::string& dictionary2Path,
-		const std::string& dictionary3Path)
+TextParser::getInstance(const std::string& configDirPath, const Configuration& config)
 {
-	if (language == "english") {
-		return std::make_unique<English::EnglishTextParser>(configDirPath, dictionary1Path, dictionary2Path, dictionary3Path);
+	TextParser::Mode textParserMode;
+	switch (config.textParserMode) {
+	case 0: textParserMode = MODE_NORMAL  ; break;
+	case 1: textParserMode = MODE_EMPHASIS; break;
+	case 2: textParserMode = MODE_LETTER  ; break;
+	default:
+		THROW_EXCEPTION(InvalidValueException, "Invalid text parser mode: " << config.textParserMode << '.');
+	}
+
+	if (config.language == "english") {
+		return std::make_unique<English::EnglishTextParser>(
+							configDirPath,
+							config.dictionary1File,
+							config.dictionary2File,
+							config.dictionary3File,
+							textParserMode);
 	} else {
-		THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << language << '.');
+		THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << config.language << '.');
 	}
 }
 

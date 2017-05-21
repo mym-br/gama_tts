@@ -24,16 +24,14 @@
 namespace GS {
 namespace VTMControlModel {
 
+class Configuration;
+
 class TextParser {
 public:
 	enum Mode {
-		MODE_UNDEFINED,
 		MODE_NORMAL,
-		MODE_RAW,
-		MODE_LETTER,
 		MODE_EMPHASIS,
-		MODE_TAGGING,
-		MODE_SILENCE
+		MODE_LETTER
 	};
 
 	virtual ~TextParser() {}
@@ -41,11 +39,7 @@ public:
 	virtual std::string parse(const char* text) = 0;
 	virtual void setMode(Mode mode) = 0;
 
-	static std::unique_ptr<TextParser> getInstance(const std::string& language,
-						const std::string& configDirPath,
-						const std::string& dictionary1Path,
-						const std::string& dictionary2Path,
-						const std::string& dictionary3Path);
+	static std::unique_ptr<TextParser> getInstance(const std::string& configDirPath, const Configuration& config);
 };
 
 } /* namespace VTMControlModel */

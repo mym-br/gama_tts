@@ -39,7 +39,8 @@ public:
 		const std::string& configDirPath,
 		const std::string& dictionary1Path,
 		const std::string& dictionary2Path,
-		const std::string& dictionary3Path);
+		const std::string& dictionary3Path,
+		Mode mode = MODE_NORMAL);
 	~EnglishTextParser();
 
 	virtual std::string parse(const char* text);

@@ -48,6 +48,7 @@ struct Configuration {
 	double driftDeviation;
 	double driftLowpassCutoff;
 	int    intonation;
+	int    textParserMode;
 
 	// Intonation parameters.
 	double notionalPitch;

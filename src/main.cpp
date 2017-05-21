@@ -142,11 +142,7 @@ main(int argc, char* argv[])
 		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(configDirPath, *vtmControlModel);
 		const GS::VTMControlModel::Configuration& vtmControlConfig = vtmController->vtmControlModelConfiguration();
 
-		auto textParser = GS::VTMControlModel::TextParser::getInstance(vtmControlConfig.language,
-									configDirPath,
-									vtmControlConfig.dictionary1File,
-									vtmControlConfig.dictionary2File,
-									vtmControlConfig.dictionary3File);
+		auto textParser = GS::VTMControlModel::TextParser::getInstance(configDirPath, vtmControlConfig);
 		std::string phoneticString = textParser->parse(inputText.c_str());
 
 		vtmController->synthesizePhoneticString(phoneticString, vtmParamFile, outputFile);

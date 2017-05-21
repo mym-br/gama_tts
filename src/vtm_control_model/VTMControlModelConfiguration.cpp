@@ -28,17 +28,18 @@ namespace GS {
 namespace VTMControlModel {
 
 Configuration::Configuration()
-		: controlRate(0.0)
-		, tempo(0.0)
-		, pitchOffset(0.0)
-		, driftDeviation(0.0)
-		, driftLowpassCutoff(0.0)
-		, intonation(0)
-		, notionalPitch(0.0)
-		, pretonicRange(0.0)
-		, pretonicLift(0.0)
-		, tonicRange(0.0)
-		, tonicMovement(0.0)
+		: controlRate{}
+		, tempo{}
+		, pitchOffset{}
+		, driftDeviation{}
+		, driftLowpassCutoff{}
+		, intonation{}
+		, textParserMode{}
+		, notionalPitch{}
+		, pretonicRange{}
+		, pretonicLift{}
+		, tonicRange{}
+		, tonicMovement{}
 {
 }
 
@@ -69,6 +70,8 @@ Configuration::load(const std::string& configFilePath)
 	if (config.value<int>("random_intonation") != 0) {
 		intonation += INTONATION_RANDOMIZE;
 	}
+
+	textParserMode = config.value<int>("text_parser_mode");
 
 	notionalPitch = config.value<double>("notional_pitch");
 	pretonicRange = config.value<double>("pretonic_range");

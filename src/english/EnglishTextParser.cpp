@@ -82,8 +82,6 @@
 #define STATE_MEDIAL_PUNC     2
 #define STATE_FINAL_PUNC      3
 #define STATE_END             4
-#define STATE_SILENCE         5
-#define STATE_TAGGING         6
 
 #define CHUNK_BOUNDARY        "/c"
 #define TONE_GROUP_BOUNDARY   "//"
@@ -151,15 +149,9 @@ namespace {
 using namespace GS::VTMControlModel;
 
 void printStream(std::stringstream& stream, std::size_t streamLength);
-void getState(const char* buffer, std::size_t length, std::size_t* i, TextParser::Mode mode,
-		int* current_state, int* next_state, int* raw_mode_flag,
-		char* word, std::stringstream& stream);
+void getState(const char* buffer, std::size_t length, std::size_t* i, int* current_state, int* next_state, char* word);
 void setToneGroup(std::stringstream& stream, long tg_pos, const char* word);
 int anotherWordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode);
-void insertTag(std::stringstream& stream, long insert_point, const char* word);
-void expandRawMode(const char* buffer, std::size_t length, std::size_t* j, std::stringstream& stream);
-int illegalSlashCode(const char* code);
-int expandTagNumber(const char* buffer, std::size_t length, std::size_t* j, std::stringstream& stream);
 int isIsolated(char* buffer, std::size_t len, std::size_t i);
 int partOfNumber(char* buffer, std::size_t len, std::size_t i);
 int numberFollows(char* buffer, std::size_t len, std::size_t i);
@@ -216,14 +208,12 @@ printStream(std::stringstream& stream, std::size_t streamLength)
 *       function:       get_state
 *
 *       purpose:        Determines the current state and next state in buffer.
-*                       A word or punctuation is put into word.  Raw mode
-*                       contents are expanded and written to stream.
+*                       A word or punctuation is put into word.
 *
 ******************************************************************************/
 void
-getState(const char* buffer, std::size_t length, std::size_t* i, TextParser::Mode mode,
-		int* current_state, int* next_state, int* raw_mode_flag,
-		char* word, std::stringstream& stream)
+getState(const char* buffer, std::size_t length, std::size_t* i,
+		int* current_state, int* next_state, char* word)
 {
 	int k;
 	int state = 0;
@@ -237,101 +227,64 @@ getState(const char* buffer, std::size_t length, std::size_t* i, TextParser::Mod
 	/*  GET 2 STATES  */
 	for (j = *i; j < length && state < 2; j++) { // only need two states
 
-		if ((mode == TextParser::MODE_NORMAL) || (mode == TextParser::MODE_EMPHASIS)) {
-			/*  SKIP WHITE  */
-			if (buffer[j] == ' ') {
+		/*  SKIP WHITE  */
+		if (buffer[j] == ' ') {
+			continue;
+		}
+
+		/*  PUNCTUATION  */
+		if (isPunctuation(buffer[j])) {
+			if ((buffer[j] == '.') && ((j+1) < length) && isdigit(buffer[j+1])) {
+				;  /*  DO NOTHING, HANDLE AS WORD BELOW  */
+			} else {
+				/*  SET STATE ACCORDING TO PUNCUATION TYPE  */
+				switch (buffer[j]) {
+				case '.':
+				case '!':
+				case '?':  *(state_buffer[state]) = STATE_FINAL_PUNC;  break;
+				case ';':
+				case ':':
+				case ',':  *(state_buffer[state]) = STATE_MEDIAL_PUNC;  break;
+				}
+
+				/*  PUT PUNCTUATION INTO WORD BUFFER, SET OUTSIDE COUNTER, IN CURRENT STATE  */
+				if (state == 0) {
+					word[0] = buffer[j];
+					word[1] = '\0';
+					*i = j;
+				}
+
+				/*  INCREMENT STATE  */
+				state++;
 				continue;
 			}
+		}
 
-			/*  PUNCTUATION  */
-			if (isPunctuation(buffer[j])) {
-				if ((buffer[j] == '.') && ((j+1) < length) && isdigit(buffer[j+1])) {
-					;  /*  DO NOTHING, HANDLE AS WORD BELOW  */
+		/*  WORD  */
+		if (state == 0) {
+			/*  PUT WORD INTO BUFFER  */
+			k = 0;
+			do {
+				word[k++] = buffer[j++];
+			} while ((j < length) && (buffer[j] != ' ') && (k < WORD_LENGTH_MAX));
+			word[k] = '\0'; j--;
+
+			/*  BACK UP IF WORD ENDS WITH PUNCTUATION  */
+			while (k >= 1) {
+				if (isPunctuation(word[k-1])) {
+					word[--k] = '\0';
+					j--;
 				} else {
-					/*  SET STATE ACCORDING TO PUNCUATION TYPE  */
-					switch (buffer[j]) {
-					case '.':
-					case '!':
-					case '?':  *(state_buffer[state]) = STATE_FINAL_PUNC;  break;
-					case ';':
-					case ':':
-					case ',':  *(state_buffer[state]) = STATE_MEDIAL_PUNC;  break;
-					}
-
-					/*  PUT PUNCTUATION INTO WORD BUFFER, SET OUTSIDE COUNTER, IN CURRENT STATE  */
-					if (state == 0) {
-						word[0] = buffer[j];
-						word[1] = '\0';
-						*i = j;
-					}
-
-					/*  INCREMENT STATE  */
-					state++;
-					continue;
+					break;
 				}
 			}
-
-			/*  WORD  */
-			if (state == 0) {
-				/*  PUT WORD INTO BUFFER  */
-				k = 0;
-				do {
-					word[k++] = buffer[j++];
-				} while ((j < length) && (buffer[j] != ' ') && (k < WORD_LENGTH_MAX));
-				word[k] = '\0'; j--;
-
-				/*  BACK UP IF WORD ENDS WITH PUNCTUATION  */
-				while (k >= 1) {
-					if (isPunctuation(word[k-1])) {
-						word[--k] = '\0';
-						j--;
-					} else {
-						break;
-					}
-				}
-
-				/*  SET OUTSIDE COUNTER  */
-				*i = j;
-			}
-
-			/*  SET STATE TO WORD, INCREMENT STATE  */
-			*(state_buffer[state++]) = STATE_WORD;
-		} else if ((mode == TextParser::MODE_SILENCE) && (state == 0)) {
-			/*  PUT SILENCE LENGTH INTO WORD BUFFER IN CURRENT STATE ONLY  */
-			k = 0;
-			do {
-				word[k++] = buffer[j++];
-			} while ((j < length) && (k < WORD_LENGTH_MAX));
-			word[k] = '\0';  j--;
-
-			/*  SET OUTSIDE COUNTER  */
-			*i = j;
-
-			/*  SET STATE TO SILENCE, INCREMENT STATE  */
-			*(state_buffer[state++]) = STATE_SILENCE;
-		} else if ((mode == TextParser::MODE_TAGGING) && (state == 0)) {
-			/*  PUT TAG INTO WORD BUFFER IN CURRENT STATE ONLY  */
-			k = 0;
-			do {
-				word[k++] = buffer[j++];
-			} while ((j < length) && (k < WORD_LENGTH_MAX));
-			word[k] = '\0';  j--;
-
-			/*  SET OUTSIDE COUNTER  */
-			*i = j;
-
-			/*  SET STATE TO TAGGING, INCREMENT STATE  */
-			*(state_buffer[state++]) = STATE_TAGGING;
-		} else if ((mode == TextParser::MODE_RAW) && (state == 0)) {
-			/*  EXPAND RAW MODE IN CURRENT STATE ONLY  */
-			expandRawMode(buffer, length, &j, stream);
-
-			/*  SET RAW_MODE FLAG  */
-			*raw_mode_flag = TTS_TRUE;
 
 			/*  SET OUTSIDE COUNTER  */
 			*i = j;
 		}
+
+		/*  SET STATE TO WORD, INCREMENT STATE  */
+		*(state_buffer[state++]) = STATE_WORD;
 	}
 
 	/*  IF HERE, THEN END OF INPUT BUFFER, INDICATE END STATE  */
@@ -421,237 +374,6 @@ anotherWordFollows(const char* buffer, std::size_t length, std::size_t i, TextPa
 
 	/*  IF HERE, THEN NO WORD FOLLOWS  */
 	return 0;
-}
-
-/******************************************************************************
-*
-*       function:       insert_tag
-*
-*       purpose:        Inserts the tag contained in word onto the stream at
-*                       the insert_point.
-*
-******************************************************************************/
-void
-insertTag(std::stringstream& stream, long insert_point, const char* word)
-{
-	/*  RETURN IMMEDIATELY IF NO INSERT POINT  */
-	if (insert_point == UNDEFINED_POSITION) {
-		return;
-	}
-
-	/*  FIND POSITION OF END OF STREAM  */
-	long end_point = static_cast<long>(stream.tellp());
-
-	/*  CALCULATE HOW MANY CHARACTERS TO SHIFT  */
-	long length = end_point - insert_point;
-
-	/*  IF LENGTH IS 0, THEN SIMPLY APPEND TAG TO STREAM  */
-	if (length == 0) {
-		stream << TAG_BEGIN << ' ' << word;
-	} else {
-		/*  ELSE, SAVE STREAM AFTER INSERT POINT  */
-		std::string temp(length, '\0');
-		stream.seekg(insert_point);
-		for (long j = 0; j < length; j++) {
-			char c;
-			if (!stream.get(c)) {
-				THROW_EXCEPTION(GS::EndOfBufferException, "Could not get a character from the stream.");
-			}
-			temp[j] = c;
-		}
-
-		/*  INSERT TAG; ADD TEMPORARY MATERIAL  */
-		stream.seekp(insert_point);
-		stream << TAG_BEGIN << ' ' << word << ' ' << temp;
-	}
-}
-
-/******************************************************************************
-*
-*       function:       expand_raw_mode
-*
-*       purpose:        Writes raw mode contents to stream, checking phones
-*                       and markers.
-*
-******************************************************************************/
-void
-expandRawMode(const char* buffer, std::size_t length, std::size_t* j, std::stringstream& stream)
-{
-	int k, super_raw_mode = TTS_FALSE, delimiter = TTS_FALSE, blank = TTS_TRUE;
-	char token[SYMBOL_LENGTH_MAX+1];
-
-	/*  EXPAND AND CHECK RAW MODE CONTENTS TILL END OF RAW MODE  */
-	token[k = 0] = '\0';
-	for ( ; *j < length; (*j)++) {
-		stream << buffer[*j];
-		/*  CHECK IF ENTERING OR EXITING SUPER RAW MODE  */
-		if (buffer[*j] == '%') {
-			if (!super_raw_mode) {
-				super_raw_mode = TTS_TRUE;
-				token[k = 0] = '\0';
-				continue;
-			} else {
-				super_raw_mode = TTS_FALSE;
-				token[k = 0] = '\0';
-				delimiter = blank = TTS_FALSE;
-				continue;
-			}
-		}
-		/*  EXAMINE SLASH CODES, DELIMITERS, AND PHONES IN REGULAR RAW MODE  */
-		if (!super_raw_mode) {
-			switch (buffer[*j]) {
-			case '/':
-				/*  SLASH CODE  */
-				/*  EVALUATE PENDING TOKEN  */
-				/*  PUT SLASH CODE INTO TOKEN BUFFER  */
-				token[0] = '/';
-				if (++(*j) < length) {
-					stream << buffer[*j];
-					token[1] = buffer[*j];
-					token[2] = '\0';
-					/*  CHECK LEGALITY OF SLASH CODE  */
-					if (illegalSlashCode(token)) {
-						THROW_EXCEPTION(GS::TextParserException, "Illegal slash code.");
-					}
-					/*  CHECK ANY TAG AND TAG NUMBER  */
-					if (strcmp(token, TAG_BEGIN) == 0) {
-						if (expandTagNumber(buffer, length, j, stream) == TTS_PARSER_FAILURE) {
-							THROW_EXCEPTION(GS::TextParserException, "Could not expand tag number.");
-						}
-					}
-					/*  RESET FLAGS  */
-					token[k = 0] = '\0';
-					delimiter = blank = TTS_FALSE;
-				} else {
-					THROW_EXCEPTION(GS::TextParserException, "Slash character at the end.");
-				}
-				break;
-			case '_':
-			case '.':
-				/*  SYLLABLE DELIMITERS  */
-				/*  DON'T ALLOW REPEATED DELIMITERS, OR DELIMITERS AFTER BLANK  */
-				if (delimiter) {
-					THROW_EXCEPTION(GS::TextParserException, "Repeated delimiters.");
-				}
-				if (blank) {
-					THROW_EXCEPTION(GS::TextParserException, "Delimiter after blank.");
-				}
-				delimiter = TTS_TRUE;
-				blank = TTS_FALSE;
-				/*  RESET FLAGS  */
-				token[k = 0] = '\0';
-				break;
-			case ' ':
-				/*  WORD DELIMITER  */
-				/*  DON'T ALLOW SYLLABLE DELIMITER BEFORE BLANK  */
-				if (delimiter) {
-					THROW_EXCEPTION(GS::TextParserException, "Syllable delimiter before blank.");
-				}
-				/*  SET FLAGS  */
-				blank = TTS_TRUE;
-				delimiter = TTS_FALSE;
-				/*  RESET FLAGS  */
-				token[k = 0] = '\0';
-				break;
-			default:
-				/*  PHONE SYMBOL  */
-				/*  RESET FLAGS  */
-				delimiter = blank = TTS_FALSE;
-				/*  ACCUMULATE PHONE SYMBOL IN TOKEN BUFFER  */
-				token[k++] = buffer[*j];
-				if (k <= SYMBOL_LENGTH_MAX) {
-					token[k] = '\0';
-				} else {
-					THROW_EXCEPTION(GS::TextParserException, "Token buffer too small.");
-				}
-				break;
-			}
-		}
-	}
-
-	/*  CANNOT END WITH A DELIMITER  */
-	if (delimiter) {
-		THROW_EXCEPTION(GS::TextParserException, "Delimiter at the end.");
-	}
-
-	/*  PAD WITH SPACE, RESET EXTERNAL COUNTER  */
-	stream << ' ';
-	(*j)--;
-}
-
-/******************************************************************************
-*
-*       function:       illegal_slash_code
-*
-*       purpose:        Returns 1 if code is illegal, 0 otherwise.
-*
-******************************************************************************/
-int
-illegalSlashCode(const char* code)
-{
-	const char* legal_code[] = {
-		CHUNK_BOUNDARY,
-		TONE_GROUP_BOUNDARY,
-		FOOT_BEGIN,
-		TONIC_BEGIN,
-		SECONDARY_STRESS,
-		LAST_WORD,
-		TAG_BEGIN,
-		WORD_BEGIN,
-		TG_STATEMENT,
-		TG_EXCLAMATION,
-		TG_QUESTION,
-		TG_CONTINUATION,
-		TG_HALF_PERIOD,
-		NULL
-	};
-
-	/*  COMPARE CODE WITH LEGAL CODES, RETURN 0 IMMEDIATELY IF A MATCH  */
-	int i = 0;
-	while (legal_code[i] != NULL) {
-		if (strcmp(legal_code[i++], code) == 0) {
-			return 0;
-		}
-	}
-
-	/*  IF HERE, THEN NO MATCH;  RETURN 1, INDICATING ILLEGAL CODE  */
-	return 1;
-}
-
-/******************************************************************************
-*
-*       function:       expand_tag_number
-*
-*       purpose:        Expand tag number in buffer at position j and write to
-*                       stream.  Perform error checking, returning error code
-*                       if format of tag number is illegal.
-*
-******************************************************************************/
-int
-expandTagNumber(const char* buffer, std::size_t length, std::size_t* j, std::stringstream& stream)
-{
-	/*  SKIP WHITE  */
-	while ((((*j)+1) < length) && (buffer[(*j)+1] == ' ')) {
-		(*j)++;
-		stream << buffer[*j];
-	}
-
-	/*  CHECK FORMAT OF TAG NUMBER  */
-	int sign = 0;
-	while ((((*j)+1) < length) && (buffer[(*j)+1] != ' ') && (buffer[(*j)+1] != '%')) {
-		stream << buffer[++(*j)];
-		if ((buffer[*j] == '-') || (buffer[*j] == '+')) {
-			if (sign) {
-				return TTS_PARSER_FAILURE;
-			}
-			sign++;
-		} else if (!isdigit(buffer[*j])) {
-			return TTS_PARSER_FAILURE;
-		}
-	}
-
-	/*  RETURN SUCCESS  */
-	return TTS_PARSER_SUCCESS;
 }
 
 /******************************************************************************
@@ -855,8 +577,7 @@ isPunctuation(char c)
 *       function:       word_follows
 *
 *       purpose:        Returns a 1 if a word or speakable symbol (letter mode)
-*                       follows the position i in buffer.  Raw, tagging, and
-*                       silence mode contents are ignored.  Returns a 0 if any
+*                       follows the position i in buffer. Returns a 0 if any
 *                       punctuation (except . as part of number) follows.
 *
 ******************************************************************************/
@@ -884,11 +605,6 @@ wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::M
 	case TextParser::MODE_LETTER:
 		/*  IF LETTER MODE CONTAINS ANY SYMBOLS, THEN RETURN 1  */
 		return 1;
-	case TextParser::MODE_RAW:
-	case TextParser::MODE_SILENCE:
-	case TextParser::MODE_TAGGING:
-		/*  IGNORE CONTENTS OF RAW, SILENCE, AND TAGGING MODE  */
-		return 0;
 	default:
 		return 0;
 	}
@@ -1384,8 +1100,9 @@ EnglishTextParser::EnglishTextParser(
 			const std::string& configDirPath,
 			const std::string& dictionary1Path,
 			const std::string& dictionary2Path,
-			const std::string& dictionary3Path)
-		: mode_{MODE_NORMAL}
+			const std::string& dictionary3Path,
+			Mode mode)
+		: mode_{mode}
 {
 	std::ostringstream suffixFilePathStream;
 	suffixFilePathStream << configDirPath << TEXT_PARSER_DIR SUFFIX_LIST_FILE;
@@ -1475,7 +1192,7 @@ EnglishTextParser::parse(const char* text)
 	stripPunctuation(&buffer[0], buffer_length, stream1, &stream1_length);
 
 	if (Log::debugEnabled) {
-		printf("\nPHONETIC STRING STREAM 1\n");
+		printf("PHONETIC STRING STREAM 1\n");
 		printStream(stream1, stream1_length);
 	}
 
@@ -1493,6 +1210,9 @@ EnglishTextParser::parse(const char* text)
 	}
 
 	std::string phoneticString = stream2.str();
+	if (phoneticString.length() < 2) {
+		THROW_EXCEPTION(InvalidStateException, "Empty phonetic string.");
+	}
 	return phoneticString.substr(0, phoneticString.size() - 1); // the last character is '\0'
 }
 
@@ -1579,10 +1299,8 @@ void
 EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t stream1Length,
 				std::stringstream& stream2, std::size_t* stream2Length)
 {
-	long last_word_end = UNDEFINED_POSITION;
 	long tg_marker_pos = UNDEFINED_POSITION;
 	int prior_tonic = TTS_FALSE;
-	int raw_mode_flag = TTS_FALSE;
 	int last_written_state = STATE_BEGIN;
 	int current_state;
 	int next_state;
@@ -1599,8 +1317,7 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 	for (std::size_t i = 0; i < stream1Length; i++) {
 
 		/*  GET STATE INFORMATION  */
-		getState(input, stream1Length, &i, mode_, &current_state,
-				&next_state, &raw_mode_flag, word, stream2);
+		getState(input, stream1Length, &i, &current_state, &next_state, word);
 
 		/*  ACTION ACCORDING TO CURRENT STATE  */
 		switch (current_state) {
@@ -1615,11 +1332,11 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 			case STATE_MEDIAL_PUNC:
 				stream2 << TG_UNDEFINED << ' ';
 				tg_marker_pos = static_cast<long>(stream2.tellp()) - 3;
-			case STATE_SILENCE:
 				stream2 << UTTERANCE_BOUNDARY << ' ';
 			}
 
-			if (mode_ == MODE_NORMAL) {
+			switch (mode_) {
+			case MODE_NORMAL:
 				/*  PUT IN WORD MARKER  */
 				stream2 << WORD_BEGIN << ' ';
 				/*  ADD LAST WORD MARKER AND TONICIZATION IF NECESSARY  */
@@ -1637,7 +1354,8 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 					expandWord(word, TTS_NO, stream2);
 					break;
 				}
-			} else if (mode_ == MODE_EMPHASIS) {
+				break;
+			case MODE_EMPHASIS:
 				/*  START NEW TONE GROUP IF PRIOR TONIC ALREADY SET  */
 				if (prior_tonic) {
 					setToneGroup(stream2, tg_marker_pos, ",");
@@ -1656,17 +1374,18 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 				/*  TONICIZE WORD  */
 				expandWord(word, TTS_YES, stream2);
 				prior_tonic = TTS_TRUE;
+				break;
+			case MODE_LETTER:
+				expandWord(word, TTS_NO, stream2);
+				break;
 			}
 
-			/*  SET LAST WRITTEN STATE, AND END POSITION AFTER THE WORD  */
 			last_written_state = STATE_WORD;
-			last_word_end = static_cast<long>(stream2.tellp());
 			break;
 
 		case STATE_MEDIAL_PUNC:
-			/*  APPEND LAST WORD MARK, PAUSE, TONE GROUP MARK (FALL-THRU DESIRED)  */
-			switch (last_written_state) {
-			case STATE_WORD:
+			/*  APPEND LAST WORD MARK, PAUSE, TONE GROUP MARK  */
+			if (last_written_state == STATE_WORD) {
 				if ((next_state != STATE_END) &&
 						anotherWordFollows(input, stream1Length, i, mode_)) {
 					if (strcmp(word, ",") == 0) {
@@ -1677,7 +1396,6 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 				} else if (next_state == STATE_END) {
 					stream2 << UTTERANCE_BOUNDARY << ' ';
 				}
-			case STATE_SILENCE:
 				stream2 << TONE_GROUP_BOUNDARY << ' ';
 				prior_tonic = TTS_FALSE;
 				setToneGroup(stream2, tg_marker_pos, word);
@@ -1694,32 +1412,7 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 				setToneGroup(stream2, tg_marker_pos, word);
 				tg_marker_pos = UNDEFINED_POSITION;
 				last_written_state = STATE_FINAL_PUNC;
-			} else if (last_written_state == STATE_SILENCE) {
-				stream2 << TONE_GROUP_BOUNDARY << ' ';
-				prior_tonic = TTS_FALSE;
-				setToneGroup(stream2, tg_marker_pos, word);
-				tg_marker_pos = UNDEFINED_POSITION;
-				/*  IF SILENCE INSERTED, THEN CONVERT FINAL PUNCTUATION TO MEDIAL  */
-				last_written_state = STATE_MEDIAL_PUNC;
 			}
-			break;
-
-		case STATE_SILENCE:
-			if (last_written_state == STATE_BEGIN) {
-				stream2 << CHUNK_BOUNDARY << ' ' << TONE_GROUP_BOUNDARY << ' ' << TG_UNDEFINED << ' ';
-				prior_tonic = TTS_FALSE;
-				tg_marker_pos = static_cast<long>(stream2.tellp()) - 3;
-				last_written_state = STATE_SILENCE;
-				last_word_end = static_cast<long>(stream2.tellp());
-			} else if (last_written_state == STATE_WORD) {
-				last_written_state = STATE_SILENCE;
-				last_word_end = static_cast<long>(stream2.tellp());
-			}
-			break;
-
-		case STATE_TAGGING:
-			insertTag(stream2, last_word_end, word);
-			last_word_end = UNDEFINED_POSITION;
 			break;
 
 		case STATE_END:
@@ -1733,17 +1426,14 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 		stream2 << CHUNK_BOUNDARY;
 		break;
 
-	case STATE_WORD:  /*  FALL THROUGH DESIRED  */
+	case STATE_WORD:
 		stream2 << UTTERANCE_BOUNDARY << ' ';
-	case STATE_SILENCE:
 		stream2 << TONE_GROUP_BOUNDARY << ' ' << CHUNK_BOUNDARY;
 		setToneGroup(stream2, tg_marker_pos, DEFAULT_END_PUNC);
 		break;
 
 	case STATE_BEGIN:
-		if (!raw_mode_flag) {
-			THROW_EXCEPTION(TextParserException, "Invalid state: STATE_BEGIN.");
-		}
+		THROW_EXCEPTION(TextParserException, "Invalid state: STATE_BEGIN.");
 		break;
 	}
 
