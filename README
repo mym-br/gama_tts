@@ -12,6 +12,7 @@ The base was the code on Gnuspeech's Subversion repository, revision 672,
 downloaded in 2014-08-02. The source code was obtained from the directories:
 nextstep/trunk/ObjectiveC/Monet.realtime
 nextstep/trunk/src/SpeechObject/postMonet/server.monet
+Gnuspeech is licensed under the GNU GPLv3 or later.
 
 This software includes code from RapidXml (http://rapidxml.sourceforge.net/),
 provided by Marcin Kalicinski. See the file src/rapidxml/license.txt
