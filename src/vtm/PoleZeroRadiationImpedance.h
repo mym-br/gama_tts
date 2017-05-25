@@ -46,7 +46,7 @@ namespace VTM {
  *
  * The constants a and b were calculated using as reference the radiation
  * impedance of a circular piston in a spherical baffle
- * (sphere radius: 9 cm, c: 353.6 m/s (37°C)), described in:
+ * (sphere radius: 9 cm, c: 352.4 m/s (35°C)), described in:
  *
  * - Chalker, Mackerras - "Models for Representing the Acoustic Radiation
  *   Impedance of the Mouth", 1985.
@@ -137,7 +137,7 @@ PoleZeroRadiationImpedance<FloatType>::transitionFrequency(FloatType radius) {
 	if (radius < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
 		radius = GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS;
 	}
-	return FloatType{62.5478} / radius + FloatType{321.957};
+	return FloatType{62.3371} / radius + FloatType{320.204};
 }
 
 template<typename FloatType>
@@ -161,7 +161,7 @@ PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
 	const FloatType b = 2.0f * a - 1.0f;
 
 	if (radius < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
-		a *= FloatType{40388.6} * (radius * radius);
+		a *= FloatType{40391.2} * (radius * radius);
 	}
 
 	const FloatType coef = 1.0f / (a + 1.0f);
