@@ -17,12 +17,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-//                                                                         NJ1         NJ2         NJ3         NJ4         NJ5         NJ6
-//                                                                         |           |           |           |           |           |
-//                                                             VELUM=NR1   | NR2       | NR3       | NR4       | NR5       | NR6       |
-//                                                       nasal -------------------------------------------------------------------------
-//                                                          ___|N1 |N2 |N3 |N4 |N5 |N6 |N7 |N8 |N9 |N10|N11|N12|N13|N14|N15|N16|N17|N18| nose
-//                                                         |   -------------------------------------------------------------------------
+//                                                                         NJ1         NJ2         NJ3         NJ4         NJ5         NJ6         NJ7
+//                                                                         |           |           |           |           |           |           |
+//                                                             VELUM=NR1   | NR2       | NR3       | NR4       | NR5       | NR6       | NR7       |
+//                                                       nasal -------------------------------------------------------------------------------------
+//                                                          ___|N1 |N2 |N3 |N4 |N5 |N6 |N7 |N8 |N9 |N10|N11|N12|N13|N14|N15|N16|N17|N18|N19|N20|N21| nose
+//                                                         |   -------------------------------------------------------------------------------------
 //         oropharynx                                      |
 //         -------------------------------------------------------------------------------------------------------------------------
 // vocal   |S1 |S2 |S3 |S4 |S5 |S6 |S7 |S8 |S9 |S10|S11|S12|S13|S14|S15|S16|S17|S18|S19|S20|S21|S22|S23|S24|S25|S26|S27|S28|S29|S30| mouth
@@ -117,7 +117,8 @@ private:
 		NR4 = 3,
 		NR5 = 4,
 		NR6 = 5,
-		TOTAL_NASAL_REGIONS = 6
+		NR7 = 6,
+		TOTAL_NASAL_REGIONS = 7
 	};
 	enum { /*  NASAL TRACT SECTIONS  */
 		N1  = 0,
@@ -138,7 +139,10 @@ private:
 		N16 = 15,
 		N17 = 16,
 		N18 = 17,
-		TOTAL_NASAL_SECTIONS = 18
+		N19 = 18,
+		N20 = 19,
+		N21 = 20,
+		TOTAL_NASAL_SECTIONS = 21
 	};
 	enum Waveform {
 		GLOTTAL_SOURCE_PULSE = 0,
@@ -205,7 +209,8 @@ private:
 		NJ3 = 2, /*  N9  - N10  */
 		NJ4 = 3, /*  N12 - N13  */
 		NJ5 = 4, /*  N15 - N16  */
-		NJ6 = 5, /*  N18 - AIR  */
+		NJ6 = 5, /*  N18 - N19  */
+		NJ7 = 6, /*  N21 - AIR  */
 		TOTAL_NASAL_JUNCTIONS = TOTAL_NASAL_SECTIONS / 3
 	};
 	enum ParameterIndex {
@@ -431,20 +436,21 @@ VocalTractModel5<FloatType, SectionDelay>::loadConfiguration(const Configuration
 	config_.mixOffset      = data.value<FloatType>("mix_offset");
 	const FloatType globalRadiusCoef      = data.value<FloatType>("global_radius_coef");
 	const FloatType globalNasalRadiusCoef = data.value<FloatType>("global_nasal_radius_coef");
-	config_.nasalRadius[0] = 0.0;
-	config_.nasalRadius[1] = data.value<FloatType>("nasal_radius_1") * globalNasalRadiusCoef;
-	config_.nasalRadius[2] = data.value<FloatType>("nasal_radius_2") * globalNasalRadiusCoef;
-	config_.nasalRadius[3] = data.value<FloatType>("nasal_radius_3") * globalNasalRadiusCoef;
-	config_.nasalRadius[4] = data.value<FloatType>("nasal_radius_4") * globalNasalRadiusCoef;
-	config_.nasalRadius[5] = data.value<FloatType>("nasal_radius_5") * globalNasalRadiusCoef;
-	config_.radiusCoef[0]  = data.value<FloatType>("radius_1_coef") * globalRadiusCoef;
-	config_.radiusCoef[1]  = data.value<FloatType>("radius_2_coef") * globalRadiusCoef;
-	config_.radiusCoef[2]  = data.value<FloatType>("radius_3_coef") * globalRadiusCoef;
-	config_.radiusCoef[3]  = data.value<FloatType>("radius_4_coef") * globalRadiusCoef;
-	config_.radiusCoef[4]  = data.value<FloatType>("radius_5_coef") * globalRadiusCoef;
-	config_.radiusCoef[5]  = data.value<FloatType>("radius_6_coef") * globalRadiusCoef;
-	config_.radiusCoef[6]  = data.value<FloatType>("radius_7_coef") * globalRadiusCoef;
-	config_.radiusCoef[7]  = data.value<FloatType>("radius_8_coef") * globalRadiusCoef;
+	config_.nasalRadius[NR1] = 0.0;
+	config_.nasalRadius[NR2] = data.value<FloatType>("nasal_radius_2") * globalNasalRadiusCoef;
+	config_.nasalRadius[NR3] = data.value<FloatType>("nasal_radius_3") * globalNasalRadiusCoef;
+	config_.nasalRadius[NR4] = data.value<FloatType>("nasal_radius_4") * globalNasalRadiusCoef;
+	config_.nasalRadius[NR5] = data.value<FloatType>("nasal_radius_5") * globalNasalRadiusCoef;
+	config_.nasalRadius[NR6] = data.value<FloatType>("nasal_radius_6") * globalNasalRadiusCoef;
+	config_.nasalRadius[NR7] = data.value<FloatType>("nasal_radius_7") * globalNasalRadiusCoef;
+	config_.radiusCoef[R1] = data.value<FloatType>("radius_1_coef") * globalRadiusCoef;
+	config_.radiusCoef[R2] = data.value<FloatType>("radius_2_coef") * globalRadiusCoef;
+	config_.radiusCoef[R3] = data.value<FloatType>("radius_3_coef") * globalRadiusCoef;
+	config_.radiusCoef[R4] = data.value<FloatType>("radius_4_coef") * globalRadiusCoef;
+	config_.radiusCoef[R5] = data.value<FloatType>("radius_5_coef") * globalRadiusCoef;
+	config_.radiusCoef[R6] = data.value<FloatType>("radius_6_coef") * globalRadiusCoef;
+	config_.radiusCoef[R7] = data.value<FloatType>("radius_7_coef") * globalRadiusCoef;
+	config_.radiusCoef[R8] = data.value<FloatType>("radius_8_coef") * globalRadiusCoef;
 	config_.glottalNoiseCutoff   = data.value<FloatType>("glottal_noise_cutoff");
 	config_.fricationNoiseCutoff = data.value<FloatType>("frication_noise_cutoff");
 	config_.fricationFactor      = data.value<FloatType>("frication_factor");
@@ -738,11 +744,11 @@ void
 VocalTractModel5<FloatType, SectionDelay>::initializeNasalCavity()
 {
 	// Configure junctions for fixed nasal sections.
-	for (int i = NJ2, j = NR2; i < NJ6; ++i, ++j) {
+	for (int i = NJ2, j = NR2; i < NJ7; ++i, ++j) {
 		nasalJunction_[i].configure(config_.nasalRadius[j], config_.nasalRadius[j + 1]);
 	}
 
-	const FloatType r = std::sqrt(0.5f * config_.nasalRadius[NR6] * config_.nasalRadius[NR6]);
+	const FloatType r = std::sqrt(0.5f * config_.nasalRadius[NR7] * config_.nasalRadius[NR7]);
 	nasalRadiationImpedance_->update(r * 1.0e-2f /* cm --> m */);
 }
 
@@ -847,10 +853,13 @@ VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 	propagateJunction(nasal_[N15], nasalJunction_[NJ5], nasal_[N16]);
 	propagate(nasal_[N16], nasal_[N17]);
 	propagate(nasal_[N17], nasal_[N18]);
+	propagateJunction(nasal_[N18], nasalJunction_[NJ6], nasal_[N19]);
+	propagate(nasal_[N19], nasal_[N20]);
+	propagate(nasal_[N20], nasal_[N21]);
 
 	FloatType nasalOutputFlow;
-	nasalRadiationImpedance_->process(nasal_[N18].top[outPtr_], nasalOutputFlow, nasal_[N18].bottom[inPtr_]);
-	nasal_[N18].bottom[inPtr_] *= dampingFactor_;
+	nasalRadiationImpedance_->process(nasal_[N21].top[outPtr_], nasalOutputFlow, nasal_[N21].bottom[inPtr_]);
+	nasal_[N21].bottom[inPtr_] *= dampingFactor_;
 
 	// Add frication noise.
 	const FloatType fricOffset = (S28 - S6) * (currentParameter_[PARAM_FRIC_POS] / FloatType{GS_VTM5_MAX_FRIC_POS - GS_VTM5_MIN_FRIC_POS});
