@@ -864,7 +864,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="40"/>
+        <target name="fricVol" value="27"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -900,7 +900,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="40"/>
+        <target name="fricVol" value="27"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
@@ -4384,7 +4384,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="27"/>
+        <target name="fricVol" value="28"/>
         <target name="fricPos" value="5.6"/>
         <target name="fricCF" value="2500"/>
         <target name="fricBW" value="2600"/>
@@ -6200,8 +6200,8 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
       <transition name="jFricBurst" type="triphone">
         <point-or-slopes>
           <point type="diphone" value="0" time-expression="Mark1"/>
-          <point type="diphone" value="40" time-expression="Mark1Plus6"/>
-          <point type="diphone" value="35" time-expression="QssbTwo"/>
+          <point type="diphone" value="45" time-expression="Mark1Plus6"/>
+          <point type="diphone" value="40" time-expression="QssbTwo"/>
           <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
           <point type="triphone" value="0" time-expression="Zero"/>
