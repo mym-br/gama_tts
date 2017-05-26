@@ -21,11 +21,15 @@
 #ifndef VTM_CONTROL_MODEL_CONFIGURATION_H_
 #define VTM_CONTROL_MODEL_CONFIGURATION_H_
 
+#include <memory>
 #include <string>
 
 
 
 namespace GS {
+
+class ConfigurationData;
+
 namespace VTMControlModel {
 
 struct Configuration {
@@ -40,7 +44,7 @@ struct Configuration {
 
 	Configuration();
 
-	void load(const std::string& configFilePath);
+	void load(const char* configDirPath);
 
 	double controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
 	double tempo;
@@ -56,12 +60,15 @@ struct Configuration {
 	double pretonicLift;
 	double tonicRange;
 	double tonicMovement;
+	double intonationFactor;
 
 	std::string language;
 	std::string voiceName;
 	std::string dictionary1File;
 	std::string dictionary2File;
 	std::string dictionary3File;
+
+	std::unique_ptr<ConfigurationData> voiceData;
 };
 
 } /* namespace VTMControlModel */

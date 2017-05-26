@@ -164,6 +164,9 @@ public:
 
 	void setTgUseRandom(bool tgUseRandom) { tgUseRandom_ = tgUseRandom; }
 	bool tgUseRandom() const { return tgUseRandom_; }
+
+	void setIntonationFactor(float value) { intonationFactor_ = value; }
+
 	void setCurrentPostureSyllable();
 	void setUp();
 	double getBeatAtIndex(int ruleIndex) const;
@@ -252,6 +255,8 @@ private:
 
 	bool useFixedIntonationParameters_;
 	float fixedIntonationParameters_[10];
+
+	float intonationFactor_;
 
 	std::random_device randDev_;
 	std::mt19937 randSrc_;

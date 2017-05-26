@@ -28,9 +28,8 @@
 #include "Exception.h"
 #include "Log.h"
 
-#define VTM_CONTROL_MODEL_CONFIG_FILE_NAME "/vtm_control_model.config"
+
 #define VTM_CONFIG_FILE_NAME "/vtm.config"
-#define VOICE_FILE_PREFIX "/voice_"
 
 
 
@@ -42,18 +41,14 @@ Controller::Controller(const char* configDirPath, Model& model)
 		, eventList_{configDirPath, model_}
 		, phoneticStringParser_{configDirPath, model_, eventList_}
 {
-	// Load VTMControlModel::Configuration.
-	std::ostringstream vtmControlModelConfigFilePath;
-	vtmControlModelConfigFilePath << configDirPath << VTM_CONTROL_MODEL_CONFIG_FILE_NAME;
-	vtmControlModelConfig_.load(vtmControlModelConfigFilePath.str());
+	// Load VTMControlModel configuration.
+	vtmControlModelConfig_.load(configDirPath);
 
-	// Load VTM::Configuration.
-	std::ostringstream voiceFilePath;
-	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << vtmControlModelConfig_.voiceName << ".config";
-	vtmConfigData_ = std::make_unique<ConfigurationData>(voiceFilePath.str());
+	// Load VTM configuration.
 	std::ostringstream vtmConfigFilePath;
 	vtmConfigFilePath << configDirPath << VTM_CONFIG_FILE_NAME;
-	vtmConfigData_->insert(ConfigurationData(vtmConfigFilePath.str()));
+	vtmConfigData_ = std::make_unique<ConfigurationData>(vtmConfigFilePath.str());
+	vtmConfigData_->insert(*vtmControlModelConfig_.voiceData);
 
 	// Get the vocal tract model instance.
 	vtm_ = VTM::VocalTractModel::getInstance(*vtmConfigData_);
@@ -95,6 +90,7 @@ Controller::initUtterance()
 	eventList_.setSmoothIntonation(vtmControlModelConfig_.intonation & Configuration::INTONATION_SMOOTH);
 	eventList_.setIntonationDrift( vtmControlModelConfig_.intonation & Configuration::INTONATION_DRIFT);
 	eventList_.setTgUseRandom(     vtmControlModelConfig_.intonation & Configuration::INTONATION_RANDOMIZE);
+	eventList_.setIntonationFactor(vtmControlModelConfig_.intonationFactor);
 }
 
 bool

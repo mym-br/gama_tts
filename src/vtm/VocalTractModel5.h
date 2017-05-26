@@ -247,9 +247,12 @@ private:
 		int       modulation;                  // pulse mod. of noise (0=OFF, 1=ON)
 		FloatType mixOffset;                   // noise crossmix offset (30 - 60 dB)
 		std::array<FloatType, TOTAL_REGIONS> radiusCoef;
-		FloatType glottalNoiseCutoff;          // lowpass cutoff frequency (Hz)
-		FloatType fricationNoiseCutoff;        // lowpass cutoff frequency (Hz)
+		FloatType glottalNoiseCutoff;          // glottal noise lowpass cutoff frequency (Hz)
+		FloatType fricationNoiseCutoff;        // frication noise lowpass cutoff frequency (Hz)
 		FloatType fricationFactor;
+		FloatType minGlottalLoss;              // minimum loss at glottis (%)
+		FloatType maxGlottalLoss;              // maximum loss at glottis (%)
+		FloatType glottalLowpassCutoff;        // glottal wave lowpass cutoff frequency (Hz)
 		int bypass;
 	};
 
@@ -348,7 +351,7 @@ private:
 	void calculateTubeCoefficients();
 	void initializeNasalCavity();
 	void parseInputStream(std::istream& in);
-	FloatType vocalTract(FloatType input, FloatType frication);
+	FloatType vocalTract(FloatType input, FloatType frication, FloatType glottalLossFactor);
 	void writeOutputToFile(const char* outputFile);
 	void writeOutputToBuffer(std::vector<float>& outputBuffer);
 	void synthesize();
@@ -391,6 +394,7 @@ private:
 	std::unique_ptr<Butterworth2LowPassFilter<FloatType>>  fricationNoiseFilter_;
 	std::unique_ptr<NoiseSource>                           noiseSource_;
 	std::unique_ptr<InputFilters>                          inputFilters_;
+	std::unique_ptr<Butterworth1LowPassFilter<FloatType>>  glottalFilter_;
 	DifferenceFilter<FloatType>                            outputDiffFilter_;
 	ParameterLogger<FloatType>                             paramLogger_;
 };
@@ -444,6 +448,9 @@ VocalTractModel5<FloatType, SectionDelay>::loadConfiguration(const Configuration
 	config_.glottalNoiseCutoff   = data.value<FloatType>("glottal_noise_cutoff");
 	config_.fricationNoiseCutoff = data.value<FloatType>("frication_noise_cutoff");
 	config_.fricationFactor      = data.value<FloatType>("frication_factor");
+	config_.minGlottalLoss       = data.value<FloatType>("min_glottal_loss");
+	config_.maxGlottalLoss       = data.value<FloatType>("max_glottal_loss");
+	config_.glottalLowpassCutoff = data.value<FloatType>("glottal_lowpass_cutoff");
 	config_.bypass = data.value<int>("bypass");
 
 	logParameters_ = interactive_ ? false : data.value<bool>("log_parameters");
@@ -594,6 +601,8 @@ VocalTractModel5<FloatType, SectionDelay>::initializeSynthesizer()
 	fricationNoiseFilter_ = std::make_unique<Butterworth2LowPassFilter<FloatType>>();
 	fricationNoiseFilter_->update(sampleRate_, config_.fricationNoiseCutoff);
 	noiseSource_          = std::make_unique<NoiseSource>();
+	glottalFilter_        = std::make_unique<Butterworth1LowPassFilter<FloatType>>();
+	glottalFilter_->update(sampleRate_, config_.glottalLowpassCutoff);
 
 	if (interactive_) {
 		inputFilters_ = std::make_unique<InputFilters>(sampleRate_, GS_VTM5_INPUT_FILTER_PERIOD_SEC);
@@ -680,7 +689,7 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
-	const FloatType pulse = glottalSource_->getSample(f0);
+	const FloatType pulse = glottalFilter_->filter(glottalSource_->getSample(f0));
 
 	/*  CREATE PULSED NOISE  */
 	const FloatType pulsedNoise = glottalNoise * pulse;
@@ -702,8 +711,13 @@ VocalTractModel5<FloatType, SectionDelay>::synthesize()
 		// Send to output.
 		srConv_->dataFill(interactive_ ? signal / f0 : signal); // divide by f0 to compensate for the differentiation at the output
 	} else {
+		const FloatType minGlottalLossFactor = 1.0f - glotAmplitude * (config_.minGlottalLoss / 100.0f);
+		const FloatType maxGlottalLossFactor = 1.0f - glotAmplitude * (config_.maxGlottalLoss / 100.0f);
+		const FloatType glottalLossFactor = minGlottalLossFactor + (maxGlottalLossFactor - minGlottalLossFactor) * pulse;
+
 		const FloatType signal = vocalTract(noisyPulse + aspAmplitude * fricationNoise,
-							config_.fricationFactor * bandpassFilter_->filter(fricationNoise));
+							config_.fricationFactor * bandpassFilter_->filter(fricationNoise),
+							glottalLossFactor);
 		// Send to output.
 		srConv_->dataFill(interactive_ ? signal / f0 : signal); // divide by f0 to compensate for the differentiation at the output
 	}
@@ -772,12 +786,12 @@ VocalTractModel5<FloatType, SectionDelay>::calculateTubeCoefficients()
 ******************************************************************************/
 template<typename FloatType, unsigned int SectionDelay>
 FloatType
-VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType frication)
+VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType frication, FloatType glottalLossFactor)
 {
 	Section::movePointers(inPtr_, outPtr_);
 
 	// Input to the tube.
-	oropharynx_[S1].top[inPtr_] = oropharynx_[S1].bottom[outPtr_] * dampingFactor_ + input;
+	oropharynx_[S1].top[inPtr_] = oropharynx_[S1].bottom[outPtr_] * glottalLossFactor + input;
 
 	propagate(oropharynx_[S1], oropharynx_[S2]);
 	propagate(oropharynx_[S2], oropharynx_[S3]);

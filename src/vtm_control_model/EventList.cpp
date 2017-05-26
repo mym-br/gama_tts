@@ -47,6 +47,7 @@ EventList::EventList(const char* configDirPath, Model& model)
 		, globalTempo_{1.0}
 		, tgParameters_(5)
 		, useFixedIntonationParameters_{false}
+		, intonationFactor_{1.0}
 		, randSrc_{randDev_()}
 {
 	setUp();
@@ -943,8 +944,8 @@ EventList::addIntonationPoint(double semitone, double offsetTime, double slope, 
 	IntonationPoint iPoint(this);
 	iPoint.setRuleIndex(ruleIndex);
 	iPoint.setOffsetTime(offsetTime);
-	iPoint.setSemitone(semitone);
-	iPoint.setSlope(slope);
+	iPoint.setSemitone(semitone * intonationFactor_);
+	iPoint.setSlope(slope * intonationFactor_);
 
 	double time = iPoint.absoluteTime();
 	for (std::size_t i = 0; i < intonationPoints_.size(); i++) {

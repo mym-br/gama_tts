@@ -20,9 +20,12 @@
 
 #include "VTMControlModelConfiguration.h"
 
+#include <sstream>
+
 #include "ConfigurationData.h"
 
-
+#define CONFIG_FILE_NAME "/vtm_control_model.config"
+#define VOICE_FILE_PREFIX "/voice_"
 
 namespace GS {
 namespace VTMControlModel {
@@ -40,13 +43,16 @@ Configuration::Configuration()
 		, pretonicLift{}
 		, tonicRange{}
 		, tonicMovement{}
+		, intonationFactor{1.0}
 {
 }
 
 void
-Configuration::load(const std::string& configFilePath)
+Configuration::load(const char* configDirPath)
 {
-	ConfigurationData config(configFilePath);
+	std::ostringstream configFilePath;
+	configFilePath << configDirPath << CONFIG_FILE_NAME;
+	ConfigurationData config(configFilePath.str());
 
 	controlRate        = config.value<double>("control_rate");
 	tempo              = config.value<double>("tempo");
@@ -84,6 +90,12 @@ Configuration::load(const std::string& configFilePath)
 	dictionary1File = config.value<std::string>("dictionary_1_file");
 	dictionary2File = config.value<std::string>("dictionary_2_file");
 	dictionary3File = config.value<std::string>("dictionary_3_file");
+
+	// Load voice data.
+	std::ostringstream voiceFilePath;
+	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << voiceName << ".config";
+	voiceData = std::make_unique<ConfigurationData>(voiceFilePath.str());
+	intonationFactor = voiceData->value<double>("intonation_factor");
 }
 
 } /* namespace VTMControlModel */
