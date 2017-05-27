@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <fstream>
@@ -53,7 +54,7 @@ main(int argc, char* argv[])
 {
 	if (argc < 2) {
 		showUsage(argv[0]);
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	const char* configDirPath = nullptr;
@@ -71,7 +72,7 @@ main(int argc, char* argv[])
 			++i;
 			if (i == argc) {
 				showUsage(argv[0]);
-				return 1;
+				return EXIT_FAILURE;
 			}
 			configDirPath = argv[i];
 			++i;
@@ -79,7 +80,7 @@ main(int argc, char* argv[])
 			++i;
 			if (i == argc) {
 				showUsage(argv[0]);
-				return 1;
+				return EXIT_FAILURE;
 			}
 			inputFile = argv[i];
 			++i;
@@ -87,7 +88,7 @@ main(int argc, char* argv[])
 			++i;
 			if (i == argc) {
 				showUsage(argv[0]);
-				return 1;
+				return EXIT_FAILURE;
 			}
 			vtmParamFile = argv[i];
 			++i;
@@ -95,14 +96,14 @@ main(int argc, char* argv[])
 			++i;
 			if (i == argc) {
 				showUsage(argv[0]);
-				return 1;
+				return EXIT_FAILURE;
 			}
 			outputFile = argv[i];
 			++i;
 		} else if (strcmp(argv[i], "--version") == 0) {
 			++i;
 			showUsage(argv[0]);
-			return 0;
+			return EXIT_SUCCESS;
 		} else {
 			for ( ; i < argc; ++i) {
 				inputTextStream << argv[i] << ' ';
@@ -112,14 +113,14 @@ main(int argc, char* argv[])
 
 	if (configDirPath == nullptr || vtmParamFile == nullptr || outputFile == nullptr) {
 		showUsage(argv[0]);
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	if (inputFile != nullptr) {
 		std::ifstream in(inputFile, std::ios_base::binary);
 		if (!in) {
 			std::cerr << "Error: Could not open the file " << inputFile << '.' << std::endl;
-			return 1;
+			return EXIT_FAILURE;
 		}
 		std::string line;
 		while (std::getline(in, line)) {
@@ -129,7 +130,7 @@ main(int argc, char* argv[])
 	std::string inputText = inputTextStream.str();
 	if (inputText.empty()) {
 		std::cerr << "Error: Empty input text." << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 	if (GS::Log::debugEnabled) {
 		std::cout << "INPUT TEXT [" << inputText << ']' << std::endl;
@@ -149,11 +150,11 @@ main(int argc, char* argv[])
 
 	} catch (std::exception& e) {
 		std::cerr << "Exception: " << e.what() << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	} catch (...) {
 		std::cerr << "Unknown exception." << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }

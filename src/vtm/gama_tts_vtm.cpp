@@ -18,6 +18,7 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -55,13 +56,13 @@ main(int argc, char* argv[])
 		std::cout << "\nGamaTTS VTM " << PROGRAM_VERSION << "\n\n";
 		std::cerr << "Usage: " << argv[0] << " [-v] config_file voice_file param_file output_file.wav\n";
 		std::cout << "         -v : verbose\n" << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	std::ifstream inputStream(paramFile, std::ios_base::binary);
 	if (!inputStream) {
 		std::cerr << "Could not open the file " << paramFile << '.' << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	ConfigurationData vtmConfigData{voiceFile};
@@ -72,5 +73,5 @@ main(int argc, char* argv[])
 
 	LOG_DEBUG("\nWrote scaled samples to file: " << outputFile);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
