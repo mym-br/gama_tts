@@ -65,13 +65,11 @@ main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	ConfigurationData vtmConfigData{voiceFile};
-	vtmConfigData.insert(ConfigurationData(configFile));
+	ConfigurationData vtmConfigData{configFile};
+	vtmConfigData.insert(ConfigurationData{voiceFile});
 
 	auto vtm = VTM::VocalTractModel::getInstance(vtmConfigData);
 	vtm->synthesizeToFile(inputStream, outputFile);
-
-	LOG_DEBUG("\nWrote scaled samples to file: " << outputFile);
 
 	return EXIT_SUCCESS;
 }
