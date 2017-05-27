@@ -37,7 +37,7 @@ public:
 	template<typename T> T value(const std::string& key) const;
 	template<typename T> T value(const std::string& key, T minValue, T maxValue) const;
 
-	// If an entry with the same key exists, it is overwritten.
+	// If an entry with the same key exists, it will be overwritten.
 	template<typename T> void put(const std::string& key, T value);
 	void put(const std::string& key, const char* value);
 	ConfigurationData& insert(const ConfigurationData& other);
@@ -121,7 +121,9 @@ inline
 ConfigurationData&
 ConfigurationData::insert(const ConfigurationData& other)
 {
-	valueMap_.insert(other.valueMap_.begin(), other.valueMap_.end());
+	for (auto& item : other.valueMap_) {
+		put(item.first, item.second);
+	}
 	return *this;
 }
 
