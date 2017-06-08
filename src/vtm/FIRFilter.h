@@ -106,7 +106,7 @@ FIRFilter<FloatType>::FIRFilter(FloatType beta, FloatType gamma, FloatType cutof
 	/*  PRINT OUT  */
 	printf("\n");
 	for (int i = 0; i < numberTaps_; i++) {
-		printf("coef_[%-d] = %11.8f\n", i, coef_[i]);
+		printf("FIR coef_[%-d] = %11.8f\n", i, coef_[i]);
 	}
 #endif
 }
