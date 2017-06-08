@@ -159,7 +159,7 @@ template<typename FloatType>
 void
 WavetableGlottalSource<FloatType>::updateWavetable(FloatType amplitude)
 {
-	if (amplitude == prevAmplitude_) {
+	if (tnDelta_ == 0.0 || amplitude == prevAmplitude_) {
 		return;
 	} else {
 		prevAmplitude_ = amplitude;
