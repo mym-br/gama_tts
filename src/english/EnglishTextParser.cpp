@@ -602,6 +602,7 @@ wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::M
 				return 1;
 			}
 		}
+		// Falls through.
 	case TextParser::MODE_LETTER:
 		/*  IF LETTER MODE CONTAINS ANY SYMBOLS, THEN RETURN 1  */
 		return 1;
@@ -1326,9 +1327,11 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 			switch (last_written_state) {
 			case STATE_BEGIN:
 				stream2 << CHUNK_BOUNDARY << ' ';
+				// Falls through.
 			case STATE_FINAL_PUNC:
 				stream2 << TONE_GROUP_BOUNDARY << ' ';
 				prior_tonic = TTS_FALSE;
+				// Falls through.
 			case STATE_MEDIAL_PUNC:
 				stream2 << TG_UNDEFINED << ' ';
 				tg_marker_pos = static_cast<long>(stream2.tellp()) - 3;

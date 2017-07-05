@@ -504,13 +504,15 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 			tempEvent = insertEvent(ruleSymbols[3] * timeMultiplier, -1, 0.0);
 			if (tempEvent) tempEvent->flag = 1;
 		}
-	case 3: // falls through
+		// Falls through.
+	case 3:
 		if (postureList.size() >= 3) {
 			postureData_[postureIndex + 2].onset = (double) zeroRef_ + ruleSymbols[1];
 			tempEvent = insertEvent(ruleSymbols[2] * timeMultiplier, -1, 0.0);
 			if (tempEvent) tempEvent->flag = 1;
 		}
-	case 2: // falls through
+		// Falls through.
+	case 2:
 		postureData_[postureIndex + 1].onset = (double) zeroRef_ + ruleSymbols[1];
 		tempEvent = insertEvent(0.0, -1, 0.0);
 		if (tempEvent) tempEvent->flag = 1;
