@@ -24,7 +24,7 @@
 namespace GS {
 namespace VTMControlModel {
 
-class Configuration;
+struct Configuration;
 
 class TextParser {
 public:

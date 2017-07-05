@@ -227,7 +227,7 @@ private:
 		std::array<MovingAverageFilter<FloatType>, TOTAL_PARAMETERS> filter;
 
 		InputFilters(FloatType sampleRate, FloatType period)
-			: filter{
+			: filter{{
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
@@ -243,7 +243,7 @@ private:
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
 				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period)} {}
+				MovingAverageFilter<FloatType>(sampleRate, period)}} {}
 		void reset() {
 			for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
 				filter[i].reset();
