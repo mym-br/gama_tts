@@ -4,8 +4,10 @@
   - CMake.
 
   - A C++ compiler with C++14 support.
-    The following compiler has been tested:
-    - GCC 5.4 (Linux x86_64).
+    The following compilers have been tested:
+    - GCC 5.4 (Linux+GNU x86_64).
+    - GCC 7.1 (Linux+GNU x86_64).
+    - Clang 4.0 (Linux+GNU x86_64).
 
 - Build:
 
@@ -27,11 +29,15 @@
       CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release $pkg_dir
       make
 
-- Install (Linux):
+- Test (Linux):
+  # The "play" program is included in the SoX package.
 
-  # Optional:
+  ./gama_tts -c $pkg_dir/data/english/vtm5 -p /tmp/test_param.txt -o /tmp/test.wav "Hello world." && play /tmp/test.wav
+
+- Install to system (optional, Linux):
+
   make install
 
-- Test (Linux):
-
-  ./gama_tts -c $pkg_dir/data/english/vtm0 -p /tmp/test_param.txt -o /tmp/test.wav "Hello world." && aplay -q /tmp/test.wav
+  # /usr/local/lib or /usr/local/lib64 must be in /etc/ld.so.conf
+  # (or /etc/ld.so.conf.d).
+  ldconfig
