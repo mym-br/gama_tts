@@ -134,14 +134,9 @@ add_executable(gama_tts
 )
 target_link_libraries(gama_tts gamatts)
 
-add_executable(gama_tts_vtm
-    src/vtm/gama_tts_vtm.cpp
-)
-target_link_libraries(gama_tts_vtm gamatts)
-
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
-    install(TARGETS gamatts gama_tts gama_tts_vtm
+    install(TARGETS gamatts gama_tts
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -151,6 +146,3 @@ if(UNIX AND NOT APPLE)
     configure_file(gama_tts.pc.pre gama_tts.pc @ONLY)
     install(FILES ${CMAKE_BINARY_DIR}/gama_tts.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/)
 endif()
-
-#add_dependencies(gama_tts gamatts)
-#add_dependencies(gama_tts_vtm gamatts)

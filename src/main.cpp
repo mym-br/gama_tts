@@ -32,6 +32,8 @@
 #include "TextParser.h"
 #include "VTMControlModelConfiguration.h"
 
+#define VTM_CONFIG_FILE "vtm.config"
+
 
 
 void
@@ -39,87 +41,66 @@ showUsage(const char* programName)
 {
 	std::cout << "\nGamaTTS " << PROGRAM_VERSION << "\n\n";
 	std::cout << "Usage:\n\n";
+	std::cout << programName << " --help\n";
 	std::cout << programName << " --version\n";
-	std::cout << "        Shows the program version.\n\n";
-	std::cout << programName << " [-v] -c config_dir -p vtm_param_file.txt -o output_file.wav \"Hello world.\"\n";
-	std::cout << "        Synthesizes text from the command line.\n";
-	std::cout << "        -v : verbose\n\n";
-	std::cout << programName << " [-v] -c config_dir -i input_text.txt -p vtm_param_file.txt -o output_file.wav\n";
-	std::cout << "        Synthesizes text from a file.\n";
-	std::cout << "        -v : verbose\n" << std::endl;
+	std::cout << "        Shows the program version and usage.\n\n";
+
+	std::cout << programName << " tts [-v] config_dir input_text vtm_param_file output_file.wav\n";
+	std::cout << "        Converts text to speech.\n\n";
+	std::cout << "        -v : Verbose.\n";
+	std::cout << "        config_dir : The directory containing the configuration files.\n";
+	std::cout << "        input_text : Name of the file with the input text,\n";
+	std::cout << "            or \"stdin\" to read from standard input.\n";
+	std::cout << "        vtm_param_file : This file will be created, and will contain\n";
+	std::cout << "            the parameters for the vocal tract model.\n";
+	std::cout << "        output_file.wav : This file will be created, and will contain\n";
+	std::cout << "            the synthesized speech.\n\n";
+
+	std::cout << programName << " vtm [-v] config_dir voice_file vtm_param_file output_file.wav\n";
+	std::cout << "        Converts vocal tract parameters to speech.\n\n";
+	std::cout << "        -v : Verbose.\n";
+	std::cout << "        config_dir : The directory containing the configuration files.\n";
+	std::cout << "        voice_file : Name of the voice file, relative to config_dir.\n";
+	std::cout << "        vtm_param_file : This file will be read. It must contain\n";
+	std::cout << "            the parameters for the vocal tract model.\n";
+	std::cout << "        output_file.wav : This file will be created, and will contain\n";
+	std::cout << "            the synthesized speech.\n\n";
 }
 
 int
-main(int argc, char* argv[])
+tts(int argc, char* argv[])
 {
-	if (argc < 2) {
-		showUsage(argv[0]);
-		return EXIT_FAILURE;
-	}
-
-	const char* configDirPath = nullptr;
-	const char* inputFile = nullptr;
-	const char* outputFile = nullptr;
+	const char* configDir    = nullptr;
+	const char* textInput    = nullptr;
 	const char* vtmParamFile = nullptr;
-	std::ostringstream inputTextStream;
+	const char* outputFile   = nullptr;
 
-	int i = 1;
-	while (i < argc) {
-		if (strcmp(argv[i], "-v") == 0) {
-			++i;
-			GS::Log::debugEnabled = true;
-		} else if (strcmp(argv[i], "-c") == 0) {
-			++i;
-			if (i == argc) {
-				showUsage(argv[0]);
-				return EXIT_FAILURE;
-			}
-			configDirPath = argv[i];
-			++i;
-		} else if (strcmp(argv[i], "-i") == 0) {
-			++i;
-			if (i == argc) {
-				showUsage(argv[0]);
-				return EXIT_FAILURE;
-			}
-			inputFile = argv[i];
-			++i;
-		} else if (strcmp(argv[i], "-p") == 0) {
-			++i;
-			if (i == argc) {
-				showUsage(argv[0]);
-				return EXIT_FAILURE;
-			}
-			vtmParamFile = argv[i];
-			++i;
-		} else if (strcmp(argv[i], "-o") == 0) {
-			++i;
-			if (i == argc) {
-				showUsage(argv[0]);
-				return EXIT_FAILURE;
-			}
-			outputFile = argv[i];
-			++i;
-		} else if (strcmp(argv[i], "--version") == 0) {
-			++i;
-			showUsage(argv[0]);
-			return EXIT_SUCCESS;
-		} else {
-			for ( ; i < argc; ++i) {
-				inputTextStream << argv[i] << ' ';
-			}
-		}
-	}
-
-	if (configDirPath == nullptr || vtmParamFile == nullptr || outputFile == nullptr) {
+	if (argc == 6) {
+		configDir    = argv[2];
+		textInput    = argv[3];
+		vtmParamFile = argv[4];
+		outputFile   = argv[5];
+	} else if ((argc == 7) && (strcmp("-v", argv[2]) == 0)) {
+		GS::Log::debugEnabled = true;
+		configDir    = argv[3];
+		textInput    = argv[4];
+		vtmParamFile = argv[5];
+		outputFile   = argv[6];
+	} else {
 		showUsage(argv[0]);
 		return EXIT_FAILURE;
 	}
 
-	if (inputFile != nullptr) {
-		std::ifstream in(inputFile, std::ios_base::binary);
+	std::ostringstream inputTextStream;
+	if (strcmp(textInput, "stdin") == 0) {
+		std::string line;
+		while (std::getline(std::cin, line)) {
+			inputTextStream << line << ' ';
+		}
+	} else {
+		std::ifstream in(textInput, std::ios_base::binary);
 		if (!in) {
-			std::cerr << "Error: Could not open the file " << inputFile << '.' << std::endl;
+			std::cerr << "Error: Could not open the file " << textInput << '.' << std::endl;
 			return EXIT_FAILURE;
 		}
 		std::string line;
@@ -127,24 +108,24 @@ main(int argc, char* argv[])
 			inputTextStream << line << ' ';
 		}
 	}
-	std::string inputText = inputTextStream.str();
-	if (inputText.empty()) {
+	std::string text = inputTextStream.str();
+	if (text.empty()) {
 		std::cerr << "Error: Empty input text." << std::endl;
 		return EXIT_FAILURE;
 	}
 	if (GS::Log::debugEnabled) {
-		std::cout << "INPUT TEXT [" << inputText << ']' << std::endl;
+		std::cout << "INPUT TEXT [" << text << ']' << std::endl;
 	}
 
 	try {
 		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
-		vtmControlModel->load(configDirPath, VTM_CONTROL_MODEL_CONFIG_FILE);
+		vtmControlModel->load(configDir, VTM_CONTROL_MODEL_CONFIG_FILE);
 
-		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(configDirPath, *vtmControlModel);
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(configDir, *vtmControlModel);
 		const GS::VTMControlModel::Configuration& vtmControlConfig = vtmController->vtmControlModelConfiguration();
 
-		auto textParser = GS::VTMControlModel::TextParser::getInstance(configDirPath, vtmControlConfig);
-		std::string phoneticString = textParser->parse(inputText.c_str());
+		auto textParser = GS::VTMControlModel::TextParser::getInstance(configDir, vtmControlConfig);
+		std::string phoneticString = textParser->parse(text.c_str());
 
 		vtmController->synthesizePhoneticString(phoneticString, vtmParamFile, outputFile);
 
@@ -157,4 +138,90 @@ main(int argc, char* argv[])
 	}
 
 	return EXIT_SUCCESS;
+}
+
+int
+pho0(int argc, char* argv[])
+{
+
+
+	return EXIT_SUCCESS;
+}
+
+int
+vtm(int argc, char* argv[])
+{
+	const char* configDir    = nullptr;
+	const char* voiceFile    = nullptr;
+	const char* vtmParamFile = nullptr;
+	const char* outputFile   = nullptr;
+
+	if (argc == 6) {
+		configDir    = argv[2];
+		voiceFile    = argv[3];
+		vtmParamFile = argv[4];
+		outputFile   = argv[5];
+	} else if ((argc == 7) && (strcmp("-v", argv[2]) == 0)) {
+		GS::Log::debugEnabled = true;
+		configDir    = argv[3];
+		voiceFile    = argv[4];
+		vtmParamFile = argv[5];
+		outputFile   = argv[6];
+	} else {
+		showUsage(argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	std::ifstream paramInputStream(vtmParamFile, std::ios_base::binary);
+	if (!paramInputStream) {
+		std::cerr << "Could not open the file " << vtmParamFile << '.' << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	try {
+		std::ostringstream configFilePath;
+		configFilePath << configDir << '/' << VTM_CONFIG_FILE;
+		GS::ConfigurationData vtmConfigData{configFilePath.str()};
+
+		std::ostringstream voiceFilePath;
+		voiceFilePath << configDir << '/' << voiceFile;
+		vtmConfigData.insert(GS::ConfigurationData{voiceFilePath.str()});
+
+		auto vtm = GS::VTM::VocalTractModel::getInstance(vtmConfigData);
+		vtm->synthesizeToFile(paramInputStream, outputFile);
+
+	} catch (std::exception& e) {
+		std::cerr << "Exception: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	} catch (...) {
+		std::cerr << "Unknown exception." << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+
+
+int
+main(int argc, char* argv[])
+{
+	if (argc < 2) {
+		showUsage(argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	if (strcmp(argv[1], "tts") == 0) {
+		return tts(argc, argv);
+	} else if (strcmp(argv[1], "pho0") == 0) {
+		return pho0(argc, argv);
+	} else if (strcmp(argv[1], "vtm") == 0) {
+		return vtm(argc, argv);
+	} else if (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "--help") == 0) {
+		showUsage(argv[0]);
+		return EXIT_SUCCESS;
+	}
+
+	showUsage(argv[0]);
+	return EXIT_FAILURE;
 }
