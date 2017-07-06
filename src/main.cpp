@@ -56,6 +56,17 @@ showUsage(const char* programName)
 	std::cout << "        output_file.wav : This file will be created, and will contain\n";
 	std::cout << "            the synthesized speech.\n\n";
 
+	std::cout << programName << " pho0 [-v] config_dir phonetic_string vtm_param_file output_file.wav\n";
+	std::cout << "        Converts phonetic string to speech.\n\n";
+	std::cout << "        -v : Verbose.\n";
+	std::cout << "        config_dir : The directory containing the configuration files.\n";
+	std::cout << "        phonetic_string : Name of the file with the phonetic string,\n";
+	std::cout << "            or \"stdin\" to read from standard input.\n";
+	std::cout << "        vtm_param_file : This file will be created, and will contain\n";
+	std::cout << "            the parameters for the vocal tract model.\n";
+	std::cout << "        output_file.wav : This file will be created, and will contain\n";
+	std::cout << "            the synthesized speech.\n\n";
+
 	std::cout << programName << " vtm [-v] config_dir voice_file vtm_param_file output_file.wav\n";
 	std::cout << "        Converts vocal tract parameters to speech.\n\n";
 	std::cout << "        -v : Verbose.\n";
@@ -143,7 +154,67 @@ tts(int argc, char* argv[])
 int
 pho0(int argc, char* argv[])
 {
+	const char* configDir     = nullptr;
+	const char* phoneticInput = nullptr;
+	const char* vtmParamFile  = nullptr;
+	const char* outputFile    = nullptr;
 
+	if (argc == 6) {
+		configDir     = argv[2];
+		phoneticInput = argv[3];
+		vtmParamFile  = argv[4];
+		outputFile    = argv[5];
+	} else if ((argc == 7) && (strcmp("-v", argv[2]) == 0)) {
+		GS::Log::debugEnabled = true;
+		configDir     = argv[3];
+		phoneticInput = argv[4];
+		vtmParamFile  = argv[5];
+		outputFile    = argv[6];
+	} else {
+		showUsage(argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	std::ostringstream inputPhoneticStream;
+	if (strcmp(phoneticInput, "stdin") == 0) {
+		std::string line;
+		while (std::getline(std::cin, line)) {
+			inputPhoneticStream << line << ' ';
+		}
+	} else {
+		std::ifstream in(phoneticInput, std::ios_base::binary);
+		if (!in) {
+			std::cerr << "Error: Could not open the file " << phoneticInput << '.' << std::endl;
+			return EXIT_FAILURE;
+		}
+		std::string line;
+		while (std::getline(in, line)) {
+			inputPhoneticStream << line << ' ';
+		}
+	}
+	std::string phoneticString = inputPhoneticStream.str();
+	if (phoneticString.empty()) {
+		std::cerr << "Error: Empty phonetic string." << std::endl;
+		return EXIT_FAILURE;
+	}
+	if (GS::Log::debugEnabled) {
+		std::cout << "INPUT PHONETIC STRING [" << phoneticString << ']' << std::endl;
+	}
+
+	try {
+		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
+		vtmControlModel->load(configDir, VTM_CONTROL_MODEL_CONFIG_FILE);
+
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(configDir, *vtmControlModel);
+		vtmController->synthesizePhoneticString(phoneticString, vtmParamFile, outputFile);
+
+	} catch (std::exception& e) {
+		std::cerr << "Exception: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	} catch (...) {
+		std::cerr << "Unknown exception." << std::endl;
+		return EXIT_FAILURE;
+	}
 
 	return EXIT_SUCCESS;
 }
