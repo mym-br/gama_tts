@@ -32,20 +32,21 @@
 #include "TextParser.h"
 #include "VTMControlModelConfiguration.h"
 
+#define PROGRAM_NAME "gama_tts"
 #define VTM_CONFIG_FILE "vtm.config"
 
 
 
 void
-showUsage(const char* programName)
+showUsage()
 {
 	std::cout << "\nGamaTTS " << PROGRAM_VERSION << "\n\n";
 	std::cout << "Usage:\n\n";
-	std::cout << programName << " --help\n";
-	std::cout << programName << " --version\n";
+	std::cout << PROGRAM_NAME << " --help\n";
+	std::cout << PROGRAM_NAME << " --version\n";
 	std::cout << "        Shows the program version and usage.\n\n";
 
-	std::cout << programName << " tts [-v] config_dir input_text vtm_param_file output_file.wav\n";
+	std::cout << PROGRAM_NAME << " tts [-v] config_dir input_text vtm_param_file output_file.wav\n";
 	std::cout << "        Converts text to speech.\n\n";
 	std::cout << "        -v : Verbose.\n";
 	std::cout << "        config_dir : The directory containing the configuration files.\n";
@@ -56,7 +57,7 @@ showUsage(const char* programName)
 	std::cout << "        output_file.wav : This file will be created, and will contain\n";
 	std::cout << "            the synthesized speech.\n\n";
 
-	std::cout << programName << " pho0 [-v] config_dir phonetic_string vtm_param_file output_file.wav\n";
+	std::cout << PROGRAM_NAME << " pho0 [-v] config_dir phonetic_string vtm_param_file output_file.wav\n";
 	std::cout << "        Converts phonetic string to speech.\n\n";
 	std::cout << "        -v : Verbose.\n";
 	std::cout << "        config_dir : The directory containing the configuration files.\n";
@@ -67,7 +68,7 @@ showUsage(const char* programName)
 	std::cout << "        output_file.wav : This file will be created, and will contain\n";
 	std::cout << "            the synthesized speech.\n\n";
 
-	std::cout << programName << " vtm [-v] config_dir voice_file vtm_param_file output_file.wav\n";
+	std::cout << PROGRAM_NAME << " vtm [-v] config_dir voice_file vtm_param_file output_file.wav\n";
 	std::cout << "        Converts vocal tract parameters to speech.\n\n";
 	std::cout << "        -v : Verbose.\n";
 	std::cout << "        config_dir : The directory containing the configuration files.\n";
@@ -98,7 +99,7 @@ tts(int argc, char* argv[])
 		vtmParamFile = argv[5];
 		outputFile   = argv[6];
 	} else {
-		showUsage(argv[0]);
+		showUsage();
 		return EXIT_FAILURE;
 	}
 
@@ -171,7 +172,7 @@ pho0(int argc, char* argv[])
 		vtmParamFile  = argv[5];
 		outputFile    = argv[6];
 	} else {
-		showUsage(argv[0]);
+		showUsage();
 		return EXIT_FAILURE;
 	}
 
@@ -239,7 +240,7 @@ vtm(int argc, char* argv[])
 		vtmParamFile = argv[5];
 		outputFile   = argv[6];
 	} else {
-		showUsage(argv[0]);
+		showUsage();
 		return EXIT_FAILURE;
 	}
 
@@ -278,7 +279,7 @@ int
 main(int argc, char* argv[])
 {
 	if (argc < 2) {
-		showUsage(argv[0]);
+		showUsage();
 		return EXIT_FAILURE;
 	}
 
@@ -289,10 +290,10 @@ main(int argc, char* argv[])
 	} else if (strcmp(argv[1], "vtm") == 0) {
 		return vtm(argc, argv);
 	} else if (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "--help") == 0) {
-		showUsage(argv[0]);
+		showUsage();
 		return EXIT_SUCCESS;
 	}
 
-	showUsage(argv[0]);
+	showUsage();
 	return EXIT_FAILURE;
 }
