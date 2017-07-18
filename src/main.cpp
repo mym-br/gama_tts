@@ -40,7 +40,7 @@
 void
 showUsage()
 {
-	std::cout << "\nGamaTTS " << PROGRAM_VERSION << "\n\n";
+	std::cout << "\nGamaTTS " << GAMA_TTS_VERSION << "\n\n";
 	std::cout << "Usage:\n\n";
 	std::cout << PROGRAM_NAME << " --help\n";
 	std::cout << PROGRAM_NAME << " --version\n";
