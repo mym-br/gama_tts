@@ -21,13 +21,15 @@
 #include "Controller.h"
 
 #include <cctype> /* isspace */
+#include <cmath> /* rint */
 #include <cstdio>
 #include <fstream>
 #include <sstream>
 
 #include "Exception.h"
 #include "Log.h"
-
+#include "VTMUtil.h"
+#include "WAVEFileWriter.h"
 
 #define VTM_CONFIG_FILE_NAME "/vtm.config"
 
@@ -160,7 +162,7 @@ Controller::synthesizePhoneticString(const std::string& phoneticString, const ch
 
 	fillParameterStream(phoneticString, vtmParamStream);
 
-	vtm_->synthesizeToFile(vtmParamStream, outputFile);
+	synthesizeToFile(vtmParamStream, outputFile);
 }
 
 void
@@ -173,7 +175,7 @@ Controller::synthesizePhoneticString(const std::string& phoneticString, const ch
 
 	fillParameterStream(phoneticString, vtmParamStream);
 
-	vtm_->synthesizeToBuffer(vtmParamStream, buffer);
+	synthesizeToBuffer(vtmParamStream, buffer);
 }
 
 void
@@ -192,7 +194,7 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, const char* output
 
 	vtmParamStream.seekg(0);
 
-	vtm_->synthesizeToFile(vtmParamStream, outputFile);
+	synthesizeToFile(vtmParamStream, outputFile);
 }
 
 void
@@ -211,7 +213,116 @@ Controller::synthesizeFromEventList(const char* vtmParamFile, std::vector<float>
 
 	vtmParamStream.seekg(0);
 
-	vtm_->synthesizeToBuffer(vtmParamStream, buffer);
+	synthesizeToBuffer(vtmParamStream, buffer);
+}
+
+void
+Controller::synthesizeToFile(std::istream& inputStream, const char* outputFile)
+{
+	if (!vtm_->outputBuffer().empty()) {
+		vtm_->reset();
+	}
+	std::vector<std::vector<float>> parameterList;
+	parseInputParameterStream(inputStream, parameterList);
+	synthesize(parameterList);
+	vtm_->finishSynthesis();
+	writeOutputToFile(vtm_->outputBuffer(), outputFile, vtm_->outputSampleRate());
+}
+
+void
+Controller::synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer)
+{
+	if (!vtm_->outputBuffer().empty()) {
+		vtm_->reset();
+	}
+	std::vector<std::vector<float>> parameterList;
+	parseInputParameterStream(inputStream, parameterList);
+	synthesize(parameterList);
+	vtm_->finishSynthesis();
+	writeOutputToBuffer(vtm_->outputBuffer(), outputBuffer);
+}
+
+void
+Controller::parseInputParameterStream(std::istream& in, std::vector<std::vector<float>>& paramList)
+{
+	std::string line;
+	const std::size_t numParam = model_.parameterList().size();
+	std::vector<float> parameters(numParam);
+
+	unsigned int lineNumber = 1;
+	while (std::getline(in, line)) {
+		std::istringstream lineStream(line);
+
+		for (std::size_t i = 0; i < numParam; ++i) {
+			lineStream >> parameters[i];
+		}
+		if (!lineStream) {
+			THROW_EXCEPTION(VTMException, "Could not read vocal tract parameters from stream (line number " << lineNumber << ").");
+		}
+
+		paramList.push_back(parameters);
+		++lineNumber;
+	}
+
+	// Duplicate the last set of parameters, to help the interpolation.
+	if (!paramList.empty()) {
+		paramList.push_back(paramList.back());
+	}
+}
+
+void
+Controller::synthesize(const std::vector<std::vector<float>>& paramList)
+{
+	// Number of internal sample rate periods in each control rate period.
+	const unsigned int controlSteps = static_cast<unsigned int>(std::rint(vtm_->internalSampleRate() / vtmControlModelConfig_.controlRate));
+	const float coef = 1.0f / controlSteps;
+
+	const std::size_t numParam = model_.parameterList().size();
+	std::vector<float> currentParameter(numParam);
+	std::vector<float> currentParameterDelta(numParam);
+
+	// For each control period:
+	for (std::size_t i = 1, size = paramList.size(); i < size; ++i) {
+		// Calculates the current parameter values, and their
+		// associated sample-to-sample delta values.
+		for (std::size_t j = 0; j < numParam; ++j) {
+			currentParameter[j] = paramList[i - 1][j];
+			currentParameterDelta[j] = (paramList[i][j] - currentParameter[j]) * coef;
+		}
+
+		// For each step in a control period:
+		for (std::size_t j = 0; j < controlSteps; ++j) {
+			vtm_->setAllParameters(currentParameter);
+			vtm_->execSynthesisStep();
+
+			// Do linear interpolation.
+			for (std::size_t k = 0; k < numParam; ++k) {
+				currentParameter[k] += currentParameterDelta[k];
+			}
+		}
+	}
+}
+
+void
+Controller::writeOutputToFile(const std::vector<float>& data, const char* outputFile, float outputSampleRate)
+{
+	WAVEFileWriter fileWriter(outputFile, 1, data.size(), outputSampleRate);
+
+	const float scale = VTM::Util::calculateOutputScale(data);
+	for (std::size_t i = 0, end = data.size(); i < end; ++i) {
+		fileWriter.writeSample(data[i] * scale);
+	}
+}
+
+void
+Controller::writeOutputToBuffer(const std::vector<float>& data, std::vector<float>& outputBuffer)
+{
+	outputBuffer.resize(data.size());
+
+	const float scale = VTM::Util::calculateOutputScale(data);
+	for (std::size_t i = 0, end = data.size(); i < end; ++i) {
+		outputBuffer[i] = data[i] * scale;
+	}
 }
 
 } /* namespace VTMControlModel */

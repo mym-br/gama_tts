@@ -61,6 +61,8 @@ public:
 	EventList& eventList() { return eventList_; }
 	Configuration& vtmControlModelConfiguration() { return vtmControlModelConfig_; }
 	const ConfigurationData& vtmConfigurationData() const { return *vtmConfigData_; }
+
+	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
 private:
 	enum {
 		MAX_VOICES = 5
@@ -77,6 +79,12 @@ private:
 	// A /c at the end will generate an empty chunk.
 	// Returns true if a valid chunk has been found.
 	bool nextChunk(const std::string& phoneticString, std::size_t& index, std::size_t& size);
+
+	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
+	void parseInputParameterStream(std::istream& in, std::vector<std::vector<float>>& paramList);
+	void synthesize(const std::vector<std::vector<float>>& paramList);
+	void writeOutputToFile(const std::vector<float>& data, const char* outputFile, float outputSampleRate);
+	void writeOutputToBuffer(const std::vector<float>& data, std::vector<float>& outputBuffer);
 
 	Model& model_;
 	EventList eventList_;

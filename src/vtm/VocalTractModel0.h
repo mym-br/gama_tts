@@ -21,47 +21,32 @@
 #ifndef VTM_VOCAL_TRACT_MODEL_0_H_
 #define VTM_VOCAL_TRACT_MODEL_0_H_
 
-#include <algorithm> /* max, min */
+#include <algorithm> /* max */
 #include <array>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <istream>
+#include <cstddef> /* std::size_t */
 #include <memory>
-#include <sstream>
-#include <string>
-#include <utility> /* move, swap */
 #include <vector>
 
 #include "BandpassFilter.h"
 #include "ConfigurationData.h"
 #include "Exception.h"
 #include "Log.h"
-#include "MovingAverageFilter.h"
 #include "NoiseFilter.h"
 #include "NoiseSource.h"
 #include "RadiationFilter.h"
 #include "ReflectionFilter.h"
 #include "SampleRateConverter.h"
-#include "Text.h"
 #include "Throat.h"
 #include "VocalTractModel.h"
-#include "VocalTractModelParameterValue.h"
 #include "VTMUtil.h"
-#include "WAVEFileWriter.h"
 #include "WavetableGlottalSource.h"
 
 #define GS_VTM0_MIN_RADIUS (0.01)
-#define GS_VTM0_INPUT_FILTER_PERIOD_SEC (50.0e-3)
 
 /*  SCALING CONSTANT FOR INPUT TO VOCAL TRACT & THROAT (MATCHES DSP)  */
 //#define GS_VTM0_VT_SCALE                  0.03125     /*  2^(-5)  */
 // this is a temporary fix only, to try to match dsp synthesizer
 #define GS_VTM0_VT_SCALE                  0.125     /*  2^(-3)  */
-
-/*  FINAL OUTPUT SCALING, SO THAT .SND FILES APPROX. MATCH DSP OUTPUT  */
-#define GS_VTM0_OUTPUT_SCALE              0.95
 
 
 
@@ -71,6 +56,23 @@ namespace VTM {
 template<typename FloatType>
 class VocalTractModel0 : public VocalTractModel {
 public:
+	VocalTractModel0(const ConfigurationData& data, bool interactive = false);
+	virtual ~VocalTractModel0() {}
+
+	virtual void reset();
+
+	virtual double internalSampleRate() const { return sampleRate_; }
+	virtual double outputSampleRate() const { return config_.outputRate; }
+
+	virtual void setParameter(int parameter, float value);
+	virtual void setAllParameters(const std::vector<float>& parameters);
+
+	virtual void execSynthesisStep();
+	virtual void finishSynthesis();
+
+	virtual std::vector<float>& outputBuffer() { return outputBuffer_; }
+
+private:
 	enum { /*  OROPHARYNX REGIONS  */
 		R1 = 0, /*  S1  */
 		R2 = 1, /*  S2  */
@@ -93,26 +95,8 @@ public:
 	};
 	enum Waveform {
 		GLOTTAL_SOURCE_PULSE = 0,
-		GLOTTAL_SOURCE_SINE = 1
+		GLOTTAL_SOURCE_SINE  = 1
 	};
-
-	VocalTractModel0(const ConfigurationData& data, bool interactive = false);
-	~VocalTractModel0() {}
-
-	double outputRate() const { return config_.outputRate; }
-
-	// ----- Batch mode.
-	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
-	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
-
-	// ----- Interactive mode.
-	void loadSingleInput(const VocalTractModelParameterValue pv);
-	// Synthesizes at least numberOfSamples samples (may synthesize more samples).
-	void synthesizeSamples(std::size_t numberOfSamples);
-	// Returns the number of samples read.
-	std::size_t getOutputSamples(std::size_t n, float* buffer);
-
-private:
 	enum {
 		VELUM = N1
 	};
@@ -192,7 +176,6 @@ private:
 
 	struct Configuration {
 		FloatType outputRate;                  /*  output sample rate (22.05, 44.1)  */
-		FloatType controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
 		int       waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
 		FloatType tp;                          /*  % glottal pulse rise time  */
 		FloatType tnMin;                       /*  % glottal pulse fall time minimum  */
@@ -213,56 +196,20 @@ private:
 		std::array<FloatType, TOTAL_REGIONS> radiusCoef;
 	};
 
-	struct InputFilters {
-		std::array<MovingAverageFilter<FloatType>, TOTAL_PARAMETERS> filter;
-
-		InputFilters(FloatType sampleRate, FloatType period)
-			: filter{{
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period),
-				MovingAverageFilter<FloatType>(sampleRate, period)}} {}
-		void reset() {
-			for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
-				filter[i].reset();
-			}
-		}
-	};
-
 	VocalTractModel0(const VocalTractModel0&) = delete;
 	VocalTractModel0& operator=(const VocalTractModel0&) = delete;
 
 	void loadConfiguration(const ConfigurationData& data);
-	void reset();
 	void initializeSynthesizer();
 	void calculateTubeCoefficients();
 	void initializeNasalCavity();
-	void parseInputStream(std::istream& in);
 	void setFricationTaps();
 	FloatType vocalTract(FloatType input, FloatType frication);
-	void writeOutputToFile(const char* outputFile);
-	void writeOutputToBuffer(std::vector<float>& outputBuffer);
-	void synthesize();
-	float calculateOutputScale();
-	void synthesizeForInputSequence();
 
 	bool interactive_;
 	Configuration config_;
 
 	/*  DERIVED VALUES  */
-	int controlPeriod_;
 	int sampleRate_;
 
 	/*  MEMORY FOR TUBE AND TUBE COEFFICIENTS  */
@@ -283,12 +230,8 @@ private:
 	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
 	FloatType breathinessFactor_;
 
-	std::vector<std::array<FloatType, TOTAL_PARAMETERS>> inputData_;
-	std::array<FloatType, TOTAL_PARAMETERS> currentParameter_;
-	std::array<FloatType, TOTAL_PARAMETERS> currentParameterDelta_;
-	std::array<FloatType, TOTAL_PARAMETERS> singleInput_;
-	std::size_t outputDataPos_;
-	std::vector<float> outputData_;
+	std::array<FloatType, TOTAL_PARAMETERS>            currentParameter_;
+	std::vector<float>                                 outputBuffer_;
 	std::unique_ptr<SampleRateConverter<FloatType>>    srConv_;
 	std::unique_ptr<RadiationFilter<FloatType>>        mouthRadiationFilter_;
 	std::unique_ptr<ReflectionFilter<FloatType>>       mouthReflectionFilter_;
@@ -299,7 +242,6 @@ private:
 	std::unique_ptr<BandpassFilter<FloatType>>         bandpassFilter_;
 	std::unique_ptr<NoiseFilter<FloatType>>            noiseFilter_;
 	std::unique_ptr<NoiseSource>                       noiseSource_;
-	std::unique_ptr<InputFilters>                      inputFilters_;
 };
 
 
@@ -311,8 +253,7 @@ VocalTractModel0<FloatType>::VocalTractModel0(const ConfigurationData& data, boo
 	loadConfiguration(data);
 	reset();
 	initializeSynthesizer();
-	inputData_.reserve(128);
-	outputData_.reserve(1024);
+	outputBuffer_.reserve(1024);
 }
 
 template<typename FloatType>
@@ -320,7 +261,6 @@ void
 VocalTractModel0<FloatType>::loadConfiguration(const ConfigurationData& data)
 {
 	config_.outputRate     = data.value<FloatType>("output_rate");
-	config_.controlRate    = data.value<FloatType>("control_rate");
 	config_.waveform       = data.value<int>("waveform");
 	config_.tp             = data.value<FloatType>("glottal_pulse_tp");
 	config_.tnMin          = data.value<FloatType>("glottal_pulse_tn_min");
@@ -362,10 +302,7 @@ VocalTractModel0<FloatType>::reset()
 	memset(&nasal_[0][0][0],      0, sizeof(FloatType) * TOTAL_NASAL_SECTIONS * 2 * 2);
 	currentPtr_ = 1;
 	prevPtr_    = 0;
-	inputData_.clear();
-	singleInput_.fill(0.0);
-	outputData_.clear();
-	outputDataPos_ = 0;
+	outputBuffer_.clear();
 	if (srConv_)                srConv_->reset();
 	if (mouthRadiationFilter_)  mouthRadiationFilter_->reset();
 	if (mouthReflectionFilter_) mouthReflectionFilter_->reset();
@@ -376,64 +313,6 @@ VocalTractModel0<FloatType>::reset()
 	if (bandpassFilter_)        bandpassFilter_->reset();
 	if (noiseFilter_)           noiseFilter_->reset();
 	if (noiseSource_)           noiseSource_->reset();
-	if (inputFilters_)          inputFilters_->reset();
-}
-
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::synthesizeToFile(std::istream& inputStream, const char* outputFile)
-{
-	if (!outputData_.empty()) {
-		reset();
-	}
-	parseInputStream(inputStream);
-	synthesizeForInputSequence();
-	writeOutputToFile(outputFile);
-}
-
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer)
-{
-	if (!outputData_.empty()) {
-		reset();
-	}
-	parseInputStream(inputStream);
-	synthesizeForInputSequence();
-	writeOutputToBuffer(outputBuffer);
-}
-
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::parseInputStream(std::istream& in)
-{
-	std::string line;
-	std::array<FloatType, TOTAL_PARAMETERS> value;
-
-	unsigned int lineNumber = 1;
-	while (std::getline(in, line)) {
-		std::istringstream lineStream(line);
-
-		for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
-			lineStream >> value[i];
-		}
-		if (!lineStream) {
-			THROW_EXCEPTION(VTMException, "[VTM::VocalTractModel0] Error in input parameter parsing: Could not read parameters (line number " << lineNumber << ").");
-		}
-
-		// R1 - R8.
-		for (int i = 0; i < TOTAL_REGIONS; ++i) {
-			value[PARAM_R1 + i] = std::max(value[PARAM_R1 + i] * config_.radiusCoef[i], FloatType{GS_VTM0_MIN_RADIUS});
-		}
-
-		inputData_.push_back(value);
-		++lineNumber;
-	}
-
-	/*  DOUBLE UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  */
-	if (!inputData_.empty()) {
-		inputData_.push_back(inputData_.back());
-	}
 }
 
 /******************************************************************************
@@ -453,8 +332,7 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
 	if (config_.length > 0.0) {
 		const FloatType c = Util::speedOfSound(config_.temperature);
-		controlPeriod_ = static_cast<int>(std::rint((c * TOTAL_SECTIONS * 100.0f) / (config_.length * config_.controlRate)));
-		sampleRate_ = static_cast<int>(config_.controlRate * controlPeriod_);
+		sampleRate_ = (c * TOTAL_SECTIONS * 100.0f) / config_.length;
 		nyquist = sampleRate_ / 2.0f;
 	} else {
 		THROW_EXCEPTION(VTMException, "Illegal tube length.\n");
@@ -494,80 +372,16 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 	throat_ = std::make_unique<Throat<FloatType>>(sampleRate_, config_.throatCutoff, Util::amplitude60dB(config_.throatVol));
 
 	/*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-	srConv_ = std::make_unique<SampleRateConverter<FloatType>>(sampleRate_, config_.outputRate, outputData_);
-
-	/*  INITIALIZE THE OUTPUT VECTOR  */
-	outputData_.clear();
+	srConv_ = std::make_unique<SampleRateConverter<FloatType>>(sampleRate_, config_.outputRate, outputBuffer_);
 
 	bandpassFilter_ = std::make_unique<BandpassFilter<FloatType>>();
 	noiseFilter_    = std::make_unique<NoiseFilter<FloatType>>();
 	noiseSource_    = std::make_unique<NoiseSource>();
-
-	if (interactive_) {
-		inputFilters_ = std::make_unique<InputFilters>(sampleRate_, GS_VTM0_INPUT_FILTER_PERIOD_SEC);
-	}
-}
-
-/******************************************************************************
-*
-*  function:  synthesize
-*
-*  purpose:   Performs the actual synthesis of sound samples.
-*
-******************************************************************************/
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::synthesizeForInputSequence()
-{
-	const FloatType controlFreq = 1.0 / controlPeriod_;
-
-	/*  CONTROL RATE LOOP  */
-	for (int i = 1, size = inputData_.size(); i < size; ++i) {
-		// Calculates the current parameter values, and their
-		// associated sample-to-sample delta values.
-		for (int j = 0; j < TOTAL_PARAMETERS; ++j) {
-			currentParameter_[j] = inputData_[i - 1][j];
-			currentParameterDelta_[j] = (inputData_[i][j] - currentParameter_[j]) * controlFreq;
-		}
-
-		/*  SAMPLE RATE LOOP  */
-		for (int j = 0; j < controlPeriod_; ++j) {
-			synthesize();
-
-			/*  DO SAMPLE RATE INTERPOLATION OF CONTROL PARAMETERS  */
-			for (int k = 0; k < TOTAL_PARAMETERS; ++k) {
-				currentParameter_[k] += currentParameterDelta_[k];
-			}
-		}
-	}
 }
 
 template<typename FloatType>
 void
-VocalTractModel0<FloatType>::synthesizeSamples(std::size_t numberOfSamples)
-{
-	if (!inputFilters_) {
-		THROW_EXCEPTION(InvalidStateException, "Input filters have not been initialized.");
-	}
-
-	while (outputData_.size() < numberOfSamples) {
-		for (int i = 0; i < TOTAL_PARAMETERS; ++i) {
-			currentParameter_[i] = inputFilters_->filter[i].filter(singleInput_[i]);
-		}
-
-		synthesize();
-	}
-
-	// Normalize.
-	const float scale = calculateOutputScale();
-	for (auto& sample : outputData_) {
-		sample *= scale;
-	}
-}
-
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::synthesize()
+VocalTractModel0<FloatType>::execSynthesisStep()
 {
 	/*  CONVERT PARAMETERS HERE  */
 	FloatType f0 = Util::frequency(currentParameter_[PARAM_GLOT_PITCH]);
@@ -642,7 +456,6 @@ VocalTractModel0<FloatType>::initializeNasalCavity()
 	const FloatType radB2 = config_.apertureRadius * config_.apertureRadius;
 	nasalCoeff_[NC6] = (radA2 - radB2) / (radA2 + radB2);
 }
-
 
 /******************************************************************************
 *
@@ -835,70 +648,11 @@ VocalTractModel0<FloatType>::vocalTract(FloatType input, FloatType frication)
 	return output;
 }
 
-/******************************************************************************
-*
-*  function:  writeOutputToFile
-*
-*  purpose:   Scales the samples stored in the temporary file, and
-*             writes them to the output file, with the appropriate
-*             header. Also does master volume scaling.
-*
-******************************************************************************/
 template<typename FloatType>
 void
-VocalTractModel0<FloatType>::writeOutputToFile(const char* outputFile)
+VocalTractModel0<FloatType>::setParameter(int parameter, float value)
 {
-	/*  BE SURE TO FLUSH SRC BUFFER  */
-	srConv_->flushBuffer();
-
-	if (!interactive_) LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
-			"\nMaximum sample value: " << srConv_->maximumSampleValue());
-
-	WAVEFileWriter fileWriter(outputFile, 1, srConv_->numberSamples(), config_.outputRate);
-
-	const float scale = calculateOutputScale();
-	for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
-		fileWriter.writeSample(outputData_[i] * scale);
-	}
-}
-
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::writeOutputToBuffer(std::vector<float>& outputBuffer)
-{
-	/*  BE SURE TO FLUSH SRC BUFFER  */
-	srConv_->flushBuffer();
-
-	if (!interactive_) LOG_DEBUG("\nNumber of samples: " << srConv_->numberSamples() <<
-			"\nMaximum sample value: " << srConv_->maximumSampleValue());
-
-	outputBuffer.resize(srConv_->numberSamples());
-
-	const float scale = calculateOutputScale();
-	for (unsigned int i = 0, end = srConv_->numberSamples(); i < end; ++i) {
-		outputBuffer[i] = outputData_[i] * scale;
-	}
-}
-
-template<typename FloatType>
-float
-VocalTractModel0<FloatType>::calculateOutputScale()
-{
-	const float maxValue = srConv_->maximumSampleValue();
-	if (maxValue < 1.0e-10f) {
-		return 0.0;
-	}
-
-	const float scale = GS_VTM0_OUTPUT_SCALE / maxValue;
-	if (!interactive_) LOG_DEBUG("\nScale: " << scale << '\n');
-	return scale;
-}
-
-template<typename FloatType>
-void
-VocalTractModel0<FloatType>::loadSingleInput(const VocalTractModelParameterValue pv)
-{
-	switch (pv.index) {
+	switch (parameter) {
 	case PARAM_GLOT_PITCH:
 	case PARAM_GLOT_VOL:
 	case PARAM_ASP_VOL:
@@ -907,7 +661,7 @@ VocalTractModel0<FloatType>::loadSingleInput(const VocalTractModelParameterValue
 	case PARAM_FRIC_CF:
 	case PARAM_FRIC_BW:
 	case PARAM_VELUM:
-		singleInput_[pv.index] = pv.value;
+		currentParameter_[parameter] = value;
 		break;
 	case PARAM_R1:
 	case PARAM_R2:
@@ -917,33 +671,42 @@ VocalTractModel0<FloatType>::loadSingleInput(const VocalTractModelParameterValue
 	case PARAM_R6:
 	case PARAM_R7:
 	case PARAM_R8:
-		singleInput_[pv.index] = std::max(
-					pv.value * config_.radiusCoef[pv.index - PARAM_R1],
-					FloatType{GS_VTM0_MIN_RADIUS});
+		currentParameter_[parameter] = std::max(
+						value * config_.radiusCoef[parameter - PARAM_R1],
+						FloatType{GS_VTM0_MIN_RADIUS});
 		break;
 	default:
-		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << pv.index << '.');
+		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << parameter << '.');
 	}
 }
 
 template<typename FloatType>
-std::size_t
-VocalTractModel0<FloatType>::getOutputSamples(std::size_t n, float* buffer)
+void
+VocalTractModel0<FloatType>::setAllParameters(const std::vector<float>& parameters)
 {
-	if (outputData_.empty()) return 0;
-
-	const std::size_t size = outputData_.size();
-	const std::size_t initialPos = outputDataPos_;
-	for (std::size_t j = 0; j < n && outputDataPos_ < size; ++j, ++outputDataPos_) {
-		buffer[j] = outputData_[outputDataPos_];
+	if (parameters.size() != TOTAL_PARAMETERS) {
+		THROW_EXCEPTION(VTMException, "Wrong number of parameters: "
+				<< parameters.size() << " (should be " << TOTAL_PARAMETERS << ").");
 	}
 
-	const std::size_t samplesRead = outputDataPos_ - initialPos;
-	if (outputDataPos_ == size) { // all samples were used
-		outputData_.clear();
-		outputDataPos_ = 0;
+	for (std::size_t i = PARAM_GLOT_PITCH; i <= PARAM_FRIC_BW; ++i) {
+		currentParameter_[i] = parameters[i];
 	}
-	return samplesRead;
+
+	for (std::size_t i = PARAM_R1; i <= PARAM_R8; ++i) {
+		currentParameter_[i] = std::max(
+					parameters[i] * config_.radiusCoef[i - PARAM_R1],
+					FloatType{GS_VTM0_MIN_RADIUS});
+	}
+
+	currentParameter_[PARAM_VELUM] = parameters[PARAM_VELUM];
+}
+
+template<typename FloatType>
+void
+VocalTractModel0<FloatType>::finishSynthesis()
+{
+	srConv_->flushBuffer();
 }
 
 } /* namespace VTM */

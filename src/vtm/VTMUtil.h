@@ -21,13 +21,25 @@
 #ifndef VTM_UTIL_H_
 #define VTM_UTIL_H_
 
-#include <cmath> /* pow */
+#include <cmath> /* abs, pow */
+#include <cstddef> /* std::size_t */
+#include <vector>
 
 
 
 namespace GS {
 namespace VTM {
 namespace Util {
+
+// Copies at most n samples from inBuffer (starting from inBufferPos) to outBuffer.
+// inBufferPos is updated to the position of the next available sample in inBuffer.
+// If all samples from inBuffer were copied, inBuffer is cleared and inBufferPos is set to zero.
+// Returns the number of copied samples.
+std::size_t getSamples(std::vector<float>& inBuffer, std::size_t& inBufferPos, float* outBuffer, std::size_t n);
+
+float calculateOutputScale(const std::vector<float>& buffer);
+
+
 
 //******************************************************************************
 // Converts dB value to amplitude value.
@@ -90,6 +102,20 @@ speedOfSound(FloatType temperature)
 	constexpr FloatType c1 = 0.6;
 
 	return c0 + (c1 * temperature);
+}
+
+template<typename FloatType>
+FloatType
+maximumAbsoluteValue(const std::vector<FloatType>& v)
+{
+	FloatType maxValue = 0.0;
+	for (auto& value : v) {
+		const FloatType absValue = std::abs(value);
+		if (absValue > maxValue) {
+			maxValue = absValue;
+		}
+	}
+	return maxValue;
 }
 
 } /* namespace Util */

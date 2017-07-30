@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2016 Marcelo Y. Matuda                                       *
+ *  Copyright 2017 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,41 +15,47 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef VTM_VOCAL_TRACT_MODEL_H_
-#define VTM_VOCAL_TRACT_MODEL_H_
+#include "VTMUtil.h"
 
-#include <memory>
-#include <vector>
+#define MIN_MAXIMUM_ABS_SAMPLE_VALUE (1.0e-30)
+#define MAX_OUTPUT_ABS_SAMPLE_VALUE (0.95)
 
 
 
 namespace GS {
-
-class ConfigurationData;
-
 namespace VTM {
+namespace Util {
 
-class VocalTractModel {
-public:
-	virtual ~VocalTractModel() {}
+std::size_t
+getSamples(std::vector<float>& inBuffer, std::size_t& inBufferPos, float* outBuffer, std::size_t n)
+{
+	if (inBuffer.empty()) return 0;
 
-	virtual void reset() = 0;
+	const std::size_t size = inBuffer.size();
+	const std::size_t initialPos = inBufferPos;
+	for (std::size_t i = 0; i < n && inBufferPos < size; ++i, ++inBufferPos) {
+		outBuffer[i] = inBuffer[inBufferPos];
+	}
 
-	virtual double internalSampleRate() const = 0;
-	virtual double outputSampleRate() const = 0;
+	const std::size_t samplesRead = inBufferPos - initialPos;
+	if (inBufferPos == size) { // all samples were used
+		inBuffer.clear();
+		inBufferPos = 0;
+	}
+	return samplesRead;
+}
 
-	virtual void setParameter(int parameter, float value) = 0;
-	virtual void setAllParameters(const std::vector<float>& parameters) = 0;
+float
+calculateOutputScale(const std::vector<float>& buffer)
+{
+	const float maxValue = maximumAbsoluteValue(buffer);
+	if (maxValue < float{MIN_MAXIMUM_ABS_SAMPLE_VALUE}) {
+		return 0.0;
+	}
 
-	virtual void execSynthesisStep() = 0;
-	virtual void finishSynthesis() = 0;
+	return MAX_OUTPUT_ABS_SAMPLE_VALUE / maxValue;
+}
 
-	virtual std::vector<float>& outputBuffer() = 0;
-
-	static std::unique_ptr<VocalTractModel> getInstance(const ConfigurationData& data, bool interactive = false);
-};
-
+} /* namespace Util */
 } /* namespace VTM */
 } /* namespace GS */
-
-#endif /* VTM_VOCAL_TRACT_MODEL_H_ */

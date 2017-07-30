@@ -68,11 +68,10 @@ showUsage()
 	std::cout << "        output_file.wav : This file will be created, and will contain\n";
 	std::cout << "            the synthesized speech.\n\n";
 
-	std::cout << PROGRAM_NAME << " vtm [-v] config_dir voice_file vtm_param_file output_file.wav\n";
+	std::cout << PROGRAM_NAME << " vtm [-v] config_dir vtm_param_file output_file.wav\n";
 	std::cout << "        Converts vocal tract parameters to speech.\n\n";
 	std::cout << "        -v : Verbose.\n";
 	std::cout << "        config_dir : The directory containing the configuration files.\n";
-	std::cout << "        voice_file : Name of the voice file, relative to config_dir.\n";
 	std::cout << "        vtm_param_file : This file will be read. It must contain\n";
 	std::cout << "            the parameters for the vocal tract model.\n";
 	std::cout << "        output_file.wav : This file will be created, and will contain\n";
@@ -224,21 +223,18 @@ int
 vtm(int argc, char* argv[])
 {
 	const char* configDir    = nullptr;
-	const char* voiceFile    = nullptr;
 	const char* vtmParamFile = nullptr;
 	const char* outputFile   = nullptr;
 
-	if (argc == 6) {
+	if (argc == 5) {
 		configDir    = argv[2];
-		voiceFile    = argv[3];
-		vtmParamFile = argv[4];
-		outputFile   = argv[5];
-	} else if ((argc == 7) && (strcmp("-v", argv[2]) == 0)) {
+		vtmParamFile = argv[3];
+		outputFile   = argv[4];
+	} else if ((argc == 6) && (strcmp("-v", argv[2]) == 0)) {
 		GS::Log::debugEnabled = true;
 		configDir    = argv[3];
-		voiceFile    = argv[4];
-		vtmParamFile = argv[5];
-		outputFile   = argv[6];
+		vtmParamFile = argv[4];
+		outputFile   = argv[5];
 	} else {
 		showUsage();
 		return EXIT_FAILURE;
@@ -251,16 +247,11 @@ vtm(int argc, char* argv[])
 	}
 
 	try {
-		std::ostringstream configFilePath;
-		configFilePath << configDir << '/' << VTM_CONFIG_FILE;
-		GS::ConfigurationData vtmConfigData{configFilePath.str()};
+		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
+		vtmControlModel->load(configDir, VTM_CONTROL_MODEL_CONFIG_FILE);
 
-		std::ostringstream voiceFilePath;
-		voiceFilePath << configDir << '/' << voiceFile;
-		vtmConfigData.insert(GS::ConfigurationData{voiceFilePath.str()});
-
-		auto vtm = GS::VTM::VocalTractModel::getInstance(vtmConfigData);
-		vtm->synthesizeToFile(paramInputStream, outputFile);
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(configDir, *vtmControlModel);
+		vtmController->synthesizeToFile(paramInputStream, outputFile);
 
 	} catch (std::exception& e) {
 		std::cerr << "Exception: " << e.what() << std::endl;

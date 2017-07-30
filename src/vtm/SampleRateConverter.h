@@ -32,16 +32,13 @@ namespace VTM {
 template<typename FloatType>
 class SampleRateConverter {
 public:
-	SampleRateConverter(int sampleRate, float outputRate, std::vector<float>& outputData);
+	SampleRateConverter(FloatType inputRate, FloatType outputRate, std::vector<float>& outputBuffer);
 	~SampleRateConverter() {}
 
 	void reset();
 	void dataFill(FloatType data);
 	void dataEmpty();
 	void flushBuffer();
-
-	FloatType maximumSampleValue() const { return maximumSampleValue_; }
-	long numberSamples() const { return numberSamples_; }
 private:
 	enum {
 		BUFFER_SIZE = 1024, /*  ring buffer size  */
@@ -63,7 +60,7 @@ private:
 	SampleRateConverter(const SampleRateConverter&) = delete;
 	SampleRateConverter& operator=(const SampleRateConverter&) = delete;
 
-	void initializeConversion(int sampleRate, float outputRate);
+	void initializeConversion(FloatType inputRate, FloatType outputRate);
 	void initializeBuffer();
 	void initializeFilter();
 
@@ -86,19 +83,16 @@ private:
 	unsigned int timeRegister_;
 	int fillCounter_;
 
-	FloatType maximumSampleValue_;
-	long numberSamples_;
-
 	std::vector<FloatType> h_;
 	std::vector<FloatType> deltaH_;
 	std::vector<FloatType> buffer_;
-	std::vector<float>& outputData_;
+	std::vector<float>& outputBuffer_;
 };
 
 
 
 template<typename FloatType>
-SampleRateConverter<FloatType>::SampleRateConverter(int sampleRate, float outputRate, std::vector<float>& outputData)
+SampleRateConverter<FloatType>::SampleRateConverter(FloatType inputRate, FloatType outputRate, std::vector<float>& outputBuffer)
 		: sampleRateRatio_{}
 		, fillPtr_{}
 		, emptyPtr_{}
@@ -109,14 +103,12 @@ SampleRateConverter<FloatType>::SampleRateConverter(int sampleRate, float output
 		, phaseIncrement_{}
 		, timeRegister_{}
 		, fillCounter_{}
-		, maximumSampleValue_{}
-		, numberSamples_{}
 		, h_(FILTER_LENGTH)
 		, deltaH_(FILTER_LENGTH)
 		, buffer_(BUFFER_SIZE)
-		, outputData_{outputData}
+		, outputBuffer_{outputBuffer}
 {
-	initializeConversion(sampleRate, outputRate);
+	initializeConversion(inputRate, outputRate);
 }
 
 template<typename FloatType>
@@ -126,8 +118,6 @@ SampleRateConverter<FloatType>::reset()
 	emptyPtr_ = 0;
 	timeRegister_ = 0;
 	fillCounter_ = 0;
-	maximumSampleValue_ = 0.0;
-	numberSamples_ = 0;
 	initializeBuffer();
 }
 
@@ -140,13 +130,13 @@ SampleRateConverter<FloatType>::reset()
 ******************************************************************************/
 template<typename FloatType>
 void
-SampleRateConverter<FloatType>::initializeConversion(int sampleRate, float outputRate)
+SampleRateConverter<FloatType>::initializeConversion(FloatType inputRate, FloatType outputRate)
 {
 	/*  INITIALIZE FILTER IMPULSE RESPONSE  */
 	initializeFilter();
 
 	/*  CALCULATE SAMPLE RATE RATIO  */
-	sampleRateRatio_ = outputRate / static_cast<FloatType>(sampleRate);
+	sampleRateRatio_ = outputRate / inputRate;
 
 	/*  CALCULATE TIME REGISTER INCREMENT  */
 	timeRegisterIncrement_ = static_cast<unsigned int>(std::rint(std::pow(2.0, FRACTION_BITS) / sampleRateRatio_));
@@ -346,17 +336,8 @@ SampleRateConverter<FloatType>::dataEmpty()
 						(h_[filterIndex] + (deltaH_[filterIndex] * interpolation)));
 			}
 
-			/*  RECORD MAXIMUM SAMPLE VALUE  */
-			FloatType absoluteSampleValue = std::abs(output);
-			if (absoluteSampleValue > maximumSampleValue_) {
-				maximumSampleValue_ = absoluteSampleValue;
-			}
-
-			/*  INCREMENT SAMPLE NUMBER  */
-			numberSamples_++;
-
 			/*  SAVE THE SAMPLE  */
-			outputData_.push_back(static_cast<float>(output));
+			outputBuffer_.push_back(static_cast<float>(output));
 
 			/*  CHANGE TIME REGISTER BACK TO ORIGINAL FORM  */
 			timeRegister_ = ~timeRegister_;
@@ -412,17 +393,8 @@ SampleRateConverter<FloatType>::dataEmpty()
 				phaseIndex += phaseIncrement_;
 			}
 
-			/*  RECORD MAXIMUM SAMPLE VALUE  */
-			FloatType absoluteSampleValue = std::fabs(output);
-			if (absoluteSampleValue > maximumSampleValue_) {
-				maximumSampleValue_ = absoluteSampleValue;
-			}
-
-			/*  INCREMENT SAMPLE NUMBER  */
-			numberSamples_++;
-
 			/*  SAVE THE SAMPLE  */
-			outputData_.push_back(static_cast<float>(output));
+			outputBuffer_.push_back(static_cast<float>(output));
 
 			/*  INCREMENT THE TIME REGISTER  */
 			timeRegister_ += timeRegisterIncrement_;
