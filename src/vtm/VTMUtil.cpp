@@ -27,14 +27,14 @@ namespace VTM {
 namespace Util {
 
 std::size_t
-getSamples(std::vector<float>& inBuffer, std::size_t& inBufferPos, float* outBuffer, std::size_t n)
+getSamples(std::vector<float>& inBuffer, std::size_t& inBufferPos, float* outBuffer, std::size_t n, float scale)
 {
 	if (inBuffer.empty()) return 0;
 
 	const std::size_t size = inBuffer.size();
 	const std::size_t initialPos = inBufferPos;
 	for (std::size_t i = 0; i < n && inBufferPos < size; ++i, ++inBufferPos) {
-		outBuffer[i] = inBuffer[inBufferPos];
+		outBuffer[i] = inBuffer[inBufferPos] * scale;
 	}
 
 	const std::size_t samplesRead = inBufferPos - initialPos;
@@ -54,6 +54,16 @@ calculateOutputScale(const std::vector<float>& buffer)
 	}
 
 	return MAX_OUTPUT_ABS_SAMPLE_VALUE / maxValue;
+}
+
+float
+calculateOutputScale(float maximumAbsoluteValue)
+{
+	if (maximumAbsoluteValue < float{MIN_MAXIMUM_ABS_SAMPLE_VALUE}) {
+		return 0.0;
+	}
+
+	return MAX_OUTPUT_ABS_SAMPLE_VALUE / maximumAbsoluteValue;
 }
 
 } /* namespace Util */

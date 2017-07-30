@@ -35,9 +35,10 @@ namespace Util {
 // inBufferPos is updated to the position of the next available sample in inBuffer.
 // If all samples from inBuffer were copied, inBuffer is cleared and inBufferPos is set to zero.
 // Returns the number of copied samples.
-std::size_t getSamples(std::vector<float>& inBuffer, std::size_t& inBufferPos, float* outBuffer, std::size_t n);
+std::size_t getSamples(std::vector<float>& inBuffer, std::size_t& inBufferPos, float* outBuffer, std::size_t n, float scale = 1.0);
 
 float calculateOutputScale(const std::vector<float>& buffer);
+float calculateOutputScale(float maximumAbsoluteValue);
 
 
 
