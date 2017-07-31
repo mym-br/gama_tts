@@ -1,1 +1,0 @@
-../../vtm0/text_parser/suffix_list.txt
