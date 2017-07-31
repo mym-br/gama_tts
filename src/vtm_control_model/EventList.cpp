@@ -810,10 +810,10 @@ EventList::applyIntonation()
 
 				if (tgUseRandom_) {
 					randomSemitone = randDist_(randSrc_) * intonParms_[3] - intonParms_[3] / 2.0;
-					randomSlope = randDist_(randSrc_) * 0.015 + 0.01;
+					randomSlope = randDist_(randSrc_) * 0.015 + 0.01; // hardcoded
 				} else {
 					randomSemitone = 0.0;
-					randomSlope = 0.02;
+					randomSlope = 0.02; // hardcoded
 				}
 
 				//printf("postureIndex = %d onsetTime : %f Delta: %f\n", postureIndex,
@@ -824,9 +824,9 @@ EventList::applyIntonation()
 							offsetTime, randomSlope, ruleIndex);
 			} else { /* Tonic */
 				if (toneGroups_[i].type == 3) {
-					randomSlope = 0.01;
+					randomSlope = 0.01; // hardcoded
 				} else {
-					randomSlope = 0.02;
+					randomSlope = 0.02; // hardcoded
 				}
 
 				for (k = 0; k < currentRule_; k++) {
@@ -838,10 +838,10 @@ EventList::applyIntonation()
 
 				if (tgUseRandom_) {
 					randomSemitone = randDist_(randSrc_) * intonParms_[6] - intonParms_[6] / 2.0;
-					randomSlope += randDist_(randSrc_) * 0.03;
+					randomSlope += randDist_(randSrc_) * 0.03; // hardcoded
 				} else {
 					randomSemitone = 0.0;
-					randomSlope += 0.03;
+					randomSlope += 0.03; // hardcoded
 				}
 				addIntonationPoint(intonParms_[2] + intonParms_[1] + randomSemitone,
 							offsetTime, randomSlope, ruleIndex);
@@ -857,7 +857,7 @@ EventList::applyIntonation()
 				addIntonationPoint(intonParms_[2] + intonParms_[1] + intonParms_[5],
 							0.0, 0.0, ruleIndex);
 			}
-			offsetTime = -40.0;
+			offsetTime = -40.0; // hardcoded
 		}
 	}
 	if (intonParms_) {
@@ -972,7 +972,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	float table[16]; // hardcoded
 	double pa{}, pb{}, pc{}, pd{}; // coefficients for polynomial interpolation
 
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++) { // hardcoded
 		currentValues[i] = list_[0]->getParameter(i);
 		unsigned int j = 1;
 		while ((temp = list_[j]->getParameter(i)) == Event::EMPTY_PARAMETER) {
@@ -984,7 +984,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 			currentDeltas[i] = 0.0;
 		}
 	}
-	for (int i = 16; i < 32; i++) {
+	for (int i = 16; i < 32; i++) { // hardcoded
 		currentValues[i] = currentDeltas[i] = 0.0;
 	}
 
@@ -1017,7 +1017,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	int nextTime = list_[1]->time;
 	while (targetIndex < list_.size()) {
 		// Add normal parameters and special parameters.
-		for (int j = 0; j < 16; j++) {
+		for (int j = 0; j < 16; j++) {//hardcoded
 			table[j] = (float) currentValues[j] + (float) currentValues[j + 16];
 		}
 
@@ -1038,13 +1038,13 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 
 		// Send the parameter values to the output stream.
 		vtmParamStream << table[0];
-		for (int k = 1; k < 16; ++k) {
+		for (int k = 1; k < 16; ++k) {//hardcoded
 			vtmParamStream << ' ' << table[k];
 		}
 		vtmParamStream << '\n';
 
 		// Linear interpolation of the parameters.
-		for (int j = 0; j < 32; j++) {
+		for (int j = 0; j < 32; j++) {//hardcoded
 			if (currentDeltas[j]) {
 				currentValues[j] += currentDeltas[j];
 			}
@@ -1059,7 +1059,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 				break;
 			}
 			nextTime = list_[targetIndex]->time;
-			for (int j = 0; j < 32; j++) {
+			for (int j = 0; j < 32; j++) {//hardcoded
 				if (list_[targetIndex - 1]->getParameter(j) != Event::EMPTY_PARAMETER) {
 					unsigned int k = targetIndex;
 					while ((temp = list_[k]->getParameter(j)) == Event::EMPTY_PARAMETER) {
