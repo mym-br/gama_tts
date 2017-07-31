@@ -46,7 +46,8 @@ struct Configuration {
 
 	void load(const char* configDirPath);
 
-	double controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
+	unsigned int controlPeriod; // 1, 2, 3 or 4 (ms)
+	double controlRate;         // 1000.0 / controlPeriod (Hz)
 	double tempo;
 	double pitchOffset;
 	double driftDeviation;

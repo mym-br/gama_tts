@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "ConfigurationData.h"
+#include "Exception.h"
 
 #define CONFIG_FILE_NAME "/vtm_control_model.config"
 #define VOICE_FILE_PREFIX "/voice_"
@@ -31,7 +32,8 @@ namespace GS {
 namespace VTMControlModel {
 
 Configuration::Configuration()
-		: controlRate{}
+		: controlPeriod{}
+		, controlRate{}
 		, tempo{}
 		, pitchOffset{}
 		, driftDeviation{}
@@ -54,7 +56,11 @@ Configuration::load(const char* configDirPath)
 	configFilePath << configDirPath << CONFIG_FILE_NAME;
 	ConfigurationData config(configFilePath.str());
 
-	controlRate        = config.value<double>("control_rate");
+	controlPeriod      = config.value<unsigned int>("control_period");
+	if (controlPeriod == 0 || controlPeriod > 4U) {
+		THROW_EXCEPTION(InvalidValueException, "Invalid control period in file " << configFilePath.str() << '.');
+	}
+	controlRate        = 1000.0 / controlPeriod;
 	tempo              = config.value<double>("tempo");
 	pitchOffset        = config.value<double>("pitch_offset");
 	driftDeviation     = config.value<double>("drift_deviation");

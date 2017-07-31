@@ -40,6 +40,7 @@ namespace VTMControlModel {
 
 EventList::EventList(const char* configDirPath, Model& model)
 		: model_{model}
+		, controlPeriod_{4}
 		, macroIntonation_{}
 		, microIntonation_{}
 		, intonationDrift_{}
@@ -73,7 +74,6 @@ EventList::setUp()
 	zeroRef_ = 0;
 	zeroIndex_ = 0;
 	duration_ = 0;
-	timeQuantization_ = 4;
 
 	intonParms_ = nullptr;
 
@@ -332,15 +332,14 @@ EventList::insertEvent(double time, int parameter, double value)
 	if (time < 0.0) {
 		return nullptr;
 	}
-	if (time > (double) (duration_ + timeQuantization_)) {
+	if (time > static_cast<double>(duration_ + controlPeriod_)) {
 		return nullptr;
 	}
 
-	int tempTime = zeroRef_ + (int) time;
-	tempTime = (tempTime >> 2) << 2;
-	//if ((tempTime % timeQuantization) != 0) {
-	//	tempTime++;
-	//}
+	int tempTime = zeroRef_ + static_cast<int>(time);
+	if (controlPeriod_ != 1) {
+		tempTime -= tempTime % controlPeriod_;
+	}
 
 	if (list_.empty()) {
 		auto tempEvent = std::make_unique<Event>();
@@ -980,7 +979,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 			if (++j >= list_.size()) break;
 		}
 		if (j < list_.size()) {
-			currentDeltas[i] = ((temp - currentValues[i]) / (double) (list_[j]->time)) * 4.0;
+			currentDeltas[i] = ((temp - currentValues[i]) / static_cast<double>(list_[j]->time)) * controlPeriod_;
 		} else {
 			currentDeltas[i] = 0.0;
 		}
@@ -1014,7 +1013,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	}
 
 	unsigned int targetIndex = 1; // stores the index of the next target event
-	int currentTime = 0; // absolute time in ms, multiple of 4
+	int currentTime = 0; // absolute time in ms
 	int nextTime = list_[1]->time;
 	while (targetIndex < list_.size()) {
 		// Add normal parameters and special parameters.
@@ -1051,7 +1050,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 			}
 		}
 
-		currentTime += 4; // hardcoded - 250 Hz
+		currentTime += controlPeriod_;
 
 		if (currentTime >= nextTime) {
 			// Next interval.
@@ -1069,7 +1068,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 					if (temp != Event::EMPTY_PARAMETER) {
 						// Prepare linear interpolation.
 						currentDeltas[j] = (temp - currentValues[j]) / (list_[k]->time - currentTime);
-						currentDeltas[j] *= 4.0; // hardcoded - 250 Hz
+						currentDeltas[j] *= controlPeriod_;
 					} else {
 						currentDeltas[j] = 0.0;
 					}
@@ -1101,6 +1100,15 @@ EventList::clearMacroIntonation()
 	for (auto& event : list_) {
 		event->interpData.reset();
 	}
+}
+
+void
+EventList::setControlPeriod(int value)
+{
+	if (value < 1 || value > 4) {
+		THROW_EXCEPTION(InvalidValueException, "Invalid control period: " << value << '.');
+	}
+	controlPeriod_ = value;
 }
 
 void

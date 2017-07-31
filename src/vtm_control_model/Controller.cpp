@@ -54,6 +54,8 @@ Controller::Controller(const char* configDirPath, Model& model)
 
 	// Get the vocal tract model instance.
 	vtm_ = VTM::VocalTractModel::getInstance(*vtmConfigData_);
+
+	eventList_.setControlPeriod(vtmControlModelConfig_.controlPeriod);
 }
 
 Controller::~Controller()

@@ -185,6 +185,7 @@ public:
 	void prepareMacroIntonationInterpolation();
 	void generateOutput(std::ostream& vtmParamStream);
 	void clearMacroIntonation();
+	void setControlPeriod(int value);
 
 	void setUpDriftGenerator(double deviation, double sampleRate, double lowpassCutoff);
 
@@ -217,7 +218,7 @@ private:
 	int zeroRef_;
 	int zeroIndex_;
 	int duration_;
-	int timeQuantization_;
+	int controlPeriod_;
 	bool macroIntonation_;
 	bool microIntonation_;
 	bool intonationDrift_;
