@@ -38,15 +38,6 @@ namespace VTMControlModel {
 
 class Posture {
 public:
-	struct Symbols {
-		float duration;
-		float transition;
-		float qssa;
-		float qssb;
-
-		Symbols() : duration(0.0), transition(0.0), qssa(0.0), qssb(0.0) {}
-	};
-
 	Posture(const std::string& name, unsigned int numParameters, unsigned int numSymbols)
 			: name_(name)
 			, parameterTargetList_(numParameters)
@@ -104,7 +95,7 @@ public:
 
 	std::unique_ptr<Posture> copy(const std::string& newName) const;
 private:
-	std::string name_; // must be immutable
+	const std::string name_;
 	std::vector<std::shared_ptr<Category>> categoryList_;
 	std::vector<float> parameterTargetList_;
 	std::vector<float> symbolTargetList_;
