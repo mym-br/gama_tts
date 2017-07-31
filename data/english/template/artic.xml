@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root version="1">
+  <categories>
+    <category name="phone">
+      <comment>This is the static phone category.  It cannot be changed or removed</comment>
+    </category>
+    <category name="silence"/>
+  </categories>
+  <parameters>
+    <parameter name="microInt" minimum="-10" maximum="10" default="0"/>
+    <parameter name="glotVol" minimum="0" maximum="60" default="60"/>
+    <parameter name="aspVol" minimum="0" maximum="60" default="0"/>
+    <parameter name="fricVol" minimum="0" maximum="60" default="0"/>
+    <parameter name="fricPos" minimum="0" maximum="7" default="5.5"/>
+    <parameter name="fricCF" minimum="100" maximum="20000" default="2500"/>
+    <parameter name="fricBW" minimum="250" maximum="20000" default="500"/>
+    <parameter name="r1" minimum="0" maximum="3" default="0.8"/>
+    <parameter name="r2" minimum="0" maximum="3" default="1.5"/>
+    <parameter name="r3" minimum="0" maximum="3" default="1.5"/>
+    <parameter name="r4" minimum="0" maximum="3" default="1.5"/>
+    <parameter name="r5" minimum="0" maximum="3" default="1.5"/>
+    <parameter name="r6" minimum="0" maximum="3" default="1.5"/>
+    <parameter name="r7" minimum="0" maximum="3" default="1.5"/>
+    <parameter name="r8" minimum="0" maximum="3" default="1.5"/>
+    <parameter name="velum" minimum="0" maximum="1.5" default="0.1"/>
+  </parameters>
+  <symbols>
+    <symbol name="duration" minimum="0" maximum="500" default="100"/>
+    <symbol name="transition" minimum="2" maximum="400" default="27.8"/>
+    <symbol name="qssa" minimum="10" maximum="500" default="75"/>
+    <symbol name="qssb" minimum="10" maximum="500" default="75"/>
+  </symbols>
+  <postures>
+    <posture symbol="#">
+      <comment>This is an "at rest" symbol that is used to start and terminate utterances without introducing ridiculous transitions etc!</comment>
+      <posture-categories>
+        <category-ref name="#"/>
+        <category-ref name="silence"/>
+        <category-ref name="phone"/>
+      </posture-categories>
+      <parameter-targets>
+        <target name="microInt" value="0"/>
+        <target name="glotVol" value="0"/>
+        <target name="aspVol" value="0"/>
+        <target name="fricVol" value="0"/>
+        <target name="fricPos" value="5.5"/>
+        <target name="fricCF" value="2500"/>
+        <target name="fricBW" value="500"/>
+        <target name="r1" value="0.8"/>
+        <target name="r2" value="0.89"/>
+        <target name="r3" value="0.99"/>
+        <target name="r4" value="0.81"/>
+        <target name="r5" value="0.76"/>
+        <target name="r6" value="1.05"/>
+        <target name="r7" value="1.23"/>
+        <target name="r8" value="0.01"/>
+        <target name="velum" value="0.1"/>
+      </parameter-targets>
+      <symbol-targets>
+        <target name="duration" value="72"/>
+        <target name="transition" value="20"/>
+        <target name="qssa" value="26"/>
+        <target name="qssb" value="26"/>
+      </symbol-targets>
+    </posture>
+    <posture symbol="#'">
+      <comment>This is an "at rest" symbol that is used to start and terminate utterances without introducing ridiculous transitions etc!</comment>
+      <posture-categories>
+        <category-ref name="#'"/>
+        <category-ref name="silence"/>
+        <category-ref name="phone"/>
+      </posture-categories>
+      <parameter-targets>
+        <target name="microInt" value="0"/>
+        <target name="glotVol" value="0"/>
+        <target name="aspVol" value="0"/>
+        <target name="fricVol" value="0"/>
+        <target name="fricPos" value="5.5"/>
+        <target name="fricCF" value="2500"/>
+        <target name="fricBW" value="500"/>
+        <target name="r1" value="0.8"/>
+        <target name="r2" value="0.89"/>
+        <target name="r3" value="0.99"/>
+        <target name="r4" value="0.81"/>
+        <target name="r5" value="0.76"/>
+        <target name="r6" value="1.05"/>
+        <target name="r7" value="1.23"/>
+        <target name="r8" value="0.01"/>
+        <target name="velum" value="0.1"/>
+      </parameter-targets>
+      <symbol-targets>
+        <target name="duration" value="72"/>
+        <target name="transition" value="20"/>
+        <target name="qssa" value="26"/>
+        <target name="qssb" value="26"/>
+      </symbol-targets>
+    </posture>
+    <posture symbol="^">
+      <posture-categories>
+        <category-ref name="^"/>
+        <category-ref name="silence"/>
+        <category-ref name="phone"/>
+      </posture-categories>
+      <parameter-targets>
+        <target name="microInt" value="0"/>
+        <target name="glotVol" value="0"/>
+        <target name="aspVol" value="0"/>
+        <target name="fricVol" value="0"/>
+        <target name="fricPos" value="5.5"/>
+        <target name="fricCF" value="2500"/>
+        <target name="fricBW" value="500"/>
+        <target name="r1" value="0.8"/>
+        <target name="r2" value="0.89"/>
+        <target name="r3" value="0.99"/>
+        <target name="r4" value="0.81"/>
+        <target name="r5" value="0.76"/>
+        <target name="r6" value="1.05"/>
+        <target name="r7" value="1.23"/>
+        <target name="r8" value="0.01"/>
+        <target name="velum" value="0.1"/>
+      </parameter-targets>
+      <symbol-targets>
+        <target name="duration" value="100"/>
+        <target name="transition" value="40"/>
+        <target name="qssa" value="30"/>
+        <target name="qssb" value="30"/>
+      </symbol-targets>
+    </posture>
+    <posture symbol="^'">
+      <posture-categories>
+        <category-ref name="^'"/>
+        <category-ref name="silence"/>
+        <category-ref name="phone"/>
+      </posture-categories>
+      <parameter-targets>
+        <target name="microInt" value="0"/>
+        <target name="glotVol" value="0"/>
+        <target name="aspVol" value="0"/>
+        <target name="fricVol" value="0"/>
+        <target name="fricPos" value="5.5"/>
+        <target name="fricCF" value="2500"/>
+        <target name="fricBW" value="500"/>
+        <target name="r1" value="0.8"/>
+        <target name="r2" value="0.89"/>
+        <target name="r3" value="0.99"/>
+        <target name="r4" value="0.81"/>
+        <target name="r5" value="0.76"/>
+        <target name="r6" value="1.05"/>
+        <target name="r7" value="1.23"/>
+        <target name="r8" value="0.01"/>
+        <target name="velum" value="0.1"/>
+      </parameter-targets>
+      <symbol-targets>
+        <target name="duration" value="100"/>
+        <target name="transition" value="40"/>
+        <target name="qssa" value="30"/>
+        <target name="qssb" value="30"/>
+      </symbol-targets>
+    </posture>
+  </postures>
+  <equations>
+    <equation-group name="DefaultDurations">
+      <equation name="DiphoneDefault" formula="(qssb1 + transition1 / 2.000000) / tempo1 + (transition2 / 2.000000 + qssa2) / tempo2"/>
+      <equation name="TriphoneDefault" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2 + (transition3 + qssa3) / tempo3"/>
+      <equation name="TetraphoneDefault" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2 + (transition3 + qssa3 + qssb3) / tempo3 + (transition4 + qssa4) / tempo4"/>
+    </equation-group>
+    <equation-group name="SymbolDefaults">
+      <equation name="diBeat" formula="qssb1 / tempo1"/>
+      <equation name="triBeat" formula="mark1 + qssb2 / tempo2"/>
+      <equation name="Mark1" formula="qssb1 / tempo1 + (transition2 + qssa2) / tempo2"/>
+      <equation name="Mark2" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2 + (transition3 + qssa3) / tempo3"/>
+      <equation name="Zero" formula="0.000000"/>
+      <equation name="diOneThird" formula="mark1 * 0.333333"/>
+      <equation name="diTwoThird" formula="mark1 * 0.666667"/>
+      <equation name="triOneThird" formula="(mark2 - mark1) * 0.333333 + mark1"/>
+      <equation name="triTwoThird" formula="(mark2 - mark1) * 0.666667 + mark1"/>
+      <equation name="tetraOneThird" formula="(rd - mark2) * 0.333333 + mark2"/>
+      <equation name="tetraTwoThird" formula="(rd - mark2) * 0.666667 + mark2"/>
+    </equation-group>
+    <equation-group name="DiphoneStandard">
+      <equation name="diOneTenth" formula="mark1 * 0.100000"/>
+      <equation name="diTwoTenth" formula="mark1 * 0.200000"/>
+      <equation name="diThreeTenth" formula="mark1 * 0.300000"/>
+      <equation name="diFourTenth" formula="mark1 * 0.400000"/>
+      <equation name="diFiveTenth" formula="mark1 * 0.500000"/>
+      <equation name="diSixTenth" formula="mark1 * 0.600000"/>
+      <equation name="diSevenTenth" formula="mark1 * 0.700000"/>
+      <equation name="diEightTenth" formula="mark1 * 0.800000"/>
+      <equation name="diNineTenth" formula="mark1 * 0.900000"/>
+      <equation name="TransByOneThird" formula="(qssb1 + transition1 / 6.000000) / tempo1 + transition2 / 6.000000 / tempo2"/>
+      <equation name="EndTrans" formula="rd - qssa2 / tempo2"/>
+      <equation name="qssa2By2" formula="rd - qssa2 / 2.000000 / tempo2"/>
+      <equation name="TransByTwoThird" formula="(qssb1 + transition1 / 3.000000) / tempo1 + transition2 / 3.000000 / tempo2"/>
+    </equation-group>
+    <equation-group name="TriphoneStandard">
+      <equation name="triOneTenth" formula="(mark2 - mark1) * 0.100000 + mark1"/>
+      <equation name="triTwoTenth" formula="(mark2 - mark1) * 0.200000 + mark1"/>
+      <equation name="triThreeTenth" formula="(mark2 - mark1) * 0.300000 + mark1"/>
+      <equation name="triFourTenth" formula="(mark2 - mark1) * 0.400000 + mark1"/>
+      <equation name="triFiveTenth" formula="(mark2 - mark1) * 0.500000 + mark1"/>
+      <equation name="triSixTenth" formula="(mark2 - mark1) * 0.600000 + mark1"/>
+      <equation name="triSevenTenth" formula="(mark2 - mark1) * 0.700000 + mark1"/>
+      <equation name="triEightTenth" formula="(mark2 - mark1) * 0.800000 + mark1"/>
+      <equation name="triNineTenth" formula="(mark2 - mark1) * 0.900000 + mark1"/>
+      <equation name="MarkOneMinusQssa" formula="mark1 - qssa2 / tempo2"/>
+      <equation name="MarkOnePlusQssb" formula="mark1 + qssb2 / tempo2"/>
+    </equation-group>
+    <equation-group name="TetraphoneStandard">
+      <equation name="tetraOneTenth" formula="(rd - mark2) * 0.100000 + mark2"/>
+      <equation name="tetraTwoTenth" formula="(rd - mark2) * 0.200000 + mark2"/>
+      <equation name="tetraThreeTenth" formula="(rd - mark2) * 0.300000 + mark2"/>
+      <equation name="tetraFourTenth" formula="(rd - mark2) * 0.400000 + mark2"/>
+      <equation name="tetraFiveTenth" formula="(rd - mark2) * 0.500000 + mark2"/>
+      <equation name="tetraSixTenth" formula="(rd - mark2) * 0.600000 + mark2"/>
+      <equation name="tetraSevenTenth" formula="(rd - mark2) * 0.700000 + mark2"/>
+      <equation name="tetraEightTenth" formula="(rd - mark2) * 0.800000 + mark2"/>
+      <equation name="tetraNineTenth" formula="(rd - mark2) * 0.900000 + mark2"/>
+    </equation-group>
+    <equation-group name="Durations">
+      <equation name="Triphone" formula="qssb1 + transition2 + qssa2 + qssb2 + transition3 + qssa3"/>
+      <equation name="ToSilence" formula="qssb1 + 150.000000 + qssa1"/>
+      <equation name="RuleDuration" formula="rd"/>
+    </equation-group>
+    <equation-group name="BasicDurations">
+      <equation name="QssbOne" formula="qssb1 / tempo1"/>
+      <equation name="QssbOneByTwo" formula="qssb1 / tempo1 / 2.000000"/>
+      <equation name="QssbTwo" formula="mark1 + qssb2 / tempo2"/>
+      <equation name="QssbOneTrTwo" formula="qssb1 / tempo1 + transition2 / tempo2"/>
+      <equation name="Mark1MinusQssa2ByTwo" formula="qssb1 / tempo1 + (transition2 + qssa2 / 2.000000) / tempo2"/>
+      <equation name="Mark1Plus10" formula="mark1 + 10.000000"/>
+      <equation name="Mark1Plus6" formula="mark1 + 6.000000"/>
+      <equation name="QssbOneTrOne" formula="(qssb1 + transition1) / tempo1"/>
+      <equation name="QssbTwoTrThree" formula="mark1 + qssb2 / tempo2 + transition3 / tempo3"/>
+      <equation name="RdMinusQssa3ByTwo" formula="mark1 + (qssb2 + transition2) / tempo2 + qssa3 / 2.000000 / tempo3"/>
+      <equation name="TenMS" formula="10.000000"/>
+      <equation name="TwentyMS" formula="20.000000"/>
+      <equation name="ThirtyMS" formula="30.000000"/>
+      <equation name="RuleDurationMinusTenMs" formula="rd - 10.000000"/>
+      <equation name="RuleDurationMinusTwentyMS" formula="rd - 20.000000"/>
+      <equation name="ContoidToVowelDuration" formula="(qssb1 + transition1) / tempo1 + qssa2 / tempo2"/>
+      <equation name="VowelToContoidDuration" formula="qssb1 / tempo1 + (transition2 + qssa2) / tempo2"/>
+    </equation-group>
+    <equation-group name="DiphthongDurations">
+      <equation name="uhuuUnmarked" formula="79.500000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="uhuuMarked" formula="142.700000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="eiUnmarked" formula="73.700000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="eiMarked" formula="106.800000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="oiUnmarked" formula="67.200000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="oiMarked" formula="109.700000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="ahiUnmarked" formula="92.400000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="ahiMarked" formula="161.400000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="ahuuUnmarked" formula="87.100000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="ahuuMarked" formula="122.900000 * 2.000000 / (tempo1 + tempo2)"/>
+      <equation name="vocoidToVocoid" formula="(qssb1 + 12.600000) / tempo1 + (qssa2 + 12.600000) / tempo2"/>
+    </equation-group>
+    <equation-group name="Stopped">
+      <equation name="VlessStopVolOnset1" formula="(qssb1 + 0.300000 * transition1) / tempo1"/>
+      <equation name="VlessStopVolOnset2" formula="(qssb1 + 1.330000 * transition1) / tempo1"/>
+      <equation name="VlessStopVolOnset3" formula="(qssb1 + transition1) / tempo1"/>
+      <equation name="VlessStopVolOnset4" formula="(qssb1 + transition1) / tempo1 + 0.667000 * qssa2 / tempo2"/>
+      <equation name="VlessStopFricOnset" formula="(qssb1 + 0.150000 * transition1) / tempo1"/>
+      <equation name="VlessStopAspPeak" formula="(qssb1 + 0.500000 * transition1) / tempo1"/>
+      <equation name="VlessStopAspOffset" formula="(qssb1 + 0.660000 * transition1) / tempo1"/>
+      <equation name="VlessStopMouthOnset1" formula="(qssb1 - 0.160000 * transition1) / tempo1"/>
+      <equation name="VlessStopMouthOnset2" formula="(qssb1 + transition1 * 0.833000) / tempo1"/>
+      <equation name="VLessStopAspOffset2" formula="(qssb1 + transition1 + qssa2 / 2.000000) / tempo1"/>
+    </equation-group>
+    <equation-group name="Carre">
+      <equation name="endOfStopClosureOnset" formula="qssb1 / tempo1 + transition2 / tempo2"/>
+      <equation name="startOfStopClosureOnset" formula="qssb1 / tempo1"/>
+      <equation name="rdMinusOne" formula="rd - 1.000000"/>
+      <equation name="endOfStopClosureOffset" formula="rd - qssa3 / tempo3"/>
+      <equation name="endOfVLessAspBurst" formula="rd - qssa3 / tempo3 / 2.000000">
+        <comment>This is the one we are always looking for!!
+
+Namely rd - (qssa3/2)/tempo3</comment>
+      </equation>
+      <equation name="startOfStopClosureOffset" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2"/>
+      <equation name="VStopBurstStart" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2 - 14.000000"/>
+      <equation name="VStopVTotalDur" formula="qssb1 / tempo1 + (transition2 * 2.000000 + qssa2 + qssb2) / tempo2 + qssa3 / tempo3"/>
+      <equation name="VStopVMark1" formula="qssb1 / tempo1 + (transition2 + qssa2) / tempo2"/>
+      <equation name="VStopBurstTipA" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2 - 9.000000"/>
+      <equation name="VStopBurstTipB" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2"/>
+      <equation name="VStopBurstEnd" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2) / tempo2 + 6.000000"/>
+      <equation name="vlessStopBurstTopA" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2 + 0.250000 * transition2) / tempo2"/>
+      <equation name="vlessStopBurstTopB" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2 + 0.500000 * transition2) / tempo2"/>
+      <equation name="vlessStopBurstTopC" formula="qssb1 / tempo1 + (transition2 + qssa2 + qssb2 + 0.900000 * transition2) / tempo2"/>
+    </equation-group>
+    <equation-group name="Fricative">
+      <equation name="startOfFricCharOnset" formula="qssb1 / tempo1 - 4.000000"/>
+      <equation name="endOfFricCharOnset" formula="qssb1 / tempo1"/>
+      <equation name="endOfFricCharOffset" formula="rd - qssa3 / tempo3 + 4.000000"/>
+      <equation name="startOfFricCharOffset" formula="rd - qssa3 / tempo3"/>
+    </equation-group>
+    <equation-group name="Nasal">
+      <equation name="Mk1MinusQssa2By2" formula="mark1 - qssa2 / 2.000000 / tempo2"/>
+      <equation name="Mk1PlusQssb2By2" formula="mark1 + qssb2 / 2.000000 / tempo2"/>
+    </equation-group>
+    <equation-group name="Affricates">
+      <equation name="qssb2Transition2By2" formula="mark1 + (qssb2 + transition2 / 2.000000) / tempo2"/>
+    </equation-group>
+  </equations>
+  <transitions>
+    <transition-group name="Defaults">
+      <transition name="newDiphoneDefault" type="diphone">
+        <point-or-slopes>
+          <slope-ratio>
+            <points>
+              <point type="diphone" value="0" time-expression="Zero"/>
+              <point type="diphone" value="1.912" time-expression="QssbOneByTwo"/>
+              <point type="diphone" value="8.28535" time-expression="QssbOne"/>
+              <point type="diphone" value="85.0608" time-expression="EndTrans"/>
+              <point type="diphone" value="96.5525" time-expression="qssa2By2"/>
+              <point type="diphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
+            </points>
+            <slopes>
+              <slope slope="0.3" display-time="0"/>
+              <slope slope="1" display-time="0"/>
+              <slope slope="6" display-time="0"/>
+              <slope slope="1" display-time="0"/>
+              <slope slope="0.3" display-time="0"/>
+            </slopes>
+          </slope-ratio>
+        </point-or-slopes>
+      </transition>
+    </transition-group>
+    <transition-group name="DiphoneStandard">
+      <transition name="FricCharParams" type="diphone">
+        <point-or-slopes>
+          <slope-ratio>
+            <points>
+              <point type="diphone" value="0" time-expression="Zero"/>
+              <point type="diphone" value="0" time-expression="TransByOneThird"/>
+              <point type="diphone" value="100" time-expression="TransByTwoThird"/>
+              <point type="diphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
+            </points>
+            <slopes>
+              <slope slope="0" display-time="0"/>
+              <slope slope="6" display-time="0"/>
+              <slope slope="0" display-time="0"/>
+            </slopes>
+          </slope-ratio>
+        </point-or-slopes>
+      </transition>
+    </transition-group>
+  </transitions>
+  <special-transitions>
+    <transition-group name="General">
+      <transition name="Null" type="diphone">
+        <point-or-slopes>
+          <point type="diphone" value="0" time-expression="Zero"/>
+        </point-or-slopes>
+      </transition>
+    </transition-group>
+  </special-transitions>
+  <rules>
+    <!-- Rule: 1 -->
+    <rule>
+      <boolean-expressions>
+        <boolean-expression>phone</boolean-expression>
+        <boolean-expression>phone</boolean-expression>
+      </boolean-expressions>
+      <parameter-profiles>
+        <parameter-transition name="microInt" transition="newDiphoneDefault"/>
+        <parameter-transition name="glotVol" transition="newDiphoneDefault"/>
+        <parameter-transition name="aspVol" transition="newDiphoneDefault"/>
+        <parameter-transition name="fricVol" transition="newDiphoneDefault"/>
+        <parameter-transition name="fricPos" transition="FricCharParams"/>
+        <parameter-transition name="fricCF" transition="FricCharParams"/>
+        <parameter-transition name="fricBW" transition="FricCharParams"/>
+        <parameter-transition name="r1" transition="newDiphoneDefault"/>
+        <parameter-transition name="r2" transition="newDiphoneDefault"/>
+        <parameter-transition name="r3" transition="newDiphoneDefault"/>
+        <parameter-transition name="r4" transition="newDiphoneDefault"/>
+        <parameter-transition name="r5" transition="newDiphoneDefault"/>
+        <parameter-transition name="r6" transition="newDiphoneDefault"/>
+        <parameter-transition name="r7" transition="newDiphoneDefault"/>
+        <parameter-transition name="r8" transition="newDiphoneDefault"/>
+        <parameter-transition name="velum" transition="newDiphoneDefault"/>
+      </parameter-profiles>
+      <expression-symbols>
+        <symbol-equation name="rd" equation="DiphoneDefault"/>
+        <symbol-equation name="beat" equation="diBeat"/>
+        <symbol-equation name="mark1" equation="RuleDuration"/>
+      </expression-symbols>
+    </rule>
+  </rules>
+</root>
