@@ -1,0 +1,2 @@
+
+- The first vocal tract model parameter must be the pitch.
