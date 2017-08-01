@@ -1,2 +1,6 @@
 
 - The first vocal tract model parameter must be the pitch.
+
+- The symbols (duration, transition, qssa, qssb) must not be changed.
+
+- The "phone" category must not be removed.
