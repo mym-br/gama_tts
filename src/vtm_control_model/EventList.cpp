@@ -22,6 +22,7 @@
 
 #include <cstring>
 #include <iomanip>
+#include <limits> /* std::numeric_limits<double>::infinity() */
 #include <sstream>
 #include <vector>
 
@@ -32,15 +33,20 @@
 #define TETRAPHONE 4
 
 #define INTONATION_CONFIG_FILE_NAME "/intonation.txt"
+#define DEFAULT_CONTROL_PERIOD_MS 4
 
 
 
 namespace GS {
 namespace VTMControlModel {
 
+const double Event::EMPTY_PARAMETER = std::numeric_limits<double>::infinity();
+
+
+
 EventList::EventList(const char* configDirPath, Model& model)
 		: model_{model}
-		, controlPeriod_{4}
+		, controlPeriod_{DEFAULT_CONTROL_PERIOD_MS}
 		, macroIntonation_{}
 		, microIntonation_{}
 		, intonationDrift_{}
@@ -327,7 +333,7 @@ EventList::setCurrentPostureSyllable()
 }
 
 Event*
-EventList::insertEvent(double time, int parameter, double value)
+EventList::insertEvent(double time, int parameter, double value, bool special)
 {
 	if (time < 0.0) {
 		return nullptr;
@@ -335,6 +341,7 @@ EventList::insertEvent(double time, int parameter, double value)
 	if (time > static_cast<double>(duration_ + controlPeriod_)) {
 		return nullptr;
 	}
+	const unsigned int numParam = model_.parameterList().size();
 
 	int tempTime = zeroRef_ + static_cast<int>(time);
 	if (controlPeriod_ != 1) {
@@ -342,10 +349,10 @@ EventList::insertEvent(double time, int parameter, double value)
 	}
 
 	if (list_.empty()) {
-		auto tempEvent = std::make_unique<Event>();
+		auto tempEvent = std::make_unique<Event>(numParam);
 		tempEvent->time = tempTime;
 		if (parameter >= 0) {
-			tempEvent->setParameter(parameter, value);
+			tempEvent->setParameter(parameter, value, special);
 		}
 		list_.push_back(std::move(tempEvent));
 		return list_.back().get();
@@ -355,25 +362,25 @@ EventList::insertEvent(double time, int parameter, double value)
 	for (i = list_.size() - 1; i >= zeroIndex_; i--) {
 		if (list_[i]->time == tempTime) {
 			if (parameter >= 0) {
-				list_[i]->setParameter(parameter, value);
+				list_[i]->setParameter(parameter, value, special);
 			}
 			return list_[i].get();
 		}
 		if (list_[i]->time < tempTime) {
-			auto tempEvent = std::make_unique<Event>();
+			auto tempEvent = std::make_unique<Event>(numParam);
 			tempEvent->time = tempTime;
 			if (parameter >= 0) {
-				tempEvent->setParameter(parameter, value);
+				tempEvent->setParameter(parameter, value, special);
 			}
 			list_.insert(list_.begin() + (i + 1), std::move(tempEvent));
 			return list_[i + 1].get();
 		}
 	}
 
-	auto tempEvent = std::make_unique<Event>();
+	auto tempEvent = std::make_unique<Event>(numParam);
 	tempEvent->time = tempTime;
 	if (parameter >= 0) {
-		tempEvent->setParameter(parameter, value);
+		tempEvent->setParameter(parameter, value, special);
 	}
 	list_.insert(list_.begin() + (i + 1), std::move(tempEvent));
 	return list_[i + 1].get();
@@ -463,7 +470,7 @@ EventList::createSlopeRatioEvents(
 			value = max;
 		}
 		if (!point.isPhantom) {
-			insertEvent(pointTime * timeMultiplier, eventIndex, value);
+			insertEvent(pointTime * timeMultiplier, eventIndex, value, false);
 		}
 	}
 
@@ -472,7 +479,8 @@ EventList::createSlopeRatioEvents(
 
 // It is assumed that postureList.size() >= 2.
 void
-EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postureList, const double* tempos, int postureIndex)
+EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postureList, const double* tempos, int postureIndex,
+			const std::vector<double>& minParam, const std::vector<double>& maxParam)
 {
 	int cont;
 	int currentType;
@@ -500,20 +508,20 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 	case 4:
 		if (postureList.size() == 4) {
 			postureData_[postureIndex + 3].onset = (double) zeroRef_ + ruleSymbols[1];
-			tempEvent = insertEvent(ruleSymbols[3] * timeMultiplier, -1, 0.0);
+			tempEvent = insertEvent(ruleSymbols[3] * timeMultiplier, -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
 	case 3:
 		if (postureList.size() >= 3) {
 			postureData_[postureIndex + 2].onset = (double) zeroRef_ + ruleSymbols[1];
-			tempEvent = insertEvent(ruleSymbols[2] * timeMultiplier, -1, 0.0);
+			tempEvent = insertEvent(ruleSymbols[2] * timeMultiplier, -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
 	case 2:
 		postureData_[postureIndex + 1].onset = (double) zeroRef_ + ruleSymbols[1];
-		tempEvent = insertEvent(0.0, -1, 0.0);
+		tempEvent = insertEvent(0.0, -1, 0.0, false);
 		if (tempEvent) tempEvent->flag = 1;
 		break;
 	}
@@ -548,7 +556,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 			break;
 		}
 
-		insertEvent(0.0, i, targets[0]);
+		insertEvent(0.0, i, targets[0], false);
 
 		if (cont) {
 			currentType = DIPHONE;
@@ -574,7 +582,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 					}
 					value = createSlopeRatioEvents(
 							slopeRatio, targets[currentType - 2], currentValueDelta,
-							min_[i], max_[i], i, timeMultiplier);
+							minParam[i], maxParam[i], i, timeMultiplier);
 				} else {
 					const auto& point = dynamic_cast<const Transition::Point&>(pointOrSlope);
 
@@ -585,10 +593,10 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 					}
 					double pointTime;
 					Transition::getPointData(point, model_,
-									targets[currentType - 2], currentValueDelta, min_[i], max_[i],
+									targets[currentType - 2], currentValueDelta, minParam[i], maxParam[i],
 									pointTime, value);
 					if (!point.isPhantom) {
-						insertEvent(pointTime * timeMultiplier, i, value);
+						insertEvent(pointTime * timeMultiplier, i, value, false);
 					}
 				}
 				lastValue = value;
@@ -611,27 +619,30 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 				tempTime = Transition::getPointTime(point, model_);
 
 				/* Calculate value of event */
-				value = ((point.value / 100.0) * (max_[i] - min_[i]));
+				value = ((point.value / 100.0) * (maxParam[i] - minParam[i]));
 				//maxValue = value;
 
 				/* insert event into event list */
-				insertEvent(tempTime * timeMultiplier, i + 16U, value);
+				insertEvent(tempTime * timeMultiplier, i, value, true);
 			}
 		}
 	}
 
 	setZeroRef((int) (ruleSymbols[0] * timeMultiplier) + zeroRef_);
-	tempEvent = insertEvent(0.0, -1, 0.0);
+	tempEvent = insertEvent(0.0, -1, 0.0, false);
 	if (tempEvent) tempEvent->flag = 1;
 }
 
 void
 EventList::generateEventList()
 {
-	for (unsigned int i = 0; i < 16; i++) { //TODO: replace hard-coded value
+	const std::size_t numParam = model_.parameterList().size();
+	std::vector<double> minParam(numParam);
+	std::vector<double> maxParam(numParam);
+	for (unsigned int i = 0; i < numParam; ++i) {
 		const Parameter& param = model_.getParameter(i);
-		min_[i] = (double) param.minimum();
-		max_[i] = (double) param.maximum();
+		minParam[i] = static_cast<double>(param.minimum());
+		maxParam[i] = static_cast<double>(param.maximum());
 	}
 
 	/* Calculate Rhythm including regression */
@@ -640,17 +651,17 @@ EventList::generateEventList()
 		/* Apply rhythm model */
 		double footTempo;
 		if (feet_[i].marked) {
-			double tempTempo = 117.7 - (19.36 * (double) rus);
+			double tempTempo = 117.7 - (19.36 * (double) rus); // hardcoded
 			feet_[i].tempo -= tempTempo / 180.0;
 			footTempo = globalTempo_ * feet_[i].tempo;
 		} else {
-			double tempTempo = 18.5 - (2.08 * (double) rus);
+			double tempTempo = 18.5 - (2.08 * (double) rus); // hardcoded
 			feet_[i].tempo -= tempTempo / 140.0;
 			footTempo = globalTempo_ * feet_[i].tempo;
 		}
 		for (int j = feet_[i].start; j < feet_[i].end + 1; j++) {
 			postureTempo_[j] *= footTempo;
-			if (postureTempo_[j] < 0.2) {
+			if (postureTempo_[j] < 0.2) { // hardcoded
 				postureTempo_[j] = 0.2;
 			} else if (postureTempo_[j] > 2.0) {
 				postureTempo_[j] = 2.0;
@@ -681,7 +692,7 @@ EventList::generateEventList()
 
 		ruleData_[currentRule_].number = ruleIndex + 1U;
 
-		applyRule(*tempRule, tempPostureList, &postureTempo_[basePostureIndex], basePostureIndex);
+		applyRule(*tempRule, tempPostureList, &postureTempo_[basePostureIndex], basePostureIndex, minParam, maxParam);
 
 		basePostureIndex += tempRule->numberOfExpressions() - 1;
 	}
@@ -875,7 +886,7 @@ EventList::prepareMacroIntonationInterpolation()
 
 	if (intonationPoints_.empty()) return;
 
-	Event* event1 = insertEvent(intonationPoints_[0].absoluteTime(), -1, 0.0);
+	Event* event1 = insertEvent(intonationPoints_[0].absoluteTime(), -1, 0.0, false);
 	if (!event1) return;
 	Event* event2 {};
 
@@ -883,7 +894,7 @@ EventList::prepareMacroIntonationInterpolation()
 		const IntonationPoint& point1 = intonationPoints_[j];
 		const IntonationPoint& point2 = intonationPoints_[j + 1];
 
-		event2 = insertEvent(point2.absoluteTime(), -1, 0.0);
+		event2 = insertEvent(point2.absoluteTime(), -1, 0.0, false);
 		if (!event2) break;
 
 		const double x1 = event1->time;
@@ -966,16 +977,19 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 		return;
 	}
 
-	double currentValues[32]; // hardcoded
-	double currentDeltas[32]; // hardcoded
-	double temp;
-	float table[16]; // hardcoded
+	const unsigned int numParam = model_.parameterList().size();
+	std::vector<double> currentValues(numParam, 0.0);
+	std::vector<double> currentDeltas(numParam, 0.0);
+	std::vector<double> currentSpecialValues(numParam, 0.0);
+	std::vector<double> currentSpecialDeltas(numParam, 0.0);
+	std::vector<float> table(numParam, 0.0);
 	double pa{}, pb{}, pc{}, pd{}; // coefficients for polynomial interpolation
+	double temp;
 
-	for (int i = 0; i < 16; i++) { // hardcoded
-		currentValues[i] = list_[0]->getParameter(i);
+	for (unsigned int i = 0; i < numParam; ++i) {
+		currentValues[i] = list_[0]->getParameter(i, false);
 		unsigned int j = 1;
-		while ((temp = list_[j]->getParameter(i)) == Event::EMPTY_PARAMETER) {
+		while ((temp = list_[j]->getParameter(i, false)) == Event::EMPTY_PARAMETER) {
 			if (++j >= list_.size()) break;
 		}
 		if (j < list_.size()) {
@@ -983,9 +997,6 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 		} else {
 			currentDeltas[i] = 0.0;
 		}
-	}
-	for (int i = 16; i < 32; i++) { // hardcoded
-		currentValues[i] = currentDeltas[i] = 0.0;
 	}
 
 	if (macroIntonation_) {
@@ -1017,8 +1028,8 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	int nextTime = list_[1]->time;
 	while (targetIndex < list_.size()) {
 		// Add normal parameters and special parameters.
-		for (int j = 0; j < 16; j++) {//hardcoded
-			table[j] = (float) currentValues[j] + (float) currentValues[j + 16];
+		for (unsigned int j = 0; j < numParam; ++j) {
+			table[j] = static_cast<float>(currentValues[j]) + static_cast<float>(currentSpecialValues[j]);
 		}
 
 		// Intonation.
@@ -1038,15 +1049,20 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 
 		// Send the parameter values to the output stream.
 		vtmParamStream << table[0];
-		for (int k = 1; k < 16; ++k) {//hardcoded
-			vtmParamStream << ' ' << table[k];
+		for (unsigned int j = 1; j < numParam; ++j) {
+			vtmParamStream << ' ' << table[j];
 		}
 		vtmParamStream << '\n';
 
 		// Linear interpolation of the parameters.
-		for (int j = 0; j < 32; j++) {//hardcoded
+		for (unsigned int j = 0; j < numParam; ++j) {
 			if (currentDeltas[j]) {
 				currentValues[j] += currentDeltas[j];
+			}
+		}
+		for (unsigned int j = 0; j < numParam; ++j) {
+			if (currentSpecialDeltas[j]) {
+				currentSpecialValues[j] += currentSpecialDeltas[j];
 			}
 		}
 
@@ -1059,10 +1075,10 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 				break;
 			}
 			nextTime = list_[targetIndex]->time;
-			for (int j = 0; j < 32; j++) {//hardcoded
-				if (list_[targetIndex - 1]->getParameter(j) != Event::EMPTY_PARAMETER) {
+			for (unsigned int j = 0; j < numParam; ++j) {
+				if (list_[targetIndex - 1]->getParameter(j, false) != Event::EMPTY_PARAMETER) {
 					unsigned int k = targetIndex;
-					while ((temp = list_[k]->getParameter(j)) == Event::EMPTY_PARAMETER) {
+					while ((temp = list_[k]->getParameter(j, false)) == Event::EMPTY_PARAMETER) {
 						if (++k >= list_.size()) break;
 					}
 					if (temp != Event::EMPTY_PARAMETER) {
@@ -1071,6 +1087,21 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 						currentDeltas[j] *= controlPeriod_;
 					} else {
 						currentDeltas[j] = 0.0;
+					}
+				}
+			}
+			for (unsigned int j = 0; j < numParam; ++j) {
+				if (list_[targetIndex - 1]->getParameter(j, true) != Event::EMPTY_PARAMETER) {
+					unsigned int k = targetIndex;
+					while ((temp = list_[k]->getParameter(j, true)) == Event::EMPTY_PARAMETER) {
+						if (++k >= list_.size()) break;
+					}
+					if (temp != Event::EMPTY_PARAMETER) {
+						// Prepare linear interpolation.
+						currentSpecialDeltas[j] = (temp - currentSpecialValues[j]) / (list_[k]->time - currentTime);
+						currentSpecialDeltas[j] *= controlPeriod_;
+					} else {
+						currentSpecialDeltas[j] = 0.0;
 					}
 				}
 			}
@@ -1137,26 +1168,6 @@ EventList::printDataStructures()
 		printf("Number: %d  start: %d  end: %d  duration %f\n", ruleData_[i].number, ruleData_[i].firstPosture,
 			ruleData_[i].lastPosture, ruleData_[i].duration);
 	}
-#if 0
-	printf("\nEvents %lu\n", list_.size());
-	for (unsigned int i = 0; i < list_.size(); i++) {
-		const Event& event = *list_[i];
-		printf("  Event: time=%d flag=%d\n    Values: ", event.time, event.flag);
-
-		for (int j = 0; j < 16; j++) {
-			printf("%.3f ", event.getValue(j));
-		}
-		printf("\n            ");
-		for (int j = 16; j < 32; j++) {
-			printf("%.3f ", event.getValue(j));
-		}
-		printf("\n            ");
-		for (int j = 32; j < Event::EVENTS_SIZE; j++) {
-			printf("%.3f ", event.getValue(j));
-		}
-		printf("\n");
-	}
-#endif
 }
 
 } /* namespace VTMControlModel */

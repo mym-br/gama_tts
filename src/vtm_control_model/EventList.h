@@ -22,7 +22,7 @@
 #define VTM_CONTROL_MODEL_EVENT_LIST_H_
 
 #include <cassert>
-#include <limits> /* std::numeric_limits<double>::infinity() */
+#include <cstddef> /* std::size_t */
 #include <memory>
 #include <ostream>
 #include <random>
@@ -105,27 +105,40 @@ struct InterpolationData {
 };
 
 struct Event {
-	enum {
-		NUM_PARAMETERS = 32
-	};
-	static constexpr double EMPTY_PARAMETER = std::numeric_limits<double>::infinity();
+	static const double EMPTY_PARAMETER;
 
-	Event() : time{}, flag{}, interpData{} {
-		for (int i = 0; i < NUM_PARAMETERS; ++i) {
-			parameters[i] = Event::EMPTY_PARAMETER;
+	Event(unsigned int numParameters)
+			: parameters(numParameters, EMPTY_PARAMETER)
+			, specialParameters(numParameters, EMPTY_PARAMETER)
+			, time{}
+			, flag{}
+			, interpData{}
+	{
+	}
+
+	void setParameter(int index, double value, bool special) {
+		if (index < 0 || static_cast<std::size_t>(index) >= parameters.size()) {
+			THROW_EXCEPTION(InvalidValueException, "Invalid parameter index: " << index << " (special: " << special << ").");
+		}
+		if (special) {
+			specialParameters[index] = value;
+		} else {
+			parameters[index] = value;
+		}
+	}
+	double getParameter(int index, bool special) const {
+		if (index < 0 || static_cast<std::size_t>(index) >= specialParameters.size()) {
+			THROW_EXCEPTION(InvalidValueException, "Invalid parameter index: " << index << " (special: " << special << ").");
+		}
+		if (special) {
+			return specialParameters[index];
+		} else {
+			return parameters[index];
 		}
 	}
 
-	void setParameter(int index, double value) {
-		assert(index >= 0 && index < NUM_PARAMETERS);
-		parameters[index] = value;
-	}
-	double getParameter(int index) const {
-		assert(index >= 0 && index < NUM_PARAMETERS);
-		return parameters[index];
-	}
-
-	double parameters[NUM_PARAMETERS];
+	std::vector<double> parameters;
+	std::vector<double> specialParameters;
 	int time;
 	int flag; // 1 when it is the first or the last event of the rule (this flag is used only for debug)
 	std::unique_ptr<InterpolationData> interpData;
@@ -206,9 +219,10 @@ private:
 	void addIntonationPoint(double semitone, double offsetTime, double slope, int ruleIndex);
 	void setFullTimeScale();
 	void newPosture();
-	Event* insertEvent(double time, int parameter, double value);
+	Event* insertEvent(double time, int parameter, double value, bool special);
 	void setZeroRef(int newValue);
-	void applyRule(const Rule& rule, const std::vector<const Posture*>& postureList, const double* tempos, int postureIndex);
+	void applyRule(const Rule& rule, const std::vector<const Posture*>& postureList, const double* tempos, int postureIndex,
+			const std::vector<double>& minParam, const std::vector<double>& maxParam);
 	void printDataStructures();
 	double createSlopeRatioEvents(const Transition::SlopeRatio& slopeRatio,
 			double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier);
@@ -241,9 +255,6 @@ private:
 
 	std::vector<RuleData> ruleData_;
 	int currentRule_;
-
-	double min_[16];
-	double max_[16];
 
 	std::vector<IntonationPoint> intonationPoints_;
 	std::vector<Event_ptr> list_;
