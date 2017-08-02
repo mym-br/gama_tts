@@ -64,10 +64,6 @@ public:
 	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
 
 private:
-	enum {
-		MAX_VOICES = 5
-	};
-
 	Controller(const Controller&) = delete;
 	Controller& operator=(const Controller&) = delete;
 
