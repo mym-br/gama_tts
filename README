@@ -5,7 +5,7 @@ GamaTTS
 GamaTTS is an _experimental_ command-line articulatory synthesizer that
 converts text to speech.
 
-GamaTTS started as a C++/C port of the TTS_Server in the original Gnuspeech
+GamaTTS started as a C++ port of the TTS_Server in the original Gnuspeech
 (http://www.gnu.org/software/gnuspeech/) system developed for NeXTSTEP,
 provided by David R. Hill, Leonard Manzara, Craig Schock and contributors.
 The base was the code on Gnuspeech's Subversion repository, revision 672,
