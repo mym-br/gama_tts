@@ -31,10 +31,10 @@
 
 - Test (Linux):
 
-  echo "Hello world." | ./gama_tts tts $pkg_dir/data/english/vtm5 stdin /tmp/test_param.txt /tmp/test.wav
+  echo "Hello world." | ./gama_tts tts $pkg_dir/data/english/vtm5 test.wav
 
   # The "play" program is included in the SoX package.
-  play /tmp/test.wav
+  play test.wav
 
 - Install to system (optional, Linux):
 

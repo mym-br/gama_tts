@@ -21,7 +21,6 @@
 #include "EventList.h"
 
 #include <cstring>
-#include <iomanip>
 #include <limits> /* std::numeric_limits<double>::infinity() */
 #include <sstream>
 #include <vector>
@@ -971,7 +970,7 @@ EventList::addIntonationPoint(double semitone, double offsetTime, double slope, 
 }
 
 void
-EventList::generateOutput(std::ostream& vtmParamStream)
+EventList::generateOutput(std::vector<std::vector<float>>& vtmParamList)
 {
 	if (list_.size() < 2) {
 		return;
@@ -982,7 +981,7 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	std::vector<double> currentDeltas(numParam, 0.0);
 	std::vector<double> currentSpecialValues(numParam, 0.0);
 	std::vector<double> currentSpecialDeltas(numParam, 0.0);
-	std::vector<float> table(numParam, 0.0);
+	std::vector<float> param(numParam, 0.0);
 	double pa{}, pb{}, pc{}, pd{}; // coefficients for polynomial interpolation
 	double temp;
 
@@ -1029,12 +1028,12 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 	while (targetIndex < list_.size()) {
 		// Add normal parameters and special parameters.
 		for (unsigned int j = 0; j < numParam; ++j) {
-			table[j] = static_cast<float>(currentValues[j]) + static_cast<float>(currentSpecialValues[j]);
+			param[j] = static_cast<float>(currentValues[j]) + static_cast<float>(currentSpecialValues[j]);
 		}
 
 		// Intonation.
-		if (!microIntonation_) table[0] = 0.0;
-		if (intonationDrift_)  table[0] += static_cast<float>(driftGenerator_.drift());
+		if (!microIntonation_) param[0] = 0.0;
+		if (intonationDrift_)  param[0] += static_cast<float>(driftGenerator_.drift());
 		if (macroIntonation_) {
 			const double x = currentTime;
 			float intonation;
@@ -1043,16 +1042,11 @@ EventList::generateOutput(std::ostream& vtmParamStream)
 			} else {
 				intonation = x * pa + pb;
 			}
-			table[0] += intonation;
+			param[0] += intonation;
 		}
-		table[0] += static_cast<float>(pitchMean_);
+		param[0] += static_cast<float>(pitchMean_);
 
-		// Send the parameter values to the output stream.
-		vtmParamStream << table[0];
-		for (unsigned int j = 1; j < numParam; ++j) {
-			vtmParamStream << ' ' << table[j];
-		}
-		vtmParamStream << '\n';
+		vtmParamList.push_back(param);
 
 		// Linear interpolation of the parameters.
 		for (unsigned int j = 0; j < numParam; ++j) {

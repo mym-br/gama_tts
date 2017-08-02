@@ -44,26 +44,25 @@ public:
 	Controller(const char* configDirPath, Model& model);
 	~Controller();
 
-	void fillParameterStream(const std::string& phoneticString, std::iostream& vtmParamStream);
-
-	// Synthesizes speech from phonetic string. Sends to file.
-	// The VTM parameters will be written to a file.
-	void synthesizePhoneticString(const std::string& phoneticString, const char* vtmParamFile, const char* outputFile);
-	// Synthesizes speech from phonetic string. Sends to buffer.
-	// The VTM parameters will be written to a file.
-	void synthesizePhoneticString(const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer);
-
-	// Synthesizes speech from data contained in the event list. Sends to file.
-	void synthesizeFromEventList(const char* vtmParamFile, const char* outputFile);
-	// Synthesizes speech from data contained in the event list. Sends to buffer.
-	void synthesizeFromEventList(const char* vtmParamFile, std::vector<float>& buffer);
-
-	EventList& eventList() { return eventList_; }
 	Configuration& vtmControlModelConfiguration() { return vtmControlModelConfig_; }
-	const ConfigurationData& vtmConfigurationData() const { return *vtmConfigData_; }
+	EventList& eventList() { return eventList_; }
+	double outputSampleRate() const { return vtm_->outputSampleRate(); }
 
+	// If vtmParamFile is not null, the VTM parameters will be written to a file.
+	void synthesizePhoneticStringToFile(const std::string& phoneticString, const char* vtmParamFile, const char* outputFile);
+	// If vtmParamFile is not null, the VTM parameters will be written to a file.
+	void synthesizePhoneticStringToBuffer(const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer);
+
+	// Synthesizes speech from data contained in the event list. Sends to a file.
+	// If vtmParamFile is not null, the VTM parameters will be written to a file.
+	void synthesizeFromEventListToFile(const char* vtmParamFile, const char* outputFile);
+	// Synthesizes speech from data contained in the event list. Sends to a buffer.
+	// If vtmParamFile is not null, the VTM parameters will be written to a file.
+	void synthesizeFromEventListToBuffer(const char* vtmParamFile, std::vector<float>& buffer);
+
+	// Synthesizes from VTM parameters contained in inputStream. Sends to a file.
 	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
-	void synthesizeToBuffer(std::istream& inputStream, std::vector<float>& outputBuffer);
+
 private:
 	enum {
 		MAX_VOICES = 5
@@ -81,10 +80,15 @@ private:
 	// Returns true if a valid chunk has been found.
 	bool nextChunk(const std::string& phoneticString, std::size_t& index, std::size_t& size);
 
-	void parseInputParameterStream(std::istream& in, std::vector<std::vector<float>>& paramList);
-	void synthesize(const std::vector<std::vector<float>>& paramList);
-	void writeOutputToFile(const std::vector<float>& data, const char* outputFile, float outputSampleRate);
-	void writeOutputToBuffer(const std::vector<float>& data, std::vector<float>& outputBuffer);
+	void getParametersFromPhoneticString(const std::string& phoneticString);
+	void getParametersFromEventList();
+	void getParametersFromStream(std::istream& in);
+	void synthesize();
+	void synthesizeToFile(const char* outputFile);
+	void synthesizeToBuffer(std::vector<float>& outputBuffer);
+	void writeOutputToFile(const char* outputFile);
+	void writeOutputToBuffer(std::vector<float>& outputBuffer);
+	void writeVTMParameterFile(const char* vtmParamFile);
 
 	Model& model_;
 	EventList eventList_;
@@ -92,6 +96,7 @@ private:
 	Configuration vtmControlModelConfig_;
 	std::unique_ptr<ConfigurationData> vtmConfigData_;
 	std::unique_ptr<VTM::VocalTractModel> vtm_;
+	std::vector<std::vector<float>> vtmParamList_;
 };
 
 } /* namespace VTMControlModel */

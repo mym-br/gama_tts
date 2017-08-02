@@ -24,7 +24,6 @@
 #include <cassert>
 #include <cstddef> /* std::size_t */
 #include <memory>
-#include <ostream>
 #include <random>
 #include <vector>
 
@@ -196,7 +195,7 @@ public:
 	void generateEventList();
 	void applyIntonation();
 	void prepareMacroIntonationInterpolation();
-	void generateOutput(std::ostream& vtmParamStream);
+	void generateOutput(std::vector<std::vector<float>>& vtmParamList);
 	void clearMacroIntonation();
 	void setControlPeriod(int value);
 
