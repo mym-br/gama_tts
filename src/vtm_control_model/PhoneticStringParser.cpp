@@ -103,7 +103,7 @@ PhoneticStringParser::getPosture(const char* name)
 }
 
 void
-PhoneticStringParser::rewrite(const Posture& nextPosture, int wordMarker, RewriterState& state)
+PhoneticStringParser::rewrite(const Posture& nextPosture, bool wordMarker, bool marked, RewriterState& state)
 {
 	if (state.lastPosture == nullptr) {
 		state.lastPosture = &nextPosture;
@@ -119,17 +119,17 @@ PhoneticStringParser::rewrite(const Posture& nextPosture, int wordMarker, Rewrit
 					switch (command.type) {
 					case REWRITER_COMMAND_INSERT:
 						LOG_DEBUG("REWRITER_COMMAND_INSERT");
-						eventList_.newPostureWithObject(*command.posture);
+						eventList_.newPostureWithObject(*command.posture, marked);
 						break;
 					case REWRITER_COMMAND_INSERT_IF_WORD_START:
 						LOG_DEBUG("REWRITER_COMMAND_INSERT_IF_WORD_START");
 						if (wordMarker) {
-							eventList_.newPostureWithObject(*command.posture);
+							eventList_.newPostureWithObject(*command.posture, marked);
 						}
 						break;
 					case REWRITER_COMMAND_REPLACE_FIRST:
 						LOG_DEBUG("REWRITER_COMMAND_REPLACE_FIRST");
-						eventList_.replaceCurrentPostureWith(*command.posture);
+						eventList_.replaceCurrentPostureWith(*command.posture, marked);
 						break;
 					case REWRITER_COMMAND_NOP:
 						LOG_DEBUG("REWRITER_COMMAND_REPLACE_NOP");
@@ -310,18 +310,15 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 			if (buffer.empty()) {
 				THROW_EXCEPTION(MissingValueException, "Missing posture in the phonetic string at index=" << baseIndex << '.');
 			}
-			if (markedFoot) {
-				buffer.push_back('\'');
-			}
 
 			const auto* posture = model_.postureList().find(buffer);
 			if (!posture) {
 				THROW_EXCEPTION(MissingValueException, "Posture \"" << buffer << "\" not found.");
 			}
 
-			rewrite(*posture, wordMarker, rewriterState);
+			rewrite(*posture, wordMarker, markedFoot, rewriterState);
 
-			eventList_.newPostureWithObject(*posture);
+			eventList_.newPostureWithObject(*posture, markedFoot);
 			eventList_.setCurrentPostureTempo(postureTempo);
 			eventList_.setCurrentPostureRuleTempo(ruleTempo);
 

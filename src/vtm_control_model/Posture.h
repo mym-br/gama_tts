@@ -38,6 +38,20 @@ namespace VTMControlModel {
 
 class Posture {
 public:
+	enum Symbol {
+		SYMB_DURATION,
+		SYMB_TRANSITION,
+		SYMB_QSSA,
+		SYMB_QSSB,
+
+		SYMB_MARKED_DURATION,
+		SYMB_MARKED_TRANSITION,
+		SYMB_MARKED_QSSA,
+		SYMB_MARKED_QSSB,
+
+		NUM_SYMBOLS
+	};
+
 	Posture(const std::string& name, unsigned int numParameters, unsigned int numSymbols)
 			: name_(name)
 			, parameterTargetList_(numParameters)
@@ -45,8 +59,9 @@ public:
 		if (numParameters == 0) {
 			THROW_EXCEPTION(InvalidParameterException, "Invalid number of parameters: 0.");
 		}
-		if (numSymbols == 0) {
-			THROW_EXCEPTION(InvalidParameterException, "Invalid number of symbols: 0.");
+		if (numSymbols != NUM_SYMBOLS) {
+			THROW_EXCEPTION(InvalidParameterException, "Invalid number of symbols: "
+						<< numSymbols << "(should be " << NUM_SYMBOLS << ").");
 		}
 
 		auto newCategory = std::make_shared<Category>(name);

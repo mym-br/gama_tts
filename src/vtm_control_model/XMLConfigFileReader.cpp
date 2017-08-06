@@ -477,7 +477,7 @@ XMLConfigFileReader::parseRuleExpressionSymbols(rapidxml::xml_node<char>* expres
 		}
 
 		if (name == rdSymbolName) {
-			rule.exprSymbolEquations().ruleDuration = equation;
+			rule.exprSymbolEquations().duration = equation;
 		} else if (name == beatSymbolName) {
 			rule.exprSymbolEquations().beat = equation;
 		} else if (name == mark1SymbolName) {

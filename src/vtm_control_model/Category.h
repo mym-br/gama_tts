@@ -45,7 +45,7 @@ public:
 private:
 	std::string name_;
 	std::string comment_;
-	bool native_;
+	bool native_; // true if name_ is equal to the name of a Posture
 };
 
 } /* namespace VTMControlModel */

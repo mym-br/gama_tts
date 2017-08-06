@@ -50,7 +50,7 @@ struct FormulaSymbol {
 		SYMB_TEMPO2,
 		SYMB_TEMPO3,
 		SYMB_TEMPO4,
-		SYMB_RD, // rule duration
+		SYMB_RULE_DURATION,
 		SYMB_BEAT,
 		SYMB_MARK1,
 		SYMB_MARK2,

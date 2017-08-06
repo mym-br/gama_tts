@@ -165,9 +165,11 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 
 		xml.openElement("posture-categories");
 		for (const auto& category : posture.categoryList()) {
-			xml.openElementWithAttributes("category-ref");
-			xml.addAttribute("name", category->name());
-			xml.endAttributesAndCloseElement();
+			if (!category->native()) {
+				xml.openElementWithAttributes("category-ref");
+				xml.addAttribute("name", category->name());
+				xml.endAttributesAndCloseElement();
+			}
 		}
 		xml.closeElement("posture-categories");
 
@@ -394,7 +396,7 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 
 		xml.openElementWithAttributes("symbol-equation");
 		xml.addAttribute("name", "rd");
-		xml.addAttribute("equation", rule->exprSymbolEquations().ruleDuration ? rule->exprSymbolEquations().ruleDuration->name() : "");
+		xml.addAttribute("equation", rule->exprSymbolEquations().duration ? rule->exprSymbolEquations().duration->name() : "");
 		xml.endAttributesAndCloseElement();
 
 		xml.openElementWithAttributes("symbol-equation");

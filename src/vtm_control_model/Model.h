@@ -98,7 +98,7 @@ public:
 
 	const std::vector<std::unique_ptr<Rule>>& ruleList() const { return ruleList_; }
 	std::vector<std::unique_ptr<Rule>>& ruleList() { return ruleList_; }
-	const Rule* findFirstMatchingRule(const std::vector<const Posture*>& postureSequence, unsigned int& ruleIndex) const;
+	const Rule* findFirstMatchingRule(const std::vector<RuleExpressionData>& ruleExpressionData, unsigned int& ruleIndex) const;
 
 	const std::vector<std::shared_ptr<Category>>& categoryList() const { return categoryList_; }
 	std::vector<std::shared_ptr<Category>>& categoryList() { return categoryList_; }

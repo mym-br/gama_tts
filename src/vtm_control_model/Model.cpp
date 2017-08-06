@@ -158,7 +158,7 @@ Model::printInfo() const
 	symbolList[FormulaSymbol::SYMB_TEMPO2] = 1.2f;
 	symbolList[FormulaSymbol::SYMB_TEMPO3] = 1.3f;
 	symbolList[FormulaSymbol::SYMB_TEMPO4] = 1.4f;
-	symbolList[FormulaSymbol::SYMB_RD] = 150.4f;
+	symbolList[FormulaSymbol::SYMB_RULE_DURATION] = 150.4f;
 	symbolList[FormulaSymbol::SYMB_MARK1] = 150.5f;
 	symbolList[FormulaSymbol::SYMB_MARK2] = 150.6f;
 	//symbolList[FormulaSymbol::SYMB_NULL] = 1.0f;
@@ -231,30 +231,10 @@ Model::printInfo() const
 	std::cout << std::string(40, '-') << "\nRules:\n" << std::endl;
 	unsigned int ruleNumber = 0;
 	for (auto& r : ruleList_) {
-		std::cout << "--------------------------------------" << std::endl;
-		std::cout << "Rule number: " << ++ruleNumber << '\n' << std::endl;
-		r->printBooleanNodeTree();
-	}
-	std::cout << "--------------------------------------" << std::endl;
-	std::vector<const Posture*> postSeq;
-	const Posture* pp = postureList_.find("m");
-	if (pp) postSeq.push_back(pp);
-	pp = postureList_.find("ah");
-	if (pp) postSeq.push_back(pp);
-	pp = postureList_.find("s");
-	if (pp) postSeq.push_back(pp);
-	ruleNumber = 0;
-	for (auto& r : ruleList_) {
-		std::cout << "---" << std::endl;
-		std::cout << "Rule number: " << ++ruleNumber << std::endl;
-		std::cout << "bool=" << r->evalBooleanExpression(postSeq) << std::endl;
-	}
-	std::cout << "--------------------------------------" << std::endl;
-	ruleNumber = 0;
-	for (auto& r : ruleList_) {
-		std::cout << "---" << std::endl;
-		std::cout << "Rule number: " << ++ruleNumber << std::endl;
+		std::cout << "--------------------------------------\n";
+		std::cout << "Rule number: " << ++ruleNumber << '\n';
 		std::cout << "Number of boolean expressions = " << r->numberOfExpressions() << std::endl;
+		r->printBooleanNodeTree();
 	}
 }
 
@@ -375,19 +355,19 @@ Model::setDefaultFormulaSymbols(Transition::Type transitionType)
 	setFormulaSymbolValue(FormulaSymbol::SYMB_MARK1, 100.0);
 	switch (transitionType) {
 	case Transition::TYPE_DIPHONE:
-		setFormulaSymbolValue(FormulaSymbol::SYMB_RD   , 100.0);
-		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2,   0.0);
-		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3,   0.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION, 100.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2        ,   0.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3        ,   0.0);
 		break;
 	case Transition::TYPE_TRIPHONE:
-		setFormulaSymbolValue(FormulaSymbol::SYMB_RD   , 200.0);
-		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2, 200.0);
-		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3,   0.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION, 200.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2        , 200.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3        ,   0.0);
 		break;
 	case Transition::TYPE_TETRAPHONE:
-		setFormulaSymbolValue(FormulaSymbol::SYMB_RD   , 300.0);
-		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2, 200.0);
-		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3, 300.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION, 300.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2        , 200.0);
+		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3        , 300.0);
 		break;
 	default:
 		THROW_EXCEPTION(VTMControlModelException, "Invalid transition type: " << transitionType << '.');
@@ -673,7 +653,7 @@ Model::findSpecialTransitionIndex(const std::string& name, unsigned int& groupIn
  * Finds the first Rule that matches the given sequence of Postures.
  */
 const Rule*
-Model::findFirstMatchingRule(const std::vector<const Posture*>& postureSequence, unsigned int& ruleIndex) const
+Model::findFirstMatchingRule(const std::vector<RuleExpressionData>& ruleExpressionData, unsigned int& ruleIndex) const
 {
 	if (ruleList_.empty()) {
 		ruleIndex = 0;
@@ -682,8 +662,8 @@ Model::findFirstMatchingRule(const std::vector<const Posture*>& postureSequence,
 
 	unsigned int i = 0;
 	for (const auto& r : ruleList_) {
-		if (r->numberOfExpressions() <= postureSequence.size()) {
-			if (r->evalBooleanExpression(postureSequence)) {
+		if (r->numberOfExpressions() <= ruleExpressionData.size()) {
+			if (r->evalBooleanExpression(ruleExpressionData)) {
 				ruleIndex = i;
 				return r.get();
 			}

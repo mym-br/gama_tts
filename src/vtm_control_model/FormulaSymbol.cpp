@@ -51,7 +51,7 @@ FormulaSymbol::FormulaSymbol() : codeMap() {
 	codeMap["tempo2"]      = SYMB_TEMPO2;
 	codeMap["tempo3"]      = SYMB_TEMPO3;
 	codeMap["tempo4"]      = SYMB_TEMPO4;
-	codeMap["rd"]          = SYMB_RD;
+	codeMap["rd"]          = SYMB_RULE_DURATION;
 	codeMap["beat"]        = SYMB_BEAT;
 	codeMap["mark1"]       = SYMB_MARK1;
 	codeMap["mark2"]       = SYMB_MARK2;

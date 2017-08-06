@@ -73,7 +73,7 @@ private:
 	};
 
 	void loadRewriterConfiguration(const std::string& filePath);
-	void rewrite(const Posture& nextPosture, int wordMarker, RewriterState& state);
+	void rewrite(const Posture& nextPosture, bool wordMarker, bool marked, RewriterState& state);
 	std::shared_ptr<Category> getCategory(const char* name);
 	const Posture* getPosture(const char* name);
 

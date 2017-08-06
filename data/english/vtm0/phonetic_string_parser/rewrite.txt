@@ -20,29 +20,17 @@
 # stopped stopped
 
 #d   stopped > insert qt
-#d'  stopped > insert qt
 #dx  stopped > insert qt
-#dx' stopped > insert qt
 #t   stopped > insert qt
-#t'  stopped > insert qt
 #tx  stopped > insert qt
-#tx' stopped > insert qt
 #p   stopped > insert qp
-#p'  stopped > insert qp
 #px  stopped > insert qp
-#px' stopped > insert qp
 #b   stopped > insert qp
-#b'  stopped > insert qp
 #bx  stopped > insert qp
-#bx' stopped > insert qp
 #k   stopped > insert qk
-#k'  stopped > insert qk
 #kx  stopped > insert qk
-#kx' stopped > insert qk
 #g   stopped > insert qk
-#g'  stopped > insert qk
 #gs  stopped > insert qk
-#gs' stopped > insert qk
 
 #-------------------------------------------------------------------------------
 
@@ -52,29 +40,17 @@ affricate stopped > insert qc
 # stopped affricate
 
 #d   affricate > insert qt
-#d'  affricate > insert qt
 #dx  affricate > insert qt
-#dx' affricate > insert qt
 #t   affricate > insert qt
-#t'  affricate > insert qt
 #tx  affricate > insert qt
-#tx' affricate > insert qt
 #p   affricate > insert qp
-#p'  affricate > insert qp
 #px  affricate > insert qp
-#px' affricate > insert qp
 #b   affricate > insert qp
-#b'  affricate > insert qp
 #bx  affricate > insert qp
-#bx' affricate > insert qp
 #k   affricate > insert qk
-#k'  affricate > insert qk
 #kx  affricate > insert qk
-#kx' affricate > insert qk
 #g   affricate > insert qk
-#g'  affricate > insert qk
 #gs  affricate > insert qk
-#gs' affricate > insert qk
 
 #-------------------------------------------------------------------------------
 
@@ -84,29 +60,17 @@ affricate affricate > insert qc
 # stopped hlike
 
 #d   hlike > insert qt
-#d'  hlike > insert qt
 #dx  hlike > insert qt
-#dx' hlike > insert qt
 #t   hlike > insert qt
-#t'  hlike > insert qt
 #tx  hlike > insert qt
-#tx' hlike > insert qt
 #p   hlike > insert qp
-#p'  hlike > insert qp
 #px  hlike > insert qp
-#px' hlike > insert qp
 #b   hlike > insert qp
-#b'  hlike > insert qp
 #bx  hlike > insert qp
-#bx' hlike > insert qp
 #k   hlike > insert qk
-#k'  hlike > insert qk
 #kx  hlike > insert qk
-#kx' hlike > insert qk
 #g   hlike > insert qk
-#g'  hlike > insert qk
 #gs  hlike > insert qk
-#gs' hlike > insert qk
 
 #-------------------------------------------------------------------------------
 
@@ -249,120 +213,39 @@ uu uu > insert_if_word_start gs
 #-------------------------------------------------------------------------------
 
 ll  vocoid > replace_first l
-ll' vocoid > replace_first l'
 
 #-------------------------------------------------------------------------------
 # stopped h
 
 #d   h > insert qt
-#d'  h > insert qt
 #dx  h > insert qt
-#dx' h > insert qt
 #t   h > insert qt
-#t'  h > insert qt
 #tx  h > insert qt
-#tx' h > insert qt
 #p   h > insert qp
-#p'  h > insert qp
 #px  h > insert qp
-#px' h > insert qp
 #b   h > insert qp
-#b'  h > insert qp
 #bx  h > insert qp
-#bx' h > insert qp
 #k   h > insert qk
-#k'  h > insert qk
 #kx  h > insert qk
-#kx' h > insert qk
 #g   h > insert qk
-#g'  h > insert qk
 #gs  h > insert qk
-#gs' h > insert qk
-
-# stopped h'
-
-#d   h' > insert qt
-#d'  h' > insert qt
-#dx  h' > insert qt
-#dx' h' > insert qt
-#t   h' > insert qt
-#t'  h' > insert qt
-#tx  h' > insert qt
-#tx' h' > insert qt
-#p   h' > insert qp
-#p'  h' > insert qp
-#px  h' > insert qp
-#px' h' > insert qp
-#b   h' > insert qp
-#b'  h' > insert qp
-#bx  h' > insert qp
-#bx' h' > insert qp
-#k   h' > insert qk
-#k'  h' > insert qk
-#kx  h' > insert qk
-#kx' h' > insert qk
-#g   h' > insert qk
-#g'  h' > insert qk
-#gs  h' > insert qk
-#gs' h' > insert qk
 
 # stopped hv
 
 #d   hv > insert qt
-#d'  hv > insert qt
 #dx  hv > insert qt
-#dx' hv > insert qt
 #t   hv > insert qt
-#t'  hv > insert qt
 #tx  hv > insert qt
-#tx' hv > insert qt
 #p   hv > insert qp
-#p'  hv > insert qp
 #px  hv > insert qp
-#px' hv > insert qp
 #b   hv > insert qp
-#b'  hv > insert qp
 #bx  hv > insert qp
-#bx' hv > insert qp
 #k   hv > insert qk
-#k'  hv > insert qk
 #kx  hv > insert qk
-#kx' hv > insert qk
 #g   hv > insert qk
-#g'  hv > insert qk
 #gs  hv > insert qk
-#gs' hv > insert qk
-
-# stopped hv'
-
-#d   hv' > insert qt
-#d'  hv' > insert qt
-#dx  hv' > insert qt
-#dx' hv' > insert qt
-#t   hv' > insert qt
-#t'  hv' > insert qt
-#tx  hv' > insert qt
-#tx' hv' > insert qt
-#p   hv' > insert qp
-#p'  hv' > insert qp
-#px  hv' > insert qp
-#px' hv' > insert qp
-#b   hv' > insert qp
-#b'  hv' > insert qp
-#bx  hv' > insert qp
-#bx' hv' > insert qp
-#k   hv' > insert qk
-#k'  hv' > insert qk
-#kx  hv' > insert qk
-#kx' hv' > insert qk
-#g   hv' > insert qk
-#g'  hv' > insert qk
-#gs  hv' > insert qk
-#gs' hv' > insert qk
 
 #-------------------------------------------------------------------------------
 
 s  whistlehack > insert qs
-s' whistlehack > insert qs
 z  whistlehack > insert qz
-z' whistlehack > insert qz

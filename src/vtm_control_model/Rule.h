@@ -42,11 +42,19 @@ class Model;
 class Posture;
 class Transition;
 
+// Data for the calculation of the value of expression symbols and boolean expressions.
+struct RuleExpressionData {
+	const Posture* posture;
+	double tempo;
+	bool marked;
+};
+
 class RuleBooleanNode {
 public:
-	virtual ~RuleBooleanNode();
+	RuleBooleanNode() {}
+	virtual ~RuleBooleanNode() {}
 
-	virtual bool eval(const Posture& posture) const = 0;
+	virtual bool eval(const RuleExpressionData& expressionData) const = 0;
 	virtual void print(std::ostream& out, int level = 0) const = 0;
 };
 
@@ -58,9 +66,9 @@ class RuleBooleanAndExpression : public RuleBooleanNode {
 public:
 	RuleBooleanAndExpression(RuleBooleanNode_ptr c1, RuleBooleanNode_ptr c2)
 			: RuleBooleanNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~RuleBooleanAndExpression();
+	virtual ~RuleBooleanAndExpression() {}
 
-	virtual bool eval(const Posture& posture) const;
+	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
 	RuleBooleanNode_ptr child1_;
@@ -71,9 +79,9 @@ class RuleBooleanOrExpression : public RuleBooleanNode {
 public:
 	RuleBooleanOrExpression(RuleBooleanNode_ptr c1, RuleBooleanNode_ptr c2)
 			: RuleBooleanNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~RuleBooleanOrExpression();
+	virtual ~RuleBooleanOrExpression() {}
 
-	virtual bool eval(const Posture& posture) const;
+	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
 	RuleBooleanNode_ptr child1_;
@@ -84,9 +92,9 @@ class RuleBooleanXorExpression : public RuleBooleanNode {
 public:
 	RuleBooleanXorExpression(RuleBooleanNode_ptr c1, RuleBooleanNode_ptr c2)
 			: RuleBooleanNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~RuleBooleanXorExpression();
+	virtual ~RuleBooleanXorExpression() {}
 
-	virtual bool eval(const Posture& posture) const;
+	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
 	RuleBooleanNode_ptr child1_;
@@ -97,9 +105,21 @@ class RuleBooleanNotExpression : public RuleBooleanNode {
 public:
 	RuleBooleanNotExpression(RuleBooleanNode_ptr c)
 			: RuleBooleanNode(), child_(std::move(c)) {}
-	virtual ~RuleBooleanNotExpression();
+	virtual ~RuleBooleanNotExpression() {}
 
-	virtual bool eval(const Posture& posture) const;
+	virtual bool eval(const RuleExpressionData& expressionData) const;
+	virtual void print(std::ostream& out, int level = 0) const;
+private:
+	RuleBooleanNode_ptr child_;
+};
+
+class RuleBooleanMarkedExpression : public RuleBooleanNode {
+public:
+	RuleBooleanMarkedExpression(RuleBooleanNode_ptr c)
+			: RuleBooleanNode(), child_(std::move(c)) {}
+	virtual ~RuleBooleanMarkedExpression() {}
+
+	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
 	RuleBooleanNode_ptr child_;
@@ -107,21 +127,28 @@ private:
 
 class RuleBooleanTerminal : public RuleBooleanNode {
 public:
-	RuleBooleanTerminal(const std::shared_ptr<Category>& category, bool matchAll)
-			: RuleBooleanNode(), category_(category), matchAll_(matchAll) {}
-	virtual ~RuleBooleanTerminal();
+	RuleBooleanTerminal(const std::shared_ptr<Category>& category)
+			: RuleBooleanNode(), category_(category) {}
+	virtual ~RuleBooleanTerminal() {}
 
-	virtual bool eval(const Posture& posture) const;
+	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
 	const std::shared_ptr<Category> category_;
-	bool matchAll_;
 };
 
 class Rule {
 public:
+	enum Symbol {
+		SYMB_DURATION,
+		SYMB_BEAT,
+		SYMB_MARK1,
+		SYMB_MARK2,
+		SYMB_MARK3,
+		NUM_SYMBOLS
+	};
 	struct ExpressionSymbolEquations {
-		std::shared_ptr<Equation> ruleDuration;
+		std::shared_ptr<Equation> duration;
 		std::shared_ptr<Equation> beat;
 		std::shared_ptr<Equation> mark1;
 		std::shared_ptr<Equation> mark2;
@@ -135,8 +162,8 @@ public:
 	}
 
 	std::size_t numberOfExpressions() const;
-	bool evalBooleanExpression(const std::vector<const Posture*>& postureSequence) const;
-	bool evalBooleanExpression(const Posture& posture, unsigned int expressionIndex) const;
+	bool evalBooleanExpression(const std::vector<RuleExpressionData>& expressionData) const;
+	bool evalBooleanExpression(const RuleExpressionData& expressionData, unsigned int expressionIndex) const;
 	void printBooleanNodeTree() const;
 
 	ExpressionSymbolEquations& exprSymbolEquations() { return exprSymbolEquations_; }
@@ -172,7 +199,7 @@ public:
 		specialProfileTransitionList_[parameterIndex] = transition;
 	}
 
-	void evaluateExpressionSymbols(const double* tempos, const std::vector<const Posture*>& postures, Model& model, double* ruleSymbols) const;
+	void evaluateExpressionSymbols(const std::vector<RuleExpressionData>& expressionData, Model& model, double* ruleSymbols) const;
 
 	const std::vector<std::string>& booleanExpressionList() const { return booleanExpressionList_; }
 	void setBooleanExpressionList(const std::vector<std::string>& exprList, const Model& model);

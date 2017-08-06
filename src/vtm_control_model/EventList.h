@@ -44,14 +44,18 @@ namespace VTMControlModel {
 
 struct PostureData {
 	const Posture* posture;
-	int    syllable;
-	double onset;
-	float  ruleTempo;
+	double         tempo;
+	double         ruleTempo;
+	double         onset;
+	int            syllable;
+	bool           marked;
 	PostureData()
-		: posture(nullptr)
-		, syllable(0)
-		, onset(0.0)
-		, ruleTempo(0.0) {}
+		: posture{}
+		, tempo{1.0}
+		, ruleTempo{1.0}
+		, onset{}
+		, syllable{}
+		, marked{} {}
 };
 
 struct Foot {
@@ -63,13 +67,13 @@ struct Foot {
 	int marked;
 	int last;
 	Foot()
-		: onset1(0.0)
-		, onset2(0.0)
-		, tempo(1.0)
-		, start(0)
-		, end(0)
-		, marked(0)
-		, last(0) {}
+		: onset1{}
+		, onset2{}
+		, tempo{1.0}
+		, start{}
+		, end{}
+		, marked{}
+		, last{} {}
 };
 
 struct ToneGroup {
@@ -77,9 +81,9 @@ struct ToneGroup {
 	int endFoot;
 	int type;
 	ToneGroup()
-		: startFoot(0)
-		, endFoot(0)
-		, type(0) {}
+		: startFoot{}
+		, endFoot{}
+		, type{} {}
 };
 
 struct RuleData {
@@ -89,11 +93,11 @@ struct RuleData {
 	double duration;
 	double beat;
 	RuleData()
-		: number(0)
-		, firstPosture(0)
-		, lastPosture(0)
-		, duration(0.0)
-		, beat(0.0) {}
+		: number{}
+		, firstPosture{}
+		, lastPosture{}
+		, duration{}
+		, beat{} {}
 };
 
 struct InterpolationData {
@@ -101,6 +105,11 @@ struct InterpolationData {
 	double b;
 	double c;
 	double d;
+	InterpolationData()
+		: a{}
+		, b{}
+		, c{}
+		, d{} {}
 };
 
 struct Event {
@@ -182,15 +191,15 @@ public:
 	void setCurrentPostureSyllable();
 	void setUp();
 	double getBeatAtIndex(int ruleIndex) const;
-	void newPostureWithObject(const Posture& p);
-	void replaceCurrentPostureWith(const Posture& p);
+	void newPostureWithObject(const Posture& p, bool marked=false);
+	void replaceCurrentPostureWith(const Posture& p, bool marked=false);
 	void setCurrentToneGroupType(int type);
 	void newFoot();
 	void setCurrentFootMarked();
 	void setCurrentFootLast();
 	void setCurrentFootTempo(double tempo);
 	void setCurrentPostureTempo(double tempo);
-	void setCurrentPostureRuleTempo(float tempo);
+	void setCurrentPostureRuleTempo(double tempo);
 	void newToneGroup();
 	void generateEventList();
 	void applyIntonation();
@@ -204,11 +213,17 @@ public:
 	const Posture* getPostureAtIndex(unsigned int index) const;
 	const PostureData* getPostureDataAtIndex(unsigned int index) const;
 	int numberOfRules() const { return currentRule_; }
-	const RuleData* getRuleAtIndex(unsigned int index) const;
+	const RuleData* getRuleDataAtIndex(unsigned int index) const;
 
 	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }
 	void setFixedIntonationParameters(float notionalPitch, float pretonicRange, float pretonicLift, float tonicRange, float tonicMovement);
 private:
+	enum RuleType {
+		DIPHONE    = 2,
+		TRIPHONE   = 3,
+		TETRAPHONE = 4
+	};
+
 	EventList(const EventList&) = delete;
 	EventList& operator=(const EventList&) = delete;
 
@@ -220,7 +235,7 @@ private:
 	void newPosture();
 	Event* insertEvent(double time, int parameter, double value, bool special);
 	void setZeroRef(int newValue);
-	void applyRule(const Rule& rule, const std::vector<const Posture*>& postureList, const double* tempos, int postureIndex,
+	void applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ruleExpressionData, unsigned int basePostureIndex,
 			const std::vector<double>& minParam, const std::vector<double>& maxParam);
 	void printDataStructures();
 	double createSlopeRatioEvents(const Transition::SlopeRatio& slopeRatio,
@@ -241,9 +256,7 @@ private:
 	double globalTempo_;
 	float* intonParms_;
 
-	/* NOTE postureData and postureTempo are separate for optimization reasons */
 	std::vector<PostureData> postureData_;
-	std::vector<double> postureTempo_;
 	unsigned int currentPosture_;
 
 	std::vector<Foot> feet_;

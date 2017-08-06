@@ -27,10 +27,6 @@
 
 #include "Log.h"
 
-#define DIPHONE 2
-#define TRIPHONE 3
-#define TETRAPHONE 4
-
 #define INTONATION_CONFIG_FILE_NAME "/intonation.txt"
 #define DEFAULT_CONTROL_PERIOD_MS 4
 
@@ -83,9 +79,7 @@ EventList::setUp()
 	intonParms_ = nullptr;
 
 	postureData_.clear();
-	postureData_.push_back(PostureData());
-	postureTempo_.clear();
-	postureTempo_.push_back(1.0);
+	postureData_.push_back(PostureData{});
 	currentPosture_ = 0;
 
 	feet_.clear();
@@ -130,7 +124,7 @@ EventList::getPostureDataAtIndex(unsigned int index) const
 }
 
 const RuleData*
-EventList::getRuleAtIndex(unsigned int index) const
+EventList::getRuleDataAtIndex(unsigned int index) const
 {
 	if (static_cast<int>(index) > currentRule_) {
 		return nullptr;
@@ -225,25 +219,27 @@ EventList::getBeatAtIndex(int ruleIndex) const
 }
 
 void
-EventList::newPostureWithObject(const Posture& p)
+EventList::newPostureWithObject(const Posture& p, bool marked)
 {
 	if (postureData_[currentPosture_].posture) {
-		postureData_.push_back(PostureData());
-		postureTempo_.push_back(1.0);
+		postureData_.push_back(PostureData{});
 		currentPosture_++;
 	}
-	postureTempo_[currentPosture_] = 1.0;
+	postureData_[currentPosture_].tempo = 1.0;
 	postureData_[currentPosture_].ruleTempo = 1.0;
 	postureData_[currentPosture_].posture = &p;
+	postureData_[currentPosture_].marked = marked;
 }
 
 void
-EventList::replaceCurrentPostureWith(const Posture& p)
+EventList::replaceCurrentPostureWith(const Posture& p, bool marked)
 {
 	if (postureData_[currentPosture_].posture) {
 		postureData_[currentPosture_].posture = &p;
+		postureData_[currentPosture_].marked = marked;
 	} else {
 		postureData_[currentPosture_ - 1].posture = &p;
+		postureData_[currentPosture_ - 1].marked = marked;
 	}
 }
 
@@ -290,11 +286,11 @@ EventList::setCurrentFootTempo(double tempo)
 void
 EventList::setCurrentPostureTempo(double tempo)
 {
-	postureTempo_[currentPosture_] = tempo;
+	postureData_[currentPosture_].tempo = tempo;
 }
 
 void
-EventList::setCurrentPostureRuleTempo(float tempo)
+EventList::setCurrentPostureRuleTempo(double tempo)
 {
 	postureData_[currentPosture_].ruleTempo = tempo;
 }
@@ -318,11 +314,10 @@ void
 EventList::newPosture()
 {
 	if (postureData_[currentPosture_].posture) {
-		postureData_.push_back(PostureData());
-		postureTempo_.push_back(1.0);
+		postureData_.push_back(PostureData{});
 		currentPosture_++;
 	}
-	postureTempo_[currentPosture_] = 1.0;
+	postureData_[currentPosture_].tempo = 1.0;
 }
 
 void
@@ -478,48 +473,49 @@ EventList::createSlopeRatioEvents(
 
 // It is assumed that postureList.size() >= 2.
 void
-EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postureList, const double* tempos, int postureIndex,
+EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ruleExpressionData, unsigned int basePostureIndex,
 			const std::vector<double>& minParam, const std::vector<double>& maxParam)
 {
+	const unsigned int numPostures = ruleExpressionData.size();
 	int cont;
 	int currentType;
 	double currentValueDelta, value, lastValue;
-	double ruleSymbols[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
 	double tempTime;
 	double targets[4];
 	Event* tempEvent = nullptr;
 
-	rule.evaluateExpressionSymbols(tempos, postureList, model_, ruleSymbols);
+	double ruleSymbols[Rule::NUM_SYMBOLS];
+	rule.evaluateExpressionSymbols(ruleExpressionData, model_, ruleSymbols);
 
-	const double timeMultiplier = 1.0 / postureData_[postureIndex].ruleTempo;
+	const double timeMultiplier = 1.0 / postureData_[basePostureIndex].ruleTempo;
 
 	int type = rule.numberOfExpressions();
-	setDuration((int) (ruleSymbols[0] * timeMultiplier));
+	setDuration((int) (ruleSymbols[Rule::SYMB_DURATION] * timeMultiplier));
 
-	ruleData_[currentRule_].firstPosture = postureIndex;
-	ruleData_[currentRule_].lastPosture = postureIndex + (type - 1);
-	ruleData_[currentRule_].beat = (ruleSymbols[1] * timeMultiplier) + (double) zeroRef_;
-	ruleData_[currentRule_++].duration = ruleSymbols[0] * timeMultiplier;
-	ruleData_.push_back(RuleData());
+	ruleData_[currentRule_].firstPosture = basePostureIndex;
+	ruleData_[currentRule_].lastPosture = basePostureIndex + (type - 1);
+	ruleData_[currentRule_].beat = (ruleSymbols[Rule::SYMB_BEAT] * timeMultiplier) + (double) zeroRef_;
+	ruleData_[currentRule_++].duration = ruleSymbols[Rule::SYMB_DURATION] * timeMultiplier;
+	ruleData_.push_back(RuleData{});
 
 	switch (type) {
 	/* Note: Case 4 should execute all of the below, case 3 the last two */
 	case 4:
-		if (postureList.size() == 4) {
-			postureData_[postureIndex + 3].onset = (double) zeroRef_ + ruleSymbols[1];
-			tempEvent = insertEvent(ruleSymbols[3] * timeMultiplier, -1, 0.0, false);
+		if (numPostures == 4) {
+			postureData_[basePostureIndex + 3].onset = (double) zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
+			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK2] * timeMultiplier, -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
 	case 3:
-		if (postureList.size() >= 3) {
-			postureData_[postureIndex + 2].onset = (double) zeroRef_ + ruleSymbols[1];
-			tempEvent = insertEvent(ruleSymbols[2] * timeMultiplier, -1, 0.0, false);
+		if (numPostures >= 3) {
+			postureData_[basePostureIndex + 2].onset = (double) zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
+			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK1] * timeMultiplier, -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
 	case 2:
-		postureData_[postureIndex + 1].onset = (double) zeroRef_ + ruleSymbols[1];
+		postureData_[basePostureIndex + 1].onset = (double) zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
 		tempEvent = insertEvent(0.0, -1, 0.0, false);
 		if (tempEvent) tempEvent->flag = 1;
 		break;
@@ -530,10 +526,10 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 	/* Loop through the parameters */
 	for (unsigned int i = 0, size = model_.parameterList().size(); i < size; ++i) {
 		/* Get actual parameter target values */
-		targets[0] = postureList[0]->getParameterTarget(i);
-		targets[1] = postureList[1]->getParameterTarget(i);
-		targets[2] = (postureList.size() >= 3) ? postureList[2]->getParameterTarget(i) : 0.0;
-		targets[3] = (postureList.size() == 4) ? postureList[3]->getParameterTarget(i) : 0.0;
+		targets[0] = postureData_[basePostureIndex].posture->getParameterTarget(i);
+		targets[1] = postureData_[basePostureIndex + 1].posture->getParameterTarget(i);
+		targets[2] = (numPostures >= 3) ? postureData_[basePostureIndex + 2].posture->getParameterTarget(i) : 0.0;
+		targets[3] = (numPostures == 4) ? postureData_[basePostureIndex + 3].posture->getParameterTarget(i) : 0.0;
 
 		/* Optimization, Don't calculate if no changes occur */
 		cont = 1;
@@ -627,7 +623,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 		}
 	}
 
-	setZeroRef((int) (ruleSymbols[0] * timeMultiplier) + zeroRef_);
+	setZeroRef((int) (ruleSymbols[Rule::SYMB_DURATION] * timeMultiplier) + zeroRef_);
 	tempEvent = insertEvent(0.0, -1, 0.0, false);
 	if (tempEvent) tempEvent->flag = 1;
 }
@@ -659,41 +655,44 @@ EventList::generateEventList()
 			footTempo = globalTempo_ * feet_[i].tempo;
 		}
 		for (int j = feet_[i].start; j < feet_[i].end + 1; j++) {
-			postureTempo_[j] *= footTempo;
-			if (postureTempo_[j] < 0.2) { // hardcoded
-				postureTempo_[j] = 0.2;
-			} else if (postureTempo_[j] > 2.0) {
-				postureTempo_[j] = 2.0;
+			postureData_[j].tempo *= footTempo;
+			if (postureData_[j].tempo < 0.2) { // hardcoded
+				postureData_[j].tempo = 0.2;
+			} else if (postureData_[j].tempo > 2.0) {
+				postureData_[j].tempo = 2.0;
 			}
 		}
 	}
 
 	unsigned int basePostureIndex = 0;
-	std::vector<const Posture*> tempPostureList;
+	std::vector<RuleExpressionData> ruleExpressionData;
 	while (basePostureIndex < currentPosture_) {
-		tempPostureList.clear();
+		ruleExpressionData.clear();
 		for (unsigned int i = 0; i < 4; i++) {
 			unsigned int postureIndex = basePostureIndex + i;
 			if (postureIndex <= currentPosture_ && postureData_[postureIndex].posture) {
-				tempPostureList.push_back(postureData_[postureIndex].posture);
+				ruleExpressionData.push_back(RuleExpressionData{
+								postureData_[postureIndex].posture,
+								postureData_[postureIndex].tempo,
+								postureData_[postureIndex].marked});
 			} else {
 				break;
 			}
 		}
-		if (tempPostureList.size() < 2) {
+		if (ruleExpressionData.size() < 2) {
 			break;
 		}
 		unsigned int ruleIndex = 0;
-		const Rule* tempRule = model_.findFirstMatchingRule(tempPostureList, ruleIndex);
-		if (tempRule == nullptr) {
+		const Rule* rule = model_.findFirstMatchingRule(ruleExpressionData, ruleIndex);
+		if (!rule) {
 			THROW_EXCEPTION(UnavailableResourceException, "Could not find a matching rule.");
 		}
 
 		ruleData_[currentRule_].number = ruleIndex + 1U;
 
-		applyRule(*tempRule, tempPostureList, &postureTempo_[basePostureIndex], basePostureIndex, minParam, maxParam);
+		applyRule(*rule, ruleExpressionData, basePostureIndex, minParam, maxParam);
 
-		basePostureIndex += tempRule->numberOfExpressions() - 1;
+		basePostureIndex += rule->numberOfExpressions() - 1;
 	}
 
 	//[dataPtr[numElements-1] setFlag:1];
@@ -935,8 +934,6 @@ EventList::prepareMacroIntonationInterpolation()
 			const double a = coef;
 			interpData->a = a;
 			interpData->b = b;
-			interpData->c = 0.0;
-			interpData->d = 0.0;
 		}
 
 		event1->interpData = std::move(interpData);
@@ -1154,7 +1151,7 @@ EventList::printDataStructures()
 	printf("\nPostures %d\n", currentPosture_);
 	for (unsigned int i = 0; i < currentPosture_; i++) {
 		printf("DEBUG_POSTURE %u  \"%s\" tempo: %f syllable: %d onset: %f ruleTempo: %f\n",
-			 i, postureData_[i].posture->name().c_str(), postureTempo_[i], postureData_[i].syllable, postureData_[i].onset, postureData_[i].ruleTempo);
+			 i, postureData_[i].posture->name().c_str(), postureData_[i].tempo, postureData_[i].syllable, postureData_[i].onset, postureData_[i].ruleTempo);
 	}
 
 	printf("\nRules %d\n", currentRule_);

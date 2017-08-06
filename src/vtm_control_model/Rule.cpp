@@ -41,11 +41,11 @@ using namespace GS::VTMControlModel;
 
 const char rightParenChar = ')';
 const char  leftParenChar = '(';
-const char   matchAllChar = '*';
-const std::string  orOpSymb = "or";
-const std::string notOpSymb = "not";
-const std::string xorOpSymb = "xor";
-const std::string andOpSymb = "and";
+const std::string     orOpSymb = "or";
+const std::string    notOpSymb = "not";
+const std::string    xorOpSymb = "xor";
+const std::string    andOpSymb = "and";
+const std::string markedOpSymb = "marked";
 
 class Parser {
 public:
@@ -68,6 +68,7 @@ private:
 		SYMBOL_TYPE_NOT_OP,
 		SYMBOL_TYPE_XOR_OP,
 		SYMBOL_TYPE_AND_OP,
+		SYMBOL_TYPE_MARKED_OP,
 		SYMBOL_TYPE_RIGHT_PAREN,
 		SYMBOL_TYPE_LEFT_PAREN,
 		SYMBOL_TYPE_STRING
@@ -154,6 +155,8 @@ Parser::nextSymbol()
 			symbolType_ = SYMBOL_TYPE_NOT_OP;
 		} else if (symbol_ == xorOpSymb) {
 			symbolType_ = SYMBOL_TYPE_XOR_OP;
+		} else if (symbol_ == markedOpSymb) {
+			symbolType_ = SYMBOL_TYPE_MARKED_OP;
 		} else {
 			symbolType_ = SYMBOL_TYPE_STRING;
 		}
@@ -169,8 +172,13 @@ Parser::getBooleanNode()
 		RuleBooleanNode_ptr p;
 
 		nextSymbol();
-		if (symbolType_ == SYMBOL_TYPE_NOT_OP) {
+		if (symbolType_ == SYMBOL_TYPE_MARKED_OP) {
+			// Operand.
+			nextSymbol();
+			RuleBooleanNode_ptr op(getBooleanNode());
 
+			p = std::make_unique<RuleBooleanMarkedExpression>(std::move(op));
+		} else if (symbolType_ == SYMBOL_TYPE_NOT_OP) {
 			// Operand.
 			nextSymbol();
 			RuleBooleanNode_ptr op(getBooleanNode());
@@ -221,34 +229,19 @@ Parser::getBooleanNode()
 	}
 	case SYMBOL_TYPE_STRING:
 	{
-		bool matchAll = false;
-		if (symbol_.size() >= 2 && symbol_[symbol_.size() - 1] == matchAllChar) {
-			matchAll = true;
-		}
-
-		std::string name;
-		if (matchAll) {
-			name = symbol_.substr(0, symbol_.size() - 1);
-		} else {
-			name = symbol_;
-		}
-
 		std::shared_ptr<Category> category;
-		const Posture* posture = model_.postureList().find(name);
-		if (posture != nullptr) {
-			category = posture->findCategory(name);
+		const Posture* posture = model_.postureList().find(symbol_);
+		if (posture) {
+			category = posture->findCategory(symbol_);
 		} else {
-			if (matchAll) {
-				throwException("Asterisk at the end of a category name");
-			}
-			category = model_.findCategory(name);
+			category = model_.findCategory(symbol_);
 		}
 		if (!category) {
-			throwException("Could not find category: ", name);
+			throwException("Could not find category: ", symbol_);
 		}
 
 		nextSymbol();
-		return std::make_unique<RuleBooleanTerminal>(category, matchAll);
+		return std::make_unique<RuleBooleanTerminal>(category);
 	}
 	case SYMBOL_TYPE_OR_OP:
 		throwException("Unexpected OR op.");
@@ -283,26 +276,12 @@ Parser::parse()
 namespace GS {
 namespace VTMControlModel {
 
-/*******************************************************************************
- * Destructor.
- */
-RuleBooleanNode::~RuleBooleanNode()
-{
-}
-
-/*******************************************************************************
- * Destructor.
- */
-RuleBooleanAndExpression::~RuleBooleanAndExpression()
-{
-}
-
 bool
-RuleBooleanAndExpression::eval(const Posture& posture) const
+RuleBooleanAndExpression::eval(const RuleExpressionData& expressionData) const
 {
 	assert(child1_.get() != 0 && child2_.get() != 0);
 
-	return child1_->eval(posture) && child2_->eval(posture);
+	return child1_->eval(expressionData) && child2_->eval(expressionData);
 }
 
 void
@@ -319,19 +298,12 @@ RuleBooleanAndExpression::print(std::ostream& out, int level) const
 	out << prefix << "]" << std::endl;
 }
 
-/*******************************************************************************
- * Destructor.
- */
-RuleBooleanOrExpression::~RuleBooleanOrExpression()
-{
-}
-
 bool
-RuleBooleanOrExpression::eval(const Posture& posture) const
+RuleBooleanOrExpression::eval(const RuleExpressionData& expressionData) const
 {
 	assert(child1_.get() != 0 && child2_.get() != 0);
 
-	return child1_->eval(posture) || child2_->eval(posture);
+	return child1_->eval(expressionData) || child2_->eval(expressionData);
 }
 
 void
@@ -348,19 +320,12 @@ RuleBooleanOrExpression::print(std::ostream& out, int level) const
 	out << prefix << "]" << std::endl;
 }
 
-/*******************************************************************************
- * Destructor.
- */
-RuleBooleanXorExpression::~RuleBooleanXorExpression()
-{
-}
-
 bool
-RuleBooleanXorExpression::eval(const Posture& posture) const
+RuleBooleanXorExpression::eval(const RuleExpressionData& expressionData) const
 {
 	assert(child1_.get() != 0 && child2_.get() != 0);
 
-	return child1_->eval(posture) != child2_->eval(posture);
+	return child1_->eval(expressionData) != child2_->eval(expressionData);
 }
 
 void
@@ -377,19 +342,12 @@ RuleBooleanXorExpression::print(std::ostream& out, int level) const
 	out << prefix << "]" << std::endl;
 }
 
-/*******************************************************************************
- * Destructor.
- */
-RuleBooleanNotExpression::~RuleBooleanNotExpression()
-{
-}
-
 bool
-RuleBooleanNotExpression::eval(const Posture& posture) const
+RuleBooleanNotExpression::eval(const RuleExpressionData& expressionData) const
 {
 	assert(child_.get() != 0);
 
-	return !(child_->eval(posture));
+	return !(child_->eval(expressionData));
 }
 
 void
@@ -405,20 +363,32 @@ RuleBooleanNotExpression::print(std::ostream& out, int level) const
 	out << prefix << "]" << std::endl;
 }
 
-/*******************************************************************************
- * Destructor.
- */
-RuleBooleanTerminal::~RuleBooleanTerminal()
+bool
+RuleBooleanMarkedExpression::eval(const RuleExpressionData& expressionData) const
 {
+	assert(child_.get() != 0);
+
+	return expressionData.marked && child_->eval(expressionData);
+}
+
+void
+RuleBooleanMarkedExpression::print(std::ostream& out, int level) const
+{
+	assert(child_.get() != 0);
+
+	std::string prefix(level * 8, ' ');
+	out << prefix << markedOpSymb << " [\n";
+
+	child_->print(out, level + 1);
+
+	out << prefix << "]" << std::endl;
 }
 
 bool
-RuleBooleanTerminal::eval(const Posture& posture) const
+RuleBooleanTerminal::eval(const RuleExpressionData& expressionData) const
 {
-	if (posture.isMemberOfCategory(*category_)) {
+	if (expressionData.posture->isMemberOfCategory(*category_)) {
 		return true;
-	} else if (matchAll_) {
-		return posture.name() == category_->name() + '\'';
 	}
 	return false;
 }
@@ -429,7 +399,6 @@ RuleBooleanTerminal::print(std::ostream& out, int level) const
 	std::string prefix(level * 8, ' ');
 
 	out << prefix << "category [" << category_->name();
-	if (matchAll_) out << "[*]";
 	out << "]" << std::endl;
 }
 
@@ -449,13 +418,13 @@ Rule::printBooleanNodeTree() const
  *
  */
 bool
-Rule::evalBooleanExpression(const std::vector<const Posture*>& postureSequence) const
+Rule::evalBooleanExpression(const std::vector<RuleExpressionData>& expressionData) const
 {
-	if (postureSequence.size() < booleanNodeList_.size()) return false;
 	if (booleanNodeList_.empty()) return false;
+	if (expressionData.size() < booleanNodeList_.size()) return false;
 
 	for (RuleBooleanNodeList::size_type size = booleanNodeList_.size(), i = 0; i < size; ++i) {
-		if ( !(booleanNodeList_[i]->eval(*postureSequence[i])) ) {
+		if ( !(booleanNodeList_[i]->eval(expressionData[i])) ) {
 			return false;
 		}
 	}
@@ -466,11 +435,11 @@ Rule::evalBooleanExpression(const std::vector<const Posture*>& postureSequence) 
  *
  */
 bool
-Rule::evalBooleanExpression(const Posture& posture, unsigned int expressionIndex) const
+Rule::evalBooleanExpression(const RuleExpressionData& expressionData, unsigned int expressionIndex) const
 {
 	if (expressionIndex >= booleanNodeList_.size()) return false;
 
-	return booleanNodeList_[expressionIndex]->eval(posture);
+	return booleanNodeList_[expressionIndex]->eval(expressionData);
 }
 
 /*******************************************************************************
@@ -482,79 +451,87 @@ Rule::numberOfExpressions() const
 	return booleanNodeList_.size();
 }
 
-// ruleSymbols: {rd, beat, mark1, mark2, mark3}
-// tempos[4]
+// ruleSymbols[Rule::NUM_SYMBOLS]
 void
-Rule::evaluateExpressionSymbols(const double* tempos, const std::vector<const Posture*>& postures, Model& model, double* ruleSymbols) const
+Rule::evaluateExpressionSymbols(const std::vector<RuleExpressionData>& expressionData, Model& model, double* ruleSymbols) const
 {
-	double localTempos[4];
-
+	assert(expressionData.size() <= 4);
 	model.clearFormulaSymbolList();
-	if (postures.size() >= 2) {
-		const Posture& posture = *postures[0];
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION1, posture.getSymbolTarget(1 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA1      , posture.getSymbolTarget(2 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB1      , posture.getSymbolTarget(3 /* hardcoded */));
-		const Posture& posture2 = *postures[1];
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION2, posture2.getSymbolTarget(1 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA2      , posture2.getSymbolTarget(2 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB2      , posture2.getSymbolTarget(3 /* hardcoded */));
-		localTempos[0] = tempos[0];
-		localTempos[1] = tempos[1];
-	} else {
-		localTempos[0] = 0.0;
-		localTempos[1] = 0.0;
+
+	if (expressionData.size() >= 2) {
+		const Posture& posture = *expressionData[0].posture;
+		if (expressionData[0].marked) {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION1, posture.getSymbolTarget(Posture::SYMB_MARKED_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA1      , posture.getSymbolTarget(Posture::SYMB_MARKED_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB1      , posture.getSymbolTarget(Posture::SYMB_MARKED_QSSB));
+		} else {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION1, posture.getSymbolTarget(Posture::SYMB_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA1      , posture.getSymbolTarget(Posture::SYMB_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB1      , posture.getSymbolTarget(Posture::SYMB_QSSB));
+		}
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO1, static_cast<float>(expressionData[0].tempo));
+
+		const Posture& posture2 = *expressionData[1].posture;
+		if (expressionData[1].marked) {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION2, posture2.getSymbolTarget(Posture::SYMB_MARKED_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA2      , posture2.getSymbolTarget(Posture::SYMB_MARKED_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB2      , posture2.getSymbolTarget(Posture::SYMB_MARKED_QSSB));
+		} else {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION2, posture2.getSymbolTarget(Posture::SYMB_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA2      , posture2.getSymbolTarget(Posture::SYMB_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB2      , posture2.getSymbolTarget(Posture::SYMB_QSSB));
+		}
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO2, static_cast<float>(expressionData[1].tempo));
 	}
-	if (postures.size() >= 3) {
-		const Posture& posture = *postures[2];
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION3, posture.getSymbolTarget(1 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA3      , posture.getSymbolTarget(2 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB3      , posture.getSymbolTarget(3 /* hardcoded */));
-		localTempos[2] = tempos[2];
-	} else {
-		localTempos[2] = 0.0;
+	if (expressionData.size() >= 3) {
+		const Posture& posture = *expressionData[2].posture;
+		if (expressionData[2].marked) {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION3, posture.getSymbolTarget(Posture::SYMB_MARKED_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA3      , posture.getSymbolTarget(Posture::SYMB_MARKED_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB3      , posture.getSymbolTarget(Posture::SYMB_MARKED_QSSB));
+		} else {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION3, posture.getSymbolTarget(Posture::SYMB_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA3      , posture.getSymbolTarget(Posture::SYMB_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB3      , posture.getSymbolTarget(Posture::SYMB_QSSB));
+		}
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO3, static_cast<float>(expressionData[2].tempo));
 	}
-	if (postures.size() == 4) {
-		const Posture& posture = *postures[3];
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION4, posture.getSymbolTarget(1 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA4      , posture.getSymbolTarget(2 /* hardcoded */));
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB4      , posture.getSymbolTarget(3 /* hardcoded */));
-		localTempos[3] = tempos[3];
-	} else {
-		localTempos[3] = 0.0;
+	if (expressionData.size() == 4) {
+		const Posture& posture = *expressionData[3].posture;
+		if (expressionData[3].marked) {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION4, posture.getSymbolTarget(Posture::SYMB_MARKED_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA4      , posture.getSymbolTarget(Posture::SYMB_MARKED_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB4      , posture.getSymbolTarget(Posture::SYMB_MARKED_QSSB));
+		} else {
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_TRANSITION4, posture.getSymbolTarget(Posture::SYMB_TRANSITION));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSA4      , posture.getSymbolTarget(Posture::SYMB_QSSA));
+			model.setFormulaSymbolValue(FormulaSymbol::SYMB_QSSB4      , posture.getSymbolTarget(Posture::SYMB_QSSB));
+		}
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO4, static_cast<float>(expressionData[3].tempo));
 	}
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO1, static_cast<float>(localTempos[0]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO2, static_cast<float>(localTempos[1]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO3, static_cast<float>(localTempos[2]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_TEMPO4, static_cast<float>(localTempos[3]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_RD   , static_cast<float>(ruleSymbols[0]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_BEAT , static_cast<float>(ruleSymbols[1]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK1, static_cast<float>(ruleSymbols[2]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2, static_cast<float>(ruleSymbols[3]));
-	model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3, static_cast<float>(ruleSymbols[4]));
 
 	// Execute in this order.
-	if (exprSymbolEquations_.ruleDuration) {
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_RD   , model.evalEquationFormula(*exprSymbolEquations_.ruleDuration));
+	if (exprSymbolEquations_.duration) {
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION, model.evalEquationFormula(*exprSymbolEquations_.duration));
 	}
 	if (exprSymbolEquations_.mark1) {
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK1, model.evalEquationFormula(*exprSymbolEquations_.mark1));
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK1        , model.evalEquationFormula(*exprSymbolEquations_.mark1));
 	}
 	if (exprSymbolEquations_.mark2) {
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2, model.evalEquationFormula(*exprSymbolEquations_.mark2));
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2        , model.evalEquationFormula(*exprSymbolEquations_.mark2));
 	}
 	if (exprSymbolEquations_.mark3) {
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3, model.evalEquationFormula(*exprSymbolEquations_.mark3));
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3        , model.evalEquationFormula(*exprSymbolEquations_.mark3));
 	}
 	if (exprSymbolEquations_.beat) {
-		model.setFormulaSymbolValue(FormulaSymbol::SYMB_BEAT , model.evalEquationFormula(*exprSymbolEquations_.beat));
+		model.setFormulaSymbolValue(FormulaSymbol::SYMB_BEAT         , model.evalEquationFormula(*exprSymbolEquations_.beat));
 	}
 
-	ruleSymbols[0] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_RD);
-	ruleSymbols[1] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_BEAT);
-	ruleSymbols[2] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_MARK1);
-	ruleSymbols[3] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_MARK2);
-	ruleSymbols[4] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_MARK3);
+	ruleSymbols[Rule::SYMB_DURATION] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION);
+	ruleSymbols[Rule::SYMB_BEAT    ] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_BEAT);
+	ruleSymbols[Rule::SYMB_MARK1   ] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_MARK1);
+	ruleSymbols[Rule::SYMB_MARK2   ] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_MARK2);
+	ruleSymbols[Rule::SYMB_MARK3   ] = model.getFormulaSymbolValue(FormulaSymbol::SYMB_MARK3);
 }
 
 void
