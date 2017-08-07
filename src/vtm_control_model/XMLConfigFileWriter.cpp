@@ -255,9 +255,6 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 						} else {
 							xml.addAttribute("time-expression", point->timeExpression->name());
 						}
-						if (point->isPhantom) {
-							xml.addAttribute("is-phantom", "yes");
-						}
 						xml.endAttributesAndCloseElement();
 					}
 					xml.closeElement("points");
@@ -279,9 +276,6 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 						xml.addAttribute("free-time", point.freeTime);
 					} else {
 						xml.addAttribute("time-expression", point.timeExpression->name());
-					}
-					if (point.isPhantom) {
-						xml.addAttribute("is-phantom", "yes");
 					}
 					xml.endAttributesAndCloseElement();
 				}
@@ -322,9 +316,6 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 						xml.addAttribute("free-time", point.freeTime);
 					} else {
 						xml.addAttribute("time-expression", point.timeExpression->name());
-					}
-					if (point.isPhantom) {
-						xml.addAttribute("is-phantom", "yes");
 					}
 					xml.endAttributesAndCloseElement();
 				}

@@ -239,7 +239,7 @@ private:
 			const std::vector<double>& minParam, const std::vector<double>& maxParam);
 	void printDataStructures();
 	double createSlopeRatioEvents(const Transition::SlopeRatio& slopeRatio,
-			double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier);
+			double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier, bool lastGroup);
 
 	Model& model_;
 

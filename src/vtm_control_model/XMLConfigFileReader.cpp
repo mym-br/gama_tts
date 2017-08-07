@@ -78,7 +78,6 @@ const std::string displayTimeAttrName    = "display-time";
 const std::string equationAttrName       = "equation";
 const std::string formulaAttrName        = "formula";
 const std::string freeTimeAttrName       = "free-time";
-const std::string isPhantomAttrName      = "is-phantom";
 const std::string maximumAttrName        = "maximum";
 const std::string minimumAttrName        = "minimum";
 const std::string nameAttrName           = "name";
@@ -324,9 +323,6 @@ XMLConfigFileReader::parseSlopeRatio(rapidxml::xml_node<char>* slopeRatioElem, T
 					p2->timeExpression = equation;
 				}
 
-				if (std::string("yes") == attributeValue(pointElem, isPhantomAttrName, true)) {
-					p2->isPhantom = true;
-				}
 				p->pointList.push_back(std::move(p2));
 			}
 		} else if (compareElementName(childElem, slopesTagName)) {
@@ -366,9 +362,6 @@ XMLConfigFileReader::parseTransitionPointOrSlopes(rapidxml::xml_node<char>* poin
 				p->timeExpression = equation;
 			}
 
-			if (std::string("yes") == attributeValue(childElem, isPhantomAttrName, true)) {
-				p->isPhantom = true;
-			}
 			transition.pointOrSlopeList().push_back(std::move(p));
 		} else if (compareElementName(childElem, slopeRatioTagName)) {
 			parseSlopeRatio(childElem, transition);

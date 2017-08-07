@@ -187,14 +187,14 @@ Model::printInfo() const
 					std::cout << "       point: type=" << point.type << " value=" << point.value
 						<< " freeTime=" << point.freeTime
 						<< " timeExpression=" << (point.timeExpression ? point.timeExpression->name() : "")
-						<< " isPhantom=" << point.isPhantom << std::endl;
+						<< std::endl;
 				} else {
 					const auto& slopeRatio = dynamic_cast<const Transition::SlopeRatio&>(*pointOrSlope);
 					for (auto& point : slopeRatio.pointList) {
 						std::cout << "         point: type=" << point->type << " value=" << point->value
 							<< " freeTime=" << point->freeTime
 							<< " timeExpression=" << (point->timeExpression ? point->timeExpression->name() : "")
-							<< " isPhantom=" << point->isPhantom << std::endl;
+							<< std::endl;
 					}
 					for (auto& slope : slopeRatio.slopeList) {
 						std::cout << "         slope: slope=" << slope->slope << " displayTime=" << slope->displayTime << std::endl;
@@ -219,7 +219,7 @@ Model::printInfo() const
 				std::cout << "       point: type=" << point.type << " value=" << point.value
 					<< " freeTime=" << point.freeTime
 					<< " timeExpression=" << (point.timeExpression ? point.timeExpression->name() : "")
-					<< " isPhantom=" << point.isPhantom << std::endl;
+					<< std::endl;
 			}
 		}
 	}

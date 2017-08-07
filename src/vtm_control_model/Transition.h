@@ -61,13 +61,12 @@ public:
 		};
 		Type type;
 		float value;
-		bool isPhantom;
 
 		// If timeExpression is not empty, time = timeExpression, otherwise time = freeTime.
 		std::shared_ptr<Equation> timeExpression;
 		float freeTime; // milliseconds
 
-		Point() : type(TYPE_INVALID), value(0.0), isPhantom(false), timeExpression(), freeTime(0.0) {}
+		Point() : type{TYPE_INVALID}, value{}, timeExpression{}, freeTime{} {}
 		virtual ~Point() {}
 
 		virtual bool isSlopeRatio() const { return false; }
@@ -107,7 +106,7 @@ public:
 		float slope;
 		float displayTime;
 
-		Slope() : slope(0.0), displayTime(0.0) {}
+		Slope() : slope{}, displayTime{} {}
 	private:
 		Slope(const Slope&) = delete;
 		Slope& operator=(const Slope&) = delete;
@@ -128,13 +127,8 @@ public:
 		SlopeRatio& operator=(const SlopeRatio&) = delete;
 	};
 
-	Transition(
-		const std::string& name,
-		Type type,
-		bool special)
-			: name_(name)
-			, type_(type)
-			, special_(special)
+	Transition(const std::string& name, Type type, bool special)
+			: name_{name}, type_{type}, special_{special}
 	{
 	}
 

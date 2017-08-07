@@ -401,7 +401,7 @@ EventList::setZeroRef(int newValue)
 double
 EventList::createSlopeRatioEvents(
 		const Transition::SlopeRatio& slopeRatio,
-		double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier)
+		double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier, bool lastGroup)
 {
 	double temp = 0.0, temp1 = 0.0, intervalTime = 0.0, sum = 0.0, factor = 0.0;
 	double baseTime = 0.0, endTime = 0.0, totalTime = 0.0, delta = 0.0;
@@ -445,6 +445,7 @@ EventList::createSlopeRatioEvents(
 	double value = 0.0;
 	for (unsigned int i = 0, size = slopeRatio.pointList.size(); i < size; i++) {
 		const Transition::Point& point = *slopeRatio.pointList[i];
+		const bool last = (i == slopeRatio.pointList.size() - 1);
 
 		if (i >= 1 && i < slopeRatio.pointList.size() - 1) {
 			pointTime = Transition::getPointTime(point, model_);
@@ -463,7 +464,7 @@ EventList::createSlopeRatioEvents(
 		} else if (value > max) {
 			value = max;
 		}
-		if (!point.isPhantom) {
+		if (!(lastGroup && last)) { // not a "phantom" point
 			insertEvent(pointTime * timeMultiplier, eventIndex, value, false);
 		}
 	}
@@ -567,17 +568,20 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 			/* Apply lists to parameter */
 			for (unsigned int j = 0; j < transition->pointOrSlopeList().size(); ++j) {
 				const Transition::PointOrSlope& pointOrSlope = *transition->pointOrSlopeList()[j];
+				const bool last = (j == transition->pointOrSlopeList().size() - 1);
 				if (pointOrSlope.isSlopeRatio()) {
 					const auto& slopeRatio = dynamic_cast<const Transition::SlopeRatio&>(pointOrSlope);
-
-					if (slopeRatio.pointList[0]->type != currentType) { //TODO: check pointList.size() > 0
+					if (slopeRatio.pointList.empty()) {
+						THROW_EXCEPTION(UnavailableResourceException, "Empty slope ratio in transition " << transition->name() << '.');
+					}
+					if (slopeRatio.pointList[0]->type != currentType) {
 						currentType = slopeRatio.pointList[0]->type;
 						targets[currentType - 2] = lastValue;
 						currentValueDelta = targets[currentType - 1] - lastValue;
 					}
 					value = createSlopeRatioEvents(
 							slopeRatio, targets[currentType - 2], currentValueDelta,
-							minParam[i], maxParam[i], i, timeMultiplier);
+							minParam[i], maxParam[i], i, timeMultiplier, last);
 				} else {
 					const auto& point = dynamic_cast<const Transition::Point&>(pointOrSlope);
 
@@ -590,7 +594,7 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 					Transition::getPointData(point, model_,
 									targets[currentType - 2], currentValueDelta, minParam[i], maxParam[i],
 									pointTime, value);
-					if (!point.isPhantom) {
+					if (!last) { // not a "phantom" point
 						insertEvent(pointTime * timeMultiplier, i, value, false);
 					}
 				}
