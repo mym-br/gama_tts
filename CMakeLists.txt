@@ -97,6 +97,8 @@ set(LIBRARY_FILES
     src/vtm_control_model/Model.cpp
     src/vtm_control_model/Model.h
     src/vtm_control_model/Parameter.h
+    src/vtm_control_model/Pho1Parser.cpp
+    src/vtm_control_model/Pho1Parser.h
     src/vtm_control_model/PhoneticStringParser.cpp
     src/vtm_control_model/PhoneticStringParser.h
     src/vtm_control_model/Posture.h

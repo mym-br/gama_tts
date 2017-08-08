@@ -1,0 +1,84 @@
+# Phoneme mapping for the MBROLA's pho file format.
+# In a pair, phonemes are separated by _.
+
+# In the comments: Festival MBROLA-us1
+
+# From-Festival To-Gnuspeech
+
+# ah V
+ah a
+
+# hh h
+hh h
+
+# iy i
+iy i
+
+# ih I
+ih ee
+
+# uh U
+uh u
+
+# ae {
+ae e
+
+# ax @
+ax uh
+
+# er r=
+#er er
+
+# aa A
+aa ar
+
+# ao O
+ao aw
+
+# uw u
+uw u
+
+# eh E
+eh e
+
+# ey EI
+ey er_i
+
+# ay AI
+ay ah_i
+
+# oy OI
+oy o_i
+
+# aw aU
+aw ah_uu
+
+# ow @U
+ow uh_uu
+
+# y j
+#y y
+
+# ng N
+#ng ng
+
+# sh S
+#sh sh
+
+# th T
+#th th
+
+# zh Z
+#zh zh
+
+# dh D
+#dh dh
+
+# ch tS
+#ch ch
+
+# jh dZ
+jh j
+
+# pau _
+pau #

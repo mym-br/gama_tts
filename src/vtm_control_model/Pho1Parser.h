@@ -1,6 +1,5 @@
 /***************************************************************************
- *  Copyright 1991, 1992, 1993, 1994, 1995, 1996, 2001, 2002               *
- *    David R. Hill, Leonard Manzara, Craig Schock                         *
+ *  Copyright 2017 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,11 +14,15 @@
  *  You should have received a copy of the GNU General Public License      *
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-// 2014-09
-// This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef VTM_CONTROL_MODEL_INTONATION_POINT_H_
-#define VTM_CONTROL_MODEL_INTONATION_POINT_H_
+#ifndef VTM_CONTROL_MODEL_PHO1_PARSER_H_
+#define VTM_CONTROL_MODEL_PHO1_PARSER_H_
+
+#include <list>
+#include <string>
+#include <vector>
+
+#include "StringMap.h"
 
 
 
@@ -27,36 +30,48 @@ namespace GS {
 namespace VTMControlModel {
 
 class EventList;
+class Model;
 
-class IntonationPoint {
+struct Pho1IntonationPoint {
+	Pho1IntonationPoint(float pos, float freq) : position{pos}, frequency{freq} {}
+	float position;
+	float frequency;
+};
+
+struct Pho1Data {
+	Pho1Data() : duration{1.0}, postureIndex{} {}
+	std::string phoneme;
+	float duration;
+	unsigned int postureIndex;
+	std::vector<Pho1IntonationPoint> intonationPoints;
+};
+
+// Parser for MBROLA file format.
+// Only phoneme commands are parsed.
+// It doesn't parse intonation in the format (NN,NN).
+class Pho1Parser {
 public:
-	IntonationPoint(const EventList* eventList);
-	~IntonationPoint() {}
+	Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList, const char* phonemeMapFile);
+	~Pho1Parser();
 
-	void setSemitone(double newValue) { semitone_ = newValue; }
-	double semitone() const { return semitone_; }
-
-	void setOffsetTime(double newValue) { offsetTime_ = newValue; }
-	double offsetTime() const { return offsetTime_; }
-
-	void setSlope(double newValue) { slope_ = newValue; }
-	double slope() const { return slope_; }
-
-	void setRuleIndex(int newIndex) { ruleIndex_ = newIndex; }
-	int ruleIndex() const { return ruleIndex_; }
-
-	double absoluteTime() const;
-	double beatTime() const;
-
+	void parse(const std::string& pho);
 private:
-	double semitone_;      /* Value of the in semitones */
-	double offsetTime_;    /* Points are timed wrt a beat + this offset */
-	double slope_;         /* Slope of point */
-	int ruleIndex_;        /* Index of posture which is the focus of this point */
-	const EventList* eventList_; /* Current EventList */
+	Pho1Parser(const Pho1Parser&) = delete;
+	Pho1Parser& operator=(const Pho1Parser&) = delete;
+
+	void loadInputData(const std::string& pho);
+	void replacePhonemes();
+	void fillPostureList();
+	void addIntonation();
+	void printInputData();
+
+	const Model& model_;
+	EventList& eventList_;
+	StringMap phonemeMap_;
+	std::list<Pho1Data> inputData_;
 };
 
 } /* namespace VTMControlModel */
 } /* namespace GS */
 
-#endif /* VTM_CONTROL_MODEL_INTONATION_POINT_H_ */
+#endif /* VTM_CONTROL_MODEL_PHO1_PARSER_H_ */

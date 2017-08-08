@@ -69,10 +69,26 @@ showUsage()
 	std::cout << "        vocal tract model.\n\n";
 
 	std::cout << PROGRAM_NAME << " pho0 [-v] [-i input.txt] [-p vtm_param.txt] data_dir speech.wav\n";
-	std::cout << "    Converts phonetic string to speech.\n\n";
+	std::cout << "    Converts phonetic string to speech (Gnuspeech format).\n\n";
 	std::cout << "    data_dir   : The directory containing the data and configuration files.\n";
 	std::cout << "    speech.wav : This file will be created, and will contain the\n";
 	std::cout << "                 synthesized speech.\n\n";
+	std::cout << "    Options:\n";
+	std::cout << "    -v\n";
+	std::cout << "        Verbose.\n";
+	std::cout << "    -i input.txt\n";
+	std::cout << "        Get the phonetic string from a file instead of from stdin.\n";
+	std::cout << "    -p vtm_param.txt\n";
+	std::cout << "        This file will be created, and will contain the parameters for the\n";
+	std::cout << "        vocal tract model.\n\n";
+
+	std::cout << PROGRAM_NAME << " pho1 [-v] [-i input.txt] [-p vtm_param.txt] data_dir \\\n";
+	std::cout << "        pho1_map.txt speech.wav\n";
+	std::cout << "    Converts phonetic string to speech (MBROLA format).\n\n";
+	std::cout << "    data_dir     : The directory containing the data and configuration files.\n";
+	std::cout << "    pho1_map.txt : Contains the mapping between the input and internal phonemes.\n";
+	std::cout << "    speech.wav   : This file will be created, and will contain the\n";
+	std::cout << "                   synthesized speech.\n\n";
 	std::cout << "    Options:\n";
 	std::cout << "    -v\n";
 	std::cout << "        Verbose.\n";
@@ -92,6 +108,8 @@ showUsage()
 	std::cout << "    -v\n";
 	std::cout << "        Verbose.\n\n";
 }
+
+//==============================================================================
 
 int
 tts(int argc, char* argv[])
@@ -179,6 +197,8 @@ tts(int argc, char* argv[])
 	return EXIT_SUCCESS;
 }
 
+//==============================================================================
+
 int
 pho0(int argc, char* argv[])
 {
@@ -260,6 +280,92 @@ pho0(int argc, char* argv[])
 	return EXIT_SUCCESS;
 }
 
+//==============================================================================
+
+int
+pho1(int argc, char* argv[])
+{
+	std::cout << PROGRAM_NAME << " pho1" << std::endl;
+
+	const char* phoneticInput = nullptr;
+	const char* vtmParamFile  = nullptr;
+	const char* dataDir       = nullptr;
+	const char* mapFile       = nullptr;
+	const char* outputFile    = nullptr;
+
+	int i = 2;
+	while (argc - i > 0 && isOption(argv[i])) {
+		if (strcmp("-v", argv[i]) == 0) {
+			GS::Log::debugEnabled = true;
+		} else if (strcmp("-i", argv[i]) == 0) {
+			++i;
+			if (argc - i < 1) {
+				showUsage(); return EXIT_FAILURE;
+			}
+			phoneticInput = argv[i];
+		} else if (strcmp("-p", argv[i]) == 0) {
+			++i;
+			if (argc - i < 1) {
+				showUsage(); return EXIT_FAILURE;
+			}
+			vtmParamFile = argv[i];
+		} else {
+			showUsage(); return EXIT_FAILURE;
+		}
+		++i;
+	}
+	if (argc - i != 3) {
+		showUsage(); return EXIT_FAILURE;
+	}
+	dataDir    = argv[i++];
+	mapFile    = argv[i++];
+	outputFile = argv[i];
+
+	std::ostringstream inputPhoneticStream;
+	if (phoneticInput == nullptr) {
+		std::string line;
+		while (std::getline(std::cin, line)) {
+			inputPhoneticStream << line << '\n';
+		}
+	} else {
+		std::ifstream in(phoneticInput, std::ios_base::binary);
+		if (!in) {
+			std::cerr << "Error: Could not open the file " << phoneticInput << '.' << std::endl;
+			return EXIT_FAILURE;
+		}
+		std::string line;
+		while (std::getline(in, line)) {
+			inputPhoneticStream << line << '\n';
+		}
+	}
+	std::string phoneticString = inputPhoneticStream.str();
+	if (phoneticString.empty()) {
+		std::cerr << "Error: Empty phonetic string." << std::endl;
+		return EXIT_FAILURE;
+	}
+	if (GS::Log::debugEnabled) {
+		std::cout << "INPUT PHONETIC STRING [" << phoneticString << ']' << std::endl;
+	}
+
+	try {
+		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
+		vtmControlModel->load(dataDir, VTM_CONTROL_MODEL_CONFIG_FILE);
+
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(dataDir, *vtmControlModel);
+		vtmController->synthesizePho1ToFile(phoneticString, mapFile, vtmParamFile, outputFile);
+	} catch (std::exception& e) {
+		std::cerr << "Exception: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	} catch (...) {
+		std::cerr << "Unknown exception." << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+//==============================================================================
+
 int
 vtm(int argc, char* argv[])
 {
@@ -311,7 +417,7 @@ vtm(int argc, char* argv[])
 	return EXIT_SUCCESS;
 }
 
-
+//==============================================================================
 
 int
 main(int argc, char* argv[])
@@ -324,6 +430,8 @@ main(int argc, char* argv[])
 		return tts(argc, argv);
 	} else if (strcmp(argv[1], "pho0") == 0) {
 		return pho0(argc, argv);
+	} else if (strcmp(argv[1], "pho1") == 0) {
+		return pho1(argc, argv);
 	} else if (strcmp(argv[1], "vtm") == 0) {
 		return vtm(argc, argv);
 	} else if (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "--help") == 0) {

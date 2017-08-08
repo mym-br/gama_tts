@@ -90,12 +90,18 @@ struct RuleData {
 	int    number;
 	int    firstPosture;
 	int    lastPosture;
+	int    start;
+	double mark1;
+	double mark2;
 	double duration;
 	double beat;
 	RuleData()
 		: number{}
 		, firstPosture{}
 		, lastPosture{}
+		, start{}
+		, mark1{}
+		, mark2{}
 		, duration{}
 		, beat{} {}
 };
@@ -191,7 +197,7 @@ public:
 	void setCurrentPostureSyllable();
 	void setUp();
 	double getBeatAtIndex(int ruleIndex) const;
-	void newPostureWithObject(const Posture& p, bool marked=false);
+	unsigned int newPostureWithObject(const Posture& p, bool marked=false);
 	void replaceCurrentPostureWith(const Posture& p, bool marked=false);
 	void setCurrentToneGroupType(int type);
 	void newFoot();
@@ -217,6 +223,8 @@ public:
 
 	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }
 	void setFixedIntonationParameters(float notionalPitch, float pretonicRange, float pretonicLift, float tonicRange, float tonicMovement);
+
+	void addPostureIntonationPoint(int postureIndex, double position, double semitone);
 private:
 	enum RuleType {
 		DIPHONE    = 2,

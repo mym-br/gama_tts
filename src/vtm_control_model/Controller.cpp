@@ -39,9 +39,9 @@ namespace GS {
 namespace VTMControlModel {
 
 Controller::Controller(const char* configDirPath, Model& model)
-		: model_{model}
+		: configDirPath_{configDirPath}
+		, model_{model}
 		, eventList_{configDirPath, model_}
-		, phoneticStringParser_{configDirPath, model_, eventList_}
 {
 	// Load VTMControlModel configuration.
 	vtmControlModelConfig_.load(configDirPath);
@@ -134,6 +134,10 @@ Controller::nextChunk(const std::string& phoneticString, std::size_t& index, std
 void
 Controller::getParametersFromPhoneticString(const std::string& phoneticString)
 {
+	if (!phoneticStringParser_) {
+		phoneticStringParser_ = std::make_unique<PhoneticStringParser>(configDirPath_.c_str(), model_, eventList_);
+	}
+
 	vtmParamList_.clear();
 
 	initUtterance();
@@ -143,7 +147,7 @@ Controller::getParametersFromPhoneticString(const std::string& phoneticString)
 		if (nextChunk(phoneticString, index, size)) {
 			eventList_.setUp();
 
-			phoneticStringParser_.parse(&phoneticString[index], size);
+			phoneticStringParser_->parse(&phoneticString[index], size);
 
 			eventList_.generateEventList();
 			eventList_.applyIntonation();
@@ -204,6 +208,23 @@ Controller::synthesizePhoneticStringToBuffer(const std::string& phoneticString, 
 	getParametersFromPhoneticString(phoneticString);
 	if (vtmParamFile) writeVTMParameterFile(vtmParamFile);
 	synthesizeToBuffer(buffer);
+}
+
+void
+Controller::synthesizePho1ToFile(const std::string& phoneticString, const char* phonemeMapFile, const char* vtmParamFile, const char* outputFile)
+{
+	if (!pho1Parser_) {
+		pho1Parser_ = std::make_unique<Pho1Parser>(configDirPath_.c_str(), model_, eventList_, phonemeMapFile);
+	}
+
+	vtmParamList_.clear();
+	vtmControlModelConfig_.intonation = Configuration::INTONATION_MICRO | Configuration::INTONATION_MACRO;
+	initUtterance();
+	eventList_.setUp();
+	pho1Parser_->parse(phoneticString);
+	eventList_.generateOutput(vtmParamList_);
+	if (vtmParamFile) writeVTMParameterFile(vtmParamFile);
+	synthesizeToFile(outputFile);
 }
 
 void

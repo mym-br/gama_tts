@@ -144,6 +144,48 @@ EventList::setFixedIntonationParameters(float notionalPitch, float pretonicRange
 }
 
 void
+EventList::addPostureIntonationPoint(int postureIndex, double position, double semitone)
+{
+	int ruleIndex = -1;
+	for (int i = 0; i < currentRule_; ++i) {
+		if ((postureIndex >= ruleData_[i].firstPosture) && (postureIndex < ruleData_[i].lastPosture)) {
+			ruleIndex = i;
+			break;
+		}
+	}
+	if (ruleIndex < 0) return;
+
+	// This offset will be added to the beat time.
+	double offsetTime = 0.0;
+
+	const RuleData& ruleData = ruleData_[ruleIndex];
+	const int numRulePostures = ruleData.lastPosture - ruleData.firstPosture + 1;
+	const double start = ruleData.start;
+	const int postureLocalIndex = postureIndex - ruleData.firstPosture;
+	switch (postureLocalIndex) {
+	case 0:
+		if (numRulePostures > 2) {
+			offsetTime = start + ruleData.mark1    * position - ruleData.beat;
+		} else {
+			offsetTime = start + ruleData.duration * position - ruleData.beat;
+		}
+		break;
+	case 1:
+		if (numRulePostures > 3) {
+			offsetTime = start + ruleData.mark1 + (ruleData.mark2    - ruleData.mark1) * position - ruleData.beat;
+		} else {
+			offsetTime = start + ruleData.mark1 + (ruleData.duration - ruleData.mark1) * position - ruleData.beat;
+		}
+		break;
+	case 2:
+		offsetTime = start + ruleData.mark1 + ruleData.mark2 + (ruleData.duration - ruleData.mark2) * position - ruleData.beat;
+		break;
+	}
+
+	addIntonationPoint(semitone, offsetTime, 0.0, ruleIndex);
+}
+
+void
 EventList::parseGroups(int index, int number, FILE* fp)
 {
 	char line[256];
@@ -218,7 +260,7 @@ EventList::getBeatAtIndex(int ruleIndex) const
 	}
 }
 
-void
+unsigned int
 EventList::newPostureWithObject(const Posture& p, bool marked)
 {
 	if (postureData_[currentPosture_].posture) {
@@ -229,6 +271,8 @@ EventList::newPostureWithObject(const Posture& p, bool marked)
 	postureData_[currentPosture_].ruleTempo = 1.0;
 	postureData_[currentPosture_].posture = &p;
 	postureData_[currentPosture_].marked = marked;
+
+	return currentPosture_;
 }
 
 void
@@ -490,33 +534,44 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 
 	const double timeMultiplier = 1.0 / postureData_[basePostureIndex].ruleTempo;
 
+	if (timeMultiplier != 1.0) {
+		for (int i = 0; i < Rule::NUM_SYMBOLS; ++i) {
+			ruleSymbols[i] *= timeMultiplier;
+		}
+	}
 	int type = rule.numberOfExpressions();
-	setDuration((int) (ruleSymbols[Rule::SYMB_DURATION] * timeMultiplier));
 
 	ruleData_[currentRule_].firstPosture = basePostureIndex;
-	ruleData_[currentRule_].lastPosture = basePostureIndex + (type - 1);
-	ruleData_[currentRule_].beat = (ruleSymbols[Rule::SYMB_BEAT] * timeMultiplier) + (double) zeroRef_;
-	ruleData_[currentRule_++].duration = ruleSymbols[Rule::SYMB_DURATION] * timeMultiplier;
+	ruleData_[currentRule_].lastPosture  = basePostureIndex + (type - 1);
+	ruleData_[currentRule_].start    = zeroRef_;
+	ruleData_[currentRule_].mark1    = ruleSymbols[Rule::SYMB_MARK1];
+	ruleData_[currentRule_].mark2    = ruleSymbols[Rule::SYMB_MARK2];
+	ruleData_[currentRule_].duration = ruleSymbols[Rule::SYMB_DURATION];
+	ruleData_[currentRule_].beat     = ruleSymbols[Rule::SYMB_BEAT] + zeroRef_;
+
+	setDuration(static_cast<int>(ruleData_[currentRule_].duration));
+
 	ruleData_.push_back(RuleData{});
+	++currentRule_;
 
 	switch (type) {
 	/* Note: Case 4 should execute all of the below, case 3 the last two */
 	case 4:
 		if (numPostures == 4) {
-			postureData_[basePostureIndex + 3].onset = (double) zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
-			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK2] * timeMultiplier, -1, 0.0, false);
+			postureData_[basePostureIndex + 3].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
+			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK2], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
 	case 3:
 		if (numPostures >= 3) {
-			postureData_[basePostureIndex + 2].onset = (double) zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
-			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK1] * timeMultiplier, -1, 0.0, false);
+			postureData_[basePostureIndex + 2].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
+			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK1], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
 	case 2:
-		postureData_[basePostureIndex + 1].onset = (double) zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
+		postureData_[basePostureIndex + 1].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
 		tempEvent = insertEvent(0.0, -1, 0.0, false);
 		if (tempEvent) tempEvent->flag = 1;
 		break;
@@ -572,7 +627,8 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 				if (pointOrSlope.isSlopeRatio()) {
 					const auto& slopeRatio = dynamic_cast<const Transition::SlopeRatio&>(pointOrSlope);
 					if (slopeRatio.pointList.empty()) {
-						THROW_EXCEPTION(UnavailableResourceException, "Empty slope ratio in transition " << transition->name() << '.');
+						THROW_EXCEPTION(UnavailableResourceException, "Empty slope ratio in transition "
+									<< transition->name() << '.');
 					}
 					if (slopeRatio.pointList[0]->type != currentType) {
 						currentType = slopeRatio.pointList[0]->type;
@@ -627,7 +683,7 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 		}
 	}
 
-	setZeroRef((int) (ruleSymbols[Rule::SYMB_DURATION] * timeMultiplier) + zeroRef_);
+	setZeroRef(static_cast<int>(ruleSymbols[Rule::SYMB_DURATION]) + zeroRef_);
 	tempEvent = insertEvent(0.0, -1, 0.0, false);
 	if (tempEvent) tempEvent->flag = 1;
 }
@@ -726,7 +782,7 @@ EventList::applyIntonation()
 	zeroIndex_ = 0;
 	duration_ = list_.back()->time + 100;
 
-	std::shared_ptr<const Category> vocoidCategory = model_.findCategory("vocoid");
+	std::shared_ptr<const Category> vocoidCategory = model_.findCategory("vocoid"); // hardcoded
 	if (!vocoidCategory) {
 		THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"vocoid\".");
 	}
@@ -889,15 +945,19 @@ EventList::prepareMacroIntonationInterpolation()
 	if (intonationPoints_.empty()) return;
 
 	Event* event1 = insertEvent(intonationPoints_[0].absoluteTime(), -1, 0.0, false);
-	if (!event1) return;
-	Event* event2 {};
+	if (!event1) {
+		THROW_EXCEPTION(MissingValueException, "Could not create event 1 for intonation.");
+	}
+	Event* event2{};
 
 	for (unsigned int j = 0; j < intonationPoints_.size() - 1; j++) {
 		const IntonationPoint& point1 = intonationPoints_[j];
 		const IntonationPoint& point2 = intonationPoints_[j + 1];
 
 		event2 = insertEvent(point2.absoluteTime(), -1, 0.0, false);
-		if (!event2) break;
+		if (!event2) {
+			THROW_EXCEPTION(MissingValueException, "Could not create event 2 for intonation.");
+		}
 
 		const double x1 = event1->time;
 		const double y1 = point1.semitone();
@@ -960,11 +1020,14 @@ EventList::addIntonationPoint(double semitone, double offsetTime, double slope, 
 	iPoint.setSlope(slope * intonationFactor_);
 
 	double time = iPoint.absoluteTime();
-	for (std::size_t i = 0; i < intonationPoints_.size(); i++) {
-		if (time < intonationPoints_[i].absoluteTime()) {
-			intonationPoints_.insert(intonationPoints_.begin() + i, iPoint);
-			return;
-		}
+	double minTime;
+	if (intonationPoints_.empty()) {
+		minTime = 2.0 * controlPeriod_;
+	} else {
+		minTime = intonationPoints_.back().absoluteTime() + 2.0 * controlPeriod_;
+	}
+	if (time < minTime) {
+		iPoint.setOffsetTime(offsetTime + (minTime - time));
 	}
 
 	intonationPoints_.push_back(iPoint);
@@ -1011,8 +1074,6 @@ EventList::generateOutput(std::vector<std::vector<float>>& vtmParamList)
 			// Straight line.
 			if (smoothIntonation_) {
 				const double y2 = x2 * (x2 * (x2 * data.a + data.b) + data.c) + data.d;
-				pa = 0.0;
-				pb = 0.0;
 				pc = (y2 - y1) / x2;
 				pd = y1;
 			} else {

@@ -28,13 +28,13 @@
 namespace GS {
 namespace VTMControlModel {
 
-IntonationPoint::IntonationPoint(EventList* eventList)
-	: semitone_(0.0)
-	, offsetTime_(0.0)
-	, slope_(0.0)
-	, ruleIndex_(0)
-	, eventList_(eventList) {
-
+IntonationPoint::IntonationPoint(const EventList* eventList)
+		: semitone_{}
+		, offsetTime_{}
+		, slope_{}
+		, ruleIndex_{}
+		, eventList_{eventList}
+{
 	if (eventList_ == nullptr) {
 		THROW_EXCEPTION(InvalidParameterException, "The pointer to event list is null.");
 	}
@@ -43,8 +43,12 @@ IntonationPoint::IntonationPoint(EventList* eventList)
 double
 IntonationPoint::absoluteTime() const
 {
-	double time = eventList_->getBeatAtIndex(ruleIndex_);
-	return time + offsetTime_;
+	double time = eventList_->getBeatAtIndex(ruleIndex_) + offsetTime_;
+	if (time < 0.0) {
+		return 0.0;
+	} else {
+		return time;
+	}
 }
 
 double

@@ -21,7 +21,7 @@
 #ifndef VTM_UTIL_H_
 #define VTM_UTIL_H_
 
-#include <cmath> /* abs, pow */
+#include <cmath> /* abs, log2, pow */
 #include <cstddef> /* std::size_t */
 #include <vector>
 
@@ -83,12 +83,28 @@ template<typename FloatType>
 FloatType
 frequency(FloatType pitch)
 {
-	constexpr FloatType pitchBase = 220.0;
+	constexpr FloatType refFreq = 220.0;
 	constexpr FloatType pitchOffset = 3.0; /*  MIDDLE C = 0  */
 	constexpr FloatType p = 2.0;
 	constexpr FloatType k = 1.0 / 12.0;
 
-	return pitchBase * std::pow(p, (pitch + pitchOffset) * k);
+	return refFreq * std::pow(p, (pitch + pitchOffset) * k);
+}
+
+//******************************************************************************
+// Converts a given frequency to the corresponding pitch.
+//
+// pitch in semitones, 0 = middle C
+//******************************************************************************
+template<typename FloatType>
+FloatType
+pitch(FloatType frequency)
+{
+	constexpr FloatType refFreq = 220.0;
+	constexpr FloatType pitchOffset = 3.0; /*  MIDDLE C = 0  */
+	constexpr FloatType k = 12.0;
+
+	return k * std::log2(frequency / refFreq) - pitchOffset;
 }
 
 //******************************************************************************

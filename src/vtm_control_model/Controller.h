@@ -30,6 +30,7 @@
 #include "ConfigurationData.h"
 #include "EventList.h"
 #include "Model.h"
+#include "Pho1Parser.h"
 #include "PhoneticStringParser.h"
 #include "VocalTractModel.h"
 #include "VTMControlModelConfiguration.h"
@@ -52,6 +53,9 @@ public:
 	void synthesizePhoneticStringToFile(const std::string& phoneticString, const char* vtmParamFile, const char* outputFile);
 	// If vtmParamFile is not null, the VTM parameters will be written to a file.
 	void synthesizePhoneticStringToBuffer(const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer);
+
+	// If vtmParamFile is not null, the VTM parameters will be written to a file.
+	void synthesizePho1ToFile(const std::string& phoneticString, const char* phonemeMapFile, const char* vtmParamFile, const char* outputFile);
 
 	// Synthesizes speech from data contained in the event list. Sends to a file.
 	// If vtmParamFile is not null, the VTM parameters will be written to a file.
@@ -86,9 +90,11 @@ private:
 	void writeOutputToBuffer(std::vector<float>& outputBuffer);
 	void writeVTMParameterFile(const char* vtmParamFile);
 
+	std::string configDirPath_;
 	Model& model_;
 	EventList eventList_;
-	PhoneticStringParser phoneticStringParser_;
+	std::unique_ptr<PhoneticStringParser> phoneticStringParser_;
+	std::unique_ptr<Pho1Parser> pho1Parser_;
 	Configuration vtmControlModelConfig_;
 	std::unique_ptr<ConfigurationData> vtmConfigData_;
 	std::unique_ptr<VTM::VocalTractModel> vtm_;
