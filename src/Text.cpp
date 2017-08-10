@@ -17,6 +17,8 @@
 
 #include "Text.h"
 
+#include <cctype> /* isalnum, isalpha, islower, isprint, isupper, tolower, toupper */
+
 
 
 namespace GS {
@@ -36,6 +38,83 @@ trim(const std::string& s)
 		return s;
 	} else {
 		return s.substr(firstPos, lastPos - firstPos + 1);
+	}
+}
+
+bool
+isAlpha(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::isalpha(c);
+	} else {
+		//NOTE: Non-ASCII characters are considered alphabetic.
+		return true;
+	}
+}
+
+bool
+isPrint(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::isprint(c);
+	} else {
+		//NOTE: Non-ASCII characters are considered printable.
+		return true;
+	}
+}
+
+bool
+isUpper(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::isupper(c);
+	} else {
+		//NOTE: Non-ASCII characters are considered lowercase.
+		return false;
+	}
+}
+
+bool
+isLower(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::islower(c);
+	} else {
+		//NOTE: Non-ASCII characters are considered lowercase.
+		return true;
+	}
+}
+
+bool
+isAlphaNum(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::isalnum(c);
+	} else {
+		//NOTE: Non-ASCII characters are considered alphanumeric.
+		return true;
+	}
+}
+
+char
+toUpper(char c)
+{
+	if (isAscii(c)) {
+		return std::toupper(static_cast<unsigned char>(c));
+	} else {
+		//NOTE: Non-ASCII characters are not converted to uppercase.
+		return c;
+	}
+}
+
+char
+toLower(char c)
+{
+	if (isAscii(c)) {
+		return std::tolower(static_cast<unsigned char>(c));
+	} else {
+		//NOTE: Non-ASCII characters are not converted to lowercase.
+		return c;
 	}
 }
 

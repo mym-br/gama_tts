@@ -21,7 +21,7 @@
 
 #include "PhoneticStringParser.h"
 
-#include <cctype> /* isalpha, isdigit, isspace */
+#include <cctype> /* isdigit, isspace */
 #include <fstream>
 #include <sstream>
 
@@ -301,9 +301,7 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 		default:
 			baseIndex = index;
 			buffer.clear();
-			while ((index < size) &&
-					(std::isalpha(string[index]) ||
-						(string[index] == '^') || (string[index] == '#'))) { // hardcoded
+			while ((index < size) && Model::isValidPostureCharacter(string[index])) {
 				buffer.push_back(string[index]);
 				++index;
 			}

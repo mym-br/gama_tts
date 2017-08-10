@@ -81,6 +81,7 @@ public:
 
 	const PostureList& postureList() const { return postureList_; }
 	PostureList& postureList() { return postureList_; }
+	static bool isValidPostureCharacter(char c);
 
 	const std::vector<TransitionGroup>& transitionGroupList() const { return transitionGroupList_; }
 	std::vector<TransitionGroup>& transitionGroupList() { return transitionGroupList_; }

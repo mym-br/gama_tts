@@ -31,6 +31,16 @@ namespace Text {
 
 std::string trim(const std::string& s);
 
+//NOTE: These functions work with UTF-8 encoding, but the result is only correct for ASCII characters.
+inline bool isAscii(unsigned char c) { return c < 128U; }
+bool isAlpha(unsigned char c);
+bool isPrint(unsigned char c);
+bool isUpper(unsigned char c);
+bool isLower(unsigned char c);
+bool isAlphaNum(unsigned char c);
+char toUpper(char c);
+char toLower(char c);
+
 
 
 template<typename T>

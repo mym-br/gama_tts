@@ -21,11 +21,11 @@
 #include "english/LetterToSound.h"
 
 #include <array>
-#include <cctype> /* tolower */
 #include <cstddef> /* std::size_t */
 #include <cstdio> /* sprintf */
 #include <cstring> /* strcat, strcmp, strcpy, strlen */
 
+#include "Text.h"
 #include "english/ApplyStress.h"
 #include "english/IspTrans.h"
 #include "english/NumberPronunciations.h"
@@ -41,6 +41,8 @@
 
 
 namespace {
+
+using namespace GS;
 
 /*  DATA TYPES  **************************************************************/
 typedef struct {
@@ -572,14 +574,14 @@ longMedialVowels(char* in, char** endOfWord)
 		if (member(position[2], "aeiouwxy|")) {
 			continue;
 		}
-		if (member(std::tolower(position[3]), "aeiouy")) {
+		if (member(Text::toLower(position[3]), "aeiouy")) {
 			convertToUppercase(position[1]);
 			continue;
 		}
 		if ((!(member(position[2], "bcdfgkpt")) || (position[3] != 'r'))) {
 			continue;
 		}
-		if (member(std::tolower(position[4]), "aeiouy")) {
+		if (member(Text::toLower(position[4]), "aeiouy")) {
 			convertToUppercase(position[1]);
 		}
 		/*  TO FIX cupric WE HAVE TO CHECK FOR |vowel HERE  */
@@ -594,7 +596,7 @@ longMedialVowels(char* in, char** endOfWord)
 			continue;
 		}
 		if ((position[2] == 'h') && (position[1] == 't')) {
-			if (((member(position[3], "ie")) && (member(std::tolower(position[4]), "aou")))
+			if (((member(position[3], "ie")) && (member(Text::toLower(position[4]), "aou")))
 					|| ((position[3] == 'i') && (position[4] == 'e') && (position[5] == 'n'))) {
 				convertToUppercase(*position);
 			}
@@ -602,12 +604,12 @@ longMedialVowels(char* in, char** endOfWord)
 		}
 		if (member(position[1], "bcdfgkpt")) {
 			if ((position[2] == 'r') && (position[3] == 'i'))
-				if (member(std::tolower(position[4]), "aou")) {
+				if (member(Text::toLower(position[4]), "aou")) {
 					convertToUppercase(*position);
 					continue;
 				}
 		}
-		if (((member(position[2], "ie")) && (member(std::tolower(position[3]), "aou")))
+		if (((member(position[2], "ie")) && (member(Text::toLower(position[3]), "aou")))
 				|| ((position[2] == 'i') && (position[3] == 'e') && (position[4] == 'n'))) {
 			convertToUppercase(*position);
 		}
@@ -615,13 +617,13 @@ longMedialVowels(char* in, char** endOfWord)
 
 	/*  McIlroy 4.4 - c  */
 	position = in;
-	while (!member(std::tolower(*position), "aeiouy") && (position < end)) {
+	while (!member(Text::toLower(*position), "aeiouy") && (position < end)) {
 		position++;
 	}
 	if (position == end) {
 		return 0;
 	}
-	if ((member(std::tolower(position[1]), "aou"))
+	if ((member(Text::toLower(position[1]), "aou"))
 			&& ((*position == 'i') || ((*position == 'y') && (position + 1 > in)))) {
 		convertToUppercase(*position);
 	}
@@ -646,7 +648,7 @@ medialSilentE(char* in, char** endOfWord)
 		if ((position[2] != 'l') || (position[3] != 'e')) {
 			continue;		/* le */
 		}
-		if (member(std::tolower(position[4]), "aeiouy")) {
+		if (member(Text::toLower(position[4]), "aeiouy")) {
 			continue;		/* s */
 		}
 		if (position[4] == '|') {
@@ -654,7 +656,7 @@ medialSilentE(char* in, char** endOfWord)
 		}
 
 		index = 5;
-		while (!member(std::tolower(position[index]), "aeiouy|")) {	/* he */
+		while (!member(Text::toLower(position[index]), "aeiouy|")) {	/* he */
 			index++;
 			if (&position[index] >= end) {
 				index = 0;
@@ -680,13 +682,13 @@ medialSilentE(char* in, char** endOfWord)
 		if (!member(position[1], "aiouy")) {
 			continue;
 		}
-		if (member(std::tolower(position[2]), "aehiouwxy")) {
+		if (member(Text::toLower(position[2]), "aehiouwxy")) {
 			continue;
 		}
 		if (position[3] != 'e') {
 			continue;
 		}
-		if (member(std::tolower(position[4]), "aeiouynr")) {
+		if (member(Text::toLower(position[4]), "aeiouynr")) {
 			continue;
 		}
 
@@ -696,7 +698,7 @@ medialSilentE(char* in, char** endOfWord)
 			continue;
 		}
 		index++;
-		if (!member(std::tolower(position[index]), "aeiouy")) {
+		if (!member(Text::toLower(position[index]), "aeiouy")) {
 			continue;
 		}
 		insertMark(&end, &position[3]);
@@ -711,13 +713,13 @@ medialSilentE(char* in, char** endOfWord)
 		if (!member(position[1], "aiouyU")) {
 			continue;
 		}
-		if (member(std::tolower(position[2]), "aehiouwxy")) {
+		if (member(Text::toLower(position[2]), "aehiouwxy")) {
 			continue;
 		}
 		if (position[3] != 'e') {
 			continue;
 		}
-		if (member(std::tolower(position[4]), "aeiouynr")) {
+		if (member(Text::toLower(position[4]), "aeiouynr")) {
 			continue;
 		}
 		index = 5;
@@ -726,7 +728,7 @@ medialSilentE(char* in, char** endOfWord)
 			continue;
 		}
 		index++;
-		if (!member(std::tolower(position[index]), "aeiouy")) {
+		if (!member(Text::toLower(position[index]), "aeiouy")) {
 			continue;
 		}
 		insertMark(&end, &position[3]);
@@ -741,7 +743,7 @@ medialS(char* in, char** eow)
 	char* end = *eow;
 
 	while (in < end - 1) {
-		if ((member(std::tolower(*in), "aeiouy")) && (in[1] == 's')
+		if ((member(Text::toLower(*in), "aeiouy")) && (in[1] == 's')
 				&& (member(in[2], "AEIOUYaeiouym"))) {
 			convertToUppercase(in[1]);
 		}

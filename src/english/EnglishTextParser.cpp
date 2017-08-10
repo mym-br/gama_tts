@@ -45,17 +45,18 @@
 
 #include "english/EnglishTextParser.h"
 
+#include <cctype> /* isdigit, isspace */
 #include <cmath>
-#include <cctype> /* isprint */
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
 
+#include "english/LetterToSound.h"
 #include "Exception.h"
 #include "Log.h"
-#include "english/LetterToSound.h"
+#include "Text.h"
 
 
 
@@ -146,6 +147,7 @@
 
 namespace {
 
+using namespace GS;
 using namespace GS::VTMControlModel;
 
 void printStream(std::stringstream& stream, std::size_t streamLength);
@@ -740,7 +742,7 @@ int
 isAllUpperCase(const char* word)
 {
 	while (*word) {
-		if (!isupper(*word)) {
+		if (!Text::isUpper(*word)) {
 			return 0;
 		}
 		word++;
@@ -762,8 +764,8 @@ toLowerCase(char* word)
 	char* ptr = word;
 
 	while (*ptr) {
-		if (isupper(*ptr)) {
-			*ptr = tolower(*ptr);
+		if (Text::isUpper(*ptr)) {
+			*ptr = Text::toLower(*ptr);
 		}
 		ptr++;
 	}
@@ -1045,9 +1047,8 @@ checkTonic(std::stringstream& stream, long start_pos, long end_pos)
 *
 *       function:       condition_input
 *
-*       purpose:        Converts all non-printable characters (except escape
-*                       character to blanks.  Also connects words hyphenated
-*                       over a newline.
+*       purpose:        Converts all non-printable characters to blanks.
+*                       Also connects words hyphenated over a newline.
 *
 ******************************************************************************/
 void
@@ -1056,7 +1057,7 @@ conditionInput(const char* input, std::size_t inputLength, char* output, std::si
 	std::size_t j = 0;
 
 	for (std::size_t i = 0; i < inputLength; i++) {
-		if ((input[i] == '-') && (i > 0) && isalpha(input[i-1])) {
+		if ((input[i] == '-') && (i > 0) && Text::isAlpha(input[i-1])) {
 			/*  CONNECT HYPHENATED WORD OVER NEWLINE  */
 			std::size_t ii = i;
 			/*  IGNORE ANY WHITE SPACE UP TO NEWLINE  */
@@ -1073,10 +1074,7 @@ conditionInput(const char* input, std::size_t inputLength, char* output, std::si
 			} else { /*  ELSE, OUTPUT HYPHEN  */
 				output[j++] = input[i];
 			}
-		//} else if ( !isascii(input[i]) ) {
-		//TODO: Complete UTF-8 support.
-		// Temporary solution to allow UTF-8 characters.
-		} else if (isascii(input[i]) && !isprint(input[i])) {
+		} else if (!Text::isPrint(input[i])) {
 			/*  CONVERT NONPRINTABLE CHARACTERS TO SPACE  */
 			output[j++] = ' ';
 		} else {
@@ -1471,7 +1469,7 @@ EnglishTextParser::expandWord(char* word, int is_tonic, std::stringstream& strea
 
 	/*  USE degenerate_string IF WORD IS A SINGLE CHARACTER
 	    (EXCEPT SMALL, NON-POSSESSIVE A)  */
-	if ((strlen(word) == 1) && isalpha(word[0])) {
+	if ((strlen(word) == 1) && Text::isAlpha(word[0])) {
 		if (strcmp(word, "a") == 0 && !possessive) {
 			pronunciation = "uh";
 		} else {
@@ -1593,7 +1591,7 @@ EnglishTextParser::expandAbbreviation(char* buffer, std::size_t length, std::siz
 	if ( (i == 1) || ( (i >= 2) &&
 				( (buffer[i-2] == ' ') || (buffer[i-2] == '.') )
 				) ) {
-		if (isalpha(buffer[i-1])) {
+		if (Text::isAlpha(buffer[i-1])) {
 			if ((buffer[i-1] == 'p') && ((i == 1) || ((i >= 2) && (buffer[i-2] != '.')) ) ) {
 				/*  EXPAND p. TO page  */
 				stream.seekp(-1, std::ios_base::cur);
@@ -1601,8 +1599,8 @@ EnglishTextParser::expandAbbreviation(char* buffer, std::size_t length, std::siz
 			} else {
 				/*  ELSE, CAPITALIZE CHARACTER IF NECESSARY, BLANK OUT PERIOD  */
 				stream.seekp(-1, std::ios_base::cur);
-				if (islower(buffer[i-1])) {
-					buffer[i-1] = toupper(buffer[i-1]);
+				if (Text::isLower(buffer[i-1])) {
+					buffer[i-1] = Text::toUpper(buffer[i-1]);
 				}
 				stream << buffer[i-1] << ' ';
 			}
@@ -1617,7 +1615,7 @@ EnglishTextParser::expandAbbreviation(char* buffer, std::size_t length, std::siz
 	for (std::size_t j = 2; j <= 4; j++) {
 		if ( (i == j) ||
 				((i >= j + 1) && (buffer[i-(j+1)] == ' ')) ) {
-			if (isalpha(buffer[i-j]) && isalpha(buffer[i-j+1])) {
+			if (Text::isAlpha(buffer[i-j]) && Text::isAlpha(buffer[i-j+1])) {
 				word_length = j;
 				break;
 			}
@@ -1698,7 +1696,7 @@ EnglishTextParser::stripPunctuation(char* buffer, std::size_t length, std::strin
 				}
 				break;
 			case '\'':
-				if (!((i > 0) && isalpha(buffer[i-1]) && ((i+1) < length) && isalpha(buffer[i+1]))) {
+				if (!((i > 0) && Text::isAlpha(buffer[i-1]) && ((i+1) < length) && Text::isAlpha(buffer[i+1]))) {
 					buffer[i] = ' ';
 				}
 				break;
@@ -1832,7 +1830,7 @@ EnglishTextParser::stripPunctuation(char* buffer, std::size_t length, std::strin
 				stream << buffer[i];
 				if (isPunctuation(buffer[i])) {
 					status = PUNCTUATION;
-				} else if (isalnum(buffer[i])) {
+				} else if (Text::isAlphaNum(buffer[i])) {
 					status = WORD;
 				}
 				break;
