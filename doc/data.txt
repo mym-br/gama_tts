@@ -1,6 +1,6 @@
 
-Contents of data/english/vtmX
------------------------------
+Contents of data/english/vtm0 to vtm5
+-------------------------------------
 
 artic.xml
 	Contains the articulatory database.
@@ -9,7 +9,7 @@ artic.xml
 	GamaTTS:Editor is recommended.
 
 interactive.config
-	Configuration file for GamaTTS:Interactive.
+	Configuration file for the interactive vocal tract model.
 
 intonation.txt
 	Controls the intonation.
@@ -24,8 +24,6 @@ voice_large_child.config
 voice_male.config
 voice_small_child.config
 	Contain the voice parameters.
-
-	Interesting parameters are:
 
 		vocal_tract_length
 
@@ -51,11 +49,9 @@ voice_small_child.config
 vtm_control_model.config
 	Contains the parameters for the vocal tract model controller.
 
-	Interesting parameters are:
-
 		voice_name
-			If it is set to EXAMPLE the voice file named
-			voice_EXAMPLE.config will be loaded.
+			Example: If voice_name = male, the voice file named
+			voice_male.config will be loaded.
 		tempo
 			Values greater than 1.0 will speed up the speech.
 		pitch_offset
@@ -74,17 +70,31 @@ vtm_control_model.config
 
 vtm.config
 	Contains the parameters for the vocal tract model.
+
+		model
+			The vocal tract model type.
 		vocal_tract_length_offset
 			This value is added to the vocal tract length.
 
+pho1_parser/
+	Configuration for the phonetic string parser (MBROLA format).
+
+		phoneme_map-*.txt
+			Contains the mapping between the input phonemes and the
+			internal phonemes (Postures).
+
 phonetic_string_parser/
-	rewrite.txt
-		Contains rules that may modify the phonetic string.
+	Configuration for the phonetic string parser (Gnuspeech format).
+
+		rewrite.txt
+			Contains rules that may modify the phonetic string.
 
 text_parser/
-	abbreviations_with_number.txt
-	abbreviations.txt
-	main_dictionary.txt
-		Contains the main dictionary, which relates words to postures.
-	special_acronyms.txt
-	suffix_list.txt
+	Configuration for the text to phonetic string converter.
+
+		abbreviations_with_number.txt
+		abbreviations.txt
+		main_dictionary.txt
+			The main dictionary, which relates words to postures.
+		special_acronyms.txt
+		suffix_list.txt
