@@ -1,11 +1,19 @@
-Phonetic string format
-======================
+Phonetic string format (Gnuspeech)
+==================================
 
-Valid posture names contain only:
-	alphabetic character (ASCII)
-	^
+- Valid Posture names contain Unicode characters except:
+	0000-0020
+	007F (DEL)
 	'
-	#
+	_
+	*
+	.
+	/
+	0-9
+
+- Postures are separated by _ (underscore).
+
+- Other symbols:
 
 /0		Set current tone group type: statement
 /1		Set current tone group type: exclamation
