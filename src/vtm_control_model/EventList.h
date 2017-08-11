@@ -21,7 +21,6 @@
 #ifndef VTM_CONTROL_MODEL_EVENT_LIST_H_
 #define VTM_CONTROL_MODEL_EVENT_LIST_H_
 
-#include <cassert>
 #include <cstddef> /* std::size_t */
 #include <memory>
 #include <random>
@@ -226,12 +225,6 @@ public:
 
 	void addPostureIntonationPoint(int postureIndex, double position, double semitone);
 private:
-	enum RuleType {
-		DIPHONE    = 2,
-		TRIPHONE   = 3,
-		TETRAPHONE = 4
-	};
-
 	EventList(const EventList&) = delete;
 	EventList& operator=(const EventList&) = delete;
 
@@ -247,7 +240,7 @@ private:
 			const std::vector<double>& minParam, const std::vector<double>& maxParam);
 	void printDataStructures();
 	double createSlopeRatioEvents(const Transition::SlopeRatio& slopeRatio,
-			double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier, bool lastGroup);
+			double baseline, double parameterDelta, double min, double max, int parameter, double timeMultiplier, bool lastGroup);
 
 	Model& model_;
 

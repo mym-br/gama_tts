@@ -30,16 +30,6 @@ namespace GS {
 namespace VTMControlModel {
 
 double
-Transition::SlopeRatio::totalSlopeUnits() const
-{
-	double temp = 0.0;
-	for (const auto& slope : slopeList) {
-		temp += slope->slope;
-	}
-	return temp;
-}
-
-double
 Transition::getPointTime(const Transition::Point& point, const Model& model)
 {
 	if (!point.timeExpression) {

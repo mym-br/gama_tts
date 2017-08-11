@@ -20,6 +20,7 @@
 
 #include "EventList.h"
 
+#include <cassert>
 #include <cstring>
 #include <limits> /* std::numeric_limits<double>::infinity() */
 #include <sstream>
@@ -83,15 +84,15 @@ EventList::setUp()
 	currentPosture_ = 0;
 
 	feet_.clear();
-	feet_.push_back(Foot());
+	feet_.push_back(Foot{});
 	currentFoot_ = 0;
 
 	toneGroups_.clear();
-	toneGroups_.push_back(ToneGroup());
+	toneGroups_.push_back(ToneGroup{});
 	currentToneGroup_ = 0;
 
 	ruleData_.clear();
-	ruleData_.push_back(RuleData());
+	ruleData_.push_back(RuleData{});
 	currentRule_ = 0;
 
 	intonationPoints_.clear();
@@ -202,16 +203,15 @@ EventList::parseGroups(int index, int number, FILE* fp)
 void
 EventList::initToneGroups(const char* configDirPath)
 {
-	FILE* fp;
-	char line[256];
-	int count = 0;
-
 	std::ostringstream path;
 	path << configDirPath << INTONATION_CONFIG_FILE_NAME;
-	fp = fopen(path.str().c_str(), "rb");
+	FILE* fp = fopen(path.str().c_str(), "rb");
 	if (fp == NULL) {
 		THROW_EXCEPTION(IOException, "Could not open the file " << path.str().c_str() << '.');
 	}
+
+	char line[256];
+	int count = 0;
 	while (fgets(line, 256, fp) != NULL) {
 		if ((line[0] == '#') || (line[0] == ' ')) {
 			// Skip.
@@ -443,62 +443,49 @@ EventList::setZeroRef(int newValue)
 }
 
 double
-EventList::createSlopeRatioEvents(
-		const Transition::SlopeRatio& slopeRatio,
-		double baseline, double parameterDelta, double min, double max, int eventIndex, double timeMultiplier, bool lastGroup)
+EventList::createSlopeRatioEvents(const Transition::SlopeRatio& slopeRatio,
+		double baseline, double parameterDelta, double min, double max, int parameter, double timeMultiplier, bool lastGroup)
 {
-	double temp = 0.0, temp1 = 0.0, intervalTime = 0.0, sum = 0.0, factor = 0.0;
-	double baseTime = 0.0, endTime = 0.0, totalTime = 0.0, delta = 0.0;
-	double startValue;
+	const unsigned int numPoints = slopeRatio.pointList.size();
+	const unsigned int numSlopes = slopeRatio.slopeList.size();
+	if (numPoints == 0 || numSlopes == 0) {
+		THROW_EXCEPTION(MissingValueException, "Empty slope ratio.");
+	}
+	if (numPoints != numSlopes + 1) {
+		THROW_EXCEPTION(InvalidValueException, "The number of slope points is not equal to the number of slopes plus one.");
+	}
+
 	double pointTime, pointValue;
 
 	Transition::getPointData(*slopeRatio.pointList.front(), model_, pointTime, pointValue);
-	baseTime = pointTime;
-	startValue = pointValue;
+	const double startValue = pointValue;
 
 	Transition::getPointData(*slopeRatio.pointList.back(), model_, pointTime, pointValue);
-	endTime = pointTime;
-	delta = pointValue - startValue;
+	const double valueDelta = pointValue - startValue;
 
-	temp = slopeRatio.totalSlopeUnits();
-	totalTime = endTime - baseTime;
-
-	int numSlopes = slopeRatio.slopeList.size();
-	std::vector<double> newPointValues(numSlopes - 1);
-	for (int i = 1; i < numSlopes + 1; i++) {
-		temp1 = slopeRatio.slopeList[i - 1]->slope / temp; /* Calculate normal slope */
-
-		/* Calculate time interval */
-		intervalTime = Transition::getPointTime(*slopeRatio.pointList[i], model_)
-				- Transition::getPointTime(*slopeRatio.pointList[i - 1], model_);
-
-		/* Apply interval percentage to slope */
-		temp1 = temp1 * (intervalTime / totalTime);
-
-		/* Multiply by delta and add to last point */
-		temp1 = temp1 * delta;
-		sum += temp1;
-
+	std::vector<double> tempPointValues(numSlopes - 1);
+	double sum = 0.0;
+	for (unsigned int i = 1; i < numPoints; ++i) {
+		const double deltaTime = Transition::getPointTime(*slopeRatio.pointList[i], model_)
+						- Transition::getPointTime(*slopeRatio.pointList[i - 1], model_);
+		const double value = slopeRatio.slopeList[i - 1]->slope * deltaTime;
+		sum += value;
 		if (i < numSlopes) {
-			newPointValues[i - 1] = temp1;
+			tempPointValues[i - 1] = value; // will be multiplied by "factor"
 		}
 	}
-	factor = delta / sum;
-	temp = startValue;
+	const double factor = valueDelta / sum;
 
+	double baseValue = startValue;
 	double value = 0.0;
-	for (unsigned int i = 0, size = slopeRatio.pointList.size(); i < size; i++) {
+	for (unsigned int i = 0; i < numPoints; ++i) {
 		const Transition::Point& point = *slopeRatio.pointList[i];
-		const bool last = (i == slopeRatio.pointList.size() - 1);
 
-		if (i >= 1 && i < slopeRatio.pointList.size() - 1) {
+		if (i >= 1 && i < numPoints - 1) {
 			pointTime = Transition::getPointTime(point, model_);
-
-			pointValue = newPointValues[i - 1];
-			pointValue *= factor;
-			pointValue += temp;
-			temp = pointValue;
-		} else {
+			pointValue = baseValue + tempPointValues[i - 1] * factor;
+			baseValue = pointValue;
+		} else { // the first and the last points
 			Transition::getPointData(point, model_, pointTime, pointValue);
 		}
 
@@ -508,41 +495,35 @@ EventList::createSlopeRatioEvents(
 		} else if (value > max) {
 			value = max;
 		}
-		if (!(lastGroup && last)) { // not a "phantom" point
-			insertEvent(pointTime * timeMultiplier, eventIndex, value, false);
+		if (!(lastGroup && (i == numPoints - 1))) { // not a "phantom" point
+			insertEvent(pointTime * timeMultiplier, parameter, value, false);
 		}
 	}
 
 	return value;
 }
 
-// It is assumed that postureList.size() >= 2.
 void
 EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ruleExpressionData, unsigned int basePostureIndex,
 			const std::vector<double>& minParam, const std::vector<double>& maxParam)
 {
 	const unsigned int numPostures = ruleExpressionData.size();
-	int cont;
-	int currentType;
-	double currentValueDelta, value, lastValue;
-	double tempTime;
-	double targets[4];
-	Event* tempEvent = nullptr;
+	assert(numPostures >= 2 && numPostures <= 4);
+	const unsigned int numParam = model_.parameterList().size();
 
 	double ruleSymbols[Rule::NUM_SYMBOLS];
 	rule.evaluateExpressionSymbols(ruleExpressionData, model_, ruleSymbols);
 
 	const double timeMultiplier = 1.0 / postureData_[basePostureIndex].ruleTempo;
-
 	if (timeMultiplier != 1.0) {
 		for (int i = 0; i < Rule::NUM_SYMBOLS; ++i) {
 			ruleSymbols[i] *= timeMultiplier;
 		}
 	}
-	int type = rule.numberOfExpressions();
+	const unsigned int ruleType = rule.numberOfExpressions();
 
 	ruleData_[currentRule_].firstPosture = basePostureIndex;
-	ruleData_[currentRule_].lastPosture  = basePostureIndex + (type - 1);
+	ruleData_[currentRule_].lastPosture  = basePostureIndex + (ruleType - 1U);
 	ruleData_[currentRule_].start    = zeroRef_;
 	ruleData_[currentRule_].mark1    = ruleSymbols[Rule::SYMB_MARK1];
 	ruleData_[currentRule_].mark2    = ruleSymbols[Rule::SYMB_MARK2];
@@ -554,33 +535,32 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 	ruleData_.push_back(RuleData{});
 	++currentRule_;
 
-	switch (type) {
-	/* Note: Case 4 should execute all of the below, case 3 the last two */
-	case 4:
+	switch (ruleType) {
+	case Rule::TYPE_TETRAPHONE:
 		if (numPostures == 4) {
 			postureData_[basePostureIndex + 3].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
-			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK2], -1, 0.0, false);
+			Event* tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK2], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
-	case 3:
+	case Rule::TYPE_TRIPHONE:
 		if (numPostures >= 3) {
 			postureData_[basePostureIndex + 2].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
-			tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK1], -1, 0.0, false);
+			Event* tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK1], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
-	case 2:
+	case Rule::TYPE_DIPHONE:
 		postureData_[basePostureIndex + 1].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
-		tempEvent = insertEvent(0.0, -1, 0.0, false);
+		Event* tempEvent = insertEvent(0.0, -1, 0.0, false);
 		if (tempEvent) tempEvent->flag = 1;
 		break;
 	}
 
-	//tempTargets = (List *) [rule parameterList];
-
 	/* Loop through the parameters */
-	for (unsigned int i = 0, size = model_.parameterList().size(); i < size; ++i) {
+	for (unsigned int i = 0; i < numParam; ++i) {
+		double targets[4];
+
 		/* Get actual parameter target values */
 		targets[0] = postureData_[basePostureIndex].posture->getParameterTarget(i);
 		targets[1] = postureData_[basePostureIndex + 1].posture->getParameterTarget(i);
@@ -588,42 +568,45 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 		targets[3] = (numPostures == 4) ? postureData_[basePostureIndex + 3].posture->getParameterTarget(i) : 0.0;
 
 		/* Optimization, Don't calculate if no changes occur */
-		cont = 1;
-		switch (type) {
-		case DIPHONE:
+		bool equalTargets = false;
+		switch (ruleType) {
+		case Rule::TYPE_DIPHONE:
 			if (targets[0] == targets[1]) {
-				cont = 0;
+				equalTargets = true;
 			}
 			break;
-		case TRIPHONE:
+		case Rule::TYPE_TRIPHONE:
 			if ((targets[0] == targets[1]) && (targets[0] == targets[2])) {
-				cont = 0;
+				equalTargets = true;
 			}
 			break;
-		case TETRAPHONE:
+		case Rule::TYPE_TETRAPHONE:
 			if ((targets[0] == targets[1]) && (targets[0] == targets[2]) && (targets[0] == targets[3])) {
-				cont = 0;
+				equalTargets = true;
 			}
 			break;
 		}
 
 		insertEvent(0.0, i, targets[0], false);
 
-		if (cont) {
-			currentType = DIPHONE;
-			currentValueDelta = targets[1] - targets[0];
-			lastValue = targets[0];
-			//lastValue = 0.0;
+		if (!equalTargets) {
+			auto currentType = Transition::Point::TYPE_DIPHONE;
+			double currentValueDelta = targets[1] - targets[0];
+			double lastValue = targets[0];
+			double value{};
 
 			const std::shared_ptr<Transition> transition = rule.getParamProfileTransition(i);
 			if (!transition) {
-				THROW_EXCEPTION(UnavailableResourceException, "Rule transition not found: " << i << '.');
+				THROW_EXCEPTION(UnavailableResourceException, "Rule transition not found (rule: "
+						<< ruleData_[currentRule_ - 1].number << " parameter: " << i << ").");
 			}
 
-			/* Apply lists to parameter */
-			for (unsigned int j = 0; j < transition->pointOrSlopeList().size(); ++j) {
+			// Generate events from the transition points.
+			// The points must be sorted by type.
+			const unsigned int numPointsOrSlopes = transition->pointOrSlopeList().size();
+			for (unsigned int j = 0; j < numPointsOrSlopes; ++j) {
 				const Transition::PointOrSlope& pointOrSlope = *transition->pointOrSlopeList()[j];
-				const bool last = (j == transition->pointOrSlopeList().size() - 1);
+				const bool last = (j == numPointsOrSlopes - 1);
 				if (pointOrSlope.isSlopeRatio()) {
 					const auto& slopeRatio = dynamic_cast<const Transition::SlopeRatio&>(pointOrSlope);
 					if (slopeRatio.pointList.empty()) {
@@ -640,7 +623,6 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 							minParam[i], maxParam[i], i, timeMultiplier, last);
 				} else {
 					const auto& point = dynamic_cast<const Transition::Point&>(pointOrSlope);
-
 					if (point.type != currentType) {
 						currentType = point.type;
 						targets[currentType - 2] = lastValue;
@@ -657,41 +639,37 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 				lastValue = value;
 			}
 		}
-		//else {
-		//	insertEvent(i, 0.0, targets[0]);
-		//}
 	}
 
 	/* Special Event Profiles */
-	for (unsigned int i = 0, size = model_.parameterList().size(); i < size; ++i) {
+	for (unsigned int i = 0; i < numParam; ++i) {
 		const std::shared_ptr<Transition> specialTransition = rule.getSpecialProfileTransition(i);
 		if (specialTransition) {
-			for (unsigned int j = 0; j < specialTransition->pointOrSlopeList().size(); ++j) {
+			for (unsigned int j = 0, size = specialTransition->pointOrSlopeList().size(); j < size; ++j) {
 				const Transition::PointOrSlope& pointOrSlope = *specialTransition->pointOrSlopeList()[j];
 				const auto& point = dynamic_cast<const Transition::Point&>(pointOrSlope);
 
 				/* calculate time of event */
-				tempTime = Transition::getPointTime(point, model_);
+				const double time = Transition::getPointTime(point, model_);
 
 				/* Calculate value of event */
-				value = ((point.value / 100.0) * (maxParam[i] - minParam[i]));
-				//maxValue = value;
+				const double value = ((point.value / 100.0) * (maxParam[i] - minParam[i]));
 
 				/* insert event into event list */
-				insertEvent(tempTime * timeMultiplier, i, value, true);
+				insertEvent(time * timeMultiplier, i, value, true);
 			}
 		}
 	}
 
 	setZeroRef(static_cast<int>(ruleSymbols[Rule::SYMB_DURATION]) + zeroRef_);
-	tempEvent = insertEvent(0.0, -1, 0.0, false);
+	Event* tempEvent = insertEvent(0.0, -1, 0.0, false); // insert at rule duration
 	if (tempEvent) tempEvent->flag = 1;
 }
 
 void
 EventList::generateEventList()
 {
-	const std::size_t numParam = model_.parameterList().size();
+	const unsigned int numParam = model_.parameterList().size();
 	std::vector<double> minParam(numParam);
 	std::vector<double> maxParam(numParam);
 	for (unsigned int i = 0; i < numParam; ++i) {
@@ -754,8 +732,6 @@ EventList::generateEventList()
 
 		basePostureIndex += rule->numberOfExpressions() - 1;
 	}
-
-	//[dataPtr[numElements-1] setFlag:1];
 }
 
 void
@@ -763,7 +739,7 @@ EventList::setFullTimeScale()
 {
 	zeroRef_ = 0;
 	zeroIndex_ = 0;
-	duration_ = list_.back()->time + 100;
+	duration_ = list_.back()->time + 100; // hardcoded
 }
 
 void
@@ -771,16 +747,9 @@ EventList::applyIntonation()
 {
 	if (list_.empty()) return;
 
-	int tgRandom;
-	int firstFoot, endFoot;
-	int ruleIndex = 0, postureIndex;
-	int i, j, k;
-	double startTime, endTime, pretonicDelta, offsetTime = 0.0;
-	double randomSemitone, randomSlope;
-
 	zeroRef_ = 0;
 	zeroIndex_ = 0;
-	duration_ = list_.back()->time + 100;
+	duration_ = list_.back()->time + 100; // hardcoded
 
 	std::shared_ptr<const Category> vocoidCategory = model_.findCategory("vocoid"); // hardcoded
 	if (!vocoidCategory) {
@@ -792,18 +761,19 @@ EventList::applyIntonation()
 	std::uniform_int_distribution<> intRandDist2(0, tgCount_[2] > 0 ? tgCount_[2] - 1 : 0);
 	std::uniform_int_distribution<> intRandDist3(0, tgCount_[3] > 0 ? tgCount_[3] - 1 : 0);
 
-	for (i = 0; i < currentToneGroup_; i++) {
-		firstFoot = toneGroups_[i].startFoot;
-		endFoot = toneGroups_[i].endFoot;
+	double offsetTime = 0.0;
+	int ruleIndex = 0;
+	for (int i = 0; i < currentToneGroup_; i++) {
+		const int firstFoot = toneGroups_[i].startFoot;
+		const int endFoot   = toneGroups_[i].endFoot;
 
-		startTime = postureData_[feet_[firstFoot].start].onset;
-		endTime = postureData_[feet_[endFoot].end].onset;
-
-		//printf("Tg: %d First: %d  end: %d  StartTime: %f  endTime: %f\n", i, firstFoot, endFoot, startTime, endTime);
+		const double startTime = postureData_[feet_[firstFoot].start].onset;
+		const double endTime = postureData_[feet_[endFoot].end].onset;
 
 		if (useFixedIntonationParameters_) {
 			intonParms_ = fixedIntonationParameters_;
 		} else {
+			int tgRandom{};
 			switch (toneGroups_[i].type) {
 			default:
 			case TONE_GROUP_TYPE_STATEMENT:
@@ -849,20 +819,13 @@ EventList::applyIntonation()
 			}
 		}
 
-		//printf("Intonation Parameters: Type : %d  random: %d\n", toneGroups[i].type, tgRandom);
-		//for (j = 0; j<6; j++)
-		//	printf("%f ", intonParms[j]);
-		//printf("\n");
-
-		pretonicDelta = (intonParms_[1]) / (endTime - startTime);
-		//printf("Pretonic Delta = %f time = %f\n", pretonicDelta, (endTime - startTime));
+		const double pretonicDelta = intonParms_[1] / (endTime - startTime);
 
 		/* Set up intonation boundary variables */
-		for (j = firstFoot; j <= endFoot; j++) {
-			postureIndex = feet_[j].start;
+		for (int j = firstFoot; j <= endFoot; j++) {
+			int postureIndex = feet_[j].start;
 			while (!postureData_[postureIndex].posture->isMemberOfCategory(*vocoidCategory)) {
 				postureIndex++;
-				//printf("Checking posture %s for vocoid\n", [posture[postureIndex].posture symbol]);
 				if (postureIndex > feet_[j].end) {
 					postureIndex = feet_[j].start;
 					break;
@@ -870,13 +833,14 @@ EventList::applyIntonation()
 			}
 
 			if (!feet_[j].marked) {
-				for (k = 0; k < currentRule_; k++) {
+				for (int k = 0; k < currentRule_; k++) {
 					if ((postureIndex >= ruleData_[k].firstPosture) && (postureIndex <= ruleData_[k].lastPosture)) {
 						ruleIndex = k;
 						break;
 					}
 				}
 
+				double randomSemitone, randomSlope;
 				if (tgUseRandom_) {
 					randomSemitone = randDist_(randSrc_) * intonParms_[3] - intonParms_[3] / 2.0;
 					randomSlope = randDist_(randSrc_) * 0.015 + 0.01; // hardcoded
@@ -885,20 +849,18 @@ EventList::applyIntonation()
 					randomSlope = 0.02; // hardcoded
 				}
 
-				//printf("postureIndex = %d onsetTime : %f Delta: %f\n", postureIndex,
-				//	postures[postureIndex].onset-startTime,
-				//	((postures[postureIndex].onset-startTime)*pretonicDelta) + intonParms[1] + randomSemitone);
-
 				addIntonationPoint((postureData_[postureIndex].onset - startTime) * pretonicDelta + intonParms_[1] + randomSemitone,
 							offsetTime, randomSlope, ruleIndex);
 			} else { /* Tonic */
+				double randomSemitone, randomSlope;
+
 				if (toneGroups_[i].type == 3) {
 					randomSlope = 0.01; // hardcoded
 				} else {
 					randomSlope = 0.02; // hardcoded
 				}
 
-				for (k = 0; k < currentRule_; k++) {
+				for (int k = 0; k < currentRule_; k++) {
 					if ((postureIndex >= ruleData_[k].firstPosture) && (postureIndex <= ruleData_[k].lastPosture)) {
 						ruleIndex = k;
 						break;
@@ -916,7 +878,7 @@ EventList::applyIntonation()
 							offsetTime, randomSlope, ruleIndex);
 
 				postureIndex = feet_[j].end;
-				for (k = ruleIndex; k < currentRule_; k++) {
+				for (int k = ruleIndex; k < currentRule_; k++) {
 					if ((postureIndex >= ruleData_[k].firstPosture) && (postureIndex <= ruleData_[k].lastPosture)) {
 						ruleIndex = k;
 						break;
@@ -1041,33 +1003,34 @@ EventList::generateOutput(std::vector<std::vector<float>>& vtmParamList)
 	}
 
 	const unsigned int numParam = model_.parameterList().size();
+	const unsigned int numEvents = list_.size();
 	std::vector<double> currentValues(numParam, 0.0);
 	std::vector<double> currentDeltas(numParam, 0.0);
 	std::vector<double> currentSpecialValues(numParam, 0.0);
 	std::vector<double> currentSpecialDeltas(numParam, 0.0);
-	std::vector<float> param(numParam, 0.0);
-	double pa{}, pb{}, pc{}, pd{}; // coefficients for polynomial interpolation
-	double temp;
 
+	// Set current values and deltas for normal parameters.
 	for (unsigned int i = 0; i < numParam; ++i) {
-		currentValues[i] = list_[0]->getParameter(i, false);
+		currentValues[i] = list_[0]->getParameter(i, false); // the first event contains the parameters of the first posture
 		unsigned int j = 1;
-		while ((temp = list_[j]->getParameter(i, false)) == Event::EMPTY_PARAMETER) {
-			if (++j >= list_.size()) break;
+		double value;
+		while ((value = list_[j]->getParameter(i, false)) == Event::EMPTY_PARAMETER) {
+			if (++j >= numEvents) break;
 		}
-		if (j < list_.size()) {
-			currentDeltas[i] = ((temp - currentValues[i]) / static_cast<double>(list_[j]->time)) * controlPeriod_;
-		} else {
-			currentDeltas[i] = 0.0;
+		if (j < numEvents) {
+			currentDeltas[i] = ((value - currentValues[i]) / list_[j]->time) * controlPeriod_;
 		}
 	}
 
+	double pa{}, pb{}, pc{}, pd{}; // coefficients for polynomial interpolation (macro intonation)
+
+	// Configure first segment of the macro intonation curve.
 	if (macroIntonation_) {
-		unsigned int j = 0, size = list_.size();
-		for ( ; j < size; ++j) {
+		unsigned int j = 0;
+		for ( ; j < numEvents; ++j) {
 			if (list_[j]->interpData) break;
 		}
-		if (j < size) {
+		if (j < numEvents) {
 			const double y1 = -20.0; // hardcoded initial pitch
 			const double x2 = list_[j]->time;
 			const InterpolationData& data = *list_[j]->interpData;
@@ -1085,30 +1048,37 @@ EventList::generateOutput(std::vector<std::vector<float>>& vtmParamList)
 	}
 
 	unsigned int targetIndex = 1; // stores the index of the next target event
+	int targetTime = list_[targetIndex]->time;
 	int currentTime = 0; // absolute time in ms
-	int nextTime = list_[1]->time;
-	while (targetIndex < list_.size()) {
+	std::vector<float> param(numParam, 0.0);
+	// Loop for each control period.
+	while (targetIndex < numEvents) {
 		// Add normal parameters and special parameters.
 		for (unsigned int j = 0; j < numParam; ++j) {
-			param[j] = static_cast<float>(currentValues[j]) + static_cast<float>(currentSpecialValues[j]);
+			param[j] = static_cast<float>(currentValues[j] + currentSpecialValues[j]);
 		}
 
 		// Intonation.
+		// Hardcoded: parameter 0 is always the pitch.
 		if (!microIntonation_) param[0] = 0.0;
 		if (intonationDrift_)  param[0] += static_cast<float>(driftGenerator_.drift());
 		if (macroIntonation_) {
 			const double x = currentTime;
-			float intonation;
+			double intonation;
 			if (smoothIntonation_) {
 				intonation = x * (x * (x * pa + pb) + pc) + pd;
 			} else {
 				intonation = x * pa + pb;
 			}
-			param[0] += intonation;
+			param[0] += static_cast<float>(intonation);
 		}
 		param[0] += static_cast<float>(pitchMean_);
 
+		// Store the current parameter values.
 		vtmParamList.push_back(param);
+
+		//--------------------------------------------------------------
+		// Prepare for the next iteration.
 
 		// Linear interpolation of the parameters.
 		for (unsigned int j = 0; j < numParam; ++j) {
@@ -1124,45 +1094,53 @@ EventList::generateOutput(std::vector<std::vector<float>>& vtmParamList)
 
 		currentTime += controlPeriod_;
 
-		if (currentTime >= nextTime) {
+		if (currentTime >= targetTime) {
 			// Next interval.
-			++targetIndex;
-			if (targetIndex == list_.size()) {
-				break;
+			if (++targetIndex == numEvents) {
+				break; // all events processed
 			}
-			nextTime = list_[targetIndex]->time;
+			targetTime = list_[targetIndex]->time;
+
+			// Set current values and deltas for normal parameters.
 			for (unsigned int j = 0; j < numParam; ++j) {
+				// If the current event contains a value for the parameter:
 				if (list_[targetIndex - 1]->getParameter(j, false) != Event::EMPTY_PARAMETER) {
 					unsigned int k = targetIndex;
-					while ((temp = list_[k]->getParameter(j, false)) == Event::EMPTY_PARAMETER) {
-						if (++k >= list_.size()) break;
+					double value;
+					// Search for an event with value for this parameter.
+					while ((value = list_[k]->getParameter(j, false)) == Event::EMPTY_PARAMETER) {
+						if (++k >= numEvents) break;
 					}
-					if (temp != Event::EMPTY_PARAMETER) {
+					if (value != Event::EMPTY_PARAMETER) { // found
 						// Prepare linear interpolation.
-						currentDeltas[j] = (temp - currentValues[j]) / (list_[k]->time - currentTime);
-						currentDeltas[j] *= controlPeriod_;
-					} else {
+						currentDeltas[j] = ((value - currentValues[j]) / (list_[k]->time - currentTime)) * controlPeriod_;
+					} else { // there are no more events with value for this parameter
 						currentDeltas[j] = 0.0;
 					}
 				}
 			}
+			// Set current values and deltas for special parameters.
 			for (unsigned int j = 0; j < numParam; ++j) {
+				// If the current event contains a value for the special parameter:
 				if (list_[targetIndex - 1]->getParameter(j, true) != Event::EMPTY_PARAMETER) {
 					unsigned int k = targetIndex;
-					while ((temp = list_[k]->getParameter(j, true)) == Event::EMPTY_PARAMETER) {
-						if (++k >= list_.size()) break;
+					double value;
+					// Search for an event with value for this special parameter.
+					while ((value = list_[k]->getParameter(j, true)) == Event::EMPTY_PARAMETER) {
+						if (++k >= numEvents) break;
 					}
-					if (temp != Event::EMPTY_PARAMETER) {
+					if (value != Event::EMPTY_PARAMETER) { // found
 						// Prepare linear interpolation.
-						currentSpecialDeltas[j] = (temp - currentSpecialValues[j]) / (list_[k]->time - currentTime);
-						currentSpecialDeltas[j] *= controlPeriod_;
-					} else {
+						currentSpecialDeltas[j] = ((value - currentSpecialValues[j]) / (list_[k]->time - currentTime)) * controlPeriod_;
+					} else { // there are no more events with value for this special parameter
 						currentSpecialDeltas[j] = 0.0;
 					}
 				}
 			}
 
 			if (macroIntonation_) {
+				// If the current event contains data for intonation interpolation,
+				// setup the interpolation.
 				if (list_[targetIndex - 1]->interpData) {
 					const InterpolationData& data = *list_[targetIndex - 1]->interpData;
 					pa = data.a;
@@ -1216,7 +1194,8 @@ EventList::printDataStructures()
 	printf("\nPostures %d\n", currentPosture_);
 	for (unsigned int i = 0; i < currentPosture_; i++) {
 		printf("DEBUG_POSTURE %u  \"%s\" tempo: %f syllable: %d onset: %f ruleTempo: %f\n",
-			 i, postureData_[i].posture->name().c_str(), postureData_[i].tempo, postureData_[i].syllable, postureData_[i].onset, postureData_[i].ruleTempo);
+			i, postureData_[i].posture->name().c_str(), postureData_[i].tempo, postureData_[i].syllable,
+			postureData_[i].onset, postureData_[i].ruleTempo);
 	}
 
 	printf("\nRules %d\n", currentRule_);

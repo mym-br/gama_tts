@@ -139,6 +139,12 @@ private:
 
 class Rule {
 public:
+	enum Type {
+		TYPE_INVALID    = 0,
+		TYPE_DIPHONE    = 2,
+		TYPE_TRIPHONE   = 3,
+		TYPE_TETRAPHONE = 4
+	};
 	enum Symbol {
 		SYMB_DURATION,
 		SYMB_BEAT,

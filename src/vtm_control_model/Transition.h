@@ -121,7 +121,6 @@ public:
 		virtual ~SlopeRatio() {}
 
 		virtual bool isSlopeRatio() const { return true; }
-		double totalSlopeUnits() const;
 	private:
 		SlopeRatio(const SlopeRatio&) = delete;
 		SlopeRatio& operator=(const SlopeRatio&) = delete;
