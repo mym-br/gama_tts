@@ -28,10 +28,10 @@ struct Configuration;
 
 class TextParser {
 public:
-	enum Mode {
-		MODE_NORMAL,
-		MODE_EMPHASIS,
-		MODE_LETTER
+	enum class Mode {
+		normal,
+		emphasis,
+		letter
 	};
 
 	virtual ~TextParser() {}

@@ -29,9 +29,9 @@ TextParser::getInstance(const std::string& configDirPath, const Configuration& c
 {
 	TextParser::Mode textParserMode;
 	switch (config.textParserMode) {
-	case 0: textParserMode = MODE_NORMAL  ; break;
-	case 1: textParserMode = MODE_EMPHASIS; break;
-	case 2: textParserMode = MODE_LETTER  ; break;
+	case 0: textParserMode = Mode::normal  ; break;
+	case 1: textParserMode = Mode::emphasis; break;
+	case 2: textParserMode = Mode::letter  ; break;
 	default:
 		THROW_EXCEPTION(InvalidValueException, "Invalid text parser mode: " << config.textParserMode << '.');
 	}

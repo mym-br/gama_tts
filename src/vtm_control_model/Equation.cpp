@@ -44,7 +44,7 @@ public:
 				: formulaSymbolMap_(formulaSymbol.codeMap)
 				, s_(GS::Text::trim(s))
 				, pos_(0)
-				, symbolType_(SYMBOL_TYPE_INVALID) {
+				, symbolType_(SymbolType::invalid) {
 		if (s_.empty()) {
 			THROW_EXCEPTION(GS::VTMControlModelException, "Formula expression parser error: Empty string.");
 		}
@@ -53,15 +53,15 @@ public:
 
 	FormulaNode_ptr parse();
 private:
-	enum SymbolType {
-		SYMBOL_TYPE_INVALID,
-		SYMBOL_TYPE_ADD,
-		SYMBOL_TYPE_SUB,
-		SYMBOL_TYPE_MULT,
-		SYMBOL_TYPE_DIV,
-		SYMBOL_TYPE_RIGHT_PAREN,
-		SYMBOL_TYPE_LEFT_PAREN,
-		SYMBOL_TYPE_STRING
+	enum class SymbolType {
+		invalid,
+		add,
+		sub,
+		mult,
+		div,
+		rightParen,
+		leftParen,
+		string
 	};
 
 	[[noreturn]] void throwException(const char* errorDescription) const;
@@ -121,7 +121,7 @@ FormulaNodeParser::nextSymbol()
 	symbol_.resize(0);
 
 	if (finished()) {
-		symbolType_ = SYMBOL_TYPE_INVALID;
+		symbolType_ = SymbolType::invalid;
 		return;
 	}
 
@@ -129,25 +129,25 @@ FormulaNodeParser::nextSymbol()
 	symbol_ = c;
 	switch (c) {
 	case addChar:
-		symbolType_ = SYMBOL_TYPE_ADD;
+		symbolType_ = SymbolType::add;
 		break;
 	case subChar:
-		symbolType_ = SYMBOL_TYPE_SUB;
+		symbolType_ = SymbolType::sub;
 		break;
 	case multChar:
-		symbolType_ = SYMBOL_TYPE_MULT;
+		symbolType_ = SymbolType::mult;
 		break;
 	case divChar:
-		symbolType_ = SYMBOL_TYPE_DIV;
+		symbolType_ = SymbolType::div;
 		break;
 	case rightParenChar:
-		symbolType_ = SYMBOL_TYPE_RIGHT_PAREN;
+		symbolType_ = SymbolType::rightParen;
 		break;
 	case leftParenChar:
-		symbolType_ = SYMBOL_TYPE_LEFT_PAREN;
+		symbolType_ = SymbolType::leftParen;
 		break;
 	default:
-		symbolType_ = SYMBOL_TYPE_STRING;
+		symbolType_ = SymbolType::string;
 		while ( !finished() && !isSeparator(c = s_[pos_]) ) {
 			symbol_ += c;
 			++pos_;
@@ -162,23 +162,23 @@ FormulaNode_ptr
 FormulaNodeParser::parseFactor()
 {
 	switch (symbolType_) {
-	case SYMBOL_TYPE_LEFT_PAREN: // (expression)
+	case SymbolType::leftParen: // (expression)
 	{
 		nextSymbol();
 		FormulaNode_ptr res(parseExpression());
-		if (symbolType_ != SYMBOL_TYPE_RIGHT_PAREN) {
+		if (symbolType_ != SymbolType::rightParen) {
 			throwException("Right parenthesis not found");
 		}
 		nextSymbol();
 		return res;
 	}
-	case SYMBOL_TYPE_ADD: // unary plus
+	case SymbolType::add: // unary plus
 		nextSymbol();
 		return parseFactor();
-	case SYMBOL_TYPE_SUB: // unary minus
+	case SymbolType::sub: // unary minus
 		nextSymbol();
 		return std::make_unique<FormulaMinusUnaryOp>(parseFactor());
-	case SYMBOL_TYPE_STRING: // const / symbol
+	case SymbolType::string: // const / symbol
 	{
 		std::string symbolTmp = symbol_;
 		nextSymbol();
@@ -190,11 +190,11 @@ FormulaNodeParser::parseFactor()
 			return std::make_unique<FormulaSymbolValue>(iter->second);
 		}
 	}
-	case SYMBOL_TYPE_RIGHT_PAREN:
+	case SymbolType::rightParen:
 		throwException("Unexpected symbol: ", rightParenChar);
-	case SYMBOL_TYPE_MULT:
+	case SymbolType::mult:
 		throwException("Unexpected symbol: ", multChar);
-	case SYMBOL_TYPE_DIV:
+	case SymbolType::div:
 		throwException("Unexpected symbol: ", divChar);
 	default:
 		throwException("Invalid symbol");
@@ -210,11 +210,11 @@ FormulaNode_ptr FormulaNodeParser::parseTerm()
 	FormulaNode_ptr term1 = parseFactor();
 
 	SymbolType type = symbolType_;
-	while (type == SYMBOL_TYPE_MULT || type == SYMBOL_TYPE_DIV) {
+	while (type == SymbolType::mult || type == SymbolType::div) {
 		nextSymbol();
 		FormulaNode_ptr term2 = parseFactor();
 		FormulaNode_ptr expr;
-		if (type == SYMBOL_TYPE_MULT) {
+		if (type == SymbolType::mult) {
 			expr = std::make_unique<FormulaMultBinaryOp>(std::move(term1), std::move(term2));
 		} else {
 			expr = std::make_unique<FormulaDivBinaryOp>(std::move(term1), std::move(term2));
@@ -235,13 +235,13 @@ FormulaNodeParser::parseExpression()
 	FormulaNode_ptr term1 = parseTerm();
 
 	SymbolType type = symbolType_;
-	while (type == SYMBOL_TYPE_ADD || type == SYMBOL_TYPE_SUB) {
+	while (type == SymbolType::add || type == SymbolType::sub) {
 
 		nextSymbol();
 		FormulaNode_ptr term2 = parseTerm();
 
 		FormulaNode_ptr expr;
-		if (type == SYMBOL_TYPE_ADD) {
+		if (type == SymbolType::add) {
 			expr = std::make_unique<FormulaAddBinaryOp>(std::move(term1), std::move(term2));
 		} else {
 			expr = std::make_unique<FormulaSubBinaryOp>(std::move(term1), std::move(term2));
@@ -261,7 +261,7 @@ FormulaNode_ptr
 FormulaNodeParser::parse()
 {
 	FormulaNode_ptr formulaRoot = parseExpression();
-	if (symbolType_ != SYMBOL_TYPE_INVALID) { // there is a symbol available
+	if (symbolType_ != SymbolType::invalid) { // there is a symbol available
 		throwException("Invalid text");
 	}
 	return formulaRoot;

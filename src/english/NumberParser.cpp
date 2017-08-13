@@ -648,7 +648,7 @@ NumberParser::errorCheck(Mode mode)
 	}
 
 	/* IF MODE SET TO FORCE_SPELL, USE degenerate_string()  */
-	if (mode == FORCE_SPELL) {
+	if (mode == Mode::forceSpell) {
 		return DEGENERATE;
 	}
 
@@ -1027,7 +1027,7 @@ NumberParser::processWord(Mode mode)
 	}
 	/*  PROCESS FOR YEAR IF INTEGER IN RANGE 1000 TO 1999  */
 	if ((integerDigits_ == 4) && (wordLength_ == 4) &&
-			(word_[integerDigitsPos_[0]] == '1') && (mode != OVERRIDE_YEARS)) {
+			(word_[integerDigitsPos_[0]] == '1') && (mode != Mode::overrideYears)) {
 		triad_[0] = '0';
 		triad_[1] = word_[integerDigitsPos_[0]];
 		triad_[2] = word_[integerDigitsPos_[1]];

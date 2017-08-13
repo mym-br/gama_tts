@@ -47,18 +47,18 @@ private:
 	PhoneticStringParser(const PhoneticStringParser&) = delete;
 	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;
 
-	enum RewriterCommandType {
-		REWRITER_COMMAND_NOP,
-		REWRITER_COMMAND_INSERT,
-		REWRITER_COMMAND_INSERT_IF_WORD_START,
-		REWRITER_COMMAND_REPLACE_FIRST
+	enum class RewriterCommandType {
+		nop,
+		insert,
+		insertIfWordStart,
+		replaceFirst
 	};
 
 	struct RewriterCommand {
 		const Category* category1;
 		RewriterCommandType type;
 		const Posture* posture;
-		RewriterCommand() : category1{}, type{REWRITER_COMMAND_NOP}, posture{} {}
+		RewriterCommand() : category1{}, type{RewriterCommandType::nop}, posture{} {}
 	};
 
 	struct RewriterData {

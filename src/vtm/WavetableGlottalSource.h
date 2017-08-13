@@ -41,9 +41,9 @@ template<typename FloatType>
 class WavetableGlottalSource {
 public:
 	/*  WAVEFORM TYPES  */
-	enum Type {
-		TYPE_PULSE,
-		TYPE_SINE
+	enum class Type {
+		pulse,
+		sine
 	};
 
 	WavetableGlottalSource(
@@ -107,7 +107,7 @@ WavetableGlottalSource<FloatType>::WavetableGlottalSource(Type type, FloatType s
 	currentPosition_ = 0.0;
 
 	/*  INITIALIZE THE WAVETABLE WITH EITHER A GLOTTAL PULSE OR SINE TONE  */
-	if (type == TYPE_PULSE) {
+	if (type == Type::pulse) {
 		/*  CALCULATE RISE PORTION OF WAVE TABLE  */
 		for (unsigned int i = 0; i < tableDiv1_; i++) {
 			const FloatType x = static_cast<FloatType>(i) / tableDiv1_;

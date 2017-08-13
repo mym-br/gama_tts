@@ -40,7 +40,7 @@ public:
 		const std::string& dictionary1Path,
 		const std::string& dictionary2Path,
 		const std::string& dictionary3Path,
-		Mode mode = MODE_NORMAL);
+		Mode mode=Mode::normal);
 	~EnglishTextParser();
 
 	virtual std::string parse(const char* text);

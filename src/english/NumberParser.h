@@ -67,10 +67,10 @@ TYPICAL USAGE:
 class NumberParser {
 public:
 	/*  FLAGS FOR ARGUMENT mode WHEN CALLING number_parser()  */
-	enum Mode {
-		NORMAL         = 0,
-		OVERRIDE_YEARS = 1,
-		FORCE_SPELL    = 2
+	enum class Mode {
+		normal        = 0,
+		overrideYears = 1,
+		forceSpell    = 2
 	};
 	enum {
 		CLOCK_MAX             = 2,    /*  MAX # OF COLONS IN CLOCK TIMES  */

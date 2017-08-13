@@ -121,21 +121,21 @@ PhoneticStringParser::rewrite(const Posture& nextPosture, bool wordMarker, bool 
 				if (state.lastPosture->isMemberOfCategory(*command.category1)) {
 					// Last posture is in category 1.
 					switch (command.type) {
-					case REWRITER_COMMAND_INSERT:
+					case RewriterCommandType::insert:
 						LOG_DEBUG("REWRITER_COMMAND_INSERT");
 						eventList_.newPostureWithObject(*command.posture, marked);
 						break;
-					case REWRITER_COMMAND_INSERT_IF_WORD_START:
+					case RewriterCommandType::insertIfWordStart:
 						LOG_DEBUG("REWRITER_COMMAND_INSERT_IF_WORD_START");
 						if (wordMarker) {
 							eventList_.newPostureWithObject(*command.posture, marked);
 						}
 						break;
-					case REWRITER_COMMAND_REPLACE_FIRST:
+					case RewriterCommandType::replaceFirst:
 						LOG_DEBUG("REWRITER_COMMAND_REPLACE_FIRST");
 						eventList_.replaceCurrentPostureWith(*command.posture, marked);
 						break;
-					case REWRITER_COMMAND_NOP:
+					case RewriterCommandType::nop:
 						LOG_DEBUG("REWRITER_COMMAND_REPLACE_NOP");
 						break;
 					}
@@ -437,13 +437,13 @@ PhoneticStringParser::loadRewriterConfiguration(const std::string& filePath)
 		command->posture = posture;
 
 		if (commandName == "insert") {
-			command->type = REWRITER_COMMAND_INSERT;
+			command->type = RewriterCommandType::insert;
 		} else if (commandName == "insert_if_word_start") {
-			command->type = REWRITER_COMMAND_INSERT_IF_WORD_START;
+			command->type = RewriterCommandType::insertIfWordStart;
 		} else if (commandName == "replace_first") {
-			command->type = REWRITER_COMMAND_REPLACE_FIRST;
+			command->type = RewriterCommandType::replaceFirst;
 		} else if (commandName == "nop") {
-			command->type = REWRITER_COMMAND_NOP;
+			command->type = RewriterCommandType::nop;
 		} else {
 			throwException(filePath, lineNum, "Invalid command", commandName);
 		}

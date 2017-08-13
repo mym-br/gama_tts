@@ -427,8 +427,8 @@ VocalTractModel2<FloatType, SectionDelay>::initializeSynthesizer()
 	/*  INITIALIZE THE WAVE TABLE  */
 	glottalSource_ = std::make_unique<WavetableGlottalSource<FloatType>>(
 						config_.waveform == GLOTTAL_SOURCE_PULSE ?
-							WavetableGlottalSource<FloatType>::TYPE_PULSE :
-							WavetableGlottalSource<FloatType>::TYPE_SINE,
+							WavetableGlottalSource<FloatType>::Type::pulse :
+							WavetableGlottalSource<FloatType>::Type::sine,
 						sampleRate_,
 						config_.tp, config_.tnMin, config_.tnMax);
 

@@ -53,7 +53,7 @@ public:
 				: model_(model)
 				, s_(GS::Text::trim(s))
 				, pos_(0)
-				, symbolType_(SYMBOL_TYPE_INVALID) {
+				, symbolType_(SymbolType::invalid) {
 		if (s_.empty()) {
 			THROW_EXCEPTION(GS::VTMControlModelException, "Boolean expression parser error: Empty string.");
 		}
@@ -62,16 +62,16 @@ public:
 
 	RuleBooleanNode_ptr parse();
 private:
-	enum SymbolType {
-		SYMBOL_TYPE_INVALID,
-		SYMBOL_TYPE_OR_OP,
-		SYMBOL_TYPE_NOT_OP,
-		SYMBOL_TYPE_XOR_OP,
-		SYMBOL_TYPE_AND_OP,
-		SYMBOL_TYPE_MARKED_OP,
-		SYMBOL_TYPE_RIGHT_PAREN,
-		SYMBOL_TYPE_LEFT_PAREN,
-		SYMBOL_TYPE_STRING
+	enum class SymbolType {
+		invalid,
+		orOp,
+		notOp,
+		xorOp,
+		andOp,
+		markedOp,
+		rightParen,
+		leftParen,
+		string
 	};
 
 	[[noreturn]] void throwException(const char* errorDescription) const;
@@ -129,7 +129,7 @@ Parser::nextSymbol()
 	symbol_.resize(0);
 
 	if (finished()) {
-		symbolType_ = SYMBOL_TYPE_INVALID;
+		symbolType_ = SymbolType::invalid;
 		return;
 	}
 
@@ -137,10 +137,10 @@ Parser::nextSymbol()
 	symbol_ = c;
 	switch (c) {
 	case rightParenChar:
-		symbolType_ = SYMBOL_TYPE_RIGHT_PAREN;
+		symbolType_ = SymbolType::rightParen;
 		break;
 	case leftParenChar:
-		symbolType_ = SYMBOL_TYPE_LEFT_PAREN;
+		symbolType_ = SymbolType::leftParen;
 		break;
 	default:
 		while ( !finished() && !isSeparator(c = s_[pos_]) ) {
@@ -148,17 +148,17 @@ Parser::nextSymbol()
 			++pos_;
 		}
 		if (symbol_ == orOpSymb) {
-			symbolType_ = SYMBOL_TYPE_OR_OP;
+			symbolType_ = SymbolType::orOp;
 		} else if (symbol_ == andOpSymb) {
-			symbolType_ = SYMBOL_TYPE_AND_OP;
+			symbolType_ = SymbolType::andOp;
 		} else if (symbol_ == notOpSymb) {
-			symbolType_ = SYMBOL_TYPE_NOT_OP;
+			symbolType_ = SymbolType::notOp;
 		} else if (symbol_ == xorOpSymb) {
-			symbolType_ = SYMBOL_TYPE_XOR_OP;
+			symbolType_ = SymbolType::xorOp;
 		} else if (symbol_ == markedOpSymb) {
-			symbolType_ = SYMBOL_TYPE_MARKED_OP;
+			symbolType_ = SymbolType::markedOp;
 		} else {
-			symbolType_ = SYMBOL_TYPE_STRING;
+			symbolType_ = SymbolType::string;
 		}
 	}
 }
@@ -167,18 +167,18 @@ RuleBooleanNode_ptr
 Parser::getBooleanNode()
 {
 	switch (symbolType_) {
-	case SYMBOL_TYPE_LEFT_PAREN:
+	case SymbolType::leftParen:
 	{
 		RuleBooleanNode_ptr p;
 
 		nextSymbol();
-		if (symbolType_ == SYMBOL_TYPE_MARKED_OP) {
+		if (symbolType_ == SymbolType::markedOp) {
 			// Operand.
 			nextSymbol();
 			RuleBooleanNode_ptr op(getBooleanNode());
 
 			p = std::make_unique<RuleBooleanMarkedExpression>(std::move(op));
-		} else if (symbolType_ == SYMBOL_TYPE_NOT_OP) {
+		} else if (symbolType_ == SymbolType::notOp) {
 			// Operand.
 			nextSymbol();
 			RuleBooleanNode_ptr op(getBooleanNode());
@@ -190,7 +190,7 @@ Parser::getBooleanNode()
 
 			// Operator.
 			switch (symbolType_) {
-			case SYMBOL_TYPE_OR_OP:
+			case SymbolType::orOp:
 			{	// 2nd operand.
 				nextSymbol();
 				RuleBooleanNode_ptr op2(getBooleanNode());
@@ -198,7 +198,7 @@ Parser::getBooleanNode()
 				p = std::make_unique<RuleBooleanOrExpression>(std::move(op1), std::move(op2));
 				break;
 			}
-			case SYMBOL_TYPE_AND_OP:
+			case SymbolType::andOp:
 			{	// 2nd operand.
 				nextSymbol();
 				RuleBooleanNode_ptr op2(getBooleanNode());
@@ -206,7 +206,7 @@ Parser::getBooleanNode()
 				p = std::make_unique<RuleBooleanAndExpression>(std::move(op1), std::move(op2));
 				break;
 			}
-			case SYMBOL_TYPE_XOR_OP:
+			case SymbolType::xorOp:
 			{	// 2nd operand.
 				nextSymbol();
 				RuleBooleanNode_ptr op2(getBooleanNode());
@@ -214,20 +214,20 @@ Parser::getBooleanNode()
 				p = std::make_unique<RuleBooleanXorExpression>(std::move(op1), std::move(op2));
 				break;
 			}
-			case SYMBOL_TYPE_NOT_OP:
+			case SymbolType::notOp:
 				throwException("Invalid operator");
 			default:
 				throwException("Missing operator");
 			}
 		}
 
-		if (symbolType_ != SYMBOL_TYPE_RIGHT_PAREN) {
+		if (symbolType_ != SymbolType::rightParen) {
 			throwException("Right parenthesis not found");
 		}
 		nextSymbol();
 		return p;
 	}
-	case SYMBOL_TYPE_STRING:
+	case SymbolType::string:
 	{
 		std::shared_ptr<Category> category;
 		const Posture* posture = model_.postureList().find(symbol_);
@@ -243,15 +243,15 @@ Parser::getBooleanNode()
 		nextSymbol();
 		return std::make_unique<RuleBooleanTerminal>(category);
 	}
-	case SYMBOL_TYPE_OR_OP:
+	case SymbolType::orOp:
 		throwException("Unexpected OR op.");
-	case SYMBOL_TYPE_NOT_OP:
+	case SymbolType::notOp:
 		throwException("Unexpected NOT op.");
-	case SYMBOL_TYPE_XOR_OP:
+	case SymbolType::xorOp:
 		throwException("Unexpected XOR op.");
-	case SYMBOL_TYPE_AND_OP:
+	case SymbolType::andOp:
 		throwException("Unexpected AND op.");
-	case SYMBOL_TYPE_RIGHT_PAREN:
+	case SymbolType::rightParen:
 		throwException("Unexpected right parenthesis");
 	default:
 		throwException("Missing symbol");
@@ -263,7 +263,7 @@ RuleBooleanNode_ptr
 Parser::parse()
 {
 	RuleBooleanNode_ptr booleanRoot = getBooleanNode();
-	if (symbolType_ != SYMBOL_TYPE_INVALID) { // there is a symbol available
+	if (symbolType_ != SymbolType::invalid) { // there is a symbol available
 		throwException("Invalid text");
 	}
 	return booleanRoot;

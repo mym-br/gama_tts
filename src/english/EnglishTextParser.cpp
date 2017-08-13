@@ -365,7 +365,7 @@ setToneGroup(std::stringstream& stream, long tg_pos, const char* word)
 int
 anotherWordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode)
 {
-	if ((mode == TextParser::MODE_NORMAL) || (mode == TextParser::MODE_EMPHASIS)) {
+	if ((mode == TextParser::Mode::normal) || (mode == TextParser::Mode::emphasis)) {
 		for (std::size_t j = i + 1; j < length; j++) {
 			/*  WORD HAS BEEN FOUND  */
 			if (!isPunctuation(buffer[j])) {
@@ -587,8 +587,8 @@ int
 wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode)
 {
 	switch (mode) {
-	case TextParser::MODE_NORMAL:
-	case TextParser::MODE_EMPHASIS:
+	case TextParser::Mode::normal:
+	case TextParser::Mode::emphasis:
 		for (std::size_t j = i + 1; j < length; j++) {
 			/*  IGNORE WHITE SPACE  */
 			if (buffer[j] == ' ') {
@@ -605,7 +605,7 @@ wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::M
 			}
 		}
 		// Falls through.
-	case TextParser::MODE_LETTER:
+	case TextParser::Mode::letter:
 		/*  IF LETTER MODE CONTAINS ANY SYMBOLS, THEN RETURN 1  */
 		return 1;
 	default:
@@ -1238,7 +1238,7 @@ EnglishTextParser::lookupWord(const char* word)
 			break;
 		case TTS_NUMBER_PARSER:
 			{
-				const char* pron = numberParser_.parse(word, NumberParser::NORMAL);
+				const char* pron = numberParser_.parse(word, NumberParser::Mode::normal);
 				if (pron != nullptr) {
 					return pron;
 				}
@@ -1337,7 +1337,7 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 			}
 
 			switch (mode_) {
-			case MODE_NORMAL:
+			case Mode::normal:
 				/*  PUT IN WORD MARKER  */
 				stream2 << WORD_BEGIN << ' ';
 				/*  ADD LAST WORD MARKER AND TONICIZATION IF NECESSARY  */
@@ -1356,7 +1356,7 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 					break;
 				}
 				break;
-			case MODE_EMPHASIS:
+			case Mode::emphasis:
 				/*  START NEW TONE GROUP IF PRIOR TONIC ALREADY SET  */
 				if (prior_tonic) {
 					setToneGroup(stream2, tg_marker_pos, ",");
@@ -1376,7 +1376,7 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 				expandWord(word, TTS_YES, stream2);
 				prior_tonic = TTS_TRUE;
 				break;
-			case MODE_LETTER:
+			case Mode::letter:
 				expandWord(word, TTS_NO, stream2);
 				break;
 			}
@@ -1674,7 +1674,7 @@ EnglishTextParser::stripPunctuation(char* buffer, std::size_t length, std::strin
 {
 	/*  DELETE OR CONVERT PUNCTUATION  */
 
-	if ((mode_ == MODE_NORMAL) || (mode_ == MODE_EMPHASIS)) {
+	if ((mode_ == Mode::normal) || (mode_ == Mode::emphasis)) {
 		for (std::size_t i = 0; i < length; i++) {
 			switch (buffer[i]) {
 			case '[':
@@ -1742,7 +1742,7 @@ EnglishTextParser::stripPunctuation(char* buffer, std::size_t length, std::strin
 	stream.str("");
 	int status = PUNCTUATION;
 
-	if ((mode_ == MODE_NORMAL) || (mode_ == MODE_EMPHASIS)) {
+	if ((mode_ == Mode::normal) || (mode_ == Mode::emphasis)) {
 		for (std::size_t i = 0; i < length; i++) {
 			switch (buffer[i]) {
 			case '(':
@@ -1836,7 +1836,7 @@ EnglishTextParser::stripPunctuation(char* buffer, std::size_t length, std::strin
 				break;
 			}
 		}
-	} else if (mode_ == MODE_LETTER) {
+	} else if (mode_ == Mode::letter) {
 		/*  EXPAND LETTER MODE CONTENTS TO PLAIN WORDS OR SINGLE LETTERS  */
 		expandLetterMode(buffer, length, stream);
 	} else { /*  ELSE PASS CHARACTERS STRAIGHT THROUGH  */
