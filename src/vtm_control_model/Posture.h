@@ -39,12 +39,12 @@ namespace VTMControlModel {
 class Posture {
 public:
 	enum Symbol {
-		SYMB_DURATION,
+		SYMB_DURATION, // not used
 		SYMB_TRANSITION,
 		SYMB_QSSA,
 		SYMB_QSSB,
 
-		SYMB_MARKED_DURATION,
+		SYMB_MARKED_DURATION, // not used
 		SYMB_MARKED_TRANSITION,
 		SYMB_MARKED_QSSA,
 		SYMB_MARKED_QSSB,
