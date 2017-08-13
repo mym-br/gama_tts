@@ -26,7 +26,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
-#include <utility> /* move, swap */
+#include <utility> /* move */
 #include <vector>
 
 #include "Exception.h"
@@ -139,11 +139,11 @@ private:
 
 class Rule {
 public:
-	enum Type {
-		TYPE_INVALID    = 0,
-		TYPE_DIPHONE    = 2,
-		TYPE_TRIPHONE   = 3,
-		TYPE_TETRAPHONE = 4
+	enum class Type {
+		invalid    = 0,
+		diphone    = 2,
+		triphone   = 3,
+		tetraphone = 4
 	};
 	enum Symbol {
 		SYMB_DURATION,
@@ -164,6 +164,7 @@ public:
 	Rule(unsigned int numParameters)
 		: paramProfileTransitionList_(numParameters)
 		, specialProfileTransitionList_(numParameters)
+		, type_{Type::invalid}
 	{
 	}
 
@@ -218,6 +219,8 @@ public:
 
 	const std::string& comment() const { return comment_; }
 	void setComment(const std::string& comment) { comment_ = comment; }
+
+	Type type() const { return type_; }
 private:
 	std::vector<std::string> booleanExpressionList_;
 	std::vector<std::shared_ptr<Transition>> paramProfileTransitionList_;
@@ -225,6 +228,7 @@ private:
 	ExpressionSymbolEquations exprSymbolEquations_;
 	std::string comment_;
 	RuleBooleanNodeList booleanNodeList_;
+	Type type_;
 };
 
 } /* namespace VTMControlModel */

@@ -180,19 +180,19 @@ Model::printInfo() const
 		std::cout << "=== Transition group: " << group.name << std::endl;
 		for (const auto& transition : group.transitionList) {
 			std::cout << "### Transition: [" << transition->name() << "]" << std::endl;
-			std::cout << "    type=" << transition->type() << " special=" << transition->special() << std::endl;
+			std::cout << "    type=" << Transition::getNameFromType(transition->type()) << " special=" << transition->special() << std::endl;
 
 			for (auto& pointOrSlope : transition->pointOrSlopeList()) {
 				if (!pointOrSlope->isSlopeRatio()) {
 					const auto& point = dynamic_cast<const Transition::Point&>(*pointOrSlope);
-					std::cout << "       point: type=" << point.type << " value=" << point.value
+					std::cout << "       point: type=" << Transition::Point::getNameFromType(point.type) << " value=" << point.value
 						<< " freeTime=" << point.freeTime
 						<< " timeExpression=" << (point.timeExpression ? point.timeExpression->name() : "")
 						<< std::endl;
 				} else {
 					const auto& slopeRatio = dynamic_cast<const Transition::SlopeRatio&>(*pointOrSlope);
 					for (auto& point : slopeRatio.pointList) {
-						std::cout << "         point: type=" << point->type << " value=" << point->value
+						std::cout << "         point: type=" << Transition::Point::getNameFromType(point->type) << " value=" << point->value
 							<< " freeTime=" << point->freeTime
 							<< " timeExpression=" << (point->timeExpression ? point->timeExpression->name() : "")
 							<< std::endl;
@@ -212,12 +212,12 @@ Model::printInfo() const
 		std::cout << "=== Special transition group: " << group.name << std::endl;
 		for (const auto& transition : group.transitionList) {
 			std::cout << "### Transition: [" << transition->name() << "]" << std::endl;
-			std::cout << "    type=" << transition->type() << " special=" << transition->special() << std::endl;
+			std::cout << "    type=" << Transition::getNameFromType(transition->type()) << " special=" << transition->special() << std::endl;
 
 			for (const auto& pointOrSlope : transition->pointOrSlopeList()) {
 				const auto& point = dynamic_cast<const Transition::Point&>(*pointOrSlope);
 
-				std::cout << "       point: type=" << point.type << " value=" << point.value
+				std::cout << "       point: type=" << Transition::Point::getNameFromType(point.type) << " value=" << point.value
 					<< " freeTime=" << point.freeTime
 					<< " timeExpression=" << (point.timeExpression ? point.timeExpression->name() : "")
 					<< std::endl;
@@ -355,23 +355,23 @@ Model::setDefaultFormulaSymbols(Transition::Type transitionType)
 	setFormulaSymbolValue(FormulaSymbol::SYMB_BEAT ,  33.0);
 	setFormulaSymbolValue(FormulaSymbol::SYMB_MARK1, 100.0);
 	switch (transitionType) {
-	case Transition::TYPE_DIPHONE:
+	case Transition::Type::diphone:
 		setFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION, 100.0);
 		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2        ,   0.0);
 		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3        ,   0.0);
 		break;
-	case Transition::TYPE_TRIPHONE:
+	case Transition::Type::triphone:
 		setFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION, 200.0);
 		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2        , 200.0);
 		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3        ,   0.0);
 		break;
-	case Transition::TYPE_TETRAPHONE:
+	case Transition::Type::tetraphone:
 		setFormulaSymbolValue(FormulaSymbol::SYMB_RULE_DURATION, 300.0);
 		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK2        , 200.0);
 		setFormulaSymbolValue(FormulaSymbol::SYMB_MARK3        , 300.0);
 		break;
 	default:
-		THROW_EXCEPTION(VTMControlModelException, "Invalid transition type: " << transitionType << '.');
+		THROW_EXCEPTION(VTMControlModelException, "Invalid transition type: " << static_cast<int>(transitionType) << '.');
 	}
 }
 

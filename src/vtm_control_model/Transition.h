@@ -39,11 +39,11 @@ class Model;
 
 class Transition {
 public:
-	enum Type {
-		TYPE_INVALID    = 0,
-		TYPE_DIPHONE    = 2,
-		TYPE_TRIPHONE   = 3,
-		TYPE_TETRAPHONE = 4
+	enum class Type {
+		invalid    = 0,
+		diphone    = 2,
+		triphone   = 3,
+		tetraphone = 4
 	};
 
 	struct PointOrSlope {
@@ -53,11 +53,11 @@ public:
 	typedef std::unique_ptr<PointOrSlope> PointOrSlope_ptr;
 
 	struct Point : PointOrSlope {
-		enum Type {
-			TYPE_INVALID    = 0,
-			TYPE_DIPHONE    = 2, // Posture 1 --> Posture 2
-			TYPE_TRIPHONE   = 3, // Posture 2 --> Posture 3
-			TYPE_TETRAPHONE = 4  // Posture 3 --> Posture 4
+		enum class Type {
+			invalid    = 0,
+			diphone    = 2, // Posture 1 --> Posture 2
+			triphone   = 3, // Posture 2 --> Posture 3
+			tetraphone = 4  // Posture 3 --> Posture 4
 		};
 		Type type;
 		float value;
@@ -66,31 +66,31 @@ public:
 		std::shared_ptr<Equation> timeExpression;
 		float freeTime; // milliseconds
 
-		Point() : type{TYPE_INVALID}, value{}, timeExpression{}, freeTime{} {}
+		Point() : type{Type::invalid}, value{}, timeExpression{}, freeTime{} {}
 		virtual ~Point() {}
 
 		virtual bool isSlopeRatio() const { return false; }
 
 		static Type getTypeFromName(const std::string& typeName) {
 			if (typeName == "diphone") {
-				return Transition::Point::TYPE_DIPHONE;
+				return Transition::Point::Type::diphone;
 			} else if (typeName == "triphone") {
-				return Transition::Point::TYPE_TRIPHONE;
+				return Transition::Point::Type::triphone;
 			} else if (typeName == "tetraphone") {
-				return Transition::Point::TYPE_TETRAPHONE;
+				return Transition::Point::Type::tetraphone;
 			} else {
 				THROW_EXCEPTION(VTMControlModelException, "Invalid transition point type: " << typeName << '.');
 			}
 		}
-		static std::string getNameFromType(Transition::Point::Type type) {
+		static std::string getNameFromType(Point::Type type) {
 			switch (type) {
-			case Transition::Point::TYPE_INVALID:
+			case Transition::Point::Type::invalid:
 				return "invalid";
-			case Transition::Point::TYPE_DIPHONE:
+			case Transition::Point::Type::diphone:
 				return "diphone";
-			case Transition::Point::TYPE_TRIPHONE:
+			case Transition::Point::Type::triphone:
 				return "triphone";
-			case Transition::Point::TYPE_TETRAPHONE:
+			case Transition::Point::Type::tetraphone:
 				return "tetraphone";
 			default:
 				return "---";
@@ -153,24 +153,24 @@ public:
 					double& time, double& value);
 	static Type getTypeFromName(const std::string& typeName) {
 		if (typeName == "diphone") {
-			return Transition::TYPE_DIPHONE;
+			return Type::diphone;
 		} else if (typeName == "triphone") {
-			return Transition::TYPE_TRIPHONE;
+			return Type::triphone;
 		} else if (typeName == "tetraphone") {
-			return Transition::TYPE_TETRAPHONE;
+			return Type::tetraphone;
 		} else {
 			THROW_EXCEPTION(VTMControlModelException, "Invalid transition type: " << typeName << '.');
 		}
 	}
-	static std::string getNameFromType(Transition::Type type) {
+	static std::string getNameFromType(Type type) {
 		switch (type) {
-		case Transition::TYPE_INVALID:
+		case Type::invalid:
 			return "invalid";
-		case Transition::TYPE_DIPHONE:
+		case Type::diphone:
 			return "diphone";
-		case Transition::TYPE_TRIPHONE:
+		case Type::triphone:
 			return "triphone";
-		case Transition::TYPE_TETRAPHONE:
+		case Type::tetraphone:
 			return "tetraphone";
 		default:
 			return "---";

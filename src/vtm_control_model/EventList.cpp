@@ -520,10 +520,11 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 			ruleSymbols[i] *= timeMultiplier;
 		}
 	}
-	const unsigned int ruleType = rule.numberOfExpressions();
+
+	const Rule::Type ruleType = rule.type();
 
 	ruleData_[currentRule_].firstPosture = basePostureIndex;
-	ruleData_[currentRule_].lastPosture  = basePostureIndex + (ruleType - 1U);
+	ruleData_[currentRule_].lastPosture  = basePostureIndex + (static_cast<int>(ruleType) - 1);
 	ruleData_[currentRule_].start    = zeroRef_;
 	ruleData_[currentRule_].mark1    = ruleSymbols[Rule::SYMB_MARK1];
 	ruleData_[currentRule_].mark2    = ruleSymbols[Rule::SYMB_MARK2];
@@ -536,24 +537,29 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 	++currentRule_;
 
 	switch (ruleType) {
-	case Rule::TYPE_TETRAPHONE:
+	case Rule::Type::tetraphone:
 		if (numPostures == 4) {
 			postureData_[basePostureIndex + 3].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
 			Event* tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK2], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
-	case Rule::TYPE_TRIPHONE:
+	case Rule::Type::triphone:
 		if (numPostures >= 3) {
 			postureData_[basePostureIndex + 2].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
 			Event* tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK1], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
 		// Falls through.
-	case Rule::TYPE_DIPHONE:
-		postureData_[basePostureIndex + 1].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
-		Event* tempEvent = insertEvent(0.0, -1, 0.0, false);
-		if (tempEvent) tempEvent->flag = 1;
+	case Rule::Type::diphone:
+		{
+			postureData_[basePostureIndex + 1].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
+			Event* tempEvent = insertEvent(0.0, -1, 0.0, false);
+			if (tempEvent) tempEvent->flag = 1;
+		}
+		break;
+	case Rule::Type::invalid:
+		// Unreachable.
 		break;
 	}
 
@@ -570,27 +576,30 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 		/* Optimization, Don't calculate if no changes occur */
 		bool equalTargets = false;
 		switch (ruleType) {
-		case Rule::TYPE_DIPHONE:
+		case Rule::Type::diphone:
 			if (targets[0] == targets[1]) {
 				equalTargets = true;
 			}
 			break;
-		case Rule::TYPE_TRIPHONE:
+		case Rule::Type::triphone:
 			if ((targets[0] == targets[1]) && (targets[0] == targets[2])) {
 				equalTargets = true;
 			}
 			break;
-		case Rule::TYPE_TETRAPHONE:
+		case Rule::Type::tetraphone:
 			if ((targets[0] == targets[1]) && (targets[0] == targets[2]) && (targets[0] == targets[3])) {
 				equalTargets = true;
 			}
+			break;
+		default:
+			// Unreachable.
 			break;
 		}
 
 		insertEvent(0.0, i, targets[0], false);
 
 		if (!equalTargets) {
-			auto currentType = Transition::Point::TYPE_DIPHONE;
+			auto currentType = Transition::Point::Type::diphone;
 			double currentValueDelta = targets[1] - targets[0];
 			double lastValue = targets[0];
 			double value{};
@@ -615,22 +624,22 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 					}
 					if (slopeRatio.pointList[0]->type != currentType) {
 						currentType = slopeRatio.pointList[0]->type;
-						targets[currentType - 2] = lastValue;
-						currentValueDelta = targets[currentType - 1] - lastValue;
+						targets[static_cast<int>(currentType) - 2] = lastValue;
+						currentValueDelta = targets[static_cast<int>(currentType) - 1] - lastValue;
 					}
 					value = createSlopeRatioEvents(
-							slopeRatio, targets[currentType - 2], currentValueDelta,
+							slopeRatio, targets[static_cast<int>(currentType) - 2], currentValueDelta,
 							minParam[i], maxParam[i], i, timeMultiplier, last);
 				} else {
 					const auto& point = dynamic_cast<const Transition::Point&>(pointOrSlope);
 					if (point.type != currentType) {
 						currentType = point.type;
-						targets[currentType - 2] = lastValue;
-						currentValueDelta = targets[currentType - 1] - lastValue;
+						targets[static_cast<int>(currentType) - 2] = lastValue;
+						currentValueDelta = targets[static_cast<int>(currentType) - 1] - lastValue;
 					}
 					double pointTime;
 					Transition::getPointData(point, model_,
-									targets[currentType - 2], currentValueDelta, minParam[i], maxParam[i],
+									targets[static_cast<int>(currentType) - 2], currentValueDelta, minParam[i], maxParam[i],
 									pointTime, value);
 					if (!last) { // not a "phantom" point
 						insertEvent(pointTime * timeMultiplier, i, value, false);

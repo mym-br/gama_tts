@@ -537,8 +537,19 @@ Rule::evaluateExpressionSymbols(const std::vector<RuleExpressionData>& expressio
 void
 Rule::setBooleanExpressionList(const std::vector<std::string>& exprList, const Model& model)
 {
-	unsigned int size = exprList.size();
-	if (size < 2U || size > 4U) {
+	const unsigned int size = exprList.size();
+	Type ruleType;
+	switch (size) {
+	case 2:
+		ruleType = Type::diphone;
+		break;
+	case 3:
+		ruleType = Type::triphone;
+		break;
+	case 4:
+		ruleType = Type::tetraphone;
+		break;
+	default:
 		THROW_EXCEPTION(InvalidParameterException, "Invalid number of boolean expressions: " << size << '.');
 	}
 
@@ -550,7 +561,8 @@ Rule::setBooleanExpressionList(const std::vector<std::string>& exprList, const M
 	}
 
 	booleanExpressionList_ = exprList;
-	std::swap(booleanNodeList_, testBooleanNodeList);
+	booleanNodeList_ = std::move(testBooleanNodeList);
+	type_ = ruleType;
 }
 
 } /* namespace VTMControlModel */
