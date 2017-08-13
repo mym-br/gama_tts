@@ -36,6 +36,10 @@
 
 #define CONFIG_DIR "/phonetic_string_parser/"
 #define REWRITE_CONFIG_FILE_NAME "rewrite.txt"
+#define MIN_TEMPO (0.05)
+#define MAX_TEMPO (20.0)
+
+
 
 namespace {
 
@@ -254,7 +258,7 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 				if (buffer.empty()) {
 					THROW_EXCEPTION(MissingValueException, "Missing foot tempo value in the phonetic string at index=" << baseIndex << '.');
 				}
-				eventList_.setCurrentFootTempo(std::stod(buffer));
+				eventList_.setCurrentFootTempo(getTempo(buffer, baseIndex));
 				break;
 			case 'r': /* Rule tempo indicator */
 				index++;
@@ -269,7 +273,7 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 				if (buffer.empty()) {
 					THROW_EXCEPTION(MissingValueException, "Missing rule tempo value in the phonetic string at index=" << baseIndex << '.');
 				}
-				ruleTempo = std::stod(buffer);
+				ruleTempo = getTempo(buffer, baseIndex);
 				break;
 			case '"': /* Secondary stress */
 				// Ignore.
@@ -294,8 +298,9 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 		case '7':
 		case '8':
 		case '9':
+			baseIndex = index;
 			getNumber();
-			postureTempo = std::stod(buffer);
+			postureTempo = getTempo(buffer, baseIndex);
 			break;
 
 		default:
@@ -443,6 +448,17 @@ PhoneticStringParser::loadRewriterConfiguration(const std::string& filePath)
 			throwException(filePath, lineNum, "Invalid command", commandName);
 		}
 	}
+}
+
+double
+PhoneticStringParser::getTempo(const std::string& s, std::size_t index)
+{
+	const double value = std::stod(s);
+	if (value < MIN_TEMPO || value > MAX_TEMPO) {
+		THROW_EXCEPTION(InvalidValueException, "Invalid tempo (should be between " << MIN_TEMPO
+					<< " and " << MAX_TEMPO << ") in the phonetic string at index=" << index << '.');
+	}
+	return value;
 }
 
 } /* namespace VTMControlModel */

@@ -76,6 +76,7 @@ private:
 	void rewrite(const Posture& nextPosture, bool wordMarker, bool marked, RewriterState& state);
 	std::shared_ptr<Category> getCategory(const char* name);
 	const Posture* getPosture(const char* name);
+	static double getTempo(const std::string& s, std::size_t index);
 
 	const Model& model_;
 	EventList& eventList_;
