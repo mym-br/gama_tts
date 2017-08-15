@@ -706,40 +706,38 @@ EventList::applyIntonation()
 			}
 
 			if (!feet_[j].marked) { // pretonic
-				double randomSemitone, randomSlope;
+				double semitone, slope;
 				if (intonationRhythm_.useRandomIntonation()) {
-					randomSemitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PERTURBATION_RANGE];
-					randomSlope = intonationRhythm_.randomReal() * intonationRhythm_.pretonicSlopeRandomFactor()
+					semitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PERTURBATION_RANGE];
+					slope = intonationRhythm_.randomReal() * intonationRhythm_.pretonicSlopeRandomFactor()
 							+ intonationRhythm_.pretonicBaseSlopeRandom();
 				} else {
-					randomSemitone = 0.0;
-					randomSlope = intonationRhythm_.pretonicBaseSlope();
+					semitone = 0.0;
+					slope = intonationRhythm_.pretonicBaseSlope();
 				}
 
 				addIntonationPoint((postureData_[postureIndex].onset - startTime) * pretonicDelta
 								+ intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH]
-								+ randomSemitone,
-							offsetTime, randomSlope, ruleIndex);
+								+ semitone,
+							offsetTime, slope, ruleIndex);
 			} else { // tonic
-				double randomSemitone, randomSlope;
-
+				double semitone, slope;
 				if (toneGroups_[i].type == IntonationRhythm::ToneGroup::continuation) {
-					randomSlope = intonationRhythm_.tonicContinuationBaseSlope();
+					slope = intonationRhythm_.tonicContinuationBaseSlope();
 				} else {
-					randomSlope = intonationRhythm_.tonicBaseSlope();
+					slope = intonationRhythm_.tonicBaseSlope();
 				}
-
 				if (intonationRhythm_.useRandomIntonation()) {
-					randomSemitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_TONIC_PERTURBATION_RANGE];
-					randomSlope += intonationRhythm_.randomReal() * intonationRhythm_.tonicSlopeRandomFactor();
+					semitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_TONIC_PERTURBATION_RANGE];
+					slope += intonationRhythm_.randomReal() * intonationRhythm_.tonicSlopeRandomFactor();
 				} else {
-					randomSemitone = 0.0;
-					randomSlope += intonationRhythm_.tonicSlopeOffset();
+					semitone = 0.0;
+					slope += intonationRhythm_.tonicSlopeOffset();
 				}
 				addIntonationPoint(intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PITCH_RANGE]
 								+ intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH]
-								+ randomSemitone,
-							offsetTime, randomSlope, ruleIndex);
+								+ semitone,
+							offsetTime, slope, ruleIndex);
 
 				postureIndex = feet_[j].end;
 				for (int k = ruleIndex; k < currentRule_; k++) {
