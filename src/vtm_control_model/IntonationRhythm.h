@@ -22,8 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "ConfigurationData.h"
-
 
 
 namespace GS {
@@ -73,6 +71,15 @@ public:
 	float tonicSlopeRandomFactor()     const { return tonicSlopeRandomFactor_; }
 	float tonicSlopeOffset()           const { return tonicSlopeOffset_; }
 
+	double rhythmMarkedA()     const { return rhythmMarkedA_; }
+	double rhythmMarkedB()     const { return rhythmMarkedB_; }
+	double rhythmMarkedDiv()   const { return rhythmMarkedDiv_; }
+	double rhythmUnmarkedA()   const { return rhythmUnmarkedA_; }
+	double rhythmUnmarkedB()   const { return rhythmUnmarkedB_; }
+	double rhythmUnmarkedDiv() const { return rhythmUnmarkedDiv_; }
+	double rhythmMinTempo()    const { return rhythmMinTempo_; }
+	double rhythmMaxTempo()    const { return rhythmMaxTempo_; }
+
 private:
 	void loadToneGroupParameters(ToneGroup toneGroup, const std::string& filePath);
 
@@ -82,7 +89,7 @@ private:
 	std::mt19937 randSrc_;
 	std::uniform_real_distribution<> randRealDist_;
 	std::vector<std::unique_ptr<std::uniform_int_distribution<>>> randomIntonationParamSetIndex_;
-	ConfigurationData configData_;
+
 	float intonationTimeOffset_;
 	float pretonicBaseSlope_;
 	float pretonicBaseSlopeRandom_;
@@ -91,6 +98,16 @@ private:
 	float tonicContinuationBaseSlope_;
 	float tonicSlopeRandomFactor_;
 	float tonicSlopeOffset_;
+
+	double rhythmMarkedA_;
+	double rhythmMarkedB_;
+	double rhythmMarkedDiv_;
+	double rhythmUnmarkedA_;
+	double rhythmUnmarkedB_;
+	double rhythmUnmarkedDiv_;
+	double rhythmMinTempo_;
+	double rhythmMaxTempo_;
+
 	bool useFixedIntonationParameters_;
 	bool useRandomIntonation_;
 };

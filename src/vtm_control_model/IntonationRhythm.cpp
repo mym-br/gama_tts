@@ -20,10 +20,12 @@
 #include <fstream>
 #include <sstream>
 
+#include "ConfigurationData.h"
 #include "Exception.h"
 
 #define CONFIG_SUB_DIR "/intonation_rhythm/"
-#define CONFIG_FILE "intonation.config"
+#define INTONATION_CONFIG_FILE "intonation.config"
+#define RHYTHM_CONFIG_FILE "rhythm.config"
 #define TONE_GROUP_PARAM_FILE_STATEMENT    "tone_group_param-statement.txt"
 #define TONE_GROUP_PARAM_FILE_EXCLAMATION  "tone_group_param-exclamation.txt"
 #define TONE_GROUP_PARAM_FILE_QUESTION     "tone_group_param-question.txt"
@@ -43,7 +45,6 @@ IntonationRhythm::IntonationRhythm(const char* configDirPath)
 		, fixedIntonationParameters_(NUM_INTONATION_PARAM, 0.0)
 		, randSrc_{randDev_()}
 		, randomIntonationParamSetIndex_(static_cast<int>(ToneGroup::numberOfGroups))
-		, configData_{std::string{configDirPath} + (CONFIG_SUB_DIR CONFIG_FILE)}
 		, useFixedIntonationParameters_{}
 		, useRandomIntonation_{}
 {
@@ -56,14 +57,25 @@ IntonationRhythm::IntonationRhythm(const char* configDirPath)
 	loadToneGroupParameters(ToneGroup::continuation, configDir + TONE_GROUP_PARAM_FILE_CONTINUATION);
 	loadToneGroupParameters(ToneGroup::semicolon   , configDir + TONE_GROUP_PARAM_FILE_SEMICOLON);
 
-	intonationTimeOffset_       = configData_.value<float>("time_offset");
-	pretonicBaseSlope_          = configData_.value<float>("pretonic_base_slope");
-	pretonicBaseSlopeRandom_    = configData_.value<float>("pretonic_base_slope_random");
-	pretonicSlopeRandomFactor_  = configData_.value<float>("pretonic_slope_random_factor");
-	tonicBaseSlope_             = configData_.value<float>("tonic_base_slope");
-	tonicContinuationBaseSlope_ = configData_.value<float>("tonic_continuation_base_slope");
-	tonicSlopeRandomFactor_     = configData_.value<float>("tonic_slope_random_factor");
-	tonicSlopeOffset_           = configData_.value<float>("tonic_slope_offset");
+	ConfigurationData intonationConfigData{configDir + INTONATION_CONFIG_FILE};
+	intonationTimeOffset_       = intonationConfigData.value<float>("time_offset");
+	pretonicBaseSlope_          = intonationConfigData.value<float>("pretonic_base_slope");
+	pretonicBaseSlopeRandom_    = intonationConfigData.value<float>("pretonic_base_slope_random");
+	pretonicSlopeRandomFactor_  = intonationConfigData.value<float>("pretonic_slope_random_factor");
+	tonicBaseSlope_             = intonationConfigData.value<float>("tonic_base_slope");
+	tonicContinuationBaseSlope_ = intonationConfigData.value<float>("tonic_continuation_base_slope");
+	tonicSlopeRandomFactor_     = intonationConfigData.value<float>("tonic_slope_random_factor");
+	tonicSlopeOffset_           = intonationConfigData.value<float>("tonic_slope_offset");
+
+	ConfigurationData rhythmConfigData{configDir + RHYTHM_CONFIG_FILE};
+	rhythmMarkedA_     = rhythmConfigData.value<double>("marked_a");
+	rhythmMarkedB_     = rhythmConfigData.value<double>("marked_b");
+	rhythmMarkedDiv_   = rhythmConfigData.value<double>("marked_div");
+	rhythmUnmarkedA_   = rhythmConfigData.value<double>("unmarked_a");
+	rhythmUnmarkedB_   = rhythmConfigData.value<double>("unmarked_b");
+	rhythmUnmarkedDiv_ = rhythmConfigData.value<double>("unmarked_div");
+	rhythmMinTempo_    = rhythmConfigData.value<double>("min_tempo");
+	rhythmMaxTempo_    = rhythmConfigData.value<double>("max_tempo");
 }
 
 void

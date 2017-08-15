@@ -203,6 +203,7 @@ public:
 	void newToneGroup();
 	void generateEventList();
 	void applyIntonation();
+	void applyRhythm();
 	void prepareMacroIntonationInterpolation();
 	void generateOutput(std::vector<std::vector<float>>& vtmParamList);
 	void clearMacroIntonation();

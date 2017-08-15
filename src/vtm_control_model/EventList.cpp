@@ -617,29 +617,7 @@ EventList::generateEventList()
 		maxParam[i] = static_cast<double>(param.maximum());
 	}
 
-	/* Calculate Rhythm including regression */
-	for (int i = 0; i < currentFoot_; i++) {
-		int rus = feet_[i].end - feet_[i].start + 1;
-		/* Apply rhythm model */
-		double footTempo;
-		if (feet_[i].marked) {
-			double tempTempo = 117.7 - (19.36 * (double) rus); // hardcoded
-			feet_[i].tempo -= tempTempo / 180.0;
-			footTempo = globalTempo_ * feet_[i].tempo;
-		} else {
-			double tempTempo = 18.5 - (2.08 * (double) rus); // hardcoded
-			feet_[i].tempo -= tempTempo / 140.0;
-			footTempo = globalTempo_ * feet_[i].tempo;
-		}
-		for (int j = feet_[i].start; j < feet_[i].end + 1; j++) {
-			postureData_[j].tempo *= footTempo;
-			if (postureData_[j].tempo < 0.2) { // hardcoded
-				postureData_[j].tempo = 0.2;
-			} else if (postureData_[j].tempo > 2.0) {
-				postureData_[j].tempo = 2.0;
-			}
-		}
-	}
+	applyRhythm();
 
 	unsigned int basePostureIndex = 0;
 	std::vector<RuleExpressionData> ruleExpressionData;
@@ -787,6 +765,34 @@ EventList::applyIntonation()
 	}
 
 	if (macroIntonation_) prepareMacroIntonationInterpolation();
+}
+
+void
+EventList::applyRhythm()
+{
+	/* Calculate Rhythm including regression */
+	for (int i = 0; i < currentFoot_; i++) {
+		const int numFootPostures = feet_[i].end - feet_[i].start + 1;
+		/* Apply rhythm model */
+		double footTempo;
+		if (feet_[i].marked) {
+			double tempTempo = intonationRhythm_.rhythmMarkedA() * numFootPostures + intonationRhythm_.rhythmMarkedB();
+			feet_[i].tempo += tempTempo / intonationRhythm_.rhythmMarkedDiv();
+			footTempo = globalTempo_ * feet_[i].tempo;
+		} else {
+			double tempTempo = intonationRhythm_.rhythmUnmarkedA() * numFootPostures + intonationRhythm_.rhythmUnmarkedB();
+			feet_[i].tempo += tempTempo / intonationRhythm_.rhythmUnmarkedDiv();
+			footTempo = globalTempo_ * feet_[i].tempo;
+		}
+		for (int j = feet_[i].start; j < feet_[i].end + 1; j++) {
+			postureData_[j].tempo *= footTempo;
+			if (postureData_[j].tempo < intonationRhythm_.rhythmMinTempo()) {
+				postureData_[j].tempo = intonationRhythm_.rhythmMinTempo();
+			} else if (postureData_[j].tempo > intonationRhythm_.rhythmMaxTempo()) {
+				postureData_[j].tempo = intonationRhythm_.rhythmMaxTempo();
+			}
+		}
+	}
 }
 
 void
