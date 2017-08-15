@@ -23,18 +23,12 @@
 
 #include <cstddef> /* std::size_t */
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "DriftGenerator.h"
 #include "IntonationPoint.h"
+#include "IntonationRhythm.h"
 #include "Model.h"
-
-#define TONE_GROUP_TYPE_STATEMENT    0
-#define TONE_GROUP_TYPE_EXCLAMATION  1
-#define TONE_GROUP_TYPE_QUESTION     2
-#define TONE_GROUP_TYPE_CONTINUATION 3
-#define TONE_GROUP_TYPE_SEMICOLON    4
 
 
 
@@ -78,11 +72,11 @@ struct Foot {
 struct ToneGroup {
 	int startFoot;
 	int endFoot;
-	int type;
+	IntonationRhythm::ToneGroup type;
 	ToneGroup()
 		: startFoot{}
 		, endFoot{}
-		, type{} {}
+		, type{IntonationRhythm::ToneGroup::none} {}
 };
 
 struct RuleData {
@@ -188,8 +182,9 @@ public:
 
 	void setDuration(int newValue) { duration_ = newValue; }
 
-	void setTgUseRandom(bool tgUseRandom) { tgUseRandom_ = tgUseRandom; }
-	bool tgUseRandom() const { return tgUseRandom_; }
+	void setUseRandomIntonation(bool value) {
+		intonationRhythm_.setUseRandomIntonation(value);
+	}
 
 	void setIntonationFactor(float value) { intonationFactor_ = value; }
 
@@ -198,7 +193,7 @@ public:
 	double getBeatAtIndex(int ruleIndex) const;
 	unsigned int newPostureWithObject(const Posture& p, bool marked=false);
 	void replaceCurrentPostureWith(const Posture& p, bool marked=false);
-	void setCurrentToneGroupType(int type);
+	void setCurrentToneGroupType(IntonationRhythm::ToneGroup type);
 	void newFoot();
 	void setCurrentFootMarked();
 	void setCurrentFootLast();
@@ -220,17 +215,19 @@ public:
 	int numberOfRules() const { return currentRule_; }
 	const RuleData* getRuleDataAtIndex(unsigned int index) const;
 
-	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }
-	void setFixedIntonationParameters(float notionalPitch, float pretonicRange, float pretonicLift, float tonicRange, float tonicMovement);
+	void setUseFixedIntonationParameters(bool value) { intonationRhythm_.setUseFixedIntonationParameters(value); }
+	void setFixedIntonationParameters(
+			float notionalPitch,
+			float pretonicPitchRange,
+			float pretonicPerturbationRange,
+			float tonicPitchRange,
+			float tonicPerturbationRange);
 
 	void addPostureIntonationPoint(int postureIndex, double position, double semitone);
 private:
 	EventList(const EventList&) = delete;
 	EventList& operator=(const EventList&) = delete;
 
-	void parseGroups(int index, int number, FILE* fp);
-	void initToneGroups(const char* configDirPath);
-	void printToneGroups();
 	void addIntonationPoint(double semitone, double offsetTime, double slope, int ruleIndex);
 	void setFullTimeScale();
 	void newPosture();
@@ -255,7 +252,6 @@ private:
 
 	double pitchMean_;
 	double globalTempo_;
-	float* intonParms_;
 
 	std::vector<PostureData> postureData_;
 	unsigned int currentPosture_;
@@ -271,21 +267,10 @@ private:
 
 	std::vector<IntonationPoint> intonationPoints_;
 	std::vector<Event_ptr> list_;
+
 	DriftGenerator driftGenerator_;
-
-	bool tgUseRandom_;
-	float intonationRandom_;
-	std::vector<std::vector<float>> tgParameters_;
-	int tgCount_[5];
-
-	bool useFixedIntonationParameters_;
-	float fixedIntonationParameters_[10];
-
 	float intonationFactor_;
-
-	std::random_device randDev_;
-	std::mt19937 randSrc_;
-	std::uniform_real_distribution<> randDist_;
+	IntonationRhythm intonationRhythm_;
 };
 
 } /* namespace VTMControlModel */

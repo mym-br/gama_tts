@@ -28,7 +28,6 @@
 
 #include "Log.h"
 
-#define INTONATION_CONFIG_FILE_NAME "/intonation.txt"
 #define DEFAULT_CONTROL_PERIOD_MS 4
 
 
@@ -48,20 +47,12 @@ EventList::EventList(const char* configDirPath, Model& model)
 		, intonationDrift_{}
 		, smoothIntonation_{true}
 		, globalTempo_{1.0}
-		, tgParameters_(5)
-		, useFixedIntonationParameters_{false}
 		, intonationFactor_{1.0}
-		, randSrc_{randDev_()}
+		, intonationRhythm_{configDirPath}
 {
 	setUp();
 
 	list_.reserve(128);
-
-	initToneGroups(configDirPath);
-
-	for (int i = 0; i < 10; ++i) {
-		fixedIntonationParameters_[i] = 0.0;
-	}
 }
 
 EventList::~EventList()
@@ -76,8 +67,6 @@ EventList::setUp()
 	zeroRef_ = 0;
 	zeroIndex_ = 0;
 	duration_ = 0;
-
-	intonParms_ = nullptr;
 
 	postureData_.clear();
 	postureData_.push_back(PostureData{});
@@ -135,13 +124,18 @@ EventList::getRuleDataAtIndex(unsigned int index) const
 }
 
 void
-EventList::setFixedIntonationParameters(float notionalPitch, float pretonicRange, float pretonicLift, float tonicRange, float tonicMovement)
+EventList::setFixedIntonationParameters(
+		float notionalPitch,
+		float pretonicPitchRange,
+		float pretonicPerturbationRange,
+		float tonicPitchRange,
+		float tonicPerturbationRange)
 {
-	fixedIntonationParameters_[1] = notionalPitch;
-	fixedIntonationParameters_[2] = pretonicRange;
-	fixedIntonationParameters_[3] = pretonicLift;
-	fixedIntonationParameters_[5] = tonicRange;
-	fixedIntonationParameters_[6] = tonicMovement;
+	intonationRhythm_.setFixedIntonationParameter(IntonationRhythm::INTON_PRM_NOTIONAL_PITCH             , notionalPitch);
+	intonationRhythm_.setFixedIntonationParameter(IntonationRhythm::INTON_PRM_PRETONIC_PITCH_RANGE       , pretonicPitchRange);
+	intonationRhythm_.setFixedIntonationParameter(IntonationRhythm::INTON_PRM_PRETONIC_PERTURBATION_RANGE, pretonicPerturbationRange);
+	intonationRhythm_.setFixedIntonationParameter(IntonationRhythm::INTON_PRM_TONIC_PITCH_RANGE          , tonicPitchRange);
+	intonationRhythm_.setFixedIntonationParameter(IntonationRhythm::INTON_PRM_TONIC_PERTURBATION_RANGE   , tonicPerturbationRange);
 }
 
 void
@@ -186,70 +180,6 @@ EventList::addPostureIntonationPoint(int postureIndex, double position, double s
 	addIntonationPoint(semitone, offsetTime, 0.0, ruleIndex);
 }
 
-void
-EventList::parseGroups(int index, int number, FILE* fp)
-{
-	char line[256];
-	tgParameters_[index].resize(10 * number);
-	for (int i = 0; i < number; ++i) {
-		fgets(line, 256, fp);
-		float* temp = &tgParameters_[index][i * 10];
-		sscanf(line, " %f %f %f %f %f %f %f %f %f %f",
-			&temp[0], &temp[1], &temp[2], &temp[3], &temp[4],
-			&temp[5], &temp[6], &temp[7], &temp[8], &temp[9]);
-	}
-}
-
-void
-EventList::initToneGroups(const char* configDirPath)
-{
-	std::ostringstream path;
-	path << configDirPath << INTONATION_CONFIG_FILE_NAME;
-	FILE* fp = fopen(path.str().c_str(), "rb");
-	if (fp == NULL) {
-		THROW_EXCEPTION(IOException, "Could not open the file " << path.str().c_str() << '.');
-	}
-
-	char line[256];
-	int count = 0;
-	while (fgets(line, 256, fp) != NULL) {
-		if ((line[0] == '#') || (line[0] == ' ')) {
-			// Skip.
-		} else if (strncmp(line, "TG", 2) == 0) {
-			sscanf(&line[2], " %d", &tgCount_[count]);
-			parseGroups(count, tgCount_[count], fp);
-			count++;
-		} else if (strncmp(line, "RANDOM", 6) == 0) {
-			sscanf(&line[6], " %f", &intonationRandom_);
-		}
-	}
-	fclose(fp);
-
-	if (Log::debugEnabled) {
-		printToneGroups();
-	}
-}
-
-void
-EventList::printToneGroups()
-{
-	printf("===== Intonation configuration:\n");
-	printf("Intonation random = %f\n", intonationRandom_);
-	printf("Tone groups: %d %d %d %d %d\n", tgCount_[0], tgCount_[1], tgCount_[2], tgCount_[3], tgCount_[4]);
-
-	for (int i = 0; i < 5; i++) {
-		float* temp = &tgParameters_[i][0];
-		printf("Temp [%d] = %p\n", i, temp);
-		int j = 0;
-		for (int k = 0; k < tgCount_[i]; k++) {
-			printf("%f %f %f %f %f %f %f %f %f %f\n",
-				temp[j]  , temp[j+1], temp[j+2], temp[j+3], temp[j+4],
-				temp[j+5], temp[j+6], temp[j+7], temp[j+8], temp[j+9]);
-			j += 10;
-		}
-	}
-}
-
 double
 EventList::getBeatAtIndex(int ruleIndex) const
 {
@@ -288,7 +218,7 @@ EventList::replaceCurrentPostureWith(const Posture& p, bool marked)
 }
 
 void
-EventList::setCurrentToneGroupType(int type)
+EventList::setCurrentToneGroupType(IntonationRhythm::ToneGroup type)
 {
 	toneGroups_[currentToneGroup_].type = type;
 }
@@ -765,11 +695,7 @@ EventList::applyIntonation()
 		THROW_EXCEPTION(UnavailableResourceException, "Could not find the category \"vocoid\".");
 	}
 
-	std::uniform_int_distribution<> intRandDist0(0, tgCount_[0] > 0 ? tgCount_[0] - 1 : 0);
-	std::uniform_int_distribution<> intRandDist1(0, tgCount_[1] > 0 ? tgCount_[1] - 1 : 0);
-	std::uniform_int_distribution<> intRandDist2(0, tgCount_[2] > 0 ? tgCount_[2] - 1 : 0);
-	std::uniform_int_distribution<> intRandDist3(0, tgCount_[3] > 0 ? tgCount_[3] - 1 : 0);
-
+	const float* intonParms{};
 	double offsetTime = 0.0;
 	int ruleIndex = 0;
 	for (int i = 0; i < currentToneGroup_; i++) {
@@ -779,56 +705,9 @@ EventList::applyIntonation()
 		const double startTime = postureData_[feet_[firstFoot].start].onset;
 		const double endTime = postureData_[feet_[endFoot].end].onset;
 
-		if (useFixedIntonationParameters_) {
-			intonParms_ = fixedIntonationParameters_;
-		} else {
-			int tgRandom{};
-			switch (toneGroups_[i].type) {
-			default:
-			case TONE_GROUP_TYPE_STATEMENT:
-				if (tgUseRandom_) {
-					tgRandom = intRandDist0(randSrc_);
-				} else {
-					tgRandom = 0;
-				}
-				intonParms_ = &tgParameters_[0][tgRandom * 10];
-				break;
-			case TONE_GROUP_TYPE_EXCLAMATION:
-				if (tgUseRandom_) {
-					tgRandom = intRandDist0(randSrc_);
-				} else {
-					tgRandom = 0;
-				}
-				intonParms_ = &tgParameters_[0][tgRandom * 10];
-				break;
-			case TONE_GROUP_TYPE_QUESTION:
-				if (tgUseRandom_) {
-					tgRandom = intRandDist1(randSrc_);
-				} else {
-					tgRandom = 0;
-				}
-				intonParms_ = &tgParameters_[1][tgRandom * 10];
-				break;
-			case TONE_GROUP_TYPE_CONTINUATION:
-				if (tgUseRandom_) {
-					tgRandom = intRandDist2(randSrc_);
-				} else {
-					tgRandom = 0;
-				}
-				intonParms_ = &tgParameters_[2][tgRandom * 10];
-				break;
-			case TONE_GROUP_TYPE_SEMICOLON:
-				if (tgUseRandom_) {
-					tgRandom = intRandDist3(randSrc_);
-				} else {
-					tgRandom = 0;
-				}
-				intonParms_ = &tgParameters_[3][tgRandom * 10];
-				break;
-			}
-		}
+		intonParms = intonationRhythm_.intonationParameters(toneGroups_[i].type);
 
-		const double pretonicDelta = intonParms_[1] / (endTime - startTime);
+		const double pretonicDelta = intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH] / (endTime - startTime);
 
 		/* Set up intonation boundary variables */
 		for (int j = firstFoot; j <= endFoot; j++) {
@@ -841,49 +720,47 @@ EventList::applyIntonation()
 				}
 			}
 
-			if (!feet_[j].marked) {
-				for (int k = 0; k < currentRule_; k++) {
-					if ((postureIndex >= ruleData_[k].firstPosture) && (postureIndex <= ruleData_[k].lastPosture)) {
-						ruleIndex = k;
-						break;
-					}
+			for (int k = 0; k < currentRule_; k++) {
+				if ((postureIndex >= ruleData_[k].firstPosture) && (postureIndex <= ruleData_[k].lastPosture)) {
+					ruleIndex = k;
+					break;
 				}
+			}
 
+			if (!feet_[j].marked) { // pretonic
 				double randomSemitone, randomSlope;
-				if (tgUseRandom_) {
-					randomSemitone = randDist_(randSrc_) * intonParms_[3] - intonParms_[3] / 2.0;
-					randomSlope = randDist_(randSrc_) * 0.015 + 0.01; // hardcoded
+				if (intonationRhythm_.useRandomIntonation()) {
+					randomSemitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PERTURBATION_RANGE];
+					randomSlope = intonationRhythm_.randomReal() * intonationRhythm_.pretonicSlopeRandomFactor()
+							+ intonationRhythm_.pretonicBaseSlopeRandom();
 				} else {
 					randomSemitone = 0.0;
-					randomSlope = 0.02; // hardcoded
+					randomSlope = intonationRhythm_.pretonicBaseSlope();
 				}
 
-				addIntonationPoint((postureData_[postureIndex].onset - startTime) * pretonicDelta + intonParms_[1] + randomSemitone,
+				addIntonationPoint((postureData_[postureIndex].onset - startTime) * pretonicDelta
+								+ intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH]
+								+ randomSemitone,
 							offsetTime, randomSlope, ruleIndex);
-			} else { /* Tonic */
+			} else { // tonic
 				double randomSemitone, randomSlope;
 
-				if (toneGroups_[i].type == 3) {
-					randomSlope = 0.01; // hardcoded
+				if (toneGroups_[i].type == IntonationRhythm::ToneGroup::continuation) {
+					randomSlope = intonationRhythm_.tonicContinuationBaseSlope();
 				} else {
-					randomSlope = 0.02; // hardcoded
+					randomSlope = intonationRhythm_.tonicBaseSlope();
 				}
 
-				for (int k = 0; k < currentRule_; k++) {
-					if ((postureIndex >= ruleData_[k].firstPosture) && (postureIndex <= ruleData_[k].lastPosture)) {
-						ruleIndex = k;
-						break;
-					}
-				}
-
-				if (tgUseRandom_) {
-					randomSemitone = randDist_(randSrc_) * intonParms_[6] - intonParms_[6] / 2.0;
-					randomSlope += randDist_(randSrc_) * 0.03; // hardcoded
+				if (intonationRhythm_.useRandomIntonation()) {
+					randomSemitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_TONIC_PERTURBATION_RANGE];
+					randomSlope += intonationRhythm_.randomReal() * intonationRhythm_.tonicSlopeRandomFactor();
 				} else {
 					randomSemitone = 0.0;
-					randomSlope += 0.03; // hardcoded
+					randomSlope += intonationRhythm_.tonicSlopeOffset();
 				}
-				addIntonationPoint(intonParms_[2] + intonParms_[1] + randomSemitone,
+				addIntonationPoint(intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PITCH_RANGE]
+								+ intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH]
+								+ randomSemitone,
 							offsetTime, randomSlope, ruleIndex);
 
 				postureIndex = feet_[j].end;
@@ -894,14 +771,18 @@ EventList::applyIntonation()
 					}
 				}
 
-				addIntonationPoint(intonParms_[2] + intonParms_[1] + intonParms_[5],
+				addIntonationPoint(intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PITCH_RANGE]
+								+ intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH]
+								+ intonParms[IntonationRhythm::INTON_PRM_TONIC_PITCH_RANGE],
 							0.0, 0.0, ruleIndex);
 			}
-			offsetTime = -40.0; // hardcoded
+			offsetTime = intonationRhythm_.intonationTimeOffset();
 		}
 	}
-	if (intonParms_) {
-		addIntonationPoint(intonParms_[2] + intonParms_[1] + intonParms_[5],
+	if (intonParms) {
+		addIntonationPoint(intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PITCH_RANGE]
+						+ intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH]
+						+ intonParms[IntonationRhythm::INTON_PRM_TONIC_PITCH_RANGE],
 					0.0, 0.0, currentRule_ - 1);
 	}
 
@@ -1191,7 +1072,7 @@ EventList::printDataStructures()
 	printf("Tone Groups %d\n", currentToneGroup_);
 	for (int i = 0; i < currentToneGroup_; i++) {
 		printf("%d  start: %d  end: %d  type: %d\n", i, toneGroups_[i].startFoot, toneGroups_[i].endFoot,
-			toneGroups_[i].type);
+			static_cast<int>(toneGroups_[i].type));
 	}
 
 	printf("\nFeet %d\n", currentFoot_);

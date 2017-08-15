@@ -94,6 +94,8 @@ set(LIBRARY_FILES
     src/vtm_control_model/FormulaSymbol.h
     src/vtm_control_model/IntonationPoint.cpp
     src/vtm_control_model/IntonationPoint.h
+    src/vtm_control_model/IntonationRhythm.cpp
+    src/vtm_control_model/IntonationRhythm.h
     src/vtm_control_model/Model.cpp
     src/vtm_control_model/Model.h
     src/vtm_control_model/Parameter.h

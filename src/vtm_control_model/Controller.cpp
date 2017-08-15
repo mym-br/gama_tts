@@ -89,11 +89,11 @@ Controller::initUtterance()
 	eventList_.setUpDriftGenerator(vtmControlModelConfig_.driftDeviation, vtmControlModelConfig_.controlRate, vtmControlModelConfig_.driftLowpassCutoff);
 
 	// Configure intonation.
-	eventList_.setMicroIntonation( vtmControlModelConfig_.intonation & Configuration::INTONATION_MICRO);
-	eventList_.setMacroIntonation( vtmControlModelConfig_.intonation & Configuration::INTONATION_MACRO);
-	eventList_.setSmoothIntonation(vtmControlModelConfig_.intonation & Configuration::INTONATION_SMOOTH);
-	eventList_.setIntonationDrift( vtmControlModelConfig_.intonation & Configuration::INTONATION_DRIFT);
-	eventList_.setTgUseRandom(     vtmControlModelConfig_.intonation & Configuration::INTONATION_RANDOMIZE);
+	eventList_.setMicroIntonation(    vtmControlModelConfig_.intonation & Configuration::INTONATION_MICRO);
+	eventList_.setMacroIntonation(    vtmControlModelConfig_.intonation & Configuration::INTONATION_MACRO);
+	eventList_.setSmoothIntonation(   vtmControlModelConfig_.intonation & Configuration::INTONATION_SMOOTH);
+	eventList_.setIntonationDrift(    vtmControlModelConfig_.intonation & Configuration::INTONATION_DRIFT);
+	eventList_.setUseRandomIntonation(vtmControlModelConfig_.intonation & Configuration::INTONATION_RANDOM);
 	eventList_.setIntonationFactor(vtmControlModelConfig_.intonationFactor);
 }
 

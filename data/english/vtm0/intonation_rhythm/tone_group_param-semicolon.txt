@@ -1,0 +1,8 @@
+# column parameter
+# 0      notional pitch
+# 1      pretonic pitch range
+# 2      pretonic perturbation range
+# 3      tonic pitch range
+# 4      tonic perturbation range
+
+ 0.0  0.0  4.0 -4.0  4.0

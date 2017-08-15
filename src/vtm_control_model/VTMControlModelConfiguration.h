@@ -34,12 +34,12 @@ namespace VTMControlModel {
 
 struct Configuration {
 	enum Intonation {
-		INTONATION_NONE      = 0x00,
-		INTONATION_MICRO     = 0x01,
-		INTONATION_MACRO     = 0x02,
-		INTONATION_SMOOTH    = 0x04,
-		INTONATION_DRIFT     = 0x08,
-		INTONATION_RANDOMIZE = 0x10
+		INTONATION_NONE   = 0,
+		INTONATION_MICRO  = 1,
+		INTONATION_MACRO  = 2,
+		INTONATION_SMOOTH = 4,
+		INTONATION_DRIFT  = 8,
+		INTONATION_RANDOM = 16
 	};
 
 	Configuration();
@@ -57,10 +57,10 @@ struct Configuration {
 
 	// Intonation parameters.
 	double notionalPitch;
-	double pretonicRange;
-	double pretonicLift;
-	double tonicRange;
-	double tonicMovement;
+	double pretonicPitchRange;
+	double pretonicPerturbationRange;
+	double tonicPitchRange;
+	double tonicPerturbationRange;
 	double intonationFactor;
 
 	std::string language;

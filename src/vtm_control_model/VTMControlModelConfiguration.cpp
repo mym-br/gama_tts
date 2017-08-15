@@ -41,10 +41,10 @@ Configuration::Configuration()
 		, intonation{}
 		, textParserMode{}
 		, notionalPitch{}
-		, pretonicRange{}
-		, pretonicLift{}
-		, tonicRange{}
-		, tonicMovement{}
+		, pretonicPitchRange{}
+		, pretonicPerturbationRange{}
+		, tonicPitchRange{}
+		, tonicPerturbationRange{}
 		, intonationFactor{1.0}
 {
 }
@@ -80,16 +80,16 @@ Configuration::load(const char* configDirPath)
 		intonation += INTONATION_DRIFT;
 	}
 	if (config.value<int>("random_intonation") != 0) {
-		intonation += INTONATION_RANDOMIZE;
+		intonation += INTONATION_RANDOM;
 	}
 
 	textParserMode = config.value<int>("text_parser_mode");
 
-	notionalPitch = config.value<double>("notional_pitch");
-	pretonicRange = config.value<double>("pretonic_range");
-	pretonicLift  = config.value<double>("pretonic_lift");
-	tonicRange    = config.value<double>("tonic_range");
-	tonicMovement = config.value<double>("tonic_movement");
+	notionalPitch             = config.value<double>("notional_pitch");
+	pretonicPitchRange        = config.value<double>("pretonic_pitch_range");
+	pretonicPerturbationRange = config.value<double>("pretonic_perturbation_range");
+	tonicPitchRange           = config.value<double>("tonic_pitch_range");
+	tonicPerturbationRange    = config.value<double>("tonic_perturbation_range");
 
 	language        = config.value<std::string>("language");
 	voiceName       = config.value<std::string>("voice_name");

@@ -28,6 +28,7 @@
 #include "Category.h"
 #include "EventList.h"
 #include "Exception.h"
+#include "IntonationRhythm.h"
 #include "Log.h"
 #include "Model.h"
 #include "Posture.h"
@@ -192,23 +193,23 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 			switch(string[index]) {
 			case '0': /* Tone group 0. Statement */
 				index++;
-				eventList_.setCurrentToneGroupType(TONE_GROUP_TYPE_STATEMENT);
+				eventList_.setCurrentToneGroupType(IntonationRhythm::ToneGroup::statement);
 				break;
 			case '1': /* Tone group 1. Exclamation */
 				index++;
-				eventList_.setCurrentToneGroupType(TONE_GROUP_TYPE_EXCLAMATION);
+				eventList_.setCurrentToneGroupType(IntonationRhythm::ToneGroup::exclamation);
 				break;
 			case '2': /* Tone group 2. Question */
 				index++;
-				eventList_.setCurrentToneGroupType(TONE_GROUP_TYPE_QUESTION);
+				eventList_.setCurrentToneGroupType(IntonationRhythm::ToneGroup::question);
 				break;
 			case '3': /* Tone group 3. Continuation */
 				index++;
-				eventList_.setCurrentToneGroupType(TONE_GROUP_TYPE_CONTINUATION);
+				eventList_.setCurrentToneGroupType(IntonationRhythm::ToneGroup::continuation);
 				break;
 			case '4': /* Tone group 4. Semi-colon */
 				index++;
-				eventList_.setCurrentToneGroupType(TONE_GROUP_TYPE_SEMICOLON);
+				eventList_.setCurrentToneGroupType(IntonationRhythm::ToneGroup::semicolon);
 				break;
 			case '_': /* New foot */
 				eventList_.newFoot();
@@ -303,7 +304,7 @@ PhoneticStringParser::parse(const char* string, std::size_t size)
 			postureTempo = getTempo(buffer, baseIndex);
 			break;
 
-		default:
+		default: // posture name
 			baseIndex = index;
 			buffer.clear();
 			while ((index < size) && Model::isValidPostureCharacter(string[index])) {
