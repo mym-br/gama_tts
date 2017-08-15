@@ -3,8 +3,8 @@
 
 - The symbols (duration, transition, qssa, qssb) must not be changed.
 
-- The "phone" category must not be removed.
-
 - Posture/duration,markedDuration are not being used.
 
 - pho1 parser: Posture rewriter is not being used.
+
+- The database must contain the "phone" category, and the "#" and "^" postures.
