@@ -21,6 +21,8 @@
 #ifndef VTM_CONTROL_MODEL_DRIFT_GENERATOR_H_
 #define VTM_CONTROL_MODEL_DRIFT_GENERATOR_H_
 
+#include "Butterworth2LowpassFilter.h"
+
 
 
 namespace GS {
@@ -37,12 +39,10 @@ private:
 	DriftGenerator(const DriftGenerator&) = delete;
 	DriftGenerator& operator=(const DriftGenerator&) = delete;
 
+	VTM::Butterworth2LowPassFilter<double> filter_;
 	double pitchDeviation_;
 	double pitchOffset_;
 	double seed_;
-	double a0_;
-	double b1_;
-	double previousSample_;
 };
 
 } /* namespace VTMControlModel */

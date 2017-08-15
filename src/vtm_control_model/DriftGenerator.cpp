@@ -29,12 +29,9 @@ namespace GS {
 namespace VTMControlModel {
 
 DriftGenerator::DriftGenerator()
-	: pitchDeviation_(0.0)
-	, pitchOffset_(0.0)
-	, seed_(INITIAL_SEED)
-	, a0_(0.0)
-	, b1_(0.0)
-	, previousSample_(0.0)
+	: pitchDeviation_{}
+	, pitchOffset_{}
+	, seed_{INITIAL_SEED}
 {
 }
 
@@ -66,19 +63,7 @@ DriftGenerator::setUp(double deviation, double sampleRate, double lowpassCutoff)
 	pitchDeviation_ = deviation * 2.0;
 	pitchOffset_ = deviation;
 
-	/*  CHECK RANGE OF THE LOWPASS CUTOFF ARGUMENT  */
-	if (lowpassCutoff < 0.0) {
-		lowpassCutoff = 0.0;
-	} else if (lowpassCutoff > (sampleRate / 2.0)) {
-		lowpassCutoff = sampleRate / 2.0;
-	}
-
-	/*  SET THE FILTER COEFFICIENTS  */
-	a0_ = (lowpassCutoff * 2.0) / sampleRate;
-	b1_ = 1.0 - a0_;
-
-	/*  CLEAR THE PREVIOUS SAMPLE MEMORY  */
-	previousSample_ = 0.0;
+	filter_.update(sampleRate, lowpassCutoff);
 }
 
 /******************************************************************************
@@ -92,14 +77,14 @@ double
 DriftGenerator::drift()
 {
 	/*  CREATE RANDOM NUMBER BETWEEN 0 AND 1  */
-	double temp = seed_ * FACTOR;
+	const double temp = seed_ * FACTOR;
 	seed_ = temp - static_cast<int>(temp);  /* SEED IS SAVED FOR NEXT INVOCATION  */
 
 	/*  CREATE RANDOM SIGNAL WITH RANGE -DEVIATION TO +DEVIATION  */
-	temp = (seed_ * pitchDeviation_) - pitchOffset_;
+	const double pitchNoise = (seed_ * pitchDeviation_) - pitchOffset_;
 
-	/*  LOWPASS FILTER THE RANDOM SIGNAL (OUTPUT IS SAVED FOR NEXT TIME)  */
-	return previousSample_ = (a0_ * temp) + (b1_ * previousSample_);
+	/*  LOWPASS FILTER THE RANDOM SIGNAL  */
+	return filter_.filter(pitchNoise);
 }
 
 } /* namespace VTMControlModel */
