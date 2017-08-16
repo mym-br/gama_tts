@@ -24,8 +24,6 @@
 namespace GS {
 namespace VTMControlModel {
 
-struct Configuration;
-
 class TextParser {
 public:
 	enum class Mode {
@@ -39,7 +37,17 @@ public:
 	virtual std::string parse(const char* text) = 0;
 	virtual void setMode(Mode mode) = 0;
 
-	static std::unique_ptr<TextParser> getInstance(const std::string& configDirPath, const Configuration& config);
+	static std::unique_ptr<TextParser> getInstance(const std::string& configDirPath);
+};
+
+struct TextParserConfiguration {
+	std::string language;
+	std::string dictionary1File;
+	std::string dictionary2File;
+	std::string dictionary3File;
+	TextParser::Mode mode;
+
+	TextParserConfiguration(const std::string& configDirPath);
 };
 
 } /* namespace VTMControlModel */

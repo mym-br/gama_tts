@@ -707,7 +707,7 @@ EventList::applyIntonation()
 
 			if (!feet_[j].marked) { // pretonic
 				double semitone, slope;
-				if (intonationRhythm_.useRandomIntonation()) {
+				if (intonationRhythm_.randomIntonation()) {
 					semitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_PRETONIC_PERTURBATION_RANGE];
 					slope = intonationRhythm_.randomReal() * intonationRhythm_.pretonicSlopeRandomFactor()
 							+ intonationRhythm_.pretonicBaseSlopeRandom();
@@ -727,7 +727,7 @@ EventList::applyIntonation()
 				} else {
 					slope = intonationRhythm_.tonicBaseSlope();
 				}
-				if (intonationRhythm_.useRandomIntonation()) {
+				if (intonationRhythm_.randomIntonation()) {
 					semitone = (intonationRhythm_.randomReal() - 0.5) * intonParms[IntonationRhythm::INTON_PRM_TONIC_PERTURBATION_RANGE];
 					slope += intonationRhythm_.randomReal() * intonationRhythm_.tonicSlopeRandomFactor();
 				} else {
@@ -966,7 +966,7 @@ EventList::generateOutput(std::vector<std::vector<float>>& vtmParamList)
 			}
 			param[0] += static_cast<float>(intonation);
 		}
-		param[0] += static_cast<float>(pitchMean_);
+		param[0] += static_cast<float>(meanPitch_);
 
 		// Store the current parameter values.
 		vtmParamList.push_back(param);

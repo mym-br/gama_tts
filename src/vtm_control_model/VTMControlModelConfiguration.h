@@ -33,27 +33,13 @@ class ConfigurationData;
 namespace VTMControlModel {
 
 struct Configuration {
-	enum Intonation {
-		INTONATION_NONE   = 0,
-		INTONATION_MICRO  = 1,
-		INTONATION_MACRO  = 2,
-		INTONATION_SMOOTH = 4,
-		INTONATION_DRIFT  = 8,
-		INTONATION_RANDOM = 16
-	};
-
-	Configuration();
-
-	void load(const char* configDirPath);
-
 	unsigned int controlPeriod; // 1, 2, 3 or 4 (ms)
 	double controlRate;         // 1000.0 / controlPeriod (Hz)
 	double tempo;
 	double pitchOffset;
 	double driftDeviation;
 	double driftLowpassCutoff;
-	int    intonation;
-	int    textParserMode;
+	std::string voiceName;
 
 	// Intonation parameters.
 	double notionalPitch;
@@ -62,14 +48,15 @@ struct Configuration {
 	double tonicPitchRange;
 	double tonicPerturbationRange;
 	double intonationFactor;
-
-	std::string language;
-	std::string voiceName;
-	std::string dictionary1File;
-	std::string dictionary2File;
-	std::string dictionary3File;
+	bool microIntonation;
+	bool macroIntonation;
+	bool smoothIntonation;
+	bool intonationDrift;
+	bool randomIntonation;
 
 	std::unique_ptr<ConfigurationData> voiceData;
+
+	Configuration(const char* configDirPath);
 };
 
 } /* namespace VTMControlModel */

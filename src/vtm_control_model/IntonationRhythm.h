@@ -55,8 +55,8 @@ public:
 		fixedIntonationParameters_[param] = value;
 	}
 
-	void setUseRandomIntonation(bool value);
-	bool useRandomIntonation() const { return useRandomIntonation_; }
+	void setRandomIntonation(bool value);
+	bool randomIntonation() const { return randomIntonation_; }
 
 	const float* intonationParameters(ToneGroup toneGroup);
 
@@ -109,7 +109,7 @@ private:
 	double rhythmMaxTempo_;
 
 	bool useFixedIntonationParameters_;
-	bool useRandomIntonation_;
+	bool randomIntonation_;
 };
 
 } /* namespace VTMControlModel */

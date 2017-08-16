@@ -135,9 +135,8 @@
 
 #define TTS_PARSER_SUCCESS       (-1)
 #define TTS_PARSER_FAILURE       0              /*  OR GREATER THAN 0 IF     */
-						/*  POSITION OF ERROR KNOWN  */
+                                                /*  POSITION OF ERROR KNOWN  */
 
-#define TEXT_PARSER_DIR "/text_parser/"
 #define SUFFIX_LIST_FILE "suffix_list.txt"
 #define ABBREVIATIONS_FILE "abbreviations.txt"
 #define ABBREVIATIONS_WITH_NUMBER_FILE "abbreviations_with_number.txt"
@@ -1096,33 +1095,30 @@ namespace GS {
 namespace English {
 
 EnglishTextParser::EnglishTextParser(
-			const std::string& configDirPath,
-			const std::string& dictionary1Path,
-			const std::string& dictionary2Path,
-			const std::string& dictionary3Path,
-			Mode mode)
-		: mode_{mode}
+			const std::string& textParserConfigDirPath,
+			const TextParserConfiguration& config)
+		: mode_{config.mode}
 {
 	std::ostringstream suffixFilePathStream;
-	suffixFilePathStream << configDirPath << TEXT_PARSER_DIR SUFFIX_LIST_FILE;
+	suffixFilePathStream << textParserConfigDirPath << SUFFIX_LIST_FILE;
 	std::string suffixFilePath = suffixFilePathStream.str();
 
-	if (dictionary1Path != "none") {
+	if (config.dictionary1File != "none") {
 		dict1_ = std::make_unique<VTMControlModel::DictionarySearch>();
 		std::ostringstream filePath;
-		filePath << configDirPath << TEXT_PARSER_DIR << dictionary1Path;
+		filePath << textParserConfigDirPath << config.dictionary1File;
 		dict1_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
-	if (dictionary2Path != "none") {
+	if (config.dictionary2File != "none") {
 		dict2_ = std::make_unique<VTMControlModel::DictionarySearch>();
 		std::ostringstream filePath;
-		filePath << configDirPath << TEXT_PARSER_DIR << dictionary2Path;
+		filePath << textParserConfigDirPath << config.dictionary2File;
 		dict2_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
-	if (dictionary3Path != "none") {
+	if (config.dictionary3File != "none") {
 		dict3_ = std::make_unique<VTMControlModel::DictionarySearch>();
 		std::ostringstream filePath;
-		filePath << configDirPath << TEXT_PARSER_DIR << dictionary3Path;
+		filePath << textParserConfigDirPath << config.dictionary3File;
 		dict3_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 
@@ -1134,15 +1130,15 @@ EnglishTextParser::EnglishTextParser(
 	dictionaryOrder_[5] = TTS_EMPTY;
 
 	std::ostringstream abbrevFilePath;
-	abbrevFilePath << configDirPath << TEXT_PARSER_DIR ABBREVIATIONS_FILE;
+	abbrevFilePath << textParserConfigDirPath << ABBREVIATIONS_FILE;
 	abbrevMap_.load(abbrevFilePath.str().c_str());
 
 	std::ostringstream abbrevWithNumberFilePath;
-	abbrevWithNumberFilePath << configDirPath << TEXT_PARSER_DIR ABBREVIATIONS_WITH_NUMBER_FILE;
+	abbrevWithNumberFilePath << textParserConfigDirPath << ABBREVIATIONS_WITH_NUMBER_FILE;
 	abbrevWithNumberMap_.load(abbrevWithNumberFilePath.str().c_str());
 
 	std::ostringstream specialAcronymsFilePath;
-	specialAcronymsFilePath << configDirPath << TEXT_PARSER_DIR SPECIAL_ACRONYMS_FILE;
+	specialAcronymsFilePath << textParserConfigDirPath << SPECIAL_ACRONYMS_FILE;
 	specialAcronymsMap_.load(specialAcronymsFilePath.str().c_str());
 }
 

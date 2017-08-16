@@ -162,8 +162,8 @@ public:
 	const std::vector<Event_ptr>& list() const { return list_; }
 	std::vector<IntonationPoint>& intonationPoints() { return intonationPoints_; }
 
-	void setPitchMean(double newMean) { pitchMean_ = newMean; }
-	double pitchMean() const { return pitchMean_; }
+	void setMeanPitch(double newMean) { meanPitch_ = newMean; }
+	double meanPitch() const { return meanPitch_; }
 
 	void setGlobalTempo(double newTempo) { globalTempo_ = newTempo; }
 	double globalTempo() const { return globalTempo_; }
@@ -182,8 +182,8 @@ public:
 
 	void setDuration(int newValue) { duration_ = newValue; }
 
-	void setUseRandomIntonation(bool value) {
-		intonationRhythm_.setUseRandomIntonation(value);
+	void setRandomIntonation(bool value) {
+		intonationRhythm_.setRandomIntonation(value);
 	}
 
 	void setIntonationFactor(float value) { intonationFactor_ = value; }
@@ -251,7 +251,7 @@ private:
 	bool intonationDrift_;
 	bool smoothIntonation_;
 
-	double pitchMean_;
+	double meanPitch_;
 	double globalTempo_;
 
 	std::vector<PostureData> postureData_;

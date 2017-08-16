@@ -26,9 +26,9 @@
 #include <vector>
 
 #include "DictionarySearch.h"
+#include "english/NumberParser.h"
 #include "StringMap.h"
 #include "TextParser.h"
-#include "english/NumberParser.h"
 
 namespace GS {
 namespace English {
@@ -36,11 +36,8 @@ namespace English {
 class EnglishTextParser : public VTMControlModel::TextParser {
 public:
 	EnglishTextParser(
-		const std::string& configDirPath,
-		const std::string& dictionary1Path,
-		const std::string& dictionary2Path,
-		const std::string& dictionary3Path,
-		Mode mode=Mode::normal);
+		const std::string& textParserConfigDirPath,
+		const VTMControlModel::TextParserConfiguration& config);
 	~EnglishTextParser();
 
 	virtual std::string parse(const char* text);

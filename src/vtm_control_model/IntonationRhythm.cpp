@@ -46,7 +46,7 @@ IntonationRhythm::IntonationRhythm(const char* configDirPath)
 		, randSrc_{randDev_()}
 		, randomIntonationParamSetIndex_(static_cast<int>(ToneGroup::numberOfGroups))
 		, useFixedIntonationParameters_{}
-		, useRandomIntonation_{}
+		, randomIntonation_{}
 {
 	std::string configDir{configDirPath};
 	configDir += CONFIG_SUB_DIR;
@@ -126,7 +126,7 @@ IntonationRhythm::loadToneGroupParameters(ToneGroup toneGroup, const std::string
 }
 
 void
-IntonationRhythm::setUseRandomIntonation(bool value)
+IntonationRhythm::setRandomIntonation(bool value)
 {
 	if (value) {
 		const unsigned int numToneGroups = static_cast<unsigned int>(ToneGroup::numberOfGroups);
@@ -141,7 +141,7 @@ IntonationRhythm::setUseRandomIntonation(bool value)
 			item.reset();
 		}
 	}
-	useRandomIntonation_ = value;
+	randomIntonation_ = value;
 }
 
 const float*

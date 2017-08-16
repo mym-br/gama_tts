@@ -179,9 +179,8 @@ tts(int argc, char* argv[])
 		vtmControlModel->load(dataDir, VTM_CONTROL_MODEL_CONFIG_FILE);
 
 		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(dataDir, *vtmControlModel);
-		const GS::VTMControlModel::Configuration& vtmControlConfig = vtmController->vtmControlModelConfiguration();
 
-		auto textParser = GS::VTMControlModel::TextParser::getInstance(dataDir, vtmControlConfig);
+		auto textParser = GS::VTMControlModel::TextParser::getInstance(dataDir);
 		std::string phoneticString = textParser->parse(text.c_str());
 
 		vtmController->synthesizePhoneticStringToFile(phoneticString, vtmParamFile, outputFile);

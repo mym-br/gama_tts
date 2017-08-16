@@ -200,7 +200,7 @@ Pho1Parser::addIntonation()
 		for (auto& point : item.intonationPoints) {
 			eventList_.addPostureIntonationPoint(
 					item.postureIndex, point.position / 100.0f,
-					VTM::Util::pitch(point.frequency) - eventList_.pitchMean());
+					VTM::Util::pitch(point.frequency) - eventList_.meanPitch());
 		}
 	}
 }

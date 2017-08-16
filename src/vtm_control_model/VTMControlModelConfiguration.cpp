@@ -31,26 +31,7 @@
 namespace GS {
 namespace VTMControlModel {
 
-Configuration::Configuration()
-		: controlPeriod{}
-		, controlRate{}
-		, tempo{}
-		, pitchOffset{}
-		, driftDeviation{}
-		, driftLowpassCutoff{}
-		, intonation{}
-		, textParserMode{}
-		, notionalPitch{}
-		, pretonicPitchRange{}
-		, pretonicPerturbationRange{}
-		, tonicPitchRange{}
-		, tonicPerturbationRange{}
-		, intonationFactor{1.0}
-{
-}
-
-void
-Configuration::load(const char* configDirPath)
+Configuration::Configuration(const char* configDirPath)
 {
 	std::ostringstream configFilePath;
 	configFilePath << configDirPath << CONFIG_FILE_NAME;
@@ -65,25 +46,7 @@ Configuration::load(const char* configDirPath)
 	pitchOffset        = config.value<double>("pitch_offset");
 	driftDeviation     = config.value<double>("drift_deviation");
 	driftLowpassCutoff = config.value<double>("drift_lowpass_cutoff");
-
-	intonation = 0;
-	if (config.value<int>("micro_intonation") != 0) {
-		intonation += INTONATION_MICRO;
-	}
-	if (config.value<int>("macro_intonation") != 0) {
-		intonation += INTONATION_MACRO;
-	}
-	if (config.value<int>("smooth_intonation") != 0) {
-		intonation += INTONATION_SMOOTH;
-	}
-	if (config.value<int>("intonation_drift") != 0) {
-		intonation += INTONATION_DRIFT;
-	}
-	if (config.value<int>("random_intonation") != 0) {
-		intonation += INTONATION_RANDOM;
-	}
-
-	textParserMode = config.value<int>("text_parser_mode");
+	voiceName          = config.value<std::string>("voice_name");
 
 	notionalPitch             = config.value<double>("notional_pitch");
 	pretonicPitchRange        = config.value<double>("pretonic_pitch_range");
@@ -91,11 +54,11 @@ Configuration::load(const char* configDirPath)
 	tonicPitchRange           = config.value<double>("tonic_pitch_range");
 	tonicPerturbationRange    = config.value<double>("tonic_perturbation_range");
 
-	language        = config.value<std::string>("language");
-	voiceName       = config.value<std::string>("voice_name");
-	dictionary1File = config.value<std::string>("dictionary_1_file");
-	dictionary2File = config.value<std::string>("dictionary_2_file");
-	dictionary3File = config.value<std::string>("dictionary_3_file");
+	microIntonation  = (config.value<int>("micro_intonation" ) != 0);
+	macroIntonation  = (config.value<int>("macro_intonation" ) != 0);
+	smoothIntonation = (config.value<int>("smooth_intonation") != 0);
+	intonationDrift  = (config.value<int>("intonation_drift" ) != 0);
+	randomIntonation = (config.value<int>("random_intonation") != 0);
 
 	// Load voice data.
 	std::ostringstream voiceFilePath;

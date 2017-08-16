@@ -17,34 +17,52 @@
 
 #include "TextParser.h"
 
-#include "Exception.h"
-#include "VTMControlModelConfiguration.h"
+#include <sstream>
+
+#include "ConfigurationData.h"
 #include "english/EnglishTextParser.h"
+#include "Exception.h"
+
+#define CONFIG_FILE_NAME "/text_parser.config"
+#define TEXT_PARSER_DIR "/text_parser/"
+
+
 
 namespace GS {
 namespace VTMControlModel {
 
-std::unique_ptr<TextParser>
-TextParser::getInstance(const std::string& configDirPath, const Configuration& config)
+TextParserConfiguration::TextParserConfiguration(const std::string& configDirPath)
 {
-	TextParser::Mode textParserMode;
-	switch (config.textParserMode) {
-	case 0: textParserMode = Mode::normal  ; break;
-	case 1: textParserMode = Mode::emphasis; break;
-	case 2: textParserMode = Mode::letter  ; break;
-	default:
-		THROW_EXCEPTION(InvalidValueException, "Invalid text parser mode: " << config.textParserMode << '.');
-	}
+	std::ostringstream configFilePath;
+	configFilePath << configDirPath << CONFIG_FILE_NAME;
+	ConfigurationData config(configFilePath.str());
 
-	if (config.language == "english") {
-		return std::make_unique<English::EnglishTextParser>(
-							configDirPath,
-							config.dictionary1File,
-							config.dictionary2File,
-							config.dictionary3File,
-							textParserMode);
+	language        = config.value<std::string>("language");
+	dictionary1File = config.value<std::string>("dictionary_1_file");
+	dictionary2File = config.value<std::string>("dictionary_2_file");
+	dictionary3File = config.value<std::string>("dictionary_3_file");
+
+	const int modeIndex = config.value<int>("mode");
+	switch (modeIndex) {
+	case 0: mode = TextParser::Mode::normal  ; break;
+	case 1: mode = TextParser::Mode::emphasis; break;
+	case 2: mode = TextParser::Mode::letter  ; break;
+	default:
+		THROW_EXCEPTION(InvalidValueException, "Invalid text parser mode: " << modeIndex << '.');
+	}
+}
+
+std::unique_ptr<TextParser>
+TextParser::getInstance(const std::string& configDirPath)
+{
+	std::string textParserConfigDir = configDirPath + TEXT_PARSER_DIR;
+
+	TextParserConfiguration textParserConfig{textParserConfigDir};
+
+	if (textParserConfig.language == "english") {
+		return std::make_unique<English::EnglishTextParser>(textParserConfigDir, textParserConfig);
 	} else {
-		THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << config.language << '.');
+		THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << textParserConfig.language << '.');
 	}
 }
 

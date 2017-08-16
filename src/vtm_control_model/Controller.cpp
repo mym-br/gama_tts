@@ -42,10 +42,8 @@ Controller::Controller(const char* configDirPath, Model& model)
 		: configDirPath_{configDirPath}
 		, model_{model}
 		, eventList_{configDirPath, model_}
+		, vtmControlModelConfig_{configDirPath}
 {
-	// Load VTMControlModel configuration.
-	vtmControlModelConfig_.load(configDirPath);
-
 	// Load VTM configuration.
 	std::ostringstream vtmConfigFilePath;
 	vtmConfigFilePath << configDirPath << VTM_CONFIG_FILE_NAME;
@@ -84,16 +82,16 @@ Controller::initUtterance()
 		printf("sampling Rate: %d\n", outputRate);
 	}
 
-	eventList_.setPitchMean(vtmControlModelConfig_.pitchOffset + vtmConfigData_->value<float>("reference_glottal_pitch"));
+	eventList_.setMeanPitch(vtmControlModelConfig_.pitchOffset + vtmConfigData_->value<float>("reference_glottal_pitch"));
 	eventList_.setGlobalTempo(vtmControlModelConfig_.tempo);
 	eventList_.setUpDriftGenerator(vtmControlModelConfig_.driftDeviation, vtmControlModelConfig_.controlRate, vtmControlModelConfig_.driftLowpassCutoff);
 
 	// Configure intonation.
-	eventList_.setMicroIntonation(    vtmControlModelConfig_.intonation & Configuration::INTONATION_MICRO);
-	eventList_.setMacroIntonation(    vtmControlModelConfig_.intonation & Configuration::INTONATION_MACRO);
-	eventList_.setSmoothIntonation(   vtmControlModelConfig_.intonation & Configuration::INTONATION_SMOOTH);
-	eventList_.setIntonationDrift(    vtmControlModelConfig_.intonation & Configuration::INTONATION_DRIFT);
-	eventList_.setUseRandomIntonation(vtmControlModelConfig_.intonation & Configuration::INTONATION_RANDOM);
+	eventList_.setMicroIntonation( vtmControlModelConfig_.microIntonation);
+	eventList_.setMacroIntonation( vtmControlModelConfig_.macroIntonation);
+	eventList_.setSmoothIntonation(vtmControlModelConfig_.smoothIntonation);
+	eventList_.setIntonationDrift( vtmControlModelConfig_.intonationDrift);
+	eventList_.setRandomIntonation(vtmControlModelConfig_.randomIntonation);
 	eventList_.setIntonationFactor(vtmControlModelConfig_.intonationFactor);
 }
 
@@ -218,8 +216,12 @@ Controller::synthesizePho1ToFile(const std::string& phoneticString, const char* 
 	}
 
 	vtmParamList_.clear();
-	vtmControlModelConfig_.intonation = Configuration::INTONATION_MICRO | Configuration::INTONATION_MACRO;
+
 	initUtterance();
+	eventList_.setMicroIntonation(true);
+	eventList_.setMacroIntonation(true);
+	eventList_.setSmoothIntonation(false);
+
 	eventList_.setUp();
 	pho1Parser_->parse(phoneticString);
 	eventList_.generateOutput(vtmParamList_);
