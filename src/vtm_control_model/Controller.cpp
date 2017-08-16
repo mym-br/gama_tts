@@ -67,15 +67,6 @@ Controller::initUtterance()
 	const float vtlOffset = vtmConfigData_->value<float>("vocal_tract_length_offset");
 	const float vocalTractLength = vtmConfigData_->value<float>("vocal_tract_length");
 
-	if ((outputRate != 22050) && (outputRate != 44100)) {
-		vtmConfigData_->put("output_rate", 44100);
-		outputRate = 44100;
-	}
-	if ((vtlOffset + vocalTractLength) < 15.9f) {
-		vtmConfigData_->put("output_rate", 44100);
-		outputRate = 44100;
-	}
-
 	if (Log::debugEnabled) {
 		printf("Tube Length = %f\n", vtlOffset + vocalTractLength);
 		printf("Voice: %s\n", vtmControlModelConfig_.voiceName.c_str());
