@@ -350,6 +350,7 @@ checkCluster(const char* p, const char** match_array)
 //==============================================================================
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 /******************************************************************************
@@ -405,4 +406,5 @@ syllabify(char* word)
 }
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */

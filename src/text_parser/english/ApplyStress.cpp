@@ -225,6 +225,7 @@ prefix(const char* orthography)
 //==============================================================================
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 /******************************************************************************
@@ -316,4 +317,5 @@ applyStress(char* buffer, const char* orthography)
 }
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */

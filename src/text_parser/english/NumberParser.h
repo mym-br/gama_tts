@@ -18,13 +18,14 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef ENGLISH_NUMBER_PARSER_H_
-#define ENGLISH_NUMBER_PARSER_H_
+#ifndef TEXT_PARSER_ENGLISH_NUMBER_PARSER_H_
+#define TEXT_PARSER_ENGLISH_NUMBER_PARSER_H_
 
 #include <array>
 #include <string>
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 /********************************************************************
@@ -160,6 +161,7 @@ private:
 };
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */
 
-#endif /* ENGLISH_NUMBER_PARSER_H_ */
+#endif /* TEXT_PARSER_ENGLISH_NUMBER_PARSER_H_ */

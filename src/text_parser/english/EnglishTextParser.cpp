@@ -147,12 +147,11 @@
 namespace {
 
 using namespace GS;
-using namespace GS::VTMControlModel;
 
 void printStream(std::stringstream& stream, std::size_t streamLength);
 void getState(const char* buffer, std::size_t length, std::size_t* i, int* current_state, int* next_state, char* word);
 void setToneGroup(std::stringstream& stream, long tg_pos, const char* word);
-int anotherWordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode);
+int anotherWordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::TextParser::Mode mode);
 int isIsolated(char* buffer, std::size_t len, std::size_t i);
 int partOfNumber(char* buffer, std::size_t len, std::size_t i);
 int numberFollows(char* buffer, std::size_t len, std::size_t i);
@@ -160,7 +159,7 @@ void deleteEllipsis(char* buffer, std::size_t length, std::size_t* i);
 int convertDash(char* buffer, std::size_t length, std::size_t* i);
 int isTelephoneNumber(char* buffer, std::size_t length, std::size_t i);
 int isPunctuation(char c);
-int wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode);
+int wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::TextParser::Mode mode);
 void expandLetterMode(const char* buffer, std::size_t length, std::stringstream& stream);
 int isAllUpperCase(const char* word);
 char* toLowerCase(char* word);
@@ -362,9 +361,9 @@ setToneGroup(std::stringstream& stream, long tg_pos, const char* word)
 *
 ******************************************************************************/
 int
-anotherWordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode)
+anotherWordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::TextParser::Mode mode)
 {
-	if ((mode == TextParser::Mode::normal) || (mode == TextParser::Mode::emphasis)) {
+	if ((mode == TextParser::TextParser::Mode::normal) || (mode == TextParser::TextParser::Mode::emphasis)) {
 		for (std::size_t j = i + 1; j < length; j++) {
 			/*  WORD HAS BEEN FOUND  */
 			if (!isPunctuation(buffer[j])) {
@@ -583,11 +582,11 @@ isPunctuation(char c)
 *
 ******************************************************************************/
 int
-wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::Mode mode)
+wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::TextParser::Mode mode)
 {
 	switch (mode) {
-	case TextParser::Mode::normal:
-	case TextParser::Mode::emphasis:
+	case TextParser::TextParser::Mode::normal:
+	case TextParser::TextParser::Mode::emphasis:
 		for (std::size_t j = i + 1; j < length; j++) {
 			/*  IGNORE WHITE SPACE  */
 			if (buffer[j] == ' ') {
@@ -604,7 +603,7 @@ wordFollows(const char* buffer, std::size_t length, std::size_t i, TextParser::M
 			}
 		}
 		// Falls through.
-	case TextParser::Mode::letter:
+	case TextParser::TextParser::Mode::letter:
 		/*  IF LETTER MODE CONTAINS ANY SYMBOLS, THEN RETURN 1  */
 		return 1;
 	default:
@@ -1092,6 +1091,7 @@ conditionInput(const char* input, std::size_t inputLength, char* output, std::si
 //==============================================================================
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 EnglishTextParser::EnglishTextParser(
@@ -1104,19 +1104,19 @@ EnglishTextParser::EnglishTextParser(
 	std::string suffixFilePath = suffixFilePathStream.str();
 
 	if (config.dictionary1File != "none") {
-		dict1_ = std::make_unique<VTMControlModel::DictionarySearch>();
+		dict1_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << textParserConfigDirPath << config.dictionary1File;
 		dict1_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 	if (config.dictionary2File != "none") {
-		dict2_ = std::make_unique<VTMControlModel::DictionarySearch>();
+		dict2_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << textParserConfigDirPath << config.dictionary2File;
 		dict2_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 	if (config.dictionary3File != "none") {
-		dict3_ = std::make_unique<VTMControlModel::DictionarySearch>();
+		dict3_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
 		filePath << textParserConfigDirPath << config.dictionary3File;
 		dict3_->load(filePath.str().c_str(), suffixFilePath.c_str());
@@ -1861,4 +1861,5 @@ EnglishTextParser::isSpecialAcronym(const char* word)
 }
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */

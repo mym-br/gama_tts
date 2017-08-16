@@ -74,7 +74,7 @@ wordHasSuffix(const char* word, const char* suffix)
 //==============================================================================
 
 namespace GS {
-namespace VTMControlModel {
+namespace TextParser {
 
 void
 DictionarySearch::clearBuffers()
@@ -211,5 +211,5 @@ DictionarySearch::augmentedSearch(const char* orthography)
 	return nullptr;
 }
 
-} /* namespace VTMControlModel */
+} /* namespace TextParser */
 } /* namespace GS */

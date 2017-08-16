@@ -756,6 +756,7 @@ medialS(char* in, char** eow)
 //==============================================================================
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 /******************************************************************************
@@ -803,4 +804,5 @@ letterToSound(const char* word, std::vector<char>& pronunciation)
 }
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */

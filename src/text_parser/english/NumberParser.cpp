@@ -189,6 +189,7 @@ const char* triad_name[3][TRIADS_MAX] = {
 //==============================================================================
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 NumberParser::NumberParser()
@@ -1385,4 +1386,5 @@ NumberParser::degenerateString(const char* word)
 }
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */

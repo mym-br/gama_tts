@@ -853,6 +853,7 @@ const pktrie trie[TRIE_NODES] = {
 //==============================================================================
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 void
@@ -910,4 +911,5 @@ ispTrans(char *string, char *result)
 }
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */

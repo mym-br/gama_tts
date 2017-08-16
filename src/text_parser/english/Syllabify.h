@@ -18,15 +18,17 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef ENGLISH_SYLLABIFY_H_
-#define ENGLISH_SYLLABIFY_H_
+#ifndef TEXT_PARSER_ENGLISH_SYLLABIFY_H_
+#define TEXT_PARSER_ENGLISH_SYLLABIFY_H_
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 int syllabify(char* word);
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */
 
-#endif /* ENGLISH_SYLLABIFY_H_ */
+#endif /* TEXT_PARSER_ENGLISH_SYLLABIFY_H_ */

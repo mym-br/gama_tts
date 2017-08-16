@@ -18,8 +18,8 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef ENGLISH_NUMBER_PRONUNCIATIONS_H_
-#define ENGLISH_NUMBER_PRONUNCIATIONS_H_
+#ifndef TEXT_PARSER_ENGLISH_NUMBER_PRONUNCIATIONS_H_
+#define TEXT_PARSER_ENGLISH_NUMBER_PRONUNCIATIONS_H_
 
 // Contains pronunciations for NumberParser AND LetterToSound.
 
@@ -269,4 +269,4 @@
 #define TILDE                  "'t_i_l.d_uh "
 #define UNKNOWN                "uh_n.'n_uh_uu_n "
 
-#endif /* ENGLISH_NUMBER_PRONUNCIATIONS_H_ */
+#endif /* TEXT_PARSER_ENGLISH_NUMBER_PRONUNCIATIONS_H_ */

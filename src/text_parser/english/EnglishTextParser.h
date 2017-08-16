@@ -18,8 +18,8 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef ENGLISH_TEXT_PARSER_H_
-#define ENGLISH_TEXT_PARSER_H_
+#ifndef TEXT_PARSER_ENGLISH_TEXT_PARSER_H_
+#define TEXT_PARSER_ENGLISH_TEXT_PARSER_H_
 
 #include <memory>
 #include <string>
@@ -31,13 +31,14 @@
 #include "TextParser.h"
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
-class EnglishTextParser : public VTMControlModel::TextParser {
+class EnglishTextParser : public TextParser {
 public:
 	EnglishTextParser(
 		const std::string& textParserConfigDirPath,
-		const VTMControlModel::TextParserConfiguration& config);
+		const TextParserConfiguration& config);
 	~EnglishTextParser();
 
 	virtual std::string parse(const char* text);
@@ -58,9 +59,9 @@ private:
 	void stripPunctuation(char* buffer, std::size_t length, std::stringstream& stream, std::size_t* streamLength);
 	const char* isSpecialAcronym(const char* word);
 
-	std::unique_ptr<VTMControlModel::DictionarySearch> dict1_;
-	std::unique_ptr<VTMControlModel::DictionarySearch> dict2_;
-	std::unique_ptr<VTMControlModel::DictionarySearch> dict3_;
+	std::unique_ptr<DictionarySearch> dict1_;
+	std::unique_ptr<DictionarySearch> dict2_;
+	std::unique_ptr<DictionarySearch> dict3_;
 	short dictionaryOrder_[DICTIONARY_ORDER_SIZE];
 	std::vector<char> pronunciation_;
 	NumberParser numberParser_;
@@ -71,6 +72,7 @@ private:
 };
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */
 
-#endif /* ENGLISH_TEXT_PARSER_H_ */
+#endif /* TEXT_PARSER_ENGLISH_TEXT_PARSER_H_ */

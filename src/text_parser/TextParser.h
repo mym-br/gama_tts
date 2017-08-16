@@ -15,14 +15,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef VTM_CONTROL_MODEL_TEXT_PARSER_H_
-#define VTM_CONTROL_MODEL_TEXT_PARSER_H_
+#ifndef TEXT_PARSER_H_
+#define TEXT_PARSER_H_
 
 #include <memory>
 #include <string>
 
 namespace GS {
-namespace VTMControlModel {
+namespace TextParser {
 
 class TextParser {
 public:
@@ -50,7 +50,7 @@ struct TextParserConfiguration {
 	TextParserConfiguration(const std::string& configDirPath);
 };
 
-} /* namespace VTMControlModel */
+} /* namespace TextParser */
 } /* namespace GS */
 
-#endif /* VTM_CONTROL_MODEL_TEXT_PARSER_H_ */
+#endif /* TEXT_PARSER_H_ */

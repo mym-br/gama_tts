@@ -17,6 +17,7 @@ set(GAMA_TTS_VERSION_STRING ${GAMA_TTS_VERSION_MAJOR}.${GAMA_TTS_VERSION_MINOR}.
 include_directories(
     src
     src/rapidxml
+    src/text_parser
     src/vtm
     src/vtm_control_model
     src/xml
@@ -40,21 +41,25 @@ set(LIBRARY_FILES
     src/WAVEFileWriter.cpp
     src/WAVEFileWriter.h
 
-    src/english/ApplyStress.cpp
-    src/english/ApplyStress.h
-    src/english/EnglishTextParser.cpp
-    src/english/EnglishTextParser.h
-    src/english/IspTrans.cpp
-    src/english/IspTrans.h
-    src/english/LetterToSound.cpp
-    src/english/LetterToSound.h
-    src/english/NumberParser.cpp
-    src/english/NumberParser.h
-    src/english/NumberPronunciations.h
-    src/english/Syllabify.cpp
-    src/english/Syllabify.h
-
     src/rapidxml/rapidxml.hpp
+
+    src/text_parser/english/ApplyStress.cpp
+    src/text_parser/english/ApplyStress.h
+    src/text_parser/english/EnglishTextParser.cpp
+    src/text_parser/english/EnglishTextParser.h
+    src/text_parser/english/IspTrans.cpp
+    src/text_parser/english/IspTrans.h
+    src/text_parser/english/LetterToSound.cpp
+    src/text_parser/english/LetterToSound.h
+    src/text_parser/english/NumberParser.cpp
+    src/text_parser/english/NumberParser.h
+    src/text_parser/english/NumberPronunciations.h
+    src/text_parser/english/Syllabify.cpp
+    src/text_parser/english/Syllabify.h
+    src/text_parser/DictionarySearch.cpp
+    src/text_parser/DictionarySearch.h
+    src/text_parser/TextParser.cpp
+    src/text_parser/TextParser.h
 
     src/vtm/BandpassFilter.h
     src/vtm/Butterworth1LowpassFilter.h
@@ -80,8 +85,6 @@ set(LIBRARY_FILES
     src/vtm/WavetableGlottalSource.h
 
     src/vtm_control_model/Category.h
-    src/vtm_control_model/DictionarySearch.cpp
-    src/vtm_control_model/DictionarySearch.h
     src/vtm_control_model/DriftGenerator.cpp
     src/vtm_control_model/DriftGenerator.h
     src/vtm_control_model/Controller.cpp
@@ -109,8 +112,6 @@ set(LIBRARY_FILES
     src/vtm_control_model/Rule.cpp
     src/vtm_control_model/Rule.h
     src/vtm_control_model/Symbol.h
-    src/vtm_control_model/TextParser.cpp
-    src/vtm_control_model/TextParser.h
     src/vtm_control_model/Transition.cpp
     src/vtm_control_model/Transition.h
     src/vtm_control_model/VTMControlModelConfiguration.cpp

@@ -18,17 +18,19 @@
 // 2014-09
 // This file was copied from Gnuspeech and modified by Marcelo Y. Matuda.
 
-#ifndef ENGLISH_LETTER_TO_SOUND_H_
-#define ENGLISH_LETTER_TO_SOUND_H_
+#ifndef TEXT_PARSER_ENGLISH_LETTER_TO_SOUND_H_
+#define TEXT_PARSER_ENGLISH_LETTER_TO_SOUND_H_
 
 #include <vector>
 
 namespace GS {
+namespace TextParser {
 namespace English {
 
 void letterToSound(const char* word, std::vector<char>& pronunciation);
 
 } /* namespace English */
+} /* namespace TextParser */
 } /* namespace GS */
 
-#endif /* ENGLISH_LETTER_TO_SOUND_H_ */
+#endif /* TEXT_PARSER_ENGLISH_LETTER_TO_SOUND_H_ */

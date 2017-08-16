@@ -29,7 +29,7 @@
 
 
 namespace GS {
-namespace VTMControlModel {
+namespace TextParser {
 
 TextParserConfiguration::TextParserConfiguration(const std::string& configDirPath)
 {
@@ -66,5 +66,5 @@ TextParser::getInstance(const std::string& configDirPath)
 	}
 }
 
-} /* namespace VTMControlModel */
+} /* namespace TextParser */
 } /* namespace GS */
