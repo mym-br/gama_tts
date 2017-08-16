@@ -5,5 +5,5 @@ libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
 Name: GamaTTS
 Description: Articulatory speech synthesizer
 Version: @GAMA_TTS_VERSION_STRING@
-Cflags: -I${includedir} -I${includedir}/vtm -I${includedir}/vtm_control_model -I${includedir}/xml
+Cflags: -I${includedir} -I${includedir}/text_parser -I${includedir}/vtm -I${includedir}/vtm_control_model
 Libs: -L${libdir} -lgamatts
