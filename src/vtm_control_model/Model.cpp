@@ -703,5 +703,27 @@ Model::findFirstMatchingRule(const std::vector<RuleExpressionData>& ruleExpressi
 	return nullptr;
 }
 
+/*******************************************************************************
+ * Validate the model.
+ *
+ * NOTE: The validation is not complete.
+ */
+void
+Model::validate() const
+{
+	if (ruleList_.empty()) return;
+	unsigned int ruleNumber = 1;
+	for (auto& rule : ruleList_) {
+		try {
+			rule->validate(*this);
+		} catch (Exception& e) {
+			THROW_EXCEPTION(ValidationException, "Error in the validation of rule " << ruleNumber
+						<< ". Cause: " << e.what());
+		}
+
+		++ruleNumber;
+	}
+}
+
 } /* namespace VTMControlModel */
 } /* namespace GS */

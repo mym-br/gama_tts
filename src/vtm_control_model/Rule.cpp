@@ -565,5 +565,20 @@ Rule::setBooleanExpressionList(const std::vector<std::string>& exprList, const M
 	type_ = ruleType;
 }
 
+// This validation is incomplete.
+void
+Rule::validate(const Model& model) const
+{
+	// Parse the boolean expressions.
+	const unsigned int numExpr = booleanExpressionList_.size();
+	if (numExpr < 2 || numExpr > 4) {
+		THROW_EXCEPTION(InvalidValueException, "Invalid number of boolean expressions: " << numExpr << '.');
+	}
+	for (unsigned int i = 0; i < numExpr; ++i) {
+		Parser p{booleanExpressionList_[i], model};
+		p.parse();
+	}
+}
+
 } /* namespace VTMControlModel */
 } /* namespace GS */

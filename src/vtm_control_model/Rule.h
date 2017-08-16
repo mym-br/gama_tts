@@ -221,6 +221,8 @@ public:
 	void setComment(const std::string& comment) { comment_ = comment; }
 
 	Type type() const { return type_; }
+
+	void validate(const Model& model) const;
 private:
 	std::vector<std::string> booleanExpressionList_;
 	std::vector<std::shared_ptr<Transition>> paramProfileTransitionList_;

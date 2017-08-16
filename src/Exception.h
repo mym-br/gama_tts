@@ -172,6 +172,7 @@ class IOException                       : public Exception {};
 class MissingValueException             : public Exception {};
 class ParsingException                  : public Exception {};
 class TextParserException               : public Exception {};
+class ValidationException               : public Exception {};
 class VTMControlModelException          : public Exception {};
 class VTMException                      : public Exception {};
 class UnavailableResourceException      : public Exception {};

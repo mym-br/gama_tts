@@ -106,6 +106,8 @@ public:
 	const std::shared_ptr<Category> findCategory(const std::string& name) const;
 	std::shared_ptr<Category> findCategory(const std::string& name);
 	bool findCategoryName(const std::string& name) const;
+
+	void validate() const;
 private:
 	void printInfo() const;
 
