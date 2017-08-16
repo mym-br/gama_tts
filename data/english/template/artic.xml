@@ -29,12 +29,15 @@
     <symbol name="transition" minimum="2" maximum="400" default="27.8"/>
     <symbol name="qssa" minimum="10" maximum="500" default="75"/>
     <symbol name="qssb" minimum="10" maximum="500" default="75"/>
+    <symbol name="markedDuration" minimum="0" maximum="500" default="100"/>
+    <symbol name="markedTransition" minimum="2" maximum="400" default="27.8"/>
+    <symbol name="markedQssa" minimum="10" maximum="500" default="75"/>
+    <symbol name="markedQssb" minimum="10" maximum="500" default="75"/>
   </symbols>
   <postures>
     <posture symbol="#">
       <comment>This is an "at rest" symbol that is used to start and terminate utterances without introducing ridiculous transitions etc!</comment>
       <posture-categories>
-        <category-ref name="#"/>
         <category-ref name="silence"/>
         <category-ref name="phone"/>
       </posture-categories>
@@ -61,43 +64,14 @@
         <target name="transition" value="20"/>
         <target name="qssa" value="26"/>
         <target name="qssb" value="26"/>
-      </symbol-targets>
-    </posture>
-    <posture symbol="#'">
-      <comment>This is an "at rest" symbol that is used to start and terminate utterances without introducing ridiculous transitions etc!</comment>
-      <posture-categories>
-        <category-ref name="#'"/>
-        <category-ref name="silence"/>
-        <category-ref name="phone"/>
-      </posture-categories>
-      <parameter-targets>
-        <target name="microInt" value="0"/>
-        <target name="glotVol" value="0"/>
-        <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0"/>
-        <target name="fricPos" value="5.5"/>
-        <target name="fricCF" value="2500"/>
-        <target name="fricBW" value="500"/>
-        <target name="r1" value="0.8"/>
-        <target name="r2" value="0.89"/>
-        <target name="r3" value="0.99"/>
-        <target name="r4" value="0.81"/>
-        <target name="r5" value="0.76"/>
-        <target name="r6" value="1.05"/>
-        <target name="r7" value="1.23"/>
-        <target name="r8" value="0.01"/>
-        <target name="velum" value="0.1"/>
-      </parameter-targets>
-      <symbol-targets>
-        <target name="duration" value="72"/>
-        <target name="transition" value="20"/>
-        <target name="qssa" value="26"/>
-        <target name="qssb" value="26"/>
+        <target name="markedDuration" value="72"/>
+        <target name="markedTransition" value="20"/>
+        <target name="markedQssa" value="26"/>
+        <target name="markedQssb" value="26"/>
       </symbol-targets>
     </posture>
     <posture symbol="^">
       <posture-categories>
-        <category-ref name="^"/>
         <category-ref name="silence"/>
         <category-ref name="phone"/>
       </posture-categories>
@@ -124,37 +98,10 @@
         <target name="transition" value="40"/>
         <target name="qssa" value="30"/>
         <target name="qssb" value="30"/>
-      </symbol-targets>
-    </posture>
-    <posture symbol="^'">
-      <posture-categories>
-        <category-ref name="^'"/>
-        <category-ref name="silence"/>
-        <category-ref name="phone"/>
-      </posture-categories>
-      <parameter-targets>
-        <target name="microInt" value="0"/>
-        <target name="glotVol" value="0"/>
-        <target name="aspVol" value="0"/>
-        <target name="fricVol" value="0"/>
-        <target name="fricPos" value="5.5"/>
-        <target name="fricCF" value="2500"/>
-        <target name="fricBW" value="500"/>
-        <target name="r1" value="0.8"/>
-        <target name="r2" value="0.89"/>
-        <target name="r3" value="0.99"/>
-        <target name="r4" value="0.81"/>
-        <target name="r5" value="0.76"/>
-        <target name="r6" value="1.05"/>
-        <target name="r7" value="1.23"/>
-        <target name="r8" value="0.01"/>
-        <target name="velum" value="0.1"/>
-      </parameter-targets>
-      <symbol-targets>
-        <target name="duration" value="100"/>
-        <target name="transition" value="40"/>
-        <target name="qssa" value="30"/>
-        <target name="qssb" value="30"/>
+        <target name="markedDuration" value="100"/>
+        <target name="markedTransition" value="40"/>
+        <target name="markedQssa" value="30"/>
+        <target name="markedQssb" value="30"/>
       </symbol-targets>
     </posture>
   </postures>
@@ -311,7 +258,7 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="8.28535" time-expression="QssbOne"/>
               <point type="diphone" value="85.0608" time-expression="EndTrans"/>
               <point type="diphone" value="96.5525" time-expression="qssa2By2"/>
-              <point type="diphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
+              <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
               <slope slope="0.3" display-time="0"/>
@@ -332,7 +279,7 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="0" time-expression="Zero"/>
               <point type="diphone" value="0" time-expression="TransByOneThird"/>
               <point type="diphone" value="100" time-expression="TransByTwoThird"/>
-              <point type="diphone" value="100" time-expression="RuleDuration" is-phantom="yes"/>
+              <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
               <slope slope="0" display-time="0"/>
