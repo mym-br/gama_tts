@@ -571,12 +571,33 @@ Rule::validate(const Model& model) const
 {
 	// Parse the boolean expressions.
 	const unsigned int numExpr = booleanExpressionList_.size();
-	if (numExpr < 2 || numExpr > 4) {
-		THROW_EXCEPTION(InvalidValueException, "Invalid number of boolean expressions: " << numExpr << '.');
-	}
+	// booleanExpressionList_.size() and type_ are validated in setBooleanExpressionList.
 	for (unsigned int i = 0; i < numExpr; ++i) {
 		Parser p{booleanExpressionList_[i], model};
 		p.parse();
+	}
+
+	// Check the types of the transitions.
+	unsigned int paramNumber = 1;
+	for (const auto& trans : paramProfileTransitionList_) {
+		if (!trans) {
+			THROW_EXCEPTION(ValidationException, "Transition not set for parameter " << paramNumber << '.');
+		}
+		if (static_cast<int>(trans->type()) != static_cast<int>(type_)) {
+			THROW_EXCEPTION(ValidationException, "Wrong type of transition (" << static_cast<int>(trans->type())
+						<< ") for parameter " << paramNumber << '.');
+		}
+		++paramNumber;
+	}
+
+	// Check the types of the special transitions.
+	paramNumber = 1;
+	for (const auto& trans : specialProfileTransitionList_) {
+		if (trans && static_cast<int>(trans->type()) != static_cast<int>(type_)) {
+			THROW_EXCEPTION(ValidationException, "Wrong type of special transition (" << static_cast<int>(trans->type())
+						<< ") for parameter " << paramNumber << '.');
+		}
+		++paramNumber;
 	}
 }
 
