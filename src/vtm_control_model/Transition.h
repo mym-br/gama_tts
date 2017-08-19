@@ -104,9 +104,8 @@ public:
 
 	struct Slope {
 		float slope;
-		float displayTime;
 
-		Slope() : slope{}, displayTime{} {}
+		Slope() : slope{} {}
 	private:
 		Slope(const Slope&) = delete;
 		Slope& operator=(const Slope&) = delete;

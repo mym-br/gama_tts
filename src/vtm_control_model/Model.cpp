@@ -198,7 +198,7 @@ Model::printInfo() const
 							<< std::endl;
 					}
 					for (auto& slope : slopeRatio.slopeList) {
-						std::cout << "         slope: slope=" << slope->slope << " displayTime=" << slope->displayTime << std::endl;
+						std::cout << "         slope: slope=" << slope->slope << std::endl;
 					}
 				}
 			}

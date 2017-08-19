@@ -2590,9 +2590,9 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2609,11 +2609,11 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0.3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0.3" display-time="0"/>
+              <slope slope="0.3"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
+              <slope slope="0.3"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2630,11 +2630,11 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2651,11 +2651,11 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2670,9 +2670,9 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -2683,9 +2683,9 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="triphone" value="100" time-expression="Mark2"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2740,9 +2740,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2765,11 +2765,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
+              <slope slope="2"/>
+              <slope slope="0.5"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2792,10 +2792,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -2806,9 +2806,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="3"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2864,9 +2864,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2881,9 +2881,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2898,9 +2898,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2915,9 +2915,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2932,9 +2932,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2955,9 +2955,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -2988,9 +2988,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="DiphoneDefault"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3008,12 +3008,12 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="DiphoneDefault"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="3"/>
+              <slope slope="12"/>
+              <slope slope="3"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3032,12 +3032,12 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="3"/>
+              <slope slope="12"/>
+              <slope slope="3"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3055,9 +3055,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="TriphoneDefault"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="3"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3073,9 +3073,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3086,9 +3086,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3104,9 +3104,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3118,10 +3118,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3137,9 +3137,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3150,9 +3150,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3168,9 +3168,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3181,9 +3181,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="4" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="4"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3198,9 +3198,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3212,10 +3212,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="12" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="12"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3230,9 +3230,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3244,10 +3244,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3263,9 +3263,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3276,9 +3276,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0.2" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="0.2"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3294,9 +3294,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3308,10 +3308,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0.2" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="0.2"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3328,10 +3328,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="3"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3348,10 +3348,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="3"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3369,11 +3369,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3386,11 +3386,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="4" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
+              <slope slope="12"/>
+              <slope slope="4"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3408,11 +3408,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3425,11 +3425,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="4" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="2"/>
+              <slope slope="12"/>
+              <slope slope="4"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3447,11 +3447,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3464,11 +3464,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="4" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="4"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3487,10 +3487,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3502,10 +3502,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="2"/>
+              <slope slope="0.5"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3521,9 +3521,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3534,9 +3534,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3552,9 +3552,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="2" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="2"/>
+              <slope slope="12"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3565,9 +3565,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3583,9 +3583,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3596,9 +3596,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="12"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3614,9 +3614,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3627,9 +3627,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="2" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="2"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3645,9 +3645,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3658,9 +3658,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3677,10 +3677,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="3"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3699,10 +3699,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3714,10 +3714,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="1"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3735,11 +3735,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="2"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3752,11 +3752,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="2" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="12"/>
+              <slope slope="2"/>
+              <slope slope="0.5"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3774,11 +3774,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1.5" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="1.5"/>
+              <slope slope="0.5"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3790,10 +3790,10 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3811,11 +3811,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="1.5" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1.5" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="1.5"/>
+              <slope slope="6"/>
+              <slope slope="1.5"/>
+              <slope slope="0.5"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3828,11 +3828,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0.5"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3864,9 +3864,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3879,11 +3879,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="4" display-time="0"/>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="0.3" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0.5"/>
+              <slope slope="4"/>
+              <slope slope="0.5"/>
+              <slope slope="0.3"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3899,9 +3899,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="Mark1"/>
             </points>
             <slopes>
-              <slope slope="0.5" display-time="0"/>
-              <slope slope="12" display-time="0"/>
-              <slope slope="1" display-time="0"/>
+              <slope slope="0.5"/>
+              <slope slope="12"/>
+              <slope slope="1"/>
             </slopes>
           </slope-ratio>
           <slope-ratio>
@@ -3914,11 +3914,11 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="triphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0.7" display-time="0"/>
-              <slope slope="0.3" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="0.7"/>
+              <slope slope="0.3"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -3935,9 +3935,9 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>

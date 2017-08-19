@@ -262,7 +262,6 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 					for (const auto& slope : slopeRatio.slopeList) {
 						xml.openElementWithAttributes("slope");
 						xml.addAttribute("slope", slope->slope);
-						xml.addAttribute("display-time", slope->displayTime);
 						xml.endAttributesAndCloseElement();
 					}
 					xml.closeElement("slopes");

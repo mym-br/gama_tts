@@ -261,11 +261,11 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0.3" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="1" display-time="0"/>
-              <slope slope="0.3" display-time="0"/>
+              <slope slope="0.3"/>
+              <slope slope="1"/>
+              <slope slope="6"/>
+              <slope slope="1"/>
+              <slope slope="0.3"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>
@@ -282,9 +282,9 @@ Namely rd - (qssa3/2)/tempo3</comment>
               <point type="diphone" value="100" time-expression="RuleDuration"/>
             </points>
             <slopes>
-              <slope slope="0" display-time="0"/>
-              <slope slope="6" display-time="0"/>
-              <slope slope="0" display-time="0"/>
+              <slope slope="0"/>
+              <slope slope="6"/>
+              <slope slope="0"/>
             </slopes>
           </slope-ratio>
         </point-or-slopes>

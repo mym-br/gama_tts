@@ -74,7 +74,6 @@ const std::string transitionGroupTagName     = "transition-group";
 const std::string transitionsTagName         = "transitions";
 
 const std::string defaultAttrName        = "default";
-const std::string displayTimeAttrName    = "display-time";
 const std::string equationAttrName       = "equation";
 const std::string formulaAttrName        = "formula";
 const std::string freeTimeAttrName       = "free-time";
@@ -331,7 +330,6 @@ XMLConfigFileReader::parseSlopeRatio(rapidxml::xml_node<char>* slopeRatioElem, T
 						slopeElem = nextSibling(slopeElem, slopeTagName)) {
 				auto p2 = std::make_unique<Transition::Slope>();
 				p2->slope = Text::parseString<float>(attributeValue(slopeElem, slopeAttrName));
-				p2->displayTime = Text::parseString<float>(attributeValue(slopeElem, displayTimeAttrName));
 				p->slopeList.push_back(std::move(p2));
 			}
 		}
