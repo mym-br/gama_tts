@@ -808,7 +808,8 @@ EventList::prepareMacroIntonationInterpolation()
 	}
 	Event* event2{};
 
-	for (unsigned int j = 0; j < intonationPoints_.size() - 1; j++) {
+	const unsigned int numPoints = intonationPoints_.size();
+	for (unsigned int j = 0; j < numPoints - 1; ++j) {
 		const IntonationPoint& point1 = intonationPoints_[j];
 		const IntonationPoint& point2 = intonationPoints_[j + 1];
 
@@ -861,6 +862,17 @@ EventList::prepareMacroIntonationInterpolation()
 		event1->interpData = std::move(interpData);
 
 		event1 = event2;
+
+		if (j == numPoints - 2) { // last iteration
+			// After the last point: constant value.
+			auto lastInterpData = std::make_unique<InterpolationData>();
+			if (smoothIntonation_) {
+				lastInterpData->d = point2.semitone();
+			} else {
+				lastInterpData->b = point2.semitone();
+			}
+			event2->interpData = std::move(lastInterpData);
+		}
 	}
 }
 
