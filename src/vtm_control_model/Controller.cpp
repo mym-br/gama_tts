@@ -73,7 +73,8 @@ Controller::initUtterance()
 		printf("sampling Rate: %d\n", outputRate);
 	}
 
-	eventList_.setMeanPitch(vtmControlModelConfig_.pitchOffset + vtmConfigData_->value<float>("reference_glottal_pitch"));
+	eventList_.setInitialPitch(vtmControlModelConfig_.initialPitch);
+	eventList_.setMeanPitch(vtmControlModelConfig_.pitchOffset + vtmConfigData_->value<double>("reference_glottal_pitch"));
 	eventList_.setGlobalTempo(vtmControlModelConfig_.tempo);
 	eventList_.setUpDriftGenerator(vtmControlModelConfig_.driftDeviation, vtmControlModelConfig_.controlRate, vtmControlModelConfig_.driftLowpassCutoff);
 

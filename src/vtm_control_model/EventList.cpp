@@ -46,6 +46,8 @@ EventList::EventList(const char* configDirPath, Model& model)
 		, microIntonation_{}
 		, intonationDrift_{}
 		, smoothIntonation_{true}
+		, initialPitch_{}
+		, meanPitch_{}
 		, globalTempo_{1.0}
 		, intonationFactor_{1.0}
 		, intonationRhythm_{configDirPath}
@@ -62,8 +64,6 @@ EventList::~EventList()
 void
 EventList::setUp()
 {
-	list_.clear();
-
 	zeroRef_ = 0;
 	zeroIndex_ = 0;
 	duration_ = 0;
@@ -85,6 +85,8 @@ EventList::setUp()
 	currentRule_ = 0;
 
 	intonationPoints_.clear();
+
+	list_.clear();
 }
 
 void
@@ -925,7 +927,7 @@ EventList::generateOutput(std::vector<std::vector<float>>& vtmParamList)
 			if (list_[j]->interpData) break;
 		}
 		if (j < numEvents) {
-			const double y1 = -20.0; // hardcoded initial pitch
+			const double y1 = initialPitch_;
 			const double x2 = list_[j]->time;
 			const InterpolationData& data = *list_[j]->interpData;
 			// Straight line.

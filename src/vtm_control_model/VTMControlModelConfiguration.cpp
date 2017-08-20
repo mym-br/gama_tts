@@ -43,6 +43,7 @@ Configuration::Configuration(const char* configDirPath)
 	}
 	controlRate        = 1000.0 / controlPeriod;
 	tempo              = config.value<double>("tempo");
+	initialPitch       = config.value<double>("initial_pitch");
 	pitchOffset        = config.value<double>("pitch_offset");
 	driftDeviation     = config.value<double>("drift_deviation");
 	driftLowpassCutoff = config.value<double>("drift_lowpass_cutoff");

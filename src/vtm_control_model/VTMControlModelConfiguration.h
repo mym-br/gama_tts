@@ -36,6 +36,7 @@ struct Configuration {
 	unsigned int controlPeriod; // 1, 2, 3 or 4 (ms)
 	double controlRate;         // 1000.0 / controlPeriod (Hz)
 	double tempo;
+	double initialPitch;
 	double pitchOffset;
 	double driftDeviation;
 	double driftLowpassCutoff;
