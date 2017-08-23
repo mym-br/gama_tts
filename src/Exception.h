@@ -160,6 +160,7 @@ protected:
 	ExceptionString message_;
 };
 
+class AudioException                    : public Exception {};
 class EndOfBufferException              : public Exception {};
 class ExternalProgramExecutionException : public Exception {};
 class InvalidCallException              : public Exception {};
