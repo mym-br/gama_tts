@@ -253,7 +253,7 @@ VocalTractModel0<FloatType>::VocalTractModel0(const ConfigurationData& data, boo
 	loadConfiguration(data);
 	reset();
 	initializeSynthesizer();
-	outputBuffer_.reserve(1024);
+	outputBuffer_.reserve(OUTPUT_BUFFER_RESERVE);
 }
 
 template<typename FloatType>

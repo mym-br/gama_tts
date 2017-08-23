@@ -358,7 +358,7 @@ VocalTractModel5<FloatType, SectionDelay>::VocalTractModel5(const ConfigurationD
 	loadConfiguration(data);
 	reset();
 	initializeSynthesizer();
-	outputBuffer_.reserve(1024);
+	outputBuffer_.reserve(OUTPUT_BUFFER_RESERVE);
 }
 
 template<typename FloatType, unsigned int SectionDelay>

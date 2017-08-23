@@ -47,6 +47,10 @@ public:
 	virtual std::vector<float>& outputBuffer() = 0;
 
 	static std::unique_ptr<VocalTractModel> getInstance(const ConfigurationData& data, bool interactive = false);
+protected:
+	enum {
+		OUTPUT_BUFFER_RESERVE = 1024
+	};
 };
 
 } /* namespace VTM */
