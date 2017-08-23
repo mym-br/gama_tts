@@ -48,6 +48,10 @@ public:
 	Configuration& vtmControlModelConfiguration() { return vtmControlModelConfig_; }
 	EventList& eventList() { return eventList_; }
 	double outputSampleRate() const { return vtm_->outputSampleRate(); }
+	const std::vector<std::vector<float>>& vtmParameterList() const { return vtmParamList_; }
+	const ConfigurationData& vtmConfigData() const { return *vtmConfigData_; }
+	float outputScale() const { return outputScale_; }
+	double vtmInternalSampleRate() const { return vtm_->internalSampleRate(); }
 
 	// If vtmParamFile is not null, the VTM parameters will be written to a file.
 	void synthesizePhoneticStringToFile(const std::string& phoneticString, const char* vtmParamFile, const char* outputFile);
@@ -99,6 +103,7 @@ private:
 	std::unique_ptr<ConfigurationData> vtmConfigData_;
 	std::unique_ptr<VTM::VocalTractModel> vtm_;
 	std::vector<std::vector<float>> vtmParamList_;
+	float outputScale_;
 };
 
 } /* namespace VTMControlModel */

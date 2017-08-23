@@ -309,9 +309,9 @@ Controller::writeOutputToFile(const char* outputFile)
 	const std::vector<float>& audioData = vtm_->outputBuffer();
 	WAVEFileWriter fileWriter(outputFile, 1, audioData.size(), vtm_->outputSampleRate());
 
-	const float scale = VTM::Util::calculateOutputScale(audioData);
+	outputScale_ = VTM::Util::calculateOutputScale(audioData);
 	for (std::size_t i = 0, end = audioData.size(); i < end; ++i) {
-		fileWriter.writeSample(audioData[i] * scale);
+		fileWriter.writeSample(audioData[i] * outputScale_);
 	}
 }
 
@@ -321,9 +321,9 @@ Controller::writeOutputToBuffer(std::vector<float>& outputBuffer)
 	const std::vector<float>& audioData = vtm_->outputBuffer();
 	outputBuffer.resize(audioData.size());
 
-	const float scale = VTM::Util::calculateOutputScale(audioData);
+	outputScale_ = VTM::Util::calculateOutputScale(audioData);
 	for (std::size_t i = 0, end = audioData.size(); i < end; ++i) {
-		outputBuffer[i] = audioData[i] * scale;
+		outputBuffer[i] = audioData[i] * outputScale_;
 	}
 }
 
