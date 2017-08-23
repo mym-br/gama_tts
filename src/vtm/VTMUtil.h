@@ -65,8 +65,8 @@ amplitude60dB(FloatType decibelLevel)
 		return 0.0;
 	}
 
-	/*  IF 0 OR GREATER, RETURN AMPLITUDE OF 1  */
-	if (decibelLevel >= 0.0) {
+	/*  IF 0, RETURN AMPLITUDE OF 1  */
+	if (decibelLevel == 0.0) {
 		return 1.0;
 	}
 
