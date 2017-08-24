@@ -71,6 +71,10 @@ public:
 	// Synthesizes from VTM parameters contained in inputStream. Sends to a file.
 	void synthesizeToFile(std::istream& inputStream, const char* outputFile);
 
+	// Synthesizes from list of VTM parameters.
+	// If vtmParamFile is not null, the VTM parameters will be written to a file.
+	void synthesizeToFile(std::vector<std::vector<float>>& vtmParamList, const char* vtmParamFile, const char* outputFile);
+	void synthesizeToBuffer(std::vector<std::vector<float>>& vtmParamList, const char* vtmParamFile, std::vector<float>& outputBuffer);
 private:
 	Controller(const Controller&) = delete;
 	Controller& operator=(const Controller&) = delete;
@@ -87,12 +91,12 @@ private:
 	void getParametersFromPhoneticString(const std::string& phoneticString);
 	void getParametersFromEventList();
 	void getParametersFromStream(std::istream& in);
-	void synthesize();
+	void synthesize(std::vector<std::vector<float>>& vtmParamList);
 	void synthesizeToFile(const char* outputFile);
 	void synthesizeToBuffer(std::vector<float>& outputBuffer);
-	void writeOutputToFile(const char* outputFile);
-	void writeOutputToBuffer(std::vector<float>& outputBuffer);
-	void writeVTMParameterFile(const char* vtmParamFile);
+	void writeOutputToFile(const char* outputFile, float& scale);
+	void writeOutputToBuffer(std::vector<float>& outputBuffer, float& scale);
+	void writeVTMParameterFile(const std::vector<std::vector<float>>& vtmParamList, const char* vtmParamFile);
 
 	std::string configDirPath_;
 	Model& model_;

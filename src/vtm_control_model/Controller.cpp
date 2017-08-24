@@ -188,7 +188,7 @@ void
 Controller::synthesizePhoneticStringToFile(const std::string& phoneticString, const char* vtmParamFile, const char* outputFile)
 {
 	getParametersFromPhoneticString(phoneticString);
-	if (vtmParamFile) writeVTMParameterFile(vtmParamFile);
+	if (vtmParamFile) writeVTMParameterFile(vtmParamList_, vtmParamFile);
 	synthesizeToFile(outputFile);
 }
 
@@ -196,7 +196,7 @@ void
 Controller::synthesizePhoneticStringToBuffer(const std::string& phoneticString, const char* vtmParamFile, std::vector<float>& buffer)
 {
 	getParametersFromPhoneticString(phoneticString);
-	if (vtmParamFile) writeVTMParameterFile(vtmParamFile);
+	if (vtmParamFile) writeVTMParameterFile(vtmParamList_, vtmParamFile);
 	synthesizeToBuffer(buffer);
 }
 
@@ -217,7 +217,7 @@ Controller::synthesizePho1ToFile(const std::string& phoneticString, const char* 
 	eventList_.setUp();
 	pho1Parser_->parse(phoneticString);
 	eventList_.generateOutput(vtmParamList_);
-	if (vtmParamFile) writeVTMParameterFile(vtmParamFile);
+	if (vtmParamFile) writeVTMParameterFile(vtmParamList_, vtmParamFile);
 	synthesizeToFile(outputFile);
 }
 
@@ -225,7 +225,7 @@ void
 Controller::synthesizeFromEventListToFile(const char* vtmParamFile, const char* outputFile)
 {
 	getParametersFromEventList();
-	if (vtmParamFile) writeVTMParameterFile(vtmParamFile);
+	if (vtmParamFile) writeVTMParameterFile(vtmParamList_, vtmParamFile);
 	synthesizeToFile(outputFile);
 }
 
@@ -233,7 +233,7 @@ void
 Controller::synthesizeFromEventListToBuffer(const char* vtmParamFile, std::vector<float>& buffer)
 {
 	getParametersFromEventList();
-	if (vtmParamFile) writeVTMParameterFile(vtmParamFile);
+	if (vtmParamFile) writeVTMParameterFile(vtmParamList_, vtmParamFile);
 	synthesizeToBuffer(buffer);
 }
 
@@ -241,18 +241,42 @@ void
 Controller::synthesizeToFile(const char* outputFile)
 {
 	if (!vtm_->outputBuffer().empty()) vtm_->reset();
-	synthesize();
+	synthesize(vtmParamList_);
 	vtm_->finishSynthesis();
-	writeOutputToFile(outputFile);
+	writeOutputToFile(outputFile, outputScale_);
+}
+
+void
+Controller::synthesizeToFile(std::vector<std::vector<float>>& vtmParamList, const char* vtmParamFile, const char* outputFile)
+{
+	if (vtmParamFile) writeVTMParameterFile(vtmParamList, vtmParamFile);
+
+	if (!vtm_->outputBuffer().empty()) vtm_->reset();
+	synthesize(vtmParamList);
+	vtm_->finishSynthesis();
+	float scale;
+	writeOutputToFile(outputFile, scale);
 }
 
 void
 Controller::synthesizeToBuffer(std::vector<float>& outputBuffer)
 {
 	if (!vtm_->outputBuffer().empty()) vtm_->reset();
-	synthesize();
+	synthesize(vtmParamList_);
 	vtm_->finishSynthesis();
-	writeOutputToBuffer(outputBuffer);
+	writeOutputToBuffer(outputBuffer, outputScale_);
+}
+
+void
+Controller::synthesizeToBuffer(std::vector<std::vector<float>>& vtmParamList, const char* vtmParamFile, std::vector<float>& outputBuffer)
+{
+	if (vtmParamFile) writeVTMParameterFile(vtmParamList, vtmParamFile);
+
+	if (!vtm_->outputBuffer().empty()) vtm_->reset();
+	synthesize(vtmParamList);
+	vtm_->finishSynthesis();
+	float scale;
+	writeOutputToBuffer(outputBuffer, scale);
 }
 
 void
@@ -263,12 +287,12 @@ Controller::synthesizeToFile(std::istream& inputStream, const char* outputFile)
 }
 
 void
-Controller::synthesize()
+Controller::synthesize(std::vector<std::vector<float>>& vtmParamList)
 {
-	if (vtmParamList_.empty()) return;
+	if (vtmParamList.empty()) return;
 
 	// Duplicate the last set of parameters, to help the interpolation.
-	vtmParamList_.push_back(vtmParamList_.back());
+	vtmParamList.push_back(vtmParamList.back());
 
 	// Number of internal sample rate periods in each control rate period.
 	const unsigned int controlSteps = static_cast<unsigned int>(std::rint(vtm_->internalSampleRate() / vtmControlModelConfig_.controlRate));
@@ -279,12 +303,12 @@ Controller::synthesize()
 	std::vector<float> currentParameterDelta(numParam);
 
 	// For each control period:
-	for (std::size_t i = 1, size = vtmParamList_.size(); i < size; ++i) {
+	for (std::size_t i = 1, size = vtmParamList.size(); i < size; ++i) {
 		// Calculates the current parameter values, and their
 		// associated sample-to-sample delta values.
 		for (std::size_t j = 0; j < numParam; ++j) {
-			currentParameter[j] = vtmParamList_[i - 1][j];
-			currentParameterDelta[j] = (vtmParamList_[i][j] - currentParameter[j]) * coef;
+			currentParameter[j] = vtmParamList[i - 1][j];
+			currentParameterDelta[j] = (vtmParamList[i][j] - currentParameter[j]) * coef;
 		}
 
 		// For each step in a control period:
@@ -301,7 +325,7 @@ Controller::synthesize()
 }
 
 void
-Controller::writeOutputToFile(const char* outputFile)
+Controller::writeOutputToFile(const char* outputFile, float& scale)
 {
 	if (!outputFile) {
 		THROW_EXCEPTION(MissingValueException, "Missing output file name.");
@@ -309,26 +333,26 @@ Controller::writeOutputToFile(const char* outputFile)
 	const std::vector<float>& audioData = vtm_->outputBuffer();
 	WAVEFileWriter fileWriter(outputFile, 1, audioData.size(), vtm_->outputSampleRate());
 
-	outputScale_ = VTM::Util::calculateOutputScale(audioData);
+	scale = VTM::Util::calculateOutputScale(audioData);
 	for (std::size_t i = 0, end = audioData.size(); i < end; ++i) {
-		fileWriter.writeSample(audioData[i] * outputScale_);
+		fileWriter.writeSample(audioData[i] * scale);
 	}
 }
 
 void
-Controller::writeOutputToBuffer(std::vector<float>& outputBuffer)
+Controller::writeOutputToBuffer(std::vector<float>& outputBuffer, float& scale)
 {
 	const std::vector<float>& audioData = vtm_->outputBuffer();
 	outputBuffer.resize(audioData.size());
 
-	outputScale_ = VTM::Util::calculateOutputScale(audioData);
+	scale = VTM::Util::calculateOutputScale(audioData);
 	for (std::size_t i = 0, end = audioData.size(); i < end; ++i) {
-		outputBuffer[i] = audioData[i] * outputScale_;
+		outputBuffer[i] = audioData[i] * scale;
 	}
 }
 
 void
-Controller::writeVTMParameterFile(const char* vtmParamFile)
+Controller::writeVTMParameterFile(const std::vector<std::vector<float>>& vtmParamList, const char* vtmParamFile)
 {
 	if (!vtmParamFile) {
 		THROW_EXCEPTION(MissingValueException, "Missing output VTM parameter file name.");
@@ -338,7 +362,7 @@ Controller::writeVTMParameterFile(const char* vtmParamFile)
 		THROW_EXCEPTION(IOException, "Could not open the file " << vtmParamFile << '.');
 	}
 
-	for (auto& param : vtmParamList_) {
+	for (auto& param : vtmParamList) {
 		if (param.empty()) {
 			THROW_EXCEPTION(InvalidValueException, "Empty parameter set.");
 		}
