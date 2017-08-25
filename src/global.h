@@ -18,7 +18,7 @@
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
 
-#define GAMA_TTS_VERSION "0.4"
+#define GAMA_TTS_VERSION "0.5"
 #define VTM_CONTROL_MODEL_CONFIG_FILE "/artic.xml"
 
 #endif /* GLOBAL_H_ */
