@@ -25,7 +25,7 @@
 #include <cstdio> /* sprintf */
 #include <cstring> /* strcat, strcmp, strcpy, strlen */
 
-#include "Text.h"
+#include "english/EnglishText.h"
 #include "english/ApplyStress.h"
 #include "english/IspTrans.h"
 #include "english/NumberPronunciations.h"
@@ -42,7 +42,7 @@
 
 namespace {
 
-using namespace GS;
+using namespace GS::English;
 
 /*  DATA TYPES  **************************************************************/
 typedef struct {

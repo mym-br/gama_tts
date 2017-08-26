@@ -15,40 +15,93 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "Text.h"
+#include "EnglishText.h"
 
-#include <cctype> /* isprint */
+#include <cctype> /* isalnum, isalpha, islower, isprint, isupper, tolower, toupper */
 
 
 
 namespace GS {
+namespace English {
 namespace Text {
 
-std::string
-trim(const std::string& s)
+bool
+isAlpha(unsigned char c)
 {
-	const char* charList = " \t";
-	std::string::size_type firstPos = s.find_first_not_of(charList);
-	if (firstPos == std::string::npos) {
-		return std::string();
-	}
-
-	std::string::size_type lastPos = s.find_last_not_of(charList);
-	if (firstPos == 0 && lastPos == s.size() - 1) {
-		return s;
+	if (isAscii(c)) {
+		return std::isalpha(c);
 	} else {
-		return s.substr(firstPos, lastPos - firstPos + 1);
+		// Non-ASCII characters are considered alphabetic.
+		return true;
 	}
 }
 
 bool
-isNonprintableAscii(unsigned char c)
+isPrint(unsigned char c)
 {
 	if (isAscii(c)) {
-		return !std::isprint(c);
+		return std::isprint(c);
+	} else {
+		// Non-ASCII characters are considered printable.
+		return true;
 	}
-	return false;
+}
+
+bool
+isUpper(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::isupper(c);
+	} else {
+		// Non-ASCII characters are considered lowercase.
+		return false;
+	}
+}
+
+bool
+isLower(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::islower(c);
+	} else {
+		// Non-ASCII characters are considered lowercase.
+		return true;
+	}
+}
+
+bool
+isAlphaNum(unsigned char c)
+{
+	if (isAscii(c)) {
+		return std::isalnum(c);
+	} else {
+		// Non-ASCII characters are considered alphanumeric.
+		return true;
+	}
+}
+
+char
+toUpper(char c)
+{
+	if (isAscii(c)) {
+		return std::toupper(static_cast<unsigned char>(c));
+	} else {
+		// Non-ASCII characters are not converted to uppercase.
+		return c;
+	}
+}
+
+char
+toLower(char c)
+{
+	if (isAscii(c)) {
+		return std::tolower(static_cast<unsigned char>(c));
+	} else {
+		// Non-ASCII characters are not converted to lowercase.
+		return c;
+	}
 }
 
 } /* namespace Text */
+} /* namespace English */
 } /* namespace GS */

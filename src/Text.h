@@ -20,7 +20,6 @@
 
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include "Exception.h"
 
@@ -30,26 +29,12 @@ namespace GS {
 namespace Text {
 
 std::string trim(const std::string& s);
+template<typename T> T parseString(const std::string& s);
 
-//NOTE: These functions work with UTF-8 encoding, but the result is only correct for ASCII characters.
 inline bool isAscii(unsigned char c) { return c < 128U; }
-bool isAlpha(unsigned char c);
-bool isPrint(unsigned char c);
-bool isUpper(unsigned char c);
-bool isLower(unsigned char c);
-bool isAlphaNum(unsigned char c);
-char toUpper(char c);
-char toLower(char c);
+bool isNonprintableAscii(unsigned char c);
 
 
-
-template<typename T>
-std::string
-convertToString(const T& t) {
-	std::ostringstream out;
-	out << t;
-	return out.str();
-}
 
 template<typename T>
 T
@@ -64,42 +49,6 @@ parseString(const std::string& s) {
 		THROW_EXCEPTION(InvalidValueException, "Invalid text at the end of: " << s << '.');
 	}
 	return res;
-}
-
-struct MatchAtBegin {
-	bool operator()(const std::string& s, const std::string& prefix) const {
-		std::string::size_type pos = s.find(prefix);
-		return pos == 0;
-	}
-};
-
-struct MatchAtEnd {
-	bool operator()(const std::string& s, const std::string& suffix) const {
-		std::string::size_type pos = s.rfind(suffix);
-		return pos != std::string::npos && pos == s.size() - suffix.size();
-	}
-};
-
-struct MatchWithOptionalCharSuffix {
-	char charSuffix;
-	MatchWithOptionalCharSuffix(char c) : charSuffix(c) {}
-	bool operator()(const std::string& s, const std::string& other) const {
-		if (s == other) return true;
-		return ((s + charSuffix) == other);
-	}
-};
-
-template<typename T>
-void
-parseValuesSeparatedByChar(const std::string& inString, char separator, std::vector<T>& outValueList) {
-	std::string::size_type pos1 = 0, pos2;
-	while ( (pos2 = inString.find(separator, pos1)) != std::string::npos ) {
-		outValueList.push_back(parseString<T>(inString.substr(pos1, pos2 - pos1)));
-		pos1 = pos2 + 1;
-	}
-	if (pos1 < inString.length()) {
-		outValueList.push_back(parseString<T>(inString.substr(pos1)));
-	}
 }
 
 } /* namespace Text */

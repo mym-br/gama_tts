@@ -53,10 +53,10 @@
 #include <string.h>
 #include <vector>
 
+#include "english/EnglishText.h"
 #include "english/LetterToSound.h"
 #include "Exception.h"
 #include "Log.h"
-#include "Text.h"
 
 
 
@@ -147,6 +147,7 @@
 namespace {
 
 using namespace GS;
+using namespace GS::English;
 
 void printStream(std::stringstream& stream, std::size_t streamLength);
 void getState(const char* buffer, std::size_t length, std::size_t* i, int* current_state, int* next_state, char* word);

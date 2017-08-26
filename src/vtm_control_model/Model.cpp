@@ -522,7 +522,7 @@ Model::findSymbolName(const std::string& name) const
 bool
 Model::isValidPostureCharacter(char c)
 {
-	if (!Text::isPrint(c)) return false;
+	if (Text::isNonprintableAscii(c)) return false;
 	if (c >= '0' && c <= '9') return false; // digits are used to define tempo
 	switch (c) {
 	case ' ':

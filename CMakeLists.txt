@@ -45,6 +45,8 @@ set(LIBRARY_FILES
 
     src/text_parser/english/ApplyStress.cpp
     src/text_parser/english/ApplyStress.h
+    src/text_parser/english/EnglishText.cpp
+    src/text_parser/english/EnglishText.h
     src/text_parser/english/EnglishTextParser.cpp
     src/text_parser/english/EnglishTextParser.h
     src/text_parser/english/IspTrans.cpp

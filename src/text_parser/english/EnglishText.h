@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 2014 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,40 +15,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "Text.h"
-
-#include <cctype> /* isprint */
+#ifndef ENGLISH_TEXT_H_
+#define ENGLISH_TEXT_H_
 
 
 
 namespace GS {
+namespace English {
 namespace Text {
 
-std::string
-trim(const std::string& s)
-{
-	const char* charList = " \t";
-	std::string::size_type firstPos = s.find_first_not_of(charList);
-	if (firstPos == std::string::npos) {
-		return std::string();
-	}
-
-	std::string::size_type lastPos = s.find_last_not_of(charList);
-	if (firstPos == 0 && lastPos == s.size() - 1) {
-		return s;
-	} else {
-		return s.substr(firstPos, lastPos - firstPos + 1);
-	}
-}
-
-bool
-isNonprintableAscii(unsigned char c)
-{
-	if (isAscii(c)) {
-		return !std::isprint(c);
-	}
-	return false;
-}
+// These functions work with UTF-8 encoding, but the result is only correct for ASCII characters.
+inline bool isAscii(unsigned char c) { return c < 128U; }
+bool isAlpha(unsigned char c);
+bool isPrint(unsigned char c);
+bool isUpper(unsigned char c);
+bool isLower(unsigned char c);
+bool isAlphaNum(unsigned char c);
+char toUpper(char c);
+char toLower(char c);
 
 } /* namespace Text */
+} /* namespace English */
 } /* namespace GS */
+
+#endif /* ENGLISH_TEXT_H_ */
