@@ -497,7 +497,12 @@ VocalTractModel4<FloatType, SectionDelay>::initializeSynthesizer()
 	throat_ = std::make_unique<Throat<FloatType>>(sampleRate_, config_.throatCutoff, Util::amplitude60dB(config_.throatVol));
 
 	/*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-	srConv_ = std::make_unique<SampleRateConverter<FloatType>>(sampleRate_, config_.outputRate, outputBuffer_);
+	srConv_ = std::make_unique<SampleRateConverter<FloatType>>(
+					sampleRate_,
+					config_.outputRate,
+					[&](float sample) {
+						outputBuffer_.push_back(sample);
+					});
 
 	bandpassFilter_ = std::make_unique<BandpassFilter<FloatType>>();
 	noiseFilter_    = std::make_unique<NoiseFilter<FloatType>>();

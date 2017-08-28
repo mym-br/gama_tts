@@ -23,6 +23,7 @@
 namespace GS {
 namespace VTM {
 
+// Central difference.
 template<typename FloatType>
 class DifferenceFilter {
 public:
@@ -36,12 +37,13 @@ private:
 	DifferenceFilter& operator=(const DifferenceFilter&) = delete;
 
 	FloatType x1_;
+	FloatType x2_;
 };
 
 
 
 template<typename FloatType>
-DifferenceFilter<FloatType>::DifferenceFilter() : x1_{}
+DifferenceFilter<FloatType>::DifferenceFilter() : x1_{}, x2_{}
 {
 }
 
@@ -50,13 +52,15 @@ void
 DifferenceFilter<FloatType>::reset()
 {
 	x1_ = 0.0;
+	x2_ = 0.0;
 }
 
 template<typename FloatType>
 FloatType
 DifferenceFilter<FloatType>::filter(FloatType x)
 {
-	const FloatType y = x - x1_;
+	const FloatType y = x - x2_;
+	x2_ = x1_;
 	x1_ = x;
 	return y;
 }
