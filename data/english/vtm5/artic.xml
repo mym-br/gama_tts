@@ -1582,14 +1582,14 @@ s* >> qt* >> whistlehack</comment>
         <target name="velum" value="0.1"/>
       </parameter-targets>
       <symbol-targets>
-        <target name="duration" value="18"/>
-        <target name="transition" value="6"/>
-        <target name="qssa" value="6"/>
-        <target name="qssb" value="6"/>
-        <target name="markedDuration" value="21"/>
-        <target name="markedTransition" value="7"/>
-        <target name="markedQssa" value="7"/>
-        <target name="markedQssb" value="7"/>
+        <target name="duration" value="30"/>
+        <target name="transition" value="10"/>
+        <target name="qssa" value="10"/>
+        <target name="qssb" value="10"/>
+        <target name="markedDuration" value="30"/>
+        <target name="markedTransition" value="10"/>
+        <target name="markedQssa" value="10"/>
+        <target name="markedQssb" value="10"/>
       </symbol-targets>
     </posture>
     <posture symbol="qc">
@@ -1616,14 +1616,14 @@ s* >> qt* >> whistlehack</comment>
         <target name="velum" value="0.1"/>
       </parameter-targets>
       <symbol-targets>
-        <target name="duration" value="6"/>
-        <target name="transition" value="2"/>
-        <target name="qssa" value="2"/>
-        <target name="qssb" value="2"/>
-        <target name="markedDuration" value="6"/>
-        <target name="markedTransition" value="2"/>
-        <target name="markedQssa" value="2"/>
-        <target name="markedQssb" value="2"/>
+        <target name="duration" value="30"/>
+        <target name="transition" value="10"/>
+        <target name="qssa" value="10"/>
+        <target name="qssb" value="10"/>
+        <target name="markedDuration" value="30"/>
+        <target name="markedTransition" value="10"/>
+        <target name="markedQssa" value="10"/>
+        <target name="markedQssb" value="10"/>
       </symbol-targets>
     </posture>
     <posture symbol="qk">
@@ -1650,14 +1650,14 @@ s* >> qt* >> whistlehack</comment>
         <target name="velum" value="0.1"/>
       </parameter-targets>
       <symbol-targets>
-        <target name="duration" value="6"/>
-        <target name="transition" value="2"/>
-        <target name="qssa" value="2"/>
-        <target name="qssb" value="2"/>
-        <target name="markedDuration" value="6"/>
-        <target name="markedTransition" value="2"/>
-        <target name="markedQssa" value="2"/>
-        <target name="markedQssb" value="2"/>
+        <target name="duration" value="30"/>
+        <target name="transition" value="10"/>
+        <target name="qssa" value="10"/>
+        <target name="qssb" value="10"/>
+        <target name="markedDuration" value="30"/>
+        <target name="markedTransition" value="10"/>
+        <target name="markedQssa" value="10"/>
+        <target name="markedQssb" value="10"/>
       </symbol-targets>
     </posture>
     <posture symbol="qp">
@@ -1684,14 +1684,14 @@ s* >> qt* >> whistlehack</comment>
         <target name="velum" value="0.1"/>
       </parameter-targets>
       <symbol-targets>
-        <target name="duration" value="6"/>
-        <target name="transition" value="2"/>
-        <target name="qssa" value="2"/>
-        <target name="qssb" value="2"/>
-        <target name="markedDuration" value="6"/>
-        <target name="markedTransition" value="2"/>
-        <target name="markedQssa" value="2"/>
-        <target name="markedQssb" value="2"/>
+        <target name="duration" value="30"/>
+        <target name="transition" value="10"/>
+        <target name="qssa" value="10"/>
+        <target name="qssb" value="10"/>
+        <target name="markedDuration" value="30"/>
+        <target name="markedTransition" value="10"/>
+        <target name="markedQssa" value="10"/>
+        <target name="markedQssb" value="10"/>
       </symbol-targets>
     </posture>
     <posture symbol="qs">
@@ -1719,14 +1719,14 @@ s* >> qt* >> whistlehack</comment>
         <target name="velum" value="0.1"/>
       </parameter-targets>
       <symbol-targets>
-        <target name="duration" value="6"/>
-        <target name="transition" value="2"/>
-        <target name="qssa" value="2"/>
-        <target name="qssb" value="2"/>
-        <target name="markedDuration" value="6"/>
-        <target name="markedTransition" value="2"/>
-        <target name="markedQssa" value="2"/>
-        <target name="markedQssb" value="2"/>
+        <target name="duration" value="30"/>
+        <target name="transition" value="10"/>
+        <target name="qssa" value="10"/>
+        <target name="qssb" value="10"/>
+        <target name="markedDuration" value="30"/>
+        <target name="markedTransition" value="10"/>
+        <target name="markedQssa" value="10"/>
+        <target name="markedQssb" value="10"/>
       </symbol-targets>
     </posture>
     <posture symbol="qt">
@@ -1753,14 +1753,14 @@ s* >> qt* >> whistlehack</comment>
         <target name="velum" value="0.1"/>
       </parameter-targets>
       <symbol-targets>
-        <target name="duration" value="6"/>
-        <target name="transition" value="2"/>
-        <target name="qssa" value="2"/>
-        <target name="qssb" value="2"/>
-        <target name="markedDuration" value="6"/>
-        <target name="markedTransition" value="2"/>
-        <target name="markedQssa" value="2"/>
-        <target name="markedQssb" value="2"/>
+        <target name="duration" value="30"/>
+        <target name="transition" value="10"/>
+        <target name="qssa" value="10"/>
+        <target name="qssb" value="10"/>
+        <target name="markedDuration" value="30"/>
+        <target name="markedTransition" value="10"/>
+        <target name="markedQssa" value="10"/>
+        <target name="markedQssb" value="10"/>
       </symbol-targets>
     </posture>
     <posture symbol="qz">
@@ -1788,14 +1788,14 @@ s* >> qt* >> whistlehack</comment>
         <target name="velum" value="0.1"/>
       </parameter-targets>
       <symbol-targets>
-        <target name="duration" value="6"/>
-        <target name="transition" value="2"/>
-        <target name="qssa" value="2"/>
-        <target name="qssb" value="2"/>
-        <target name="markedDuration" value="6"/>
-        <target name="markedTransition" value="2"/>
-        <target name="markedQssa" value="2"/>
-        <target name="markedQssb" value="2"/>
+        <target name="duration" value="30"/>
+        <target name="transition" value="10"/>
+        <target name="qssa" value="10"/>
+        <target name="qssb" value="10"/>
+        <target name="markedDuration" value="30"/>
+        <target name="markedTransition" value="10"/>
+        <target name="markedQssa" value="10"/>
+        <target name="markedQssb" value="10"/>
       </symbol-targets>
     </posture>
     <posture symbol="r">
