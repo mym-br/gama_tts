@@ -40,6 +40,9 @@
 namespace GS {
 namespace VTMControlModel {
 
+/*******************************************************************************
+ * Constructor.
+ */
 IntonationRhythm::IntonationRhythm(const char* configDirPath)
 		: toneGroupParameters_(static_cast<int>(ToneGroup::numberOfGroups))
 		, fixedIntonationParameters_(NUM_INTONATION_PARAM, 0.0)
@@ -78,6 +81,16 @@ IntonationRhythm::IntonationRhythm(const char* configDirPath)
 	rhythmMaxTempo_    = rhythmConfigData.value<double>("max_tempo");
 }
 
+/*******************************************************************************
+ * Destructor.
+ */
+IntonationRhythm::~IntonationRhythm()
+{
+}
+
+/*******************************************************************************
+ *
+ */
 void
 IntonationRhythm::loadToneGroupParameters(ToneGroup toneGroup, const std::string& filePath)
 {
@@ -125,6 +138,9 @@ IntonationRhythm::loadToneGroupParameters(ToneGroup toneGroup, const std::string
 	}
 }
 
+/*******************************************************************************
+ *
+ */
 void
 IntonationRhythm::setRandomIntonation(bool value)
 {
@@ -144,6 +160,9 @@ IntonationRhythm::setRandomIntonation(bool value)
 	randomIntonation_ = value;
 }
 
+/*******************************************************************************
+ *
+ */
 const float*
 IntonationRhythm::intonationParameters(ToneGroup toneGroup)
 {

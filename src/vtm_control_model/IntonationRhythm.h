@@ -48,7 +48,7 @@ public:
 	};
 
 	IntonationRhythm(const char* configDirPath);
-	~IntonationRhythm() {}
+	~IntonationRhythm();
 
 	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }
 	void setFixedIntonationParameter(IntonationParam param, float value) { // range not checked
