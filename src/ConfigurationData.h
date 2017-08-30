@@ -31,8 +31,8 @@ namespace GS {
 // Format: "key = value"
 class ConfigurationData {
 public:
-	ConfigurationData() {}
 	ConfigurationData(const std::string& filePath);
+	~ConfigurationData();
 
 	template<typename T> T value(const std::string& key) const;
 	template<typename T> T value(const std::string& key, T minValue, T maxValue) const;
@@ -118,16 +118,6 @@ ConfigurationData::convertValue(const T& value, std::string& s)
 	std::ostringstream out;
 	out << value;
 	s = out.str();
-}
-
-inline
-ConfigurationData&
-ConfigurationData::insert(const ConfigurationData& other)
-{
-	for (auto& item : other.valueMap_) {
-		put(item.first, item.second);
-	}
-	return *this;
 }
 
 } /* namespace GS */

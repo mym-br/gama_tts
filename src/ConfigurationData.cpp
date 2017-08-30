@@ -47,6 +47,9 @@ throwException(const std::string& filePath, int lineNumber, const char* message,
 
 namespace GS {
 
+/*******************************************************************************
+ * Constructor.
+ */
 ConfigurationData::ConfigurationData(const std::string& filePath)
 		: filePath_(filePath)
 {
@@ -95,6 +98,13 @@ ConfigurationData::ConfigurationData(const std::string& filePath)
 			throwException(filePath, lineNum, "Duplicate key: ", key);
 		}
 	}
+}
+
+/*******************************************************************************
+ * Destructor.
+ */
+ConfigurationData::~ConfigurationData()
+{
 }
 
 
@@ -198,6 +208,15 @@ ConfigurationData::put(const std::string& key, const char* value)
 {
 	std::string& valueString = valueMap_[key];
 	convertValue(std::string(value), valueString);
+}
+
+ConfigurationData&
+ConfigurationData::insert(const ConfigurationData& other)
+{
+	for (auto& item : other.valueMap_) {
+		put(item.first, item.second);
+	}
+	return *this;
 }
 
 } /* namespace GS */
