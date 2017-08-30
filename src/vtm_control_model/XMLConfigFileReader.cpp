@@ -105,6 +105,8 @@ const std::string transitionSymbolName = "transition";
 namespace GS {
 namespace VTMControlModel {
 
+using namespace RapidXmlUtil;
+
 void
 XMLConfigFileReader::parseCategories(rapidxml::xml_node<char>* categoriesElem)
 {

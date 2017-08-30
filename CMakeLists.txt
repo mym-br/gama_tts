@@ -123,6 +123,7 @@ set(LIBRARY_FILES
     src/vtm_control_model/XMLConfigFileWriter.cpp
     src/vtm_control_model/XMLConfigFileWriter.h
 
+    src/xml/RapidXmlUtil.cpp
     src/xml/RapidXmlUtil.h
     src/xml/StreamXMLWriter.h
 )

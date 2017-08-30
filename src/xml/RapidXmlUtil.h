@@ -18,7 +18,6 @@
 #ifndef RAPIDXML_UTIL_H_
 #define RAPIDXML_UTIL_H_
 
-#include <fstream>
 #include <string>
 
 #include "rapidxml.hpp"
@@ -28,28 +27,9 @@
 
 
 namespace GS {
+namespace RapidXmlUtil {
 
-inline
-std::string
-readXMLFile(const std::string& filePath)
-{
-	std::ifstream in(filePath.c_str(), std::ios_base::binary);
-	if (!in) {
-		THROW_EXCEPTION(XMLException, "Could not open the file: " << filePath << '.');
-	}
-
-	std::string source;
-	in.seekg(0, std::ios::end);
-	source.resize(static_cast<std::string::size_type>(in.tellg()));
-	in.seekg(0, std::ios::beg);
-	in.read(&source[0], source.size());
-	in.close();
-	if (source.empty()) {
-		THROW_EXCEPTION(XMLException, "Empty XML file.");
-	}
-
-	return source;
-}
+std::string readXMLFile(const std::string& filePath);
 
 inline
 rapidxml::xml_node<char>*
@@ -102,6 +82,7 @@ compareElementName(rapidxml::xml_node<char>* elem, const std::string& name)
 	return rapidxml::internal::compare(elem->name(), elem->name_size(), &name[0], name.size(), true);
 }
 
+} /* namespace RapidXmlUtil */
 } /* namespace GS */
 
 #endif /*RAPIDXML_UTIL_H_*/
