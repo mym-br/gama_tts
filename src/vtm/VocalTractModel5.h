@@ -477,13 +477,22 @@ VocalTractModel5<FloatType, SectionDelay>::initializeSynthesizer()
 	initializeNasalCavity();
 
 	/*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-	srConv_ = std::make_unique<SampleRateConverter<FloatType>>(
-					sampleRate_,
-					config_.outputRate,
-					[&](float sample) {
-						// Does not use the 0.5 factor.
-						outputBuffer_.push_back(outputDiffFilter_.filter(sample) * config_.outputRate);
-					});
+	if (config_.bypass == 1) {
+		srConv_ = std::make_unique<SampleRateConverter<FloatType>>(
+						sampleRate_,
+						config_.outputRate,
+						[&](float sample) {
+							outputBuffer_.push_back(sample);
+						});
+	} else {
+		srConv_ = std::make_unique<SampleRateConverter<FloatType>>(
+						sampleRate_,
+						config_.outputRate,
+						[&](float sample) {
+							// Does not use the 0.5 factor.
+							outputBuffer_.push_back(outputDiffFilter_.filter(sample) * config_.outputRate);
+						});
+	}
 
 	bandpassFilter_       = std::make_unique<BandpassFilter<FloatType>>();
 	glottalNoiseFilter_   = std::make_unique<Butterworth1LowPassFilter<FloatType>>();
