@@ -36,11 +36,11 @@
 #include "NoiseSource.h"
 #include "RadiationFilter.h"
 #include "ReflectionFilter.h"
+#include "RosenbergBGlottalSource.h"
 #include "SampleRateConverter.h"
 #include "Throat.h"
 #include "VocalTractModel.h"
 #include "VTMUtil.h"
-#include "WavetableGlottalSource.h"
 
 #define GS_VTM0_MIN_RADIUS (0.01)
 
@@ -231,18 +231,18 @@ private:
 	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
 	FloatType breathinessFactor_;
 
-	std::array<FloatType, TOTAL_PARAMETERS>            currentParameter_;
-	std::vector<float>                                 outputBuffer_;
-	std::unique_ptr<SampleRateConverter<FloatType>>    srConv_;
-	std::unique_ptr<RadiationFilter<FloatType>>        mouthRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>>       mouthReflectionFilter_;
-	std::unique_ptr<RadiationFilter<FloatType>>        nasalRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>>       nasalReflectionFilter_;
-	std::unique_ptr<Throat<FloatType>>                 throat_;
-	std::unique_ptr<WavetableGlottalSource<FloatType>> glottalSource_;
-	std::unique_ptr<BandpassFilter<FloatType>>         bandpassFilter_;
-	std::unique_ptr<NoiseFilter<FloatType>>            noiseFilter_;
-	std::unique_ptr<NoiseSource>                       noiseSource_;
+	std::array<FloatType, TOTAL_PARAMETERS>             currentParameter_;
+	std::vector<float>                                  outputBuffer_;
+	std::unique_ptr<SampleRateConverter<FloatType>>     srConv_;
+	std::unique_ptr<RadiationFilter<FloatType>>         mouthRadiationFilter_;
+	std::unique_ptr<ReflectionFilter<FloatType>>        mouthReflectionFilter_;
+	std::unique_ptr<RadiationFilter<FloatType>>         nasalRadiationFilter_;
+	std::unique_ptr<ReflectionFilter<FloatType>>        nasalReflectionFilter_;
+	std::unique_ptr<Throat<FloatType>>                  throat_;
+	std::unique_ptr<RosenbergBGlottalSource<FloatType>> glottalSource_;
+	std::unique_ptr<BandpassFilter<FloatType>>          bandpassFilter_;
+	std::unique_ptr<NoiseFilter<FloatType>>             noiseFilter_;
+	std::unique_ptr<NoiseSource>                        noiseSource_;
 };
 
 
@@ -349,10 +349,10 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 	dampingFactor_ = 1.0f - (config_.lossFactor / 100.0f);
 
 	/*  INITIALIZE THE WAVE TABLE  */
-	glottalSource_ = std::make_unique<WavetableGlottalSource<FloatType>>(
+	glottalSource_ = std::make_unique<RosenbergBGlottalSource<FloatType>>(
 						config_.waveform == GLOTTAL_SOURCE_PULSE ?
-							WavetableGlottalSource<FloatType>::Type::pulse :
-							WavetableGlottalSource<FloatType>::Type::sine,
+							RosenbergBGlottalSource<FloatType>::Type::pulse :
+							RosenbergBGlottalSource<FloatType>::Type::sine,
 						sampleRate_,
 						config_.tp, config_.tnMin, config_.tnMax);
 
@@ -403,7 +403,7 @@ VocalTractModel0<FloatType>::execSynthesisStep()
 
 	/*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
 	if (config_.waveform == GLOTTAL_SOURCE_PULSE) {
-		glottalSource_->updateWavetable(ax);
+		glottalSource_->setup(ax);
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */

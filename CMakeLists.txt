@@ -68,13 +68,13 @@ set(LIBRARY_FILES
     src/vtm/Butterworth1LowpassFilter.h
     src/vtm/Butterworth2LowpassFilter.h
     src/vtm/DifferenceFilter.h
-    src/vtm/FIRFilter.h
     src/vtm/MovingAverageFilter.h
     src/vtm/NoiseFilter.h
     src/vtm/NoiseSource.h
     src/vtm/PoleZeroRadiationImpedance.h
     src/vtm/RadiationFilter.h
     src/vtm/ReflectionFilter.h
+    src/vtm/RosenbergBGlottalSource.h
     src/vtm/SampleRateConverter.h
     src/vtm/Throat.h
     src/vtm/VocalTractModel.cpp
@@ -85,7 +85,6 @@ set(LIBRARY_FILES
     src/vtm/VocalTractModel5.h
     src/vtm/VTMUtil.cpp
     src/vtm/VTMUtil.h
-    src/vtm/WavetableGlottalSource.h
 
     src/vtm_control_model/Category.h
     src/vtm_control_model/DriftGenerator.cpp

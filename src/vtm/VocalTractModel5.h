@@ -52,10 +52,10 @@
 #include "NoiseSource.h"
 #include "ParameterLogger.h"
 #include "PoleZeroRadiationImpedance.h"
+#include "RosenbergBGlottalSource.h"
 #include "SampleRateConverter.h"
 #include "VocalTractModel.h"
 #include "VTMUtil.h"
-#include "WavetableGlottalSource.h"
 
 #define GS_VTM5_MIN_RADIUS (0.01)
 #define GS_VTM5_MIN_FRIC_POS (0.0)
@@ -338,7 +338,7 @@ private:
 	std::unique_ptr<SampleRateConverter<FloatType>>        srConv_;
 	std::unique_ptr<PoleZeroRadiationImpedance<FloatType>> mouthRadiationImpedance_;
 	std::unique_ptr<PoleZeroRadiationImpedance<FloatType>> nasalRadiationImpedance_;
-	std::unique_ptr<WavetableGlottalSource<FloatType>>     glottalSource_;
+	std::unique_ptr<RosenbergBGlottalSource<FloatType>>    glottalSource_;
 	std::unique_ptr<BandpassFilter<FloatType>>             bandpassFilter_;
 	std::unique_ptr<Butterworth1LowPassFilter<FloatType>>  glottalNoiseFilter_;
 	std::unique_ptr<Butterworth2LowPassFilter<FloatType>>  fricationNoiseFilter_;
@@ -460,10 +460,10 @@ VocalTractModel5<FloatType, SectionDelay>::initializeSynthesizer()
 	dampingFactor_ = 1.0f - (config_.lossFactor / 100.0f);
 
 	/*  INITIALIZE THE WAVE TABLE  */
-	glottalSource_ = std::make_unique<WavetableGlottalSource<FloatType>>(
+	glottalSource_ = std::make_unique<RosenbergBGlottalSource<FloatType>>(
 						config_.waveform == GLOTTAL_SOURCE_PULSE ?
-							WavetableGlottalSource<FloatType>::Type::pulse :
-							WavetableGlottalSource<FloatType>::Type::sine,
+							RosenbergBGlottalSource<FloatType>::Type::pulse :
+							RosenbergBGlottalSource<FloatType>::Type::sine,
 						sampleRate_,
 						config_.tp, config_.tnMin, config_.tnMax);
 
@@ -523,7 +523,7 @@ VocalTractModel5<FloatType, SectionDelay>::execSynthesisStep()
 
 	/*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
 	if (config_.waveform == GLOTTAL_SOURCE_PULSE) {
-		glottalSource_->updateWavetable(glotAmplitude);
+		glottalSource_->setup(glotAmplitude);
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
