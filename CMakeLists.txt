@@ -108,6 +108,7 @@ set(LIBRARY_FILES
     src/vtm_control_model/Pho1Parser.h
     src/vtm_control_model/PhoneticStringParser.cpp
     src/vtm_control_model/PhoneticStringParser.h
+    src/vtm_control_model/Posture.cpp
     src/vtm_control_model/Posture.h
     src/vtm_control_model/PostureList.cpp
     src/vtm_control_model/PostureList.h

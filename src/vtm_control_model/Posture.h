@@ -29,7 +29,6 @@
 
 #include "Category.h"
 #include "Exception.h"
-#include "Parameter.h"
 
 
 
@@ -52,22 +51,8 @@ public:
 		NUM_SYMBOLS
 	};
 
-	Posture(const std::string& name, unsigned int numParameters, unsigned int numSymbols)
-			: name_(name)
-			, parameterTargetList_(numParameters)
-			, symbolTargetList_(numSymbols) {
-		if (numParameters == 0) {
-			THROW_EXCEPTION(InvalidParameterException, "Invalid number of parameters: 0.");
-		}
-		if (numSymbols != NUM_SYMBOLS) {
-			THROW_EXCEPTION(InvalidParameterException, "Invalid number of symbols: "
-						<< numSymbols << "(should be " << NUM_SYMBOLS << ").");
-		}
-
-		auto newCategory = std::make_shared<Category>(name);
-		newCategory->setNative();
-		categoryList_.push_back(newCategory);
-	}
+	Posture(const std::string& name, unsigned int numParameters, unsigned int numSymbols);
+	~Posture();
 
 	const std::string& name() const { return name_; }
 
@@ -119,59 +104,6 @@ private:
 	std::vector<float> symbolTargetList_;
 	std::string comment_;
 };
-
-
-
-/*******************************************************************************
- *
- */
-inline
-const std::shared_ptr<Category>
-Posture::findCategory(const std::string& name) const
-{
-	for (auto& category : categoryList_) {
-		if (category->name() == name) {
-			return category;
-		}
-	}
-	return std::shared_ptr<Category>();
-}
-
-/*******************************************************************************
- *
- */
-inline
-bool
-Posture::isMemberOfCategory(const Category& category) const
-{
-	for (const auto& postureCat : categoryList_) {
-		if (postureCat.get() == &category) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/*******************************************************************************
- *
- */
-inline
-std::unique_ptr<Posture>
-Posture::copy(const std::string& newName) const
-{
-	auto newPosture = std::make_unique<Posture>(newName, parameterTargetList_.size(), symbolTargetList_.size());
-
-	for (const auto& category : categoryList_) {
-		if (!category->native()) {
-			newPosture->categoryList_.push_back(category);
-		}
-	}
-	newPosture->parameterTargetList_ = parameterTargetList_;
-	newPosture->symbolTargetList_ = symbolTargetList_;
-	newPosture->comment_ = comment_;
-
-	return newPosture;
-}
 
 } /* namespace VTMControlModel */
 } /* namespace GS */
