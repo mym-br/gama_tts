@@ -123,6 +123,9 @@ struct Event {
 	{
 	}
 
+	Event(const Event&) = delete;
+	Event& operator=(const Event&) = delete;
+
 	void setParameter(int index, double value, bool special) {
 		if (index < 0 || static_cast<std::size_t>(index) >= parameters.size()) {
 			THROW_EXCEPTION(InvalidValueException, "Invalid parameter index: " << index << " (special: " << special << ").");

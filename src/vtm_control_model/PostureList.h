@@ -48,6 +48,9 @@ public:
 	const Posture* find(const std::string& name) const;
 	Posture* find(const std::string& name);
 private:
+	PostureList(const PostureList&) = delete;
+	PostureList& operator=(const PostureList&) = delete;
+
 	std::vector<std::unique_ptr<Posture>> postureList_; // always sorted, by name
 };
 

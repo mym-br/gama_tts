@@ -110,6 +110,9 @@ public:
 
 	std::unique_ptr<Posture> copy(const std::string& newName) const;
 private:
+	Posture(const Posture&) = delete;
+	Posture& operator=(const Posture&) = delete;
+
 	const std::string name_;
 	std::vector<std::shared_ptr<Category>> categoryList_;
 	std::vector<float> parameterTargetList_;

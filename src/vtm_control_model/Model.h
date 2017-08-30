@@ -109,6 +109,9 @@ public:
 
 	void validate() const;
 private:
+	Model(const Model&) = delete;
+	Model& operator=(const Model&) = delete;
+
 	void printInfo() const;
 
 	std::vector<std::shared_ptr<Category>> categoryList_;

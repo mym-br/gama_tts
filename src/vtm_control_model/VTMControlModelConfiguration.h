@@ -58,6 +58,10 @@ struct Configuration {
 	std::unique_ptr<ConfigurationData> voiceData;
 
 	Configuration(const char* configDirPath);
+	~Configuration();
+
+	Configuration(const Configuration&) = delete;
+	Configuration& operator=(const Configuration&) = delete;
 };
 
 } /* namespace VTMControlModel */

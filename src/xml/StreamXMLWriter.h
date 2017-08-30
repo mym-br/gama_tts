@@ -125,6 +125,9 @@ public:
 		}
 	}
 private:
+	StreamXMLWriter(const StreamXMLWriter&) = delete;
+	StreamXMLWriter& operator=(const StreamXMLWriter&) = delete;
+
 	std::ostream& out_;
 	int indentSize_;
 	int indentLevel_;

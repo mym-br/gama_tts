@@ -224,6 +224,9 @@ public:
 
 	void validate(const Model& model) const;
 private:
+	Rule(const Rule&) = delete;
+	Rule& operator=(const Rule&) = delete;
+
 	std::vector<std::string> booleanExpressionList_;
 	std::vector<std::shared_ptr<Transition>> paramProfileTransitionList_;
 	std::vector<std::shared_ptr<Transition>> specialProfileTransitionList_;

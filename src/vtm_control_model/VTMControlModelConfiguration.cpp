@@ -68,5 +68,9 @@ Configuration::Configuration(const char* configDirPath)
 	intonationFactor = voiceData->value<double>("intonation_factor");
 }
 
+Configuration::~Configuration()
+{
+}
+
 } /* namespace VTMControlModel */
 } /* namespace GS */

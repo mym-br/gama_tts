@@ -44,6 +44,9 @@ public:
 private:
 	typedef std::unordered_map<std::string, std::string> Map;
 
+	ConfigurationData(const ConfigurationData&) = delete;
+	ConfigurationData& operator=(const ConfigurationData&) = delete;
+
 	template<typename T> static T convertString(const std::string& s);
 	template<typename T> static void convertValue(const T& value, std::string& s);
 

@@ -81,6 +81,9 @@ public:
 	double rhythmMaxTempo()    const { return rhythmMaxTempo_; }
 
 private:
+	IntonationRhythm(const IntonationRhythm&) = delete;
+	IntonationRhythm& operator=(const IntonationRhythm&) = delete;
+
 	void loadToneGroupParameters(ToneGroup toneGroup, const std::string& filePath);
 
 	std::vector<std::vector<std::vector<float>>> toneGroupParameters_;
