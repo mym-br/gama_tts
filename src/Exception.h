@@ -18,11 +18,6 @@
 #ifndef EXCEPTION_H_
 #define EXCEPTION_H_
 
-#include <algorithm> /* move */
-#include <cassert>
-#include <cstdio>    /* fprintf */
-#include <cstdlib>   /* free, malloc */
-#include <cstring>   /* strcpy, strlen */
 #include <exception>
 #include <sstream>
 #include <string>
@@ -50,64 +45,20 @@
 
 namespace GS {
 
-// Note: string / vector default constructor may throw bad_alloc in C++11.
+/*******************************************************************************
+ *
+ */
 class ExceptionString {
 public:
-	ExceptionString() noexcept : str_(nullptr) {}
-	ExceptionString(const ExceptionString& o) noexcept : str_(nullptr) {
-		*this = o;
-	}
-	ExceptionString(ExceptionString&& o) noexcept : str_(nullptr) {
-		*this = std::move(o);
-	}
-	~ExceptionString() noexcept {
-		std::free(str_);
-	}
-	ExceptionString& operator=(const ExceptionString& o) noexcept {
-		if (this != &o) {
-			if (o.str_ == nullptr) {
-				std::free(str_);
-				str_ = nullptr;
-				return *this;
-			}
-			std::size_t size = std::strlen(o.str_);
-			auto p = static_cast<char*>(std::malloc(size + 1));
-			if (p == nullptr) {
-				std::fprintf(stderr, "Exception string copy error. String: %s\n", o.str_);
-				return *this;
-			}
-			std::free(str_);
-			str_ = p;
-			std::strcpy(str_, o.str_);
-		}
-		return *this;
-	}
-	ExceptionString& operator=(ExceptionString&& o) noexcept {
-		assert(this != &o);
-		std::free(str_);
-		str_ = o.str_;
-		o.str_ = nullptr;
-		return *this;
-	}
-	const char* str() const noexcept {
-		return str_ ? str_ : "";
-	}
-	void setStr(const char* s) noexcept {
-		if (s == nullptr) {
-			std::free(str_);
-			str_ = nullptr;
-			return;
-		}
-		std::size_t size = std::strlen(s);
-		auto p = static_cast<char*>(std::malloc(size + 1));
-		if (p == nullptr) {
-			std::fprintf(stderr, "Exception string assignment error. String: %s\n", s);
-			return;
-		}
-		std::free(str_);
-		str_ = p;
-		std::strcpy(str_, s);
-	}
+	ExceptionString() noexcept;
+	ExceptionString(const ExceptionString& o) noexcept;
+	ExceptionString(ExceptionString&& o) noexcept;
+	~ExceptionString() noexcept;
+
+	ExceptionString& operator=(const ExceptionString& o) noexcept;
+	ExceptionString& operator=(ExceptionString&& o) noexcept;
+	const char* str() const noexcept;
+	void setStr(const char* s) noexcept;
 private:
 	char* str_;
 };
@@ -118,23 +69,16 @@ private:
  */
 class ErrorMessage {
 public:
-	ErrorMessage() {}
-	~ErrorMessage() {}
+	ErrorMessage() = default;
+	~ErrorMessage() = default;
 
-	template<typename T>
-	ErrorMessage& operator<<(const T& messagePart) {
+	template<typename T> ErrorMessage& operator<<(const T& messagePart) {
 		buffer_ << messagePart;
 		return *this;
 	}
 
-	ErrorMessage& operator<<(const std::exception& e) {
-		buffer_ << e.what();
-		return *this;
-	}
-
-	std::string getString() const {
-		return buffer_.str();
-	}
+	ErrorMessage& operator<<(const std::exception& e);
+	std::string getString() const;
 private:
 	ErrorMessage(const ErrorMessage&) = delete;
 	ErrorMessage& operator=(const ErrorMessage&) = delete;
@@ -147,18 +91,15 @@ private:
  */
 class Exception : public std::exception {
 public:
-	virtual const char* what() const noexcept {
-		return message_.str();
-	}
+	virtual const char* what() const noexcept;
 
 	// May throw std::bad_alloc.
-	void setMessage(const ErrorMessage& em) {
-		std::string msg = em.getString();
-		message_.setStr(msg.c_str());
-	}
-protected:
+	void setMessage(const ErrorMessage& em);
+private:
 	ExceptionString message_;
 };
+
+
 
 class AudioException                    : public Exception {};
 class EndOfBufferException              : public Exception {};
