@@ -24,6 +24,7 @@
 #include <algorithm> /* max */
 #include <array>
 #include <cstddef> /* std::size_t */
+#include <cstring> /* memset */
 #include <memory>
 #include <vector>
 
