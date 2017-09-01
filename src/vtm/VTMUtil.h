@@ -43,9 +43,7 @@ float calculateOutputScale(float maximumAbsoluteValue);
 
 
 //******************************************************************************
-// Converts dB value to amplitude value.
-//
-// 0 <= decibelLevel <= 60 dB
+// Converts dB level (0 - 60) to amplitude (0 - 1).
 //******************************************************************************
 template<typename FloatType>
 FloatType
@@ -53,31 +51,25 @@ amplitude60dB(FloatType decibelLevel)
 {
 	constexpr FloatType p = 10.0;
 	constexpr FloatType k = 1.0 / 20.0;
-
-	/*  RANGE OF ALL VOLUME CONTROLS  */
 	constexpr FloatType volMax = 60.0;
 
-	/*  CONVERT 0-60 RANGE TO -60-0 RANGE  */
-	decibelLevel -= volMax;
-
-	/*  IF -60 OR LESS, RETURN AMPLITUDE OF 0  */
-	if (decibelLevel <= -volMax) {
+	if (decibelLevel <= 0.0) {
 		return 0.0;
 	}
-
-	/*  IF 0, RETURN AMPLITUDE OF 1  */
-	if (decibelLevel == 0.0) {
+	if (decibelLevel == volMax) {
 		return 1.0;
 	}
 
-	/*  ELSE RETURN INVERSE LOG VALUE  */
+	/*  CONVERT 0 - 60 RANGE TO -60 - 0 RANGE  */
+	decibelLevel -= volMax;
+
 	return std::pow(p, decibelLevel * k);
 }
 
 //******************************************************************************
-// Converts a given pitch to the corresponding frequency.
+// Converts a pitch to the corresponding frequency (Hz).
 //
-// pitch in semitones, 0 = middle C
+// pitch in semitones (0 = middle C)
 //******************************************************************************
 template<typename FloatType>
 FloatType
@@ -92,9 +84,9 @@ frequency(FloatType pitch)
 }
 
 //******************************************************************************
-// Converts a given frequency to the corresponding pitch.
+// Converts a frequency (Hz) to the corresponding pitch.
 //
-// pitch in semitones, 0 = middle C
+// pitch in semitones (0 = middle C)
 //******************************************************************************
 template<typename FloatType>
 FloatType
@@ -108,8 +100,7 @@ pitch(FloatType frequency)
 }
 
 //******************************************************************************
-// Returns the speed of sound according to the value of
-// the temperature (in Celsius degrees).
+// Returns the speed of sound (m/s) at a given temperature (degrees Celsius).
 //******************************************************************************
 template<typename FloatType>
 FloatType
@@ -126,7 +117,7 @@ FloatType
 maximumAbsoluteValue(const std::vector<FloatType>& v)
 {
 	FloatType maxValue = 0.0;
-	for (auto& value : v) {
+	for (FloatType value : v) {
 		const FloatType absValue = std::abs(value);
 		if (absValue > maxValue) {
 			maxValue = absValue;
