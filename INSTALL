@@ -9,7 +9,7 @@
     - GCC 7.1 (Linux+GNU x86_64).
     - Clang 4.0 (Linux+GNU x86_64).
 
-- Build:
+- Build (Linux):
 
   - Linux - GCC:
     - Execute in a terminal (running bash):
@@ -39,3 +39,4 @@
 - Install to system (optional, Linux):
 
   make install
+  #make install DESTDIR=/tmp/dist
