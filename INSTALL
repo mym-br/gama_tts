@@ -39,7 +39,3 @@
 - Install to system (optional, Linux):
 
   make install
-
-  # /usr/local/lib or /usr/local/lib64 must be in /etc/ld.so.conf
-  # (or /etc/ld.so.conf.d).
-  ldconfig
