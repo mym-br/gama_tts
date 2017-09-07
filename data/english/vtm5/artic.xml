@@ -433,8 +433,8 @@ s* >> qt* >> whistlehack</comment>
         <target name="aspVol" value="0"/>
         <target name="fricVol" value="0"/>
         <target name="fricPos" value="5.6"/>
-        <target name="fricCF" value="2500"/>
-        <target name="fricBW" value="2600"/>
+        <target name="fricCF" value="3800"/>
+        <target name="fricBW" value="1000"/>
         <target name="r1" value="0.8"/>
         <target name="r2" value="1.36"/>
         <target name="r3" value="1.74"/>
@@ -3648,8 +3648,8 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
         <point-or-slopes>
           <point type="diphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="Mark1"/>
-          <point type="diphone" value="5" time-expression="Mark1Plus6"/>
-          <point type="diphone" value="7" time-expression="QssbTwo"/>
+          <point type="diphone" value="25" time-expression="Mark1Plus6"/>
+          <point type="diphone" value="30" time-expression="QssbTwo"/>
           <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
         </point-or-slopes>
@@ -3658,8 +3658,8 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
         <point-or-slopes>
           <point type="diphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="Mark1Plus6"/>
-          <point type="diphone" value="10" time-expression="Mark1Plus10"/>
-          <point type="diphone" value="15" time-expression="QssbTwo"/>
+          <point type="diphone" value="25" time-expression="Mark1Plus10"/>
+          <point type="diphone" value="30" time-expression="QssbTwo"/>
           <point type="diphone" value="0" time-expression="qssb2Transition2By2"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
         </point-or-slopes>
