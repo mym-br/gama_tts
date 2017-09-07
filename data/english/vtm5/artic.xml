@@ -508,7 +508,7 @@ s* >> qt* >> whistlehack</comment>
         <target name="microInt" value="-1"/>
         <target name="glotVol" value="54"/>
         <target name="aspVol" value="0"/>
-        <target name="fricVol" value="27"/>
+        <target name="fricVol" value="43"/>
         <target name="fricPos" value="6"/>
         <target name="fricCF" value="4400"/>
         <target name="fricBW" value="4500"/>
