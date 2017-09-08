@@ -20,6 +20,7 @@
 
 t v  > insert q
 t dh > insert q
+k dh > insert q
 
 #-------------------------------------------------------------------------------
 # stopped stopped
