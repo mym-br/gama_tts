@@ -3542,7 +3542,7 @@ A smoothly fitted null triphone is to be found as "StopGlide" under "Carre".</co
         <point-or-slopes>
           <point type="diphone" value="0" time-expression="Zero"/>
           <point type="diphone" value="0" time-expression="VStopBurstStart"/>
-          <point type="diphone" value="10" time-expression="VStopBurstTipA"/>
+          <point type="diphone" value="25" time-expression="VStopBurstTipA"/>
           <point type="diphone" value="0" time-expression="VStopBurstTipB"/>
           <point type="diphone" value="0" time-expression="VStopBurstEnd"/>
           <point type="diphone" value="0" time-expression="RuleDuration"/>
