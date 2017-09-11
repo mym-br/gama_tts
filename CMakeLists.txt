@@ -80,6 +80,8 @@ set(LIBRARY_FILES
     src/vtm/VocalTractModel5.h
     src/vtm/VTMUtil.cpp
     src/vtm/VTMUtil.h
+    src/vtm/WavetableGlottalSource.h
+    src/vtm/WavetableGlottalSourceFIRFilter.h
 
     src/vtm_control_model/Category.h
     src/vtm_control_model/DriftGenerator.cpp

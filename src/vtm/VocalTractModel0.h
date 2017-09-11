@@ -36,11 +36,11 @@
 #include "NoiseSource.h"
 #include "RadiationFilter.h"
 #include "ReflectionFilter.h"
-#include "RosenbergBGlottalSource.h"
 #include "SampleRateConverter.h"
 #include "Throat.h"
 #include "VocalTractModel.h"
 #include "VTMUtil.h"
+#include "WavetableGlottalSource.h"
 
 #define GS_VTM0_MIN_RADIUS (0.01)
 
@@ -239,7 +239,7 @@ private:
 	std::unique_ptr<RadiationFilter<FloatType>>         nasalRadiationFilter_;
 	std::unique_ptr<ReflectionFilter<FloatType>>        nasalReflectionFilter_;
 	std::unique_ptr<Throat<FloatType>>                  throat_;
-	std::unique_ptr<RosenbergBGlottalSource<FloatType>> glottalSource_;
+	std::unique_ptr<WavetableGlottalSource<FloatType>>  glottalSource_;
 	std::unique_ptr<BandpassFilter<FloatType>>          bandpassFilter_;
 	std::unique_ptr<NoiseFilter<FloatType>>             noiseFilter_;
 	std::unique_ptr<NoiseSource>                        noiseSource_;
@@ -349,10 +349,10 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 	dampingFactor_ = 1.0f - (config_.lossFactor / 100.0f);
 
 	/*  INITIALIZE THE WAVE TABLE  */
-	glottalSource_ = std::make_unique<RosenbergBGlottalSource<FloatType>>(
+	glottalSource_ = std::make_unique<WavetableGlottalSource<FloatType>>(
 						config_.waveform == GLOTTAL_SOURCE_PULSE ?
-							RosenbergBGlottalSource<FloatType>::Type::pulse :
-							RosenbergBGlottalSource<FloatType>::Type::sine,
+							WavetableGlottalSource<FloatType>::Type::pulse :
+							WavetableGlottalSource<FloatType>::Type::sine,
 						sampleRate_,
 						config_.tp, config_.tnMin, config_.tnMax);
 
