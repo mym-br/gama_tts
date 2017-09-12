@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 /*  LOCAL DEFINES  ***********************************************************/
 #define MAX_SYLLS      100
@@ -145,8 +146,8 @@ const char* prefices[] = {
 
 
 int stressSuffix(const char* orthography, int* type);
-int light(const char* sb);
-int prefix(const char* orthography);
+bool light(const char* sb);
+bool prefix(const char* orthography);
 
 
 
@@ -176,7 +177,7 @@ stressSuffix(const char* orthography, int* type)
 *	purpose:	Determine if a syllable is light.
 *
 ******************************************************************************/
-int
+bool
 light(const char* sb)
 {
 	while (!isvowel(*sb)) {
@@ -186,25 +187,25 @@ light(const char* sb)
 		sb++;
 	}
 	if (!*sb) {
-		return 1;
+		return true;
 	}
 	while ((*sb != '_') && (*sb != '.') && *sb) {
 		sb++;
 	}
 	if (!*sb) {
-		return 1;
+		return true;
 	}
 	while (((*sb == '_') || (*sb == '.')) && *sb) {
 		sb++;
 	}
 	if (!*sb) {
-		return 1;
+		return true;
 	}
 
 	return isvowel(*sb);
 }
 
-int
+bool
 prefix(const char* orthography)
 {
 	int t = 0, l, m;
@@ -213,11 +214,11 @@ prefix(const char* orthography)
 	m = strlen(orthography);
 	while ( (a = prefices[t++]) ) {
 		if (((l = strlen(a)) <= m) && strncmp(a, orthography, l) == 0) {
-			return 1;
+			return true;
 		}
 	}
 
-	return 0;
+	return false;
 }
 
 } /* namespace */
@@ -244,57 +245,60 @@ namespace English {
 int
 applyStress(char* buffer, const char* orthography)
 {
-	char* syll_array[MAX_SYLLS];
-	char* spt;
-	char ich, temp = '\0';
-	int index;
-	int type, t, syll = (-1);
-	int last_was_break = 1;
-
-	for (index = 0, spt = buffer; *spt; spt++) {
-		if (last_was_break) {
-			last_was_break = 0;
-			syll_array[index++] = spt;
-		}
-		if (*spt == '.') {
-			last_was_break = 1;
-		}
+	if (buffer[0] == '\0') {
+		return 1;
 	}
 
-	if (index > MAX_SYLLS) {
+	std::vector<char*> syllArray;
+	bool lastWasBreak = true;
+	for (char* spt = buffer; *spt; spt++) {
+		if (lastWasBreak) {
+			lastWasBreak = false;
+			syllArray.push_back(spt);
+		}
+		if (*spt == '.') {
+			lastWasBreak = true;
+		}
+	}
+	// syllArray has at least one element here.
+
+	int numSylls = syllArray.size();
+	if (numSylls > MAX_SYLLS) {
 		return 1;
 	}
 
 	/*  RETURNS SYLLABLE NO. (FROM THE END) THAT IS THE START OF A STRESS-AFFECTING
 	SUFFIX, 0 IF NONE; AND TYPE  */
-	t = stressSuffix(orthography, &type);
-	if (t) {
+	int type;
+	const int suffixSylls = stressSuffix(orthography, &type);
+	int syll = -1;
+	if (suffixSylls > 0) {
 		if (type == AUTOSTRESSED) {
-			syll = index - t;
+			syll = numSylls - suffixSylls;
 		} else if (type == PRESTRESS1) {
-			syll = index - t - 1;
+			syll = numSylls - suffixSylls - 1;
 		} else if (type == PRESTRESS2) {
-			syll = index - t - 2;
+			syll = numSylls - suffixSylls - 2;
 		} else if (type == PRESTRESS3) {
-			syll = index - t - 1;
-			if (syll >= 0 && light(syll_array[syll])) {
+			syll = numSylls - suffixSylls - 1;
+			if (syll >= 0 && light(syllArray[syll])) {
 				syll--;
 			}
 		} else if (type == NEUTRAL) {
-			index -= t;
+			numSylls -= suffixSylls;
 		}
 	}
 
-	if ((syll < 0) && prefix(orthography) && (index >= 2)) {
+	if ((syll < 0) && prefix(orthography) && (numSylls >= 2)) {
 		syll = 1;
 	}
 
 	if (syll < 0) {		/* if as yet unsuccessful */
-		syll = index - 2;
+		syll = numSylls - 2;
 		if (syll < 0) {
 			syll = 0;
 		}
-		if (light(syll_array[syll])) {
+		if (light(syllArray[syll])) {
 			syll--;
 		}
 	}
@@ -303,16 +307,16 @@ applyStress(char* buffer, const char* orthography)
 		syll = 0;
 	}
 
-	spt = syll_array[syll];
-	/*  strcpy(spt+1,spt); */
-	ich = '\'';
+	char* spt = syllArray[syll];
+	char ich = '\'';
 	while (ich) {
-		temp = *spt;
+		char temp = *spt;
 		*spt = ich;
 		ich = temp;
 		spt++;
 	}
 	*spt = '\0';
+
 	return 0;
 }
 
