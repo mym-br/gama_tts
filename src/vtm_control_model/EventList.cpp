@@ -774,23 +774,21 @@ EventList::applyRhythm()
 	for (int i = 0; i < currentFoot_; i++) {
 		const int numFootPostures = feet_[i].end - feet_[i].start + 1;
 		/* Apply rhythm model */
-		double footTempo;
 		if (feet_[i].marked) {
-			double tempTempo = intonationRhythm_.rhythmMarkedA() * numFootPostures + intonationRhythm_.rhythmMarkedB();
-			feet_[i].tempo += tempTempo / intonationRhythm_.rhythmMarkedDiv();
-			footTempo = globalTempo_ * feet_[i].tempo;
+			const double temp = intonationRhythm_.rhythmMarkedA() * numFootPostures + intonationRhythm_.rhythmMarkedB();
+			feet_[i].tempo += temp / intonationRhythm_.rhythmMarkedDiv();
 		} else {
-			double tempTempo = intonationRhythm_.rhythmUnmarkedA() * numFootPostures + intonationRhythm_.rhythmUnmarkedB();
-			feet_[i].tempo += tempTempo / intonationRhythm_.rhythmUnmarkedDiv();
-			footTempo = globalTempo_ * feet_[i].tempo;
+			const double temp = intonationRhythm_.rhythmUnmarkedA() * numFootPostures + intonationRhythm_.rhythmUnmarkedB();
+			feet_[i].tempo += temp / intonationRhythm_.rhythmUnmarkedDiv();
 		}
+		if (feet_[i].tempo < intonationRhythm_.rhythmMinTempo()) {
+			feet_[i].tempo = intonationRhythm_.rhythmMinTempo();
+		} else if (feet_[i].tempo > intonationRhythm_.rhythmMaxTempo()) {
+			feet_[i].tempo = intonationRhythm_.rhythmMaxTempo();
+		}
+		feet_[i].tempo *= globalTempo_;
 		for (int j = feet_[i].start; j < feet_[i].end + 1; j++) {
-			postureData_[j].tempo *= footTempo;
-			if (postureData_[j].tempo < intonationRhythm_.rhythmMinTempo()) {
-				postureData_[j].tempo = intonationRhythm_.rhythmMinTempo();
-			} else if (postureData_[j].tempo > intonationRhythm_.rhythmMaxTempo()) {
-				postureData_[j].tempo = intonationRhythm_.rhythmMaxTempo();
-			}
+			postureData_[j].tempo *= feet_[i].tempo;
 		}
 	}
 }

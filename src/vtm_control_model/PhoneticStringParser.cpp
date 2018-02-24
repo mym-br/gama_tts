@@ -37,8 +37,8 @@
 
 #define CONFIG_DIR "/phonetic_string_parser/"
 #define REWRITE_CONFIG_FILE_NAME "rewrite.txt"
-#define MIN_TEMPO (0.05)
-#define MAX_TEMPO (20.0)
+#define MIN_TEMPO (0.01)
+#define MAX_TEMPO (100.0)
 
 
 
