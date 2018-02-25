@@ -57,7 +57,7 @@ showUsage()
 		PROGRAM_NAME << " --version\n"
 		"    Shows the program version and usage.\n\n"
 
-		PROGRAM_NAME << " tts [-v] [-i input.txt] [-p vtm_param.txt] data_dir speech.wav\n"
+		PROGRAM_NAME << " tts [-v] [-i input.txt] [-p vtm_param.txt] data_dir [speech.wav]\n"
 		"    Converts text to speech.\n\n"
 		"    data_dir   : The directory containing the data and configuration files.\n"
 		"    speech.wav : This file will be created, and will contain the\n"
@@ -72,7 +72,7 @@ showUsage()
 		"        This file will be created, and will contain the parameters for the\n"
 		"        vocal tract model.\n\n"
 
-		PROGRAM_NAME << " pho0 [-v] [-i input.txt] [-p vtm_param.txt] data_dir speech.wav\n"
+		PROGRAM_NAME << " pho0 [-v] [-i input.txt] [-p vtm_param.txt] data_dir [speech.wav]\n"
 		"    Converts phonetic string to speech (Gnuspeech format).\n\n"
 		"    data_dir   : The directory containing the data and configuration files.\n"
 		"    speech.wav : This file will be created, and will contain the\n"
@@ -88,7 +88,7 @@ showUsage()
 		"        vocal tract model.\n\n"
 
 		PROGRAM_NAME << " pho1 [-v] [-i input.txt] [-p vtm_param.txt] data_dir \\\n"
-		"        pho1_map.txt speech.wav\n"
+		"        pho1_map.txt [speech.wav]\n"
 		"    Converts phonetic string to speech (MBROLA format).\n\n"
 		"    data_dir     : The directory containing the data and configuration files.\n"
 		"    pho1_map.txt : Contains the mapping between the input and internal phonemes.\n"
@@ -150,11 +150,14 @@ tts(int argc, char* argv[])
 		}
 		++i;
 	}
-	if (argc - i != 2) {
+	if (argc - i == 2) {
+		dataDir    = argv[i++];
+		outputFile = argv[i];
+	} else if (argc - i == 1) {
+		dataDir    = argv[i];
+	} else {
 		showUsage(); return EXIT_FAILURE;
 	}
-	dataDir    = argv[i++];
-	outputFile = argv[i];
 
 	std::ostringstream inputTextStream;
 	if (textInput == nullptr) {
@@ -236,11 +239,14 @@ pho0(int argc, char* argv[])
 		}
 		++i;
 	}
-	if (argc - i != 2) {
+	if (argc - i == 2) {
+		dataDir    = argv[i++];
+		outputFile = argv[i];
+	} else if (argc - i == 1) {
+		dataDir    = argv[i];
+	} else {
 		showUsage(); return EXIT_FAILURE;
 	}
-	dataDir    = argv[i++];
-	outputFile = argv[i];
 
 	std::ostringstream inputPhoneticStream;
 	if (phoneticInput == nullptr) {
@@ -320,12 +326,16 @@ pho1(int argc, char* argv[])
 		}
 		++i;
 	}
-	if (argc - i != 3) {
+	if (argc - i == 3) {
+		dataDir    = argv[i++];
+		mapFile    = argv[i++];
+		outputFile = argv[i];
+	} else if (argc - i == 2) {
+		dataDir    = argv[i++];
+		mapFile    = argv[i];
+	} else {
 		showUsage(); return EXIT_FAILURE;
 	}
-	dataDir    = argv[i++];
-	mapFile    = argv[i++];
-	outputFile = argv[i];
 
 	std::ostringstream inputPhoneticStream;
 	if (phoneticInput == nullptr) {

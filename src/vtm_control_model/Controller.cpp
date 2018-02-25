@@ -240,6 +240,8 @@ Controller::synthesizeFromEventListToBuffer(const char* vtmParamFile, std::vecto
 void
 Controller::synthesizeToFile(const char* outputFile)
 {
+	if (!outputFile) return;
+
 	if (!vtm_->outputBuffer().empty()) vtm_->reset();
 	synthesize(vtmParamList_);
 	vtm_->finishSynthesis();
