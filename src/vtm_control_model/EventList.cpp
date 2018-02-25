@@ -495,6 +495,32 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 		break;
 	}
 
+	// Check time intervals.
+	const int minTimeInterval = controlPeriod_ + 1;
+	switch (ruleType) {
+	case Rule::Type::tetraphone:
+		if (static_cast<int>(ruleSymbols[Rule::SYMB_DURATION] - ruleSymbols[Rule::SYMB_MARK2]) < minTimeInterval ||
+				static_cast<int>(ruleSymbols[Rule::SYMB_MARK2] - ruleSymbols[Rule::SYMB_MARK1]) < minTimeInterval ||
+				static_cast<int>(ruleSymbols[Rule::SYMB_MARK1]) < minTimeInterval) {
+			THROW_EXCEPTION(InvalidValueException, "The time interval between two postures is too small. Try reducing the tempo.");
+		}
+		break;
+	case Rule::Type::triphone:
+		if (static_cast<int>(ruleSymbols[Rule::SYMB_DURATION] - ruleSymbols[Rule::SYMB_MARK1]) < minTimeInterval ||
+				static_cast<int>(ruleSymbols[Rule::SYMB_MARK1]) < minTimeInterval) {
+			THROW_EXCEPTION(InvalidValueException, "The time interval between two postures is too small. Try reducing the tempo.");
+		}
+		break;
+	case Rule::Type::diphone:
+		if (static_cast<int>(ruleSymbols[Rule::SYMB_DURATION]) < minTimeInterval) {
+			THROW_EXCEPTION(InvalidValueException, "The time interval between two postures is too small. Try reducing the tempo.");
+		}
+		break;
+	case Rule::Type::invalid:
+		// Unreachable.
+		break;
+	}
+
 	/* Loop through the parameters */
 	for (unsigned int i = 0; i < numParam; ++i) {
 		double targets[4];
