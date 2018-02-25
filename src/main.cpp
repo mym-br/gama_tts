@@ -48,65 +48,73 @@ isOption(const char* arg)
 void
 showUsage()
 {
-	std::cout << "\nGamaTTS " << GAMA_TTS_VERSION << "\n\n";
-	std::cout << "Usage:\n\n";
-	std::cout << PROGRAM_NAME << " --help\n";
-	std::cout << PROGRAM_NAME << " --version\n";
-	std::cout << "    Shows the program version and usage.\n\n";
+	std::cout <<
+		"\nGamaTTS " << GAMA_TTS_VERSION << "\n\n"
 
-	std::cout << PROGRAM_NAME << " tts [-v] [-i input.txt] [-p vtm_param.txt] data_dir speech.wav\n";
-	std::cout << "    Converts text to speech.\n\n";
-	std::cout << "    data_dir   : The directory containing the data and configuration files.\n";
-	std::cout << "    speech.wav : This file will be created, and will contain the\n";
-	std::cout << "                 synthesized speech.\n\n";
-	std::cout << "    Options:\n";
-	std::cout << "    -v\n";
-	std::cout << "        Verbose.\n";
-	std::cout << "    -i input.txt\n";
-	std::cout << "        Get the text from a file instead of from stdin.\n";
-	std::cout << "    -p vtm_param.txt\n";
-	std::cout << "        This file will be created, and will contain the parameters for the\n";
-	std::cout << "        vocal tract model.\n\n";
+		"Usage:\n\n"
 
-	std::cout << PROGRAM_NAME << " pho0 [-v] [-i input.txt] [-p vtm_param.txt] data_dir speech.wav\n";
-	std::cout << "    Converts phonetic string to speech (Gnuspeech format).\n\n";
-	std::cout << "    data_dir   : The directory containing the data and configuration files.\n";
-	std::cout << "    speech.wav : This file will be created, and will contain the\n";
-	std::cout << "                 synthesized speech.\n\n";
-	std::cout << "    Options:\n";
-	std::cout << "    -v\n";
-	std::cout << "        Verbose.\n";
-	std::cout << "    -i input.txt\n";
-	std::cout << "        Get the phonetic string from a file instead of from stdin.\n";
-	std::cout << "    -p vtm_param.txt\n";
-	std::cout << "        This file will be created, and will contain the parameters for the\n";
-	std::cout << "        vocal tract model.\n\n";
+		PROGRAM_NAME << " --help\n"
+		PROGRAM_NAME << " --version\n"
+		"    Shows the program version and usage.\n\n"
 
-	std::cout << PROGRAM_NAME << " pho1 [-v] [-i input.txt] [-p vtm_param.txt] data_dir \\\n";
-	std::cout << "        pho1_map.txt speech.wav\n";
-	std::cout << "    Converts phonetic string to speech (MBROLA format).\n\n";
-	std::cout << "    data_dir     : The directory containing the data and configuration files.\n";
-	std::cout << "    pho1_map.txt : Contains the mapping between the input and internal phonemes.\n";
-	std::cout << "    speech.wav   : This file will be created, and will contain the\n";
-	std::cout << "                   synthesized speech.\n\n";
-	std::cout << "    Options:\n";
-	std::cout << "    -v\n";
-	std::cout << "        Verbose.\n";
-	std::cout << "    -i input.txt\n";
-	std::cout << "        Get the phonetic string from a file instead of from stdin.\n";
-	std::cout << "    -p vtm_param.txt\n";
-	std::cout << "        This file will be created, and will contain the parameters for the\n";
-	std::cout << "        vocal tract model.\n\n";
+		PROGRAM_NAME << " tts [-v] [-i input.txt] [-p vtm_param.txt] data_dir speech.wav\n"
+		"    Converts text to speech.\n\n"
+		"    data_dir   : The directory containing the data and configuration files.\n"
+		"    speech.wav : This file will be created, and will contain the\n"
+		"                 synthesized speech.\n\n"
 
-	std::cout << PROGRAM_NAME << " vtm [-v] data_dir vtm_param.txt speech.wav\n";
-	std::cout << "    Converts vocal tract parameters to speech.\n\n";
-	std::cout << "    data_dir      : The directory containing the data and configuration files.\n";
-	std::cout << "    vtm_param.txt : The file with the parameters for the vocal tract model.\n";
-	std::cout << "    speech.wav    : This file will be created, and will contain the\n";
-	std::cout << "                    synthesized speech.\n\n";
-	std::cout << "    Options:\n";
-	std::cout << "    -v\n";
-	std::cout << "        Verbose.\n\n";
+		"    Options:\n"
+		"    -v\n"
+		"        Verbose.\n"
+		"    -i input.txt\n"
+		"        Get the text from a file instead of from stdin.\n"
+		"    -p vtm_param.txt\n"
+		"        This file will be created, and will contain the parameters for the\n"
+		"        vocal tract model.\n\n"
+
+		PROGRAM_NAME << " pho0 [-v] [-i input.txt] [-p vtm_param.txt] data_dir speech.wav\n"
+		"    Converts phonetic string to speech (Gnuspeech format).\n\n"
+		"    data_dir   : The directory containing the data and configuration files.\n"
+		"    speech.wav : This file will be created, and will contain the\n"
+		"                 synthesized speech.\n\n"
+
+		"    Options:\n"
+		"    -v\n"
+		"        Verbose.\n"
+		"    -i input.txt\n"
+		"        Get the phonetic string from a file instead of from stdin.\n"
+		"    -p vtm_param.txt\n"
+		"        This file will be created, and will contain the parameters for the\n"
+		"        vocal tract model.\n\n"
+
+		PROGRAM_NAME << " pho1 [-v] [-i input.txt] [-p vtm_param.txt] data_dir \\\n"
+		"        pho1_map.txt speech.wav\n"
+		"    Converts phonetic string to speech (MBROLA format).\n\n"
+		"    data_dir     : The directory containing the data and configuration files.\n"
+		"    pho1_map.txt : Contains the mapping between the input and internal phonemes.\n"
+		"    speech.wav   : This file will be created, and will contain the\n"
+		"                   synthesized speech.\n\n"
+
+		"    Options:\n"
+		"    -v\n"
+		"        Verbose.\n"
+		"    -i input.txt\n"
+		"        Get the phonetic string from a file instead of from stdin.\n"
+		"    -p vtm_param.txt\n"
+		"        This file will be created, and will contain the parameters for the\n"
+		"        vocal tract model.\n\n"
+
+		PROGRAM_NAME << " vtm [-v] data_dir vtm_param.txt speech.wav\n"
+		"    Converts vocal tract parameters to speech.\n\n"
+		"    data_dir      : The directory containing the data and configuration files.\n"
+		"    vtm_param.txt : The file with the parameters for the vocal tract model.\n"
+		"    speech.wav    : This file will be created, and will contain the\n"
+		"                    synthesized speech.\n\n"
+
+		"    Options:\n"
+		"    -v\n"
+		"        Verbose.\n\n"
+		<< std::endl;
 }
 
 //==============================================================================
