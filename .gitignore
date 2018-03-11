@@ -1,3 +1,4 @@
 *.txt.user*
 *__NOP
 generated__*
+__pycache__
