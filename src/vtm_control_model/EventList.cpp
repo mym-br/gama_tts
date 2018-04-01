@@ -29,6 +29,7 @@
 #include "Log.h"
 
 #define DEFAULT_CONTROL_PERIOD_MS 4
+#define EPS (1.0e-6)
 
 
 
@@ -713,7 +714,10 @@ EventList::applyIntonation()
 
 		intonParms = intonationRhythm_.intonationParameters(toneGroups_[i].type);
 
-		const double pretonicDelta = intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH] / (endTime - startTime);
+		const double deltaTime = endTime - startTime;
+		const double pretonicDelta = deltaTime < EPS ?
+					0.0 :
+					intonParms[IntonationRhythm::INTON_PRM_NOTIONAL_PITCH] / deltaTime;
 
 		/* Set up intonation boundary variables */
 		for (int j = firstFoot; j <= endFoot; j++) {
