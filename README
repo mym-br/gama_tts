@@ -2,8 +2,8 @@
 GamaTTS
 =======
 
-GamaTTS is an _experimental_ command-line articulatory synthesizer that
-converts text to speech.
+GamaTTS is an _experimental_ articulatory synthesizer that converts text to
+speech.
 
 GamaTTS started as a C++ port of the TTS_Server in the original Gnuspeech
 (http://www.gnu.org/software/gnuspeech/) system developed for NeXTSTEP,
@@ -17,6 +17,10 @@ Gnuspeech is licensed under the GNU GPLv3 or later.
 This software includes code from RapidXml (http://rapidxml.sourceforge.net/),
 provided by Marcin Kalicinski. See the file src/rapidxml/license.txt
 for details.
+
+Notes:
+- GamaTTS is not compatible with Gnuspeech.
+- "Gama" is the portuguese for gamma.
 
 
 
