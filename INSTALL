@@ -5,38 +5,31 @@
 
   - A C++ compiler with C++14 support.
     The following compilers have been tested:
-    - GCC 5.4 (Linux+GNU x86_64).
-    - GCC 7.1 (Linux+GNU x86_64).
-    - Clang 4.0 (Linux+GNU x86_64).
+    - GCC 5.5        (Linux+GNU x86_64).
+    - LLVM/Clang 3.8 (Linux+GNU x86_64).
 
-- Build (Linux):
+- Build:
 
   - Linux - GCC:
-    - Execute in a terminal (running bash):
+    - Execute in a terminal:
 
-      pkg_dir=$PWD
-      mkdir ../gama_tts-build
-      cd ../gama_tts-build
-      cmake -D CMAKE_BUILD_TYPE=Release $pkg_dir
+      mkdir build
+      cd build
+      cmake -D CMAKE_BUILD_TYPE=Release ..
       make
 
   - Linux - LLVM/Clang:
-    - Execute in a terminal (running bash):
+    - Execute in a terminal:
 
-      pkg_dir=$PWD
-      mkdir ../gama_tts-build
-      cd ../gama_tts-build
-      CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release $pkg_dir
+      mkdir build
+      cd build
+      CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ..
       make
 
 - Test (Linux):
 
-  echo "Hello world." | ./gama_tts tts $pkg_dir/data/english/vtm5 test.wav
+  - Execute in a terminal, in the directory "build":
 
-  # The "play" program is included in the SoX package.
-  play test.wav
+    echo "Hello world." | ./gama_tts tts ../data/english/vtm5 test.wav
 
-- Install to system (optional, Linux):
-
-  make install
-  #make install DESTDIR=/tmp/dist
+  - Play the file test.wav.
