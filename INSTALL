@@ -8,28 +8,30 @@
     - GCC 5.5        (Linux+GNU x86_64).
     - LLVM/Clang 3.8 (Linux+GNU x86_64).
 
+  - Rename the current directory to "gama_tts" (if needed).
+
 - Build:
 
   - Linux - GCC:
     - Execute in a terminal:
 
-      mkdir build
-      cd build
-      cmake -D CMAKE_BUILD_TYPE=Release ..
+      mkdir ../gama_tts-build
+      cd ../gama_tts-build
+      cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
       make
 
   - Linux - LLVM/Clang:
     - Execute in a terminal:
 
-      mkdir build
-      cd build
-      CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ..
+      mkdir ../gama_tts-build
+      cd ../gama_tts-build
+      CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
       make
 
 - Test (Linux):
 
-  - Execute in a terminal, in the directory "build":
+  - Execute in a terminal, in the directory "gama_tts-build":
 
-    echo "Hello world." | ./gama_tts tts ../data/english/vtm5 test.wav
+    echo "Hello world." | ./gama_tts tts ../gama_tts/data/english/vtm5 test.wav
 
   - Play the file test.wav.
