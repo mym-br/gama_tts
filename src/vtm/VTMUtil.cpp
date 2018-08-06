@@ -17,8 +17,8 @@
 
 #include "VTMUtil.h"
 
-#define MIN_MAXIMUM_ABS_SAMPLE_VALUE (1.0e-30)
-#define MAX_OUTPUT_ABS_SAMPLE_VALUE (0.95)
+#define MIN_MAXIMUM_ABS_SAMPLE_VALUE (1.0e-30f)
+#define MAX_OUTPUT_ABS_SAMPLE_VALUE (0.95f)
 
 
 
@@ -49,7 +49,7 @@ float
 calculateOutputScale(const std::vector<float>& buffer)
 {
 	const float maxValue = maximumAbsoluteValue(buffer);
-	if (maxValue < float{MIN_MAXIMUM_ABS_SAMPLE_VALUE}) {
+	if (maxValue < MIN_MAXIMUM_ABS_SAMPLE_VALUE) {
 		return 0.0;
 	}
 
@@ -59,7 +59,7 @@ calculateOutputScale(const std::vector<float>& buffer)
 float
 calculateOutputScale(float maximumAbsoluteValue)
 {
-	if (maximumAbsoluteValue < float{MIN_MAXIMUM_ABS_SAMPLE_VALUE}) {
+	if (maximumAbsoluteValue < MIN_MAXIMUM_ABS_SAMPLE_VALUE) {
 		return 0.0;
 	}
 

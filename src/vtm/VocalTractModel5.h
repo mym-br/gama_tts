@@ -694,7 +694,7 @@ VocalTractModel5<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 
 	// Add frication noise.
 	const FloatType fricOffset = (S28 - S6) * (currentParameter_[PARAM_FRIC_POS] / FloatType{GS_VTM5_MAX_FRIC_POS - GS_VTM5_MIN_FRIC_POS});
-	const int fricOffsetInt = fricOffset;
+	const int fricOffsetInt = static_cast<int>(fricOffset);
 	const FloatType fricRight = fricOffset - fricOffsetInt;
 	const FloatType fricLeft = 1.0f - fricRight;
 	const FloatType fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]);

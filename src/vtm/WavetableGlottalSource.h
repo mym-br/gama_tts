@@ -87,13 +87,13 @@ private:
 template<typename FloatType>
 WavetableGlottalSource<FloatType>::WavetableGlottalSource(Type type, FloatType sampleRate,
 			FloatType tp, FloatType tnMin, FloatType tnMax)
-		: tableLength_{512}
-		, tableModulus_{tableLength_ - 1}
-		, firBeta_{0.2}
-		, firGamma_{0.1}
-		, firCutoff_{0.00000001}
+		: tableLength_(512)
+		, tableModulus_(tableLength_ - 1)
+		, firBeta_(0.2)
+		, firGamma_(0.1)
+		, firCutoff_(0.00000001)
 		, wavetable_(tableLength_)
-		, prevAmplitude_{-1.0}
+		, prevAmplitude_(-1.0)
 {
 	// Calculates the initial glottal pulse and stores it
 	// in the wavetable, for use in the oscillator.

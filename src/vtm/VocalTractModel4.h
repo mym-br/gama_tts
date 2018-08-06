@@ -456,7 +456,7 @@ VocalTractModel4<FloatType, SectionDelay>::initializeSynthesizer()
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
 	if (config_.length > 0.0) {
 		const FloatType c = Util::speedOfSound(config_.temperature);
-		sampleRate_ = (c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / config_.length;
+		sampleRate_ = static_cast<int>((c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / config_.length);
 		nyquist = sampleRate_ / 2.0f;
 		if (!interactive_) LOG_DEBUG("[VocalTractModel4] Internal sample rate: " << sampleRate_);
 	} else {

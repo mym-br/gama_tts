@@ -946,7 +946,9 @@ safetyCheck(std::stringstream& stream, std::size_t* streamLength)
 	}
 
 	/*  BE SURE TO RESET LENGTH OF STREAM  */
-	*streamLength = stream.tellg();
+	std::stringstream::pos_type g = stream.tellg();
+	if (g < 0) THROW_EXCEPTION(IOException, "Could not get the get position of the stringstream.");
+	*streamLength = g;
 }
 
 /******************************************************************************
@@ -1439,7 +1441,9 @@ EnglishTextParser::finalConversion(std::stringstream& stream1, std::size_t strea
 	stream2 << '\0';
 
 	/*  SET STREAM2 LENGTH  */
-	*stream2Length = stream2.tellp();
+	std::stringstream::pos_type p = stream2.tellp();
+	if (p < 0) THROW_EXCEPTION(IOException, "Could not get the put position of the stringstream.");
+	*stream2Length = p;
 }
 
 /******************************************************************************
@@ -1639,7 +1643,7 @@ EnglishTextParser::expandAbbreviation(char* buffer, std::size_t length, std::siz
 			}
 			/*  EXPAND ONLY IF NUMBER FOLLOWS  */
 			if (numberFollows(buffer, length, i)) {
-				stream.seekp(-word_length, std::ios_base::cur);
+				stream.seekp(-static_cast<std::stringstream::off_type>(word_length), std::ios_base::cur);
 				stream << entry << ' ';
 				return 1;
 			}
@@ -1648,7 +1652,7 @@ EnglishTextParser::expandAbbreviation(char* buffer, std::size_t length, std::siz
 		/*  EXPAND THESE ABBREVIATIONS UNCONDITIONALLY  */
 		entry = abbrevMap_.getEntry(word);
 		if (entry) {
-			stream.seekp(-word_length, std::ios_base::cur);
+			stream.seekp(-static_cast<std::stringstream::off_type>(word_length), std::ios_base::cur);
 			stream << entry << ' ';
 			return 1;
 		}
@@ -1843,7 +1847,9 @@ EnglishTextParser::stripPunctuation(char* buffer, std::size_t length, std::strin
 	}
 
 	/*  SET STREAM LENGTH  */
-	*streamLength = stream.tellp();
+	std::stringstream::pos_type p = stream.tellp();
+	if (p < 0) THROW_EXCEPTION(IOException, "Could not get the put position of the stringstream.");
+	*streamLength = p;
 }
 
 /******************************************************************************

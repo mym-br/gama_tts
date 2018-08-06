@@ -172,7 +172,7 @@ SampleRateConverter<FloatType>::initializeConversion(FloatType inputRate, FloatT
 template<typename FloatType>
 FloatType SampleRateConverter<FloatType>::Izero(FloatType x)
 {
-	const FloatType IzeroEPSILON {1E-21};
+	const FloatType IzeroEPSILON = 1E-21;
 
 	FloatType sum, u, halfx, temp;
 	int n;
@@ -227,12 +227,12 @@ template<typename FloatType>
 void
 SampleRateConverter<FloatType>::initializeFilter()
 {
-	const FloatType beta{5.658};         /*  kaiser window parameter  */
-	const FloatType lpCutoff{11.0/13.0}; /*  (0.846 OF NYQUIST)  */
+	const FloatType beta = 5.658;           /*  kaiser window parameter  */
+	const FloatType lpCutoff = 11.0 / 13.0; /*  (0.846 OF NYQUIST)  */
 
 	/*  INITIALIZE THE FILTER IMPULSE RESPONSE  */
 	h_[0] = lpCutoff;
-	const FloatType x = FloatType{M_PI} / L_RANGE;
+	const FloatType x = M_PI / L_RANGE;
 	for (unsigned int i = 1; i < FILTER_LENGTH; i++) {
 		const FloatType y = i * x;
 		h_[i] = std::sin(y * lpCutoff) / y;

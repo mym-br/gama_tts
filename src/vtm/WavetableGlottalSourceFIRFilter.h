@@ -160,7 +160,7 @@ WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatT
 	}
 
 	/*  CALCULATE THE RATIONAL APPROXIMATION TO THE CUT-OFF POINT  */
-	const FloatType ac = (1.0f + std::cos((2.0f * FloatType{M_PI}) * beta)) / 2.0f;
+	const FloatType ac = (1.0f + std::cos((2.0f * static_cast<FloatType>(M_PI)) * beta)) / 2.0f;
 	rationalApproximation(ac, &nt, &numerator, np);
 
 	/*  CALCULATE FILTER ORDER  */
@@ -174,7 +174,7 @@ WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatT
 	const int ll = nt - numerator;
 
 	for (int i = 2; i <= *np; i++) {
-		c[i] = std::cos((2.0f * FloatType{M_PI}) * (static_cast<FloatType>(i - 1) / n));
+		c[i] = std::cos((2.0f * static_cast<FloatType>(M_PI)) * (static_cast<FloatType>(i - 1) / n));
 		const FloatType x = (1.0f - c[i]) / 2.0f;
 		FloatType y = x;
 

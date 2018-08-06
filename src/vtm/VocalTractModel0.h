@@ -333,7 +333,7 @@ VocalTractModel0<FloatType>::initializeSynthesizer()
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
 	if (config_.length > 0.0) {
 		const FloatType c = Util::speedOfSound(config_.temperature);
-		sampleRate_ = (c * TOTAL_SECTIONS * 100.0f) / config_.length;
+		sampleRate_ = static_cast<int>((c * TOTAL_SECTIONS * 100.0f) / config_.length);
 		nyquist = sampleRate_ / 2.0f;
 	} else {
 		THROW_EXCEPTION(VTMException, "Illegal tube length.\n");
@@ -679,7 +679,7 @@ VocalTractModel0<FloatType>::setParameter(int parameter, float value)
 	case PARAM_R8:
 		currentParameter_[parameter] = std::max(
 						value * config_.radiusCoef[parameter - PARAM_R1],
-						FloatType{GS_VTM0_MIN_RADIUS});
+						static_cast<FloatType>(GS_VTM0_MIN_RADIUS));
 		break;
 	default:
 		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << parameter << '.');
@@ -702,7 +702,7 @@ VocalTractModel0<FloatType>::setAllParameters(const std::vector<float>& paramete
 	for (std::size_t i = PARAM_R1; i <= PARAM_R8; ++i) {
 		currentParameter_[i] = std::max(
 					parameters[i] * config_.radiusCoef[i - PARAM_R1],
-					FloatType{GS_VTM0_MIN_RADIUS});
+					static_cast<FloatType>(GS_VTM0_MIN_RADIUS));
 	}
 
 	currentParameter_[PARAM_VELUM] = parameters[PARAM_VELUM];
