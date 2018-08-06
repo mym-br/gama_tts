@@ -33,13 +33,13 @@ class EventList;
 class Model;
 
 struct Pho1IntonationPoint {
-	Pho1IntonationPoint(float pos, float freq) : position{pos}, frequency{freq} {}
+	Pho1IntonationPoint(float pos, float freq) : position(pos), frequency(freq) {}
 	float position;
 	float frequency;
 };
 
 struct Pho1Data {
-	Pho1Data() : duration{1.0}, postureIndex{} {}
+	Pho1Data() : duration(1.0), postureIndex() {}
 	std::string phoneme;
 	float duration;
 	unsigned int postureIndex;

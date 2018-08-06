@@ -58,18 +58,18 @@ private:
 		const Category* category1;
 		RewriterCommandType type;
 		const Posture* posture;
-		RewriterCommand() : category1{}, type{RewriterCommandType::nop}, posture{} {}
+		RewriterCommand() : category1(), type(RewriterCommandType::nop), posture() {}
 	};
 
 	struct RewriterData {
 		const Category* category2;
 		std::vector<RewriterCommand> commandList;
-		RewriterData() : category2{} {}
+		RewriterData() : category2() {}
 	};
 
 	struct RewriterState {
 		const Posture* lastPosture;
-		RewriterState() : lastPosture{} {}
+		RewriterState() : lastPosture() {}
 	};
 
 	void loadRewriterConfiguration(const std::string& filePath);

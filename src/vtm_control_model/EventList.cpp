@@ -41,17 +41,17 @@ const double Event::EMPTY_PARAMETER = std::numeric_limits<double>::infinity();
 
 
 EventList::EventList(const char* configDirPath, Model& model)
-		: model_{model}
-		, controlPeriod_{DEFAULT_CONTROL_PERIOD_MS}
-		, macroIntonation_{}
-		, microIntonation_{}
-		, intonationDrift_{}
-		, smoothIntonation_{true}
-		, initialPitch_{}
-		, meanPitch_{}
-		, globalTempo_{1.0}
-		, intonationFactor_{1.0}
-		, intonationRhythm_{configDirPath}
+		: model_(model)
+		, controlPeriod_(DEFAULT_CONTROL_PERIOD_MS)
+		, macroIntonation_()
+		, microIntonation_()
+		, intonationDrift_()
+		, smoothIntonation_(true)
+		, initialPitch_()
+		, meanPitch_()
+		, globalTempo_(1.0)
+		, intonationFactor_(1.0)
+		, intonationRhythm_(configDirPath)
 {
 	setUp();
 

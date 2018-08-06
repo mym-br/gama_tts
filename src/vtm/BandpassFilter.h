@@ -58,16 +58,16 @@ private:
 
 template<typename FloatType>
 BandpassFilter<FloatType>::BandpassFilter()
-		: b0_{}
-		, a2_{}
-		, a1_{}
-		, x1_{}
-		, x2_{}
-		, y1_{}
-		, y2_{}
-		, prevSampleRate_{-1.0}
-		, prevBandwidth_{-1.0}
-		, prevCenterFreq_{-1.0}
+		: b0_()
+		, a2_()
+		, a1_()
+		, x1_()
+		, x2_()
+		, y1_()
+		, y2_()
+		, prevSampleRate_(-1.0)
+		, prevBandwidth_(-1.0)
+		, prevCenterFreq_(-1.0)
 {
 }
 

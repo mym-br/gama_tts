@@ -66,15 +66,15 @@ template<typename FloatType>
 RosenbergBGlottalSource<FloatType>::RosenbergBGlottalSource(
 			Type type, FloatType sampleRate,
 			FloatType tp, FloatType tnMin, FloatType tnMax)
-		: type_{type}
-		, sampleRate_{sampleRate}
-		, tnMin_{tnMin / 100.0f}
-		, tnMax_{tnMax / 100.0f}
-		, t1_{tp / 100.0f}
-		, t2_{t1_ + tnMax_}
-		, nextT2_{t2_}
-		, prevAmplitude_{-1.0}
-		, t_{}
+		: type_(type)
+		, sampleRate_(sampleRate)
+		, tnMin_(tnMin / 100.0f)
+		, tnMax_(tnMax / 100.0f)
+		, t1_(tp / 100.0f)
+		, t2_(t1_ + tnMax_)
+		, nextT2_(t2_)
+		, prevAmplitude_(-1.0)
+		, t_()
 {
 	constexpr FloatType eps = 1.0e-2;
 

@@ -43,12 +43,12 @@ struct PostureData {
 	int            syllable;
 	bool           marked;
 	PostureData()
-		: posture{}
-		, tempo{1.0}
-		, ruleTempo{1.0}
-		, onset{}
-		, syllable{}
-		, marked{} {}
+		: posture()
+		, tempo(1.0)
+		, ruleTempo(1.0)
+		, onset()
+		, syllable()
+		, marked() {}
 };
 
 struct Foot {
@@ -60,13 +60,13 @@ struct Foot {
 	int marked;
 	int last;
 	Foot()
-		: onset1{}
-		, onset2{}
-		, tempo{1.0}
-		, start{}
-		, end{}
-		, marked{}
-		, last{} {}
+		: onset1()
+		, onset2()
+		, tempo(1.0)
+		, start()
+		, end()
+		, marked()
+		, last() {}
 };
 
 struct ToneGroup {
@@ -74,9 +74,9 @@ struct ToneGroup {
 	int endFoot;
 	IntonationRhythm::ToneGroup type;
 	ToneGroup()
-		: startFoot{}
-		, endFoot{}
-		, type{IntonationRhythm::ToneGroup::none} {}
+		: startFoot()
+		, endFoot()
+		, type(IntonationRhythm::ToneGroup::none) {}
 };
 
 struct RuleData {
@@ -89,14 +89,14 @@ struct RuleData {
 	double duration;
 	double beat;
 	RuleData()
-		: number{}
-		, firstPosture{}
-		, lastPosture{}
-		, start{}
-		, mark1{}
-		, mark2{}
-		, duration{}
-		, beat{} {}
+		: number()
+		, firstPosture()
+		, lastPosture()
+		, start()
+		, mark1()
+		, mark2()
+		, duration()
+		, beat() {}
 };
 
 struct InterpolationData {
@@ -105,10 +105,10 @@ struct InterpolationData {
 	double c;
 	double d;
 	InterpolationData()
-		: a{}
-		, b{}
-		, c{}
-		, d{} {}
+		: a()
+		, b()
+		, c()
+		, d() {}
 };
 
 struct Event {

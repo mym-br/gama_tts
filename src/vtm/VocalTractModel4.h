@@ -368,7 +368,7 @@ private:
 
 template<typename FloatType, unsigned int SectionDelay>
 VocalTractModel4<FloatType, SectionDelay>::VocalTractModel4(const ConfigurationData& data, bool interactive)
-		: interactive_{interactive}
+		: interactive_(interactive)
 {
 	loadConfiguration(data);
 	reset();

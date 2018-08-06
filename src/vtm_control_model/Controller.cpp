@@ -39,10 +39,10 @@ namespace GS {
 namespace VTMControlModel {
 
 Controller::Controller(const char* configDirPath, Model& model)
-		: configDirPath_{configDirPath}
-		, model_{model}
-		, eventList_{configDirPath, model_}
-		, vtmControlModelConfig_{configDirPath}
+		: configDirPath_(configDirPath)
+		, model_(model)
+		, eventList_(configDirPath, model_)
+		, vtmControlModelConfig_(configDirPath)
 {
 	// Load VTM configuration.
 	std::ostringstream vtmConfigFilePath;

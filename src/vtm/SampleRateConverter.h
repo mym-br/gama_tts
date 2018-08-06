@@ -94,20 +94,20 @@ private:
 
 template<typename FloatType>
 SampleRateConverter<FloatType>::SampleRateConverter(FloatType inputRate, FloatType outputRate, std::function<void(float)> output)
-		: sampleRateRatio_{}
-		, fillPtr_{}
-		, emptyPtr_{}
-		, padSize_{}
-		, fillSize_{}
-		, timeRegisterIncrement_{}
-		, filterIncrement_{}
-		, phaseIncrement_{}
-		, timeRegister_{}
-		, fillCounter_{}
+		: sampleRateRatio_()
+		, fillPtr_()
+		, emptyPtr_()
+		, padSize_()
+		, fillSize_()
+		, timeRegisterIncrement_()
+		, filterIncrement_()
+		, phaseIncrement_()
+		, timeRegister_()
+		, fillCounter_()
 		, h_(FILTER_LENGTH)
 		, deltaH_(FILTER_LENGTH)
 		, buffer_(BUFFER_SIZE)
-		, output_{output}
+		, output_(output)
 {
 	initializeConversion(inputRate, outputRate);
 }

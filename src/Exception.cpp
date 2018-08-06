@@ -31,7 +31,7 @@ namespace GS {
  * Constructor.
  */
 ExceptionString::ExceptionString() noexcept
-		: str_{}
+		: str_()
 {
 }
 
@@ -39,7 +39,7 @@ ExceptionString::ExceptionString() noexcept
  * Constructor.
  */
 ExceptionString::ExceptionString(const ExceptionString& o) noexcept
-		: str_{}
+		: str_()
 {
 	*this = o;
 }
@@ -48,7 +48,7 @@ ExceptionString::ExceptionString(const ExceptionString& o) noexcept
  * Constructor.
  */
 ExceptionString::ExceptionString(ExceptionString&& o) noexcept
-		: str_{}
+		: str_()
 {
 	*this = std::move(o);
 }

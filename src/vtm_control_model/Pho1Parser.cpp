@@ -48,8 +48,8 @@ namespace GS {
 namespace VTMControlModel {
 
 Pho1Parser::Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList, const char* phonemeMapFile)
-		: model_{model}
-		, eventList_{eventList}
+		: model_(model)
+		, eventList_(eventList)
 {
 	std::ostringstream phonemeMapFilePath;
 	phonemeMapFilePath << configDirPath << CONFIG_SUBDIR << phonemeMapFile;

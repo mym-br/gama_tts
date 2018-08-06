@@ -164,7 +164,7 @@ public:
 	Rule(unsigned int numParameters)
 		: paramProfileTransitionList_(numParameters)
 		, specialProfileTransitionList_(numParameters)
-		, type_{Type::invalid}
+		, type_(Type::invalid)
 	{
 	}
 

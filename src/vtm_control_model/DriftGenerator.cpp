@@ -29,9 +29,9 @@ namespace GS {
 namespace VTMControlModel {
 
 DriftGenerator::DriftGenerator()
-	: pitchDeviation_{}
-	, pitchOffset_{}
-	, seed_{INITIAL_SEED}
+	: pitchDeviation_()
+	, pitchOffset_()
+	, seed_(INITIAL_SEED)
 {
 }
 

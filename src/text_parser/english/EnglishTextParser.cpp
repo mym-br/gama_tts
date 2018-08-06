@@ -1100,7 +1100,7 @@ namespace English {
 EnglishTextParser::EnglishTextParser(
 			const std::string& textParserConfigDirPath,
 			const TextParserConfiguration& config)
-		: mode_{config.mode}
+		: mode_(config.mode)
 {
 	std::ostringstream suffixFilePathStream;
 	suffixFilePathStream << textParserConfigDirPath << SUFFIX_LIST_FILE;

@@ -66,7 +66,7 @@ public:
 		std::shared_ptr<Equation> timeExpression;
 		float freeTime; // milliseconds
 
-		Point() : type{Type::invalid}, value{}, timeExpression{}, freeTime{} {}
+		Point() : type(Type::invalid), value(), timeExpression(), freeTime() {}
 		virtual ~Point() {}
 
 		virtual bool isSlopeRatio() const { return false; }
@@ -105,7 +105,7 @@ public:
 	struct Slope {
 		float slope;
 
-		Slope() : slope{} {}
+		Slope() : slope() {}
 	private:
 		Slope(const Slope&) = delete;
 		Slope& operator=(const Slope&) = delete;
@@ -126,7 +126,7 @@ public:
 	};
 
 	Transition(const std::string& name, Type type, bool special)
-			: name_{name}, type_{type}, special_{special}
+			: name_(name), type_(type), special_(special)
 	{
 	}
 

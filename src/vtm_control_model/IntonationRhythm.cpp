@@ -46,10 +46,10 @@ namespace VTMControlModel {
 IntonationRhythm::IntonationRhythm(const char* configDirPath)
 		: toneGroupParameters_(static_cast<int>(ToneGroup::numberOfGroups))
 		, fixedIntonationParameters_(NUM_INTONATION_PARAM, 0.0)
-		, randSrc_{randDev_()}
+		, randSrc_(randDev_())
 		, randomIntonationParamSetIndex_(static_cast<int>(ToneGroup::numberOfGroups))
-		, useFixedIntonationParameters_{}
-		, randomIntonation_{}
+		, useFixedIntonationParameters_()
+		, randomIntonation_()
 {
 	std::string configDir{configDirPath};
 	configDir += CONFIG_SUB_DIR;

@@ -66,8 +66,8 @@ namespace GS {
 namespace VTMControlModel {
 
 PhoneticStringParser::PhoneticStringParser(const char* configDirPath, const Model& model, EventList& eventList)
-		: model_{model}
-		, eventList_{eventList}
+		: model_(model)
+		, eventList_(eventList)
 {
 	std::ostringstream rewriteFilePath;
 	rewriteFilePath << configDirPath << CONFIG_DIR REWRITE_CONFIG_FILE_NAME;

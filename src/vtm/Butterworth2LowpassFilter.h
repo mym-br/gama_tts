@@ -53,14 +53,14 @@ private:
 
 template<typename FloatType>
 Butterworth2LowPassFilter<FloatType>::Butterworth2LowPassFilter()
-		: b0_{}
-		, b1_{}
-		, a1_{}
-		, a2_{}
-		, x1_{}
-		, x2_{}
-		, y1_{}
-		, y2_{}
+		: b0_()
+		, b1_()
+		, a1_()
+		, a2_()
+		, x1_()
+		, x2_()
+		, y1_()
+		, y2_()
 {
 }
 

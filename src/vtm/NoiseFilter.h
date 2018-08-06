@@ -45,7 +45,7 @@ private:
 
 
 template<typename FloatType>
-NoiseFilter<FloatType>::NoiseFilter() : x1_{}
+NoiseFilter<FloatType>::NoiseFilter() : x1_()
 {
 }
 

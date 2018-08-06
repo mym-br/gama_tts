@@ -29,11 +29,11 @@ namespace GS {
 namespace VTMControlModel {
 
 IntonationPoint::IntonationPoint(const EventList* eventList)
-		: semitone_{}
-		, offsetTime_{}
-		, slope_{}
-		, ruleIndex_{}
-		, eventList_{eventList}
+		: semitone_()
+		, offsetTime_()
+		, slope_()
+		, ruleIndex_()
+		, eventList_(eventList)
 {
 	if (eventList_ == nullptr) {
 		THROW_EXCEPTION(InvalidParameterException, "The pointer to event list is null.");
