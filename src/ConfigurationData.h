@@ -111,15 +111,6 @@ ConfigurationData::put(const std::string& key, T value)
 	convertValue(value, valueString);
 }
 
-template<typename T>
-void
-ConfigurationData::convertValue(const T& value, std::string& s)
-{
-	std::ostringstream out;
-	out << value;
-	s = out.str();
-}
-
 } /* namespace GS */
 
 #endif /* CONFIGURATION_DATA_H_ */

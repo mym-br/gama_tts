@@ -169,6 +169,15 @@ ConfigurationData::convertString<bool>(const std::string& s)
 	return (s == "true") ? true : false;
 }
 
+template<typename T>
+void
+ConfigurationData::convertValue(const T& value, std::string& s)
+{
+	std::ostringstream out;
+	out << value;
+	s = out.str();
+}
+
 template<>
 void
 ConfigurationData::convertValue<float>(const float& value, std::string& s)
