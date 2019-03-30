@@ -2,40 +2,41 @@
 GamaTTS
 =======
 
-GamaTTS is an _experimental_ articulatory synthesizer that converts text to
+GamaTTS is an *experimental* articulatory synthesizer that converts text to
 speech.
 
-GamaTTS started as a C++ port of the TTS_Server in the original Gnuspeech
-(http://www.gnu.org/software/gnuspeech/) system developed for NeXTSTEP,
-provided by David R. Hill, Leonard Manzara, Craig Schock and contributors.
+GamaTTS started as a C++ port of the TTS_Server in the original [Gnuspeech][]
+system developed for NeXTSTEP, provided by David R. Hill, Leonard Manzara,
+Craig Schock and contributors.
 The base was the code on Gnuspeech's Subversion repository, revision 672,
 downloaded in 2014-08-02. The source code was obtained from the directories:
-nextstep/trunk/ObjectiveC/Monet.realtime
-nextstep/trunk/src/SpeechObject/postMonet/server.monet
+
+    nextstep/trunk/ObjectiveC/Monet.realtime
+    nextstep/trunk/src/SpeechObject/postMonet/server.monet
+
 Gnuspeech is licensed under the GNU GPLv3 or later.
 
-This software includes code from RapidXml (http://rapidxml.sourceforge.net/),
-provided by Marcin Kalicinski. See the file src/rapidxml/license.txt
-for details.
-
 Notes:
+
 - GamaTTS is not compatible with Gnuspeech.
 - "Gama" is the portuguese for gamma.
 
+External code
+-------------
 
+This software includes code from [RapidXml][], provided by Marcin Kalicinski.
+See the file src/rapidxml/license.txt for details.
 
 Status
 ------
 
-[pre-alpha]
+**pre-alpha**
 
 Only english is supported.
 
 The quality of the synthesized speech is very far from the best speech
 synthesizers. This software is mostly for people interested in articulatory
 speech synthesis.
-
-
 
 License
 -------
@@ -49,3 +50,6 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 COPYING file for more details.
+
+[Gnuspeech]: http://www.gnu.org/software/gnuspeech/
+[RapidXml]: http://rapidxml.sourceforge.net/
