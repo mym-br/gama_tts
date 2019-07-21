@@ -5,10 +5,10 @@
 
   - A C++ compiler with C++14 support.
     The following compilers have been tested:
-    - GCC 5.5        (Linux+GNU x86_64).
-    - LLVM/Clang 3.8 (Linux+GNU x86_64).
+    - GCC 8.3      (Linux+GNU x86_64).
+    - LLVM/Clang 7 (Linux+GNU x86_64).
 
-  - Rename the current directory to "gama_tts" (if needed).
+  - Rename the current directory to "gama_tts".
 
 - Build:
 
