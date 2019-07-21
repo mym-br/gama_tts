@@ -21,7 +21,6 @@
 #ifndef TEXT_PARSER_DICTIONARY_SEARCH_H_
 #define TEXT_PARSER_DICTIONARY_SEARCH_H_
 
-#include <array>
 #include <string>
 #include <vector>
 
@@ -46,7 +45,8 @@ public:
 	const char* version();
 private:
 	enum {
-		MAXLEN = 1024
+		BUF_LEN = 32,
+		MAX_LEN = 1024
 	};
 
 	struct SuffixInfo {
@@ -62,9 +62,9 @@ private:
 	const char* augmentedSearch(const char* orthography);
 
 	Dictionary dict_;
-	std::array<char, MAXLEN> buffer_;
-	std::array<char, 32> wordTypeBuffer_;
 	std::vector<SuffixInfo> suffixInfoList_;
+	std::vector<char> wordTypeBuffer_;
+	std::vector<char> buffer_;
 };
 
 } /* namespace TextParser */

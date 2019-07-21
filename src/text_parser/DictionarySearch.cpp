@@ -76,20 +76,22 @@ wordHasSuffix(const char* word, const char* suffix)
 namespace GS {
 namespace TextParser {
 
-void
-DictionarySearch::clearBuffers()
-{
-	buffer_.fill('\0');
-	wordTypeBuffer_.fill('\0');
-}
-
 DictionarySearch::DictionarySearch()
+		: wordTypeBuffer_(BUF_LEN)
+		, buffer_(MAX_LEN)
 {
 	clearBuffers();
 }
 
 DictionarySearch::~DictionarySearch()
 {
+}
+
+void
+DictionarySearch::clearBuffers()
+{
+	wordTypeBuffer_.assign(wordTypeBuffer_.size(), '\0');
+	buffer_.assign(buffer_.size(), '\0');
 }
 
 void
