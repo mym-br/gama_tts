@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 
 if(UNIX)
     if(APPLE)
-        set(CMAKE_CXX_FLAGS "-std=c++14 -stdlib=libc++")
+        set(CMAKE_CXX_FLAGS "-std=c++17 -stdlib=libc++")
     else()
-        set(CMAKE_CXX_FLAGS "-std=c++14 -Wall -Wextra -Wno-strict-overflow")
+        set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -Wno-strict-overflow")
     endif()
 endif()
 
