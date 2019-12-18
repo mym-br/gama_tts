@@ -23,6 +23,7 @@
 #include "XMLConfigFileReader.h"
 
 #include <memory>
+#include <string_view>
 
 #include "Exception.h"
 #include "Log.h"
@@ -36,69 +37,69 @@ using namespace rapidxml;
 
 namespace {
 
-const std::string booleanExpressionTagName   = "boolean-expression";
-const std::string booleanExpressionsTagName  = "boolean-expressions";
-const std::string categoriesTagName          = "categories";
-const std::string categoryTagName            = "category";
-const std::string categoryRefTagName         = "category-ref";
-const std::string commentTagName             = "comment";
-const std::string equationTagName            = "equation";
-const std::string equationGroupTagName       = "equation-group";
-const std::string equationsTagName           = "equations";
-const std::string expressionSymbolsTagName   = "expression-symbols";
-const std::string parameterTagName           = "parameter";
-const std::string parameterProfilesTagName   = "parameter-profiles";
-const std::string parametersTagName          = "parameters";
-const std::string parameterTargetsTagName    = "parameter-targets";
-const std::string parameterTransitionTagName = "parameter-transition";
-const std::string pointOrSlopesTagName       = "point-or-slopes";
-const std::string pointTagName               = "point";
-const std::string pointsTagName              = "points";
-const std::string postureCategoriesTagName   = "posture-categories";
-const std::string posturesTagName            = "postures";
-const std::string postureTagName             = "posture";
-const std::string ruleTagName                = "rule";
-const std::string rulesTagName               = "rules";
-const std::string slopeTagName               = "slope";
-const std::string slopeRatioTagName          = "slope-ratio";
-const std::string slopesTagName              = "slopes";
-const std::string specialProfilesTagName     = "special-profiles";
-const std::string specialTransitionsTagName  = "special-transitions";
-const std::string symbolEquationTagName      = "symbol-equation";
-const std::string symbolsTagName             = "symbols";
-const std::string symbolTagName              = "symbol";
-const std::string symbolTargetsTagName       = "symbol-targets";
-const std::string targetTagName              = "target";
-const std::string transitionTagName          = "transition";
-const std::string transitionGroupTagName     = "transition-group";
-const std::string transitionsTagName         = "transitions";
+constexpr std::string_view booleanExpressionTagName   = "boolean-expression";
+constexpr std::string_view booleanExpressionsTagName  = "boolean-expressions";
+constexpr std::string_view categoriesTagName          = "categories";
+constexpr std::string_view categoryTagName            = "category";
+constexpr std::string_view categoryRefTagName         = "category-ref";
+constexpr std::string_view commentTagName             = "comment";
+constexpr std::string_view equationTagName            = "equation";
+constexpr std::string_view equationGroupTagName       = "equation-group";
+constexpr std::string_view equationsTagName           = "equations";
+constexpr std::string_view expressionSymbolsTagName   = "expression-symbols";
+constexpr std::string_view parameterTagName           = "parameter";
+constexpr std::string_view parameterProfilesTagName   = "parameter-profiles";
+constexpr std::string_view parametersTagName          = "parameters";
+constexpr std::string_view parameterTargetsTagName    = "parameter-targets";
+constexpr std::string_view parameterTransitionTagName = "parameter-transition";
+constexpr std::string_view pointOrSlopesTagName       = "point-or-slopes";
+constexpr std::string_view pointTagName               = "point";
+constexpr std::string_view pointsTagName              = "points";
+constexpr std::string_view postureCategoriesTagName   = "posture-categories";
+constexpr std::string_view posturesTagName            = "postures";
+constexpr std::string_view postureTagName             = "posture";
+constexpr std::string_view ruleTagName                = "rule";
+constexpr std::string_view rulesTagName               = "rules";
+constexpr std::string_view slopeTagName               = "slope";
+constexpr std::string_view slopeRatioTagName          = "slope-ratio";
+constexpr std::string_view slopesTagName              = "slopes";
+constexpr std::string_view specialProfilesTagName     = "special-profiles";
+constexpr std::string_view specialTransitionsTagName  = "special-transitions";
+constexpr std::string_view symbolEquationTagName      = "symbol-equation";
+constexpr std::string_view symbolsTagName             = "symbols";
+constexpr std::string_view symbolTagName              = "symbol";
+constexpr std::string_view symbolTargetsTagName       = "symbol-targets";
+constexpr std::string_view targetTagName              = "target";
+constexpr std::string_view transitionTagName          = "transition";
+constexpr std::string_view transitionGroupTagName     = "transition-group";
+constexpr std::string_view transitionsTagName         = "transitions";
 
-const std::string defaultAttrName        = "default";
-const std::string equationAttrName       = "equation";
-const std::string formulaAttrName        = "formula";
-const std::string freeTimeAttrName       = "free-time";
-const std::string maximumAttrName        = "maximum";
-const std::string minimumAttrName        = "minimum";
-const std::string nameAttrName           = "name";
-const std::string p12AttrName            = "p12";
-const std::string p23AttrName            = "p23";
-const std::string p34AttrName            = "p34";
-const std::string slopeAttrName          = "slope";
-const std::string symbolAttrName         = "symbol";
-const std::string timeExpressionAttrName = "time-expression";
-const std::string typeAttrName           = "type";
-const std::string transitionAttrName     = "transition";
-const std::string valueAttrName          = "value";
+constexpr std::string_view defaultAttrName        = "default";
+constexpr std::string_view equationAttrName       = "equation";
+constexpr std::string_view formulaAttrName        = "formula";
+constexpr std::string_view freeTimeAttrName       = "free-time";
+constexpr std::string_view maximumAttrName        = "maximum";
+constexpr std::string_view minimumAttrName        = "minimum";
+constexpr std::string_view nameAttrName           = "name";
+constexpr std::string_view p12AttrName            = "p12";
+constexpr std::string_view p23AttrName            = "p23";
+constexpr std::string_view p34AttrName            = "p34";
+constexpr std::string_view slopeAttrName          = "slope";
+constexpr std::string_view symbolAttrName         = "symbol";
+constexpr std::string_view timeExpressionAttrName = "time-expression";
+constexpr std::string_view typeAttrName           = "type";
+constexpr std::string_view transitionAttrName     = "transition";
+constexpr std::string_view valueAttrName          = "value";
 
-const std::string beatSymbolName       = "beat";
-const std::string durationSymbolName   = "duration";
-const std::string mark1SymbolName      = "mark1";
-const std::string mark2SymbolName      = "mark2";
-const std::string mark3SymbolName      = "mark3";
-const std::string qssaSymbolName       = "qssa";
-const std::string qssbSymbolName       = "qssb";
-const std::string rdSymbolName         = "rd";
-const std::string transitionSymbolName = "transition";
+constexpr std::string_view beatSymbolName       = "beat";
+constexpr std::string_view durationSymbolName   = "duration";
+constexpr std::string_view mark1SymbolName      = "mark1";
+constexpr std::string_view mark2SymbolName      = "mark2";
+constexpr std::string_view mark3SymbolName      = "mark3";
+constexpr std::string_view qssaSymbolName       = "qssa";
+constexpr std::string_view qssbSymbolName       = "qssb";
+constexpr std::string_view rdSymbolName         = "rd";
+constexpr std::string_view transitionSymbolName = "transition";
 
 } /* namespace */
 
@@ -550,7 +551,7 @@ XMLConfigFileReader::~XMLConfigFileReader()
 void
 XMLConfigFileReader::loadModel()
 {
-	std::string source = readXMLFile(filePath_);
+	std::string source = readXMLFile(filePath_.c_str());
 	xml_document<char> doc;
 	doc.parse<parse_no_data_nodes | parse_validate_closing_tags>(&source[0]);
 

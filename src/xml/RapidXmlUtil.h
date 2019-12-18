@@ -18,7 +18,7 @@
 #ifndef RAPIDXML_UTIL_H_
 #define RAPIDXML_UTIL_H_
 
-#include <string>
+#include <string_view>
 
 #include "rapidxml.hpp"
 
@@ -29,7 +29,7 @@
 namespace GS {
 namespace RapidXmlUtil {
 
-std::string readXMLFile(const std::string& filePath);
+std::string readXMLFile(const char* filePath);
 
 inline
 rapidxml::xml_node<char>*
@@ -40,9 +40,9 @@ firstChild(rapidxml::xml_node<char>* elem)
 
 inline
 rapidxml::xml_node<char>*
-firstChild(rapidxml::xml_node<char>* elem, const std::string& name)
+firstChild(rapidxml::xml_node<char>* elem, const std::string_view& name)
 {
-	return elem->first_node(&name[0], name.size());
+	return elem->first_node(name.data(), name.size());
 }
 
 inline
@@ -54,16 +54,16 @@ nextSibling(rapidxml::xml_node<char>* elem)
 
 inline
 rapidxml::xml_node<char>*
-nextSibling(rapidxml::xml_node<char>* elem, const std::string& name)
+nextSibling(rapidxml::xml_node<char>* elem, const std::string_view& name)
 {
-	return elem->next_sibling(&name[0], name.size());
+	return elem->next_sibling(name.data(), name.size());
 }
 
 inline
 const char*
-attributeValue(rapidxml::xml_node<char>* elem, const std::string& name, bool optional=false)
+attributeValue(rapidxml::xml_node<char>* elem, const std::string_view& name, bool optional=false)
 {
-	rapidxml::xml_attribute<char>* attr = elem->first_attribute(&name[0], name.size());
+	rapidxml::xml_attribute<char>* attr = elem->first_attribute(name.data(), name.size());
 	if (attr == 0) {
 		if (optional) {
 			return "";
@@ -77,9 +77,9 @@ attributeValue(rapidxml::xml_node<char>* elem, const std::string& name, bool opt
 // Returns true if the names are equal.
 inline
 bool
-compareElementName(rapidxml::xml_node<char>* elem, const std::string& name)
+compareElementName(rapidxml::xml_node<char>* elem, const std::string_view& name)
 {
-	return rapidxml::internal::compare(elem->name(), elem->name_size(), &name[0], name.size(), true);
+	return rapidxml::internal::compare(elem->name(), elem->name_size(), name.data(), name.size(), true);
 }
 
 } /* namespace RapidXmlUtil */

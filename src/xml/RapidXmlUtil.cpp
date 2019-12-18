@@ -25,9 +25,9 @@ namespace GS {
 namespace RapidXmlUtil {
 
 std::string
-readXMLFile(const std::string& filePath)
+readXMLFile(const char* filePath)
 {
-	std::ifstream in(filePath.c_str(), std::ios_base::binary);
+	std::ifstream in(filePath, std::ios_base::binary);
 	if (!in) {
 		THROW_EXCEPTION(XMLException, "Could not open the file: " << filePath << '.');
 	}

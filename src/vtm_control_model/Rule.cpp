@@ -25,6 +25,7 @@
 #include <cassert>
 #include <cctype> /* isspace */
 #include <iostream>
+#include <string_view>
 
 #include "Category.h"
 #include "Equation.h"
@@ -39,13 +40,13 @@ namespace {
 
 using namespace GS::VTMControlModel;
 
-const char rightParenChar = ')';
-const char  leftParenChar = '(';
-const std::string     orOpSymb = "or";
-const std::string    notOpSymb = "not";
-const std::string    xorOpSymb = "xor";
-const std::string    andOpSymb = "and";
-const std::string markedOpSymb = "marked";
+constexpr char rightParenChar = ')';
+constexpr char  leftParenChar = '(';
+constexpr std::string_view     orOpSymb = "or";
+constexpr std::string_view    notOpSymb = "not";
+constexpr std::string_view    xorOpSymb = "xor";
+constexpr std::string_view    andOpSymb = "and";
+constexpr std::string_view markedOpSymb = "marked";
 
 class Parser {
 public:
