@@ -37,13 +37,11 @@ constexpr char rightParenChar = ')';
 constexpr char  leftParenChar = '(';
 
 
-FormulaSymbol formulaSymbol;
 
 class FormulaNodeParser {
 public:
 	FormulaNodeParser(const std::string& s)
-				: formulaSymbolMap_(formulaSymbol.codeMap)
-				, s_(GS::Text::trim(s))
+				: s_(GS::Text::trim(s))
 				, pos_(0)
 				, symbolType_(SymbolType::invalid) {
 		if (s_.empty()) {
@@ -84,7 +82,7 @@ private:
 		}
 	}
 
-	const FormulaSymbol::CodeMap& formulaSymbolMap_;
+	const FormulaSymbol formulaSymbol_;
 	const std::string s_;
 	std::string::size_type pos_;
 	std::string symbol_;
@@ -183,8 +181,8 @@ FormulaNodeParser::parseFactor()
 	{
 		std::string symbolTmp = symbol_;
 		nextSymbol();
-		FormulaSymbol::CodeMap::const_iterator iter = formulaSymbolMap_.find(symbolTmp);
-		if (iter == formulaSymbolMap_.end()) {
+		auto iter = formulaSymbol_.codeMap.find(symbolTmp);
+		if (iter == formulaSymbol_.codeMap.end()) {
 			// It's not a symbol.
 			return std::make_unique<FormulaConst>(GS::Text::parseString<float>(symbolTmp));
 		} else {
