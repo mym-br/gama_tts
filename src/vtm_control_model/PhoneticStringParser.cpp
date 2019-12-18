@@ -47,14 +47,14 @@ namespace {
 const char SEPARATOR_CHAR = '>';
 const char COMMENT_CHAR = '#';
 
-void
+[[noreturn]] void
 throwException(const std::string& filePath, int lineNumber, const char* message)
 {
 	THROW_EXCEPTION(GS::ParsingException, "[PhoneticStringParser] Error in file " << filePath << " (line " << lineNumber << "): " << message << '.');
 }
 
 template<typename T>
-void
+[[noreturn]] void
 throwException(const std::string& filePath, int lineNumber, const char* message, const T& complement)
 {
 	THROW_EXCEPTION(GS::ParsingException, "[PhoneticStringParser] Error in file " << filePath << " (line " << lineNumber << "): " << message << complement << '.');

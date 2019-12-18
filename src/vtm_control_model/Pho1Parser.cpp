@@ -36,7 +36,7 @@
 
 namespace {
 
-void
+[[noreturn]] void
 throwException(int lineNumber, const char* message)
 {
 	THROW_EXCEPTION(GS::ParsingException, "[Pho1Parser] Error in phonetic string (line " << lineNumber << "): " << message << '.');
