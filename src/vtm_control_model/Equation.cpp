@@ -29,12 +29,13 @@ namespace {
 
 using namespace GS::VTMControlModel;
 
-const char        addChar = '+';
-const char        subChar = '-';
-const char       multChar = '*';
-const char        divChar = '/';
-const char rightParenChar = ')';
-const char  leftParenChar = '(';
+constexpr char        addChar = '+';
+constexpr char        subChar = '-';
+constexpr char       multChar = '*';
+constexpr char        divChar = '/';
+constexpr char rightParenChar = ')';
+constexpr char  leftParenChar = '(';
+
 
 FormulaSymbol formulaSymbol;
 
