@@ -23,7 +23,6 @@ set(LIBRARY_FILES
     src/ConfigurationData.h
     src/Dictionary.cpp
     src/Dictionary.h
-    src/Exception.cpp
     src/Exception.h
     src/global.h
     src/Log.cpp
