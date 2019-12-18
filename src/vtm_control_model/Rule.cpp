@@ -257,7 +257,7 @@ Parser::getBooleanNode()
 	default:
 		throwException("Missing symbol");
 	}
-	return RuleBooleanNode_ptr(); // unreachable
+	// Unreachable.
 }
 
 RuleBooleanNode_ptr

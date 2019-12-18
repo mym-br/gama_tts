@@ -198,7 +198,7 @@ FormulaNodeParser::parseFactor()
 	default:
 		throwException("Invalid symbol");
 	}
-	return FormulaNode_ptr(); // unreachable
+	// Unreachable.
 }
 
 /*******************************************************************************

@@ -1275,7 +1275,6 @@ EnglishTextParser::lookupWord(const char* word)
 			} else {
 				return numberParser_.degenerateString(word);
 			}
-			break;
 		default:
 			break;
 		}

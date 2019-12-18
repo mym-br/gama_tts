@@ -81,9 +81,9 @@ constexpr std::string_view freeTimeAttrName       = "free-time";
 constexpr std::string_view maximumAttrName        = "maximum";
 constexpr std::string_view minimumAttrName        = "minimum";
 constexpr std::string_view nameAttrName           = "name";
-constexpr std::string_view p12AttrName            = "p12";
-constexpr std::string_view p23AttrName            = "p23";
-constexpr std::string_view p34AttrName            = "p34";
+//constexpr std::string_view p12AttrName            = "p12";
+//constexpr std::string_view p23AttrName            = "p23";
+//constexpr std::string_view p34AttrName            = "p34";
 constexpr std::string_view slopeAttrName          = "slope";
 constexpr std::string_view symbolAttrName         = "symbol";
 constexpr std::string_view timeExpressionAttrName = "time-expression";
@@ -92,14 +92,14 @@ constexpr std::string_view transitionAttrName     = "transition";
 constexpr std::string_view valueAttrName          = "value";
 
 constexpr std::string_view beatSymbolName       = "beat";
-constexpr std::string_view durationSymbolName   = "duration";
+//constexpr std::string_view durationSymbolName   = "duration";
 constexpr std::string_view mark1SymbolName      = "mark1";
 constexpr std::string_view mark2SymbolName      = "mark2";
 constexpr std::string_view mark3SymbolName      = "mark3";
-constexpr std::string_view qssaSymbolName       = "qssa";
-constexpr std::string_view qssbSymbolName       = "qssb";
+//constexpr std::string_view qssaSymbolName       = "qssa";
+//constexpr std::string_view qssbSymbolName       = "qssb";
 constexpr std::string_view rdSymbolName         = "rd";
-constexpr std::string_view transitionSymbolName = "transition";
+//constexpr std::string_view transitionSymbolName = "transition";
 
 } /* namespace */
 
