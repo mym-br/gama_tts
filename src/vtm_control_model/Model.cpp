@@ -526,16 +526,11 @@ Model::isValidPostureCharacter(char c)
 	if (c >= '0' && c <= '9') return false; // digits are used to define tempo
 	switch (c) {
 	case ' ':
-		// Falls through.
 	case '\'': // marked posture
-		// Falls through.
-	case '_': // posture separator, new foot
-		// Falls through.
-	case '*': // new marked foot
-		// Falls through.
-	case '.': // new syllable, decimal point
-		// Falls through.
-	case '/': // start of control code
+	case '_':  // posture separator, new foot
+	case '*':  // new marked foot
+	case '.':  // new syllable, decimal point
+	case '/':  // start of control code
 		// Characters used in the phonetic string (Gnuspeech) and to indicate a marked posture.
 		return false;
 	default:

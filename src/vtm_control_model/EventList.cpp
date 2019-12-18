@@ -476,14 +476,14 @@ EventList::applyRule(const Rule& rule, const std::vector<RuleExpressionData>& ru
 			Event* tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK2], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
-		// Falls through.
+		[[fallthrough]];
 	case Rule::Type::triphone:
 		if (numPostures >= 3) {
 			postureData_[basePostureIndex + 2].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
 			Event* tempEvent = insertEvent(ruleSymbols[Rule::SYMB_MARK1], -1, 0.0, false);
 			if (tempEvent) tempEvent->flag = 1;
 		}
-		// Falls through.
+		[[fallthrough]];
 	case Rule::Type::diphone:
 		{
 			postureData_[basePostureIndex + 1].onset = zeroRef_ + ruleSymbols[Rule::SYMB_BEAT];
