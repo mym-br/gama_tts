@@ -43,6 +43,7 @@ Controller::Controller(const char* configDirPath, Model& model)
 		, model_(model)
 		, eventList_(configDirPath, model_)
 		, vtmControlModelConfig_(configDirPath)
+		, outputScale_(1.0)
 {
 	// Load VTM configuration.
 	std::ostringstream vtmConfigFilePath;

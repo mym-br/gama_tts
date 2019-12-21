@@ -35,12 +35,12 @@ readXMLFile(const char* filePath)
 	std::string source;
 	in.seekg(0, std::ios::end);
 	source.resize(static_cast<std::string::size_type>(in.tellg()));
-	in.seekg(0, std::ios::beg);
-	in.read(&source[0], source.size());
-	in.close();
 	if (source.empty()) {
 		THROW_EXCEPTION(XMLException, "Empty XML file.");
 	}
+	in.seekg(0, std::ios::beg);
+	in.read(&source[0], source.size());
+	in.close();
 
 	return source;
 }

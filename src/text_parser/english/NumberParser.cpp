@@ -864,9 +864,9 @@ NumberParser::errorCheck(Mode mode)
 
 	/*  CHECK FOR LEGAL USE OF ORDINAL SUFFIXES  */
 	if (ordinal_) {
-		char ones_digit = '\0', tens_digit = '\0';
+		char tens_digit = '\0';
 
-		ones_digit = word_[integerDigitsPos_[integerDigits_ - 1]];
+		char ones_digit = word_[integerDigitsPos_[integerDigits_ - 1]];
 		if (integerDigits_ >= 2) {
 			tens_digit = word_[integerDigitsPos_[integerDigits_ - 2]];
 		}
@@ -1118,8 +1118,8 @@ NumberParser::processWord(Mode mode)
 
 	/*  APPEND POINT IF FRACTIONAL DIGITS, NO SLASH,
 		AND IF NOT .00 DOLLAR FORMAT  */
-	if (fractionalDigits_ && (!slash_) &&
-			((!dollar_) || (dollar_ && (fractionalDigits_ != 2)))) {
+	if (fractionalDigits_ && !slash_ &&
+			(!dollar_ || fractionalDigits_ != 2)) {
 		appendToOutput(POINT);
 		for (int i = 0; i < fractionalDigits_; i++) {
 			processDigit(word_[fractionalDigitsPos_[i]], NO, NO, NO);
@@ -1127,14 +1127,14 @@ NumberParser::processWord(Mode mode)
 	} else if (slash_) {
 		/*  PROCESS DENOMINATOR OF FRACTIONS  */
 
-		char ones_digit = '\0', tens_digit = '\0';
-
 		if (((integerDigits_ >= 3) && (fractionalDigits_ >= 3)) ||
 				(word_[integerDigitsPos_[integerDigits_ - 1]] == '0')) {
 			appendToOutput(PAUSE);
 		}
 
-		ones_digit = word_[fractionalDigitsPos_[fractionalDigits_ - 1]];
+		char tens_digit = '\0';
+
+		char ones_digit = word_[fractionalDigitsPos_[fractionalDigits_ - 1]];
 		if (fractionalDigits_ >= 2) {
 			tens_digit = word_[fractionalDigitsPos_[fractionalDigits_ - 2]];
 		}
