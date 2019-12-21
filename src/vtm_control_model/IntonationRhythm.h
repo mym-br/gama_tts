@@ -47,7 +47,7 @@ public:
 		NUM_INTONATION_PARAM
 	};
 
-	IntonationRhythm(const char* configDirPath);
+	explicit IntonationRhythm(const char* configDirPath);
 	~IntonationRhythm();
 
 	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }

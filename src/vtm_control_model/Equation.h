@@ -43,7 +43,7 @@ typedef std::unique_ptr<FormulaNode> FormulaNode_ptr;
 
 class FormulaMinusUnaryOp : public FormulaNode {
 public:
-	FormulaMinusUnaryOp(FormulaNode_ptr c)
+	explicit FormulaMinusUnaryOp(FormulaNode_ptr c)
 			: FormulaNode(), child_(std::move(c)) {}
 	virtual ~FormulaMinusUnaryOp() {}
 
@@ -107,7 +107,7 @@ private:
 
 class FormulaConst : public FormulaNode {
 public:
-	FormulaConst(float value)
+	explicit FormulaConst(float value)
 			: FormulaNode(), value_(value) {}
 	virtual ~FormulaConst() {}
 
@@ -119,7 +119,7 @@ private:
 
 class FormulaSymbolValue : public FormulaNode {
 public:
-	FormulaSymbolValue(FormulaSymbol::Code symbol)
+	explicit FormulaSymbolValue(FormulaSymbol::Code symbol)
 			: FormulaNode(), symbol_(symbol) {}
 	virtual ~FormulaSymbolValue() {}
 

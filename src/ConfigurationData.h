@@ -31,7 +31,7 @@ namespace GS {
 // Format: "key = value"
 class ConfigurationData {
 public:
-	ConfigurationData(const std::string& filePath);
+	explicit ConfigurationData(const std::string& filePath);
 	~ConfigurationData();
 
 	template<typename T> T value(const std::string& key) const;

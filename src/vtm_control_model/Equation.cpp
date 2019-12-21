@@ -40,7 +40,7 @@ constexpr char  leftParenChar = '(';
 
 class FormulaNodeParser {
 public:
-	FormulaNodeParser(const std::string& s)
+	explicit FormulaNodeParser(const std::string& s)
 				: s_(GS::Text::trim(s))
 				, pos_(0)
 				, symbolType_(SymbolType::invalid) {

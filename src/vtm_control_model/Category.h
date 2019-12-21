@@ -32,7 +32,7 @@ namespace VTMControlModel {
 
 class Category {
 public:
-	Category(const std::string& name) : name_(name), native_(false) {}
+	explicit Category(const std::string& name) : name_(name), native_(false) {}
 
 	const std::string& name() const { return name_; }
 	void setName(const std::string& name) { name_ = name; }

@@ -47,7 +47,7 @@ struct TextParserConfiguration {
 	std::string dictionary3File;
 	TextParser::Mode mode;
 
-	TextParserConfiguration(const std::string& configDirPath);
+	explicit TextParserConfiguration(const std::string& configDirPath);
 };
 
 } /* namespace TextParser */

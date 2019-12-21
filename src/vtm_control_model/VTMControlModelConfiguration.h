@@ -57,7 +57,7 @@ struct Configuration {
 
 	std::unique_ptr<ConfigurationData> voiceData;
 
-	Configuration(const char* configDirPath);
+	explicit Configuration(const char* configDirPath);
 	~Configuration();
 
 	Configuration(const Configuration&) = delete;

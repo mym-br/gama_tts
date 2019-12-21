@@ -103,7 +103,7 @@ private:
 
 class RuleBooleanNotExpression : public RuleBooleanNode {
 public:
-	RuleBooleanNotExpression(RuleBooleanNode_ptr c)
+	explicit RuleBooleanNotExpression(RuleBooleanNode_ptr c)
 			: RuleBooleanNode(), child_(std::move(c)) {}
 	virtual ~RuleBooleanNotExpression() {}
 
@@ -115,7 +115,7 @@ private:
 
 class RuleBooleanMarkedExpression : public RuleBooleanNode {
 public:
-	RuleBooleanMarkedExpression(RuleBooleanNode_ptr c)
+	explicit RuleBooleanMarkedExpression(RuleBooleanNode_ptr c)
 			: RuleBooleanNode(), child_(std::move(c)) {}
 	virtual ~RuleBooleanMarkedExpression() {}
 
@@ -127,7 +127,7 @@ private:
 
 class RuleBooleanTerminal : public RuleBooleanNode {
 public:
-	RuleBooleanTerminal(const std::shared_ptr<Category>& category)
+	explicit RuleBooleanTerminal(const std::shared_ptr<Category>& category)
 			: RuleBooleanNode(), category_(category) {}
 	virtual ~RuleBooleanTerminal() {}
 
@@ -161,7 +161,7 @@ public:
 		std::shared_ptr<Equation> mark3;
 	};
 
-	Rule(unsigned int numParameters)
+	explicit Rule(unsigned int numParameters)
 		: paramProfileTransitionList_(numParameters)
 		, specialProfileTransitionList_(numParameters)
 		, type_(Type::invalid)

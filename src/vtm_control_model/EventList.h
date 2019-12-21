@@ -114,7 +114,7 @@ struct InterpolationData {
 struct Event {
 	static const double EMPTY_PARAMETER;
 
-	Event(unsigned int numParameters)
+	explicit Event(unsigned int numParameters)
 			: parameters(numParameters, EMPTY_PARAMETER)
 			, specialParameters(numParameters, EMPTY_PARAMETER)
 			, time{}

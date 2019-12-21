@@ -30,7 +30,7 @@ class EventList;
 
 class IntonationPoint {
 public:
-	IntonationPoint(const EventList* eventList);
+	explicit IntonationPoint(const EventList* eventList);
 	~IntonationPoint() {}
 
 	void setSemitone(double newValue) { semitone_ = newValue; }
