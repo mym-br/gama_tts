@@ -371,7 +371,7 @@ VocalTractModel4<FloatType, SectionDelay>::VocalTractModel4(const ConfigurationD
 		: interactive_(interactive)
 {
 	loadConfiguration(data);
-	reset();
+	VocalTractModel4::reset();
 	initializeSynthesizer();
 	outputBuffer_.reserve(OUTPUT_BUFFER_RESERVE);
 }

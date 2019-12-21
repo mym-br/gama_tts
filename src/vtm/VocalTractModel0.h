@@ -252,7 +252,7 @@ VocalTractModel0<FloatType>::VocalTractModel0(const ConfigurationData& data, boo
 		: interactive_(interactive)
 {
 	loadConfiguration(data);
-	reset();
+	VocalTractModel0::reset();
 	initializeSynthesizer();
 	outputBuffer_.reserve(OUTPUT_BUFFER_RESERVE);
 }

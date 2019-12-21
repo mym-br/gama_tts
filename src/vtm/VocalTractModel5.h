@@ -356,7 +356,7 @@ VocalTractModel5<FloatType, SectionDelay>::VocalTractModel5(const ConfigurationD
 		, logParameters_()
 {
 	loadConfiguration(data);
-	reset();
+	VocalTractModel5::reset();
 	initializeSynthesizer();
 	outputBuffer_.reserve(OUTPUT_BUFFER_RESERVE);
 }
