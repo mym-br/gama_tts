@@ -128,14 +128,14 @@ Model::printInfo() const
 			std::cout << "  categ: " << category->name() << std::endl;
 		}
 		std::cout << "  parameter targets:" << std::endl;
-		for (unsigned int i = 0, size = parameterList_.size(); i < size; ++i) {
-			const Parameter& param = parameterList_[i];
-			std::cout << "    " << param.name() << ": " << posture.getParameterTarget(i) << std::endl;
+		for (unsigned int j = 0, size = parameterList_.size(); j < size; ++j) {
+			const Parameter& param = parameterList_[j];
+			std::cout << "    " << param.name() << ": " << posture.getParameterTarget(j) << std::endl;
 		}
 		std::cout << "  symbol targets:" << std::endl;
-		for (unsigned int i = 0, size = symbolList_.size(); i < size; ++i) {
-			const Symbol& symbol = symbolList_[i];
-			std::cout << "    " << symbol.name() << ": " << posture.getSymbolTarget(i) << std::endl;
+		for (unsigned int j = 0, size = symbolList_.size(); j < size; ++j) {
+			const Symbol& symbol = symbolList_[j];
+			std::cout << "    " << symbol.name() << ": " << posture.getSymbolTarget(j) << std::endl;
 		}
 	}
 

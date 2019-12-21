@@ -35,17 +35,17 @@ namespace GS {
 
 #define THROW_EXCEPTION(E,M) \
 	do {\
-		std::ostringstream buf;\
-		std::string msg;\
+		std::ostringstream throwExceptionBuf_;\
+		std::string throwExceptionMsg_;\
 		try {\
-			buf << M << "\n[file: " << __FILE__ <<\
+			throwExceptionBuf_ << M << "\n[file: " << __FILE__ <<\
 			"]\n[function: " << GS_EXCEPTION_FUNCTION_NAME <<\
 			"]\n[line: " << __LINE__ << "]";\
-			msg = buf.str();\
+			throwExceptionMsg_ = throwExceptionBuf_.str();\
 		} catch (...) {\
 			std::cerr << "Exception caught during error message processing." << std::endl;\
 		}\
-		throw E(msg); /* E(msg) may throw std::bad_alloc */\
+		throw E(throwExceptionMsg_); /* E(throwExceptionMsg_) may throw std::bad_alloc */\
 	} while (false)
 
 

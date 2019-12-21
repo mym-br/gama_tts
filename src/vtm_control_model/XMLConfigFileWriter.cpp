@@ -174,9 +174,9 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 		xml.closeElement("posture-categories");
 
 		xml.openElement("parameter-targets");
-		for (unsigned int i = 0, numParam = model_.parameterList().size(); i < numParam; ++i) {
-			const Parameter& param = model_.getParameter(i);
-			const float target = posture.getParameterTarget(i);
+		for (unsigned int j = 0, numParam = model_.parameterList().size(); j < numParam; ++j) {
+			const Parameter& param = model_.getParameter(j);
+			const float target = posture.getParameterTarget(j);
 			xml.openElementWithAttributes("target");
 			xml.addAttribute("name", param.name());
 			xml.addAttribute("value", target);
@@ -186,11 +186,11 @@ XMLConfigFileWriter::writeElements(StreamXMLWriter& xml)
 
 		xml.openElement("symbol-targets");
 
-		for (unsigned int i = 0, size = model_.symbolList().size(); i < size; ++i) {
-			const Symbol& symbol = model_.symbolList()[i];
+		for (unsigned int j = 0, size = model_.symbolList().size(); j < size; ++j) {
+			const Symbol& symbol = model_.symbolList()[j];
 			xml.openElementWithAttributes("target");
 			xml.addAttribute("name", symbol.name());
-			xml.addAttribute("value", posture.getSymbolTarget(i));
+			xml.addAttribute("value", posture.getSymbolTarget(j));
 			xml.endAttributesAndCloseElement();
 		}
 
