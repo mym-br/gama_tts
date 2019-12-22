@@ -403,6 +403,17 @@ RuleBooleanTerminal::print(std::ostream& out, int level) const
 	out << "]" << std::endl;
 }
 
+Rule::Rule(unsigned int numParameters)
+	: paramProfileTransitionList_(numParameters)
+	, specialProfileTransitionList_(numParameters)
+	, type_(Type::invalid)
+{
+}
+
+Rule::~Rule()
+{
+}
+
 /*******************************************************************************
  *
  */

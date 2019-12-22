@@ -32,6 +32,7 @@ public:
 		, indentSize_(indentSize)
 		, indentLevel_(0)
 	{}
+	~StreamXMLWriter() = default;
 
 	void writeDeclaration() {
 		out_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -127,6 +128,8 @@ public:
 private:
 	StreamXMLWriter(const StreamXMLWriter&) = delete;
 	StreamXMLWriter& operator=(const StreamXMLWriter&) = delete;
+	StreamXMLWriter(StreamXMLWriter&&) = delete;
+	StreamXMLWriter& operator=(StreamXMLWriter&&) = delete;
 
 	std::ostream& out_;
 	int indentSize_;

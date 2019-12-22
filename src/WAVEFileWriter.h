@@ -41,6 +41,8 @@ public:
 private:
 	WAVEFileWriter(const WAVEFileWriter&) = delete;
 	WAVEFileWriter& operator=(const WAVEFileWriter&) = delete;
+	WAVEFileWriter(WAVEFileWriter&&) = delete;
+	WAVEFileWriter& operator=(WAVEFileWriter&&) = delete;
 
 	void writeWaveFileHeader(int channels, int numberSamples, float outputRate);
 	void writeUInt32LE(int data);

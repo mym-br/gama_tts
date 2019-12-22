@@ -82,13 +82,6 @@ IntonationRhythm::IntonationRhythm(const char* configDirPath)
 }
 
 /*******************************************************************************
- * Destructor.
- */
-IntonationRhythm::~IntonationRhythm()
-{
-}
-
-/*******************************************************************************
  *
  */
 void

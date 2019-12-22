@@ -30,13 +30,15 @@ template<typename FloatType>
 class Throat {
 public:
 	Throat(FloatType sampleRate, FloatType throatCutoff, FloatType throatGain);
-	~Throat() {}
+	~Throat() = default;
 
 	void reset();
 	FloatType process(FloatType x);
 private:
 	Throat(const Throat&) = delete;
 	Throat& operator=(const Throat&) = delete;
+	Throat(Throat&&) = delete;
+	Throat& operator=(Throat&&) = delete;
 
 	const FloatType b0_;
 	const FloatType a1_;

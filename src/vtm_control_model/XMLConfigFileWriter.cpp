@@ -46,13 +46,6 @@ XMLConfigFileWriter::XMLConfigFileWriter(const Model& model, const std::string& 
 }
 
 /*******************************************************************************
- * Destructor.
- */
-XMLConfigFileWriter::~XMLConfigFileWriter()
-{
-}
-
-/*******************************************************************************
  *
  */
 void

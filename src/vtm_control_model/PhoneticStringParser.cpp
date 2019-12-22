@@ -74,10 +74,6 @@ PhoneticStringParser::PhoneticStringParser(const char* configDirPath, const Mode
 	loadRewriterConfiguration(rewriteFilePath.str());
 }
 
-PhoneticStringParser::~PhoneticStringParser()
-{
-}
-
 std::shared_ptr<Category>
 PhoneticStringParser::getCategory(const char* name)
 {

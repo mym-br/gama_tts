@@ -42,7 +42,7 @@ template<typename FloatType>
 class WavetableGlottalSourceFIRFilter {
 public:
 	WavetableGlottalSourceFIRFilter(FloatType beta, FloatType gamma, FloatType cutoff);
-	~WavetableGlottalSourceFIRFilter() {}
+	~WavetableGlottalSourceFIRFilter() = default;
 
 	void reset();
 	FloatType filter(FloatType input, int needOutput);
@@ -53,6 +53,8 @@ private:
 
 	WavetableGlottalSourceFIRFilter(const WavetableGlottalSourceFIRFilter&) = delete;
 	WavetableGlottalSourceFIRFilter& operator=(const WavetableGlottalSourceFIRFilter&) = delete;
+	WavetableGlottalSourceFIRFilter(WavetableGlottalSourceFIRFilter&&) = delete;
+	WavetableGlottalSourceFIRFilter& operator=(WavetableGlottalSourceFIRFilter&&) = delete;
 
 	static int maximallyFlat(FloatType beta, FloatType gamma, int* np, FloatType* coefficient);
 	static void trim(FloatType cutoff, int* numberCoefficients, FloatType* coefficient);

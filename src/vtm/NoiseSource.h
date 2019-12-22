@@ -32,7 +32,7 @@ public:
 		: initialSeed_(0.7892347)
 		, factor_(377.0)
 		, seed_(initialSeed_) {}
-	~NoiseSource() {}
+	~NoiseSource() = default;
 
 	void reset() {
 		seed_ = initialSeed_;
@@ -46,6 +46,8 @@ public:
 private:
 	NoiseSource(const NoiseSource&) = delete;
 	NoiseSource& operator=(const NoiseSource&) = delete;
+	NoiseSource(NoiseSource&&) = delete;
+	NoiseSource& operator=(NoiseSource&&) = delete;
 
 	const double initialSeed_;
 	const double factor_;

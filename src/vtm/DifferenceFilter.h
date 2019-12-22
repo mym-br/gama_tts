@@ -28,13 +28,15 @@ template<typename FloatType>
 class DifferenceFilter {
 public:
 	DifferenceFilter();
-	~DifferenceFilter() {}
+	~DifferenceFilter() = default;
 
 	void reset();
 	FloatType filter(FloatType x);
 private:
 	DifferenceFilter(const DifferenceFilter&) = delete;
 	DifferenceFilter& operator=(const DifferenceFilter&) = delete;
+	DifferenceFilter(DifferenceFilter&&) = delete;
+	DifferenceFilter& operator=(DifferenceFilter&&) = delete;
 
 	FloatType x1_;
 	FloatType x2_;

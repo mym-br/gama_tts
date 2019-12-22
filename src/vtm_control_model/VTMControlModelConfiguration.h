@@ -59,9 +59,10 @@ struct Configuration {
 
 	explicit Configuration(const char* configDirPath);
 	~Configuration();
-
 	Configuration(const Configuration&) = delete;
 	Configuration& operator=(const Configuration&) = delete;
+	Configuration(Configuration&&) = delete;
+	Configuration& operator=(Configuration&&) = delete;
 };
 
 } /* namespace VTMControlModel */

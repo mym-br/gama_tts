@@ -57,10 +57,6 @@ Controller::Controller(const char* configDirPath, Model& model)
 	eventList_.setControlPeriod(vtmControlModelConfig_.controlPeriod);
 }
 
-Controller::~Controller()
-{
-}
-
 void
 Controller::initUtterance()
 {

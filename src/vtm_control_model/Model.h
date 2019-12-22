@@ -43,13 +43,10 @@
 namespace GS {
 namespace VTMControlModel {
 
-class ConfigFile;
-class InputFile;
-
 class Model {
 public:
-	Model();
-	~Model();
+	Model() = default;
+	~Model() = default;
 
 	void clear();
 	void load(const char* configDirPath, const char* configFileName);
@@ -111,6 +108,8 @@ public:
 private:
 	Model(const Model&) = delete;
 	Model& operator=(const Model&) = delete;
+	Model(Model&&) = delete;
+	Model& operator=(Model&&) = delete;
 
 	void printInfo() const;
 

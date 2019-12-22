@@ -34,7 +34,7 @@ template<typename FloatType>
 class SampleRateConverter {
 public:
 	SampleRateConverter(FloatType inputRate, FloatType outputRate, std::function<void(float)> output);
-	~SampleRateConverter() {}
+	~SampleRateConverter() = default;
 
 	void reset();
 	void dataFill(FloatType data);
@@ -59,6 +59,8 @@ private:
 
 	SampleRateConverter(const SampleRateConverter&) = delete;
 	SampleRateConverter& operator=(const SampleRateConverter&) = delete;
+	SampleRateConverter(SampleRateConverter&&) = delete;
+	SampleRateConverter& operator=(SampleRateConverter&&) = delete;
 
 	void initializeConversion(FloatType inputRate, FloatType outputRate);
 	void initializeBuffer();

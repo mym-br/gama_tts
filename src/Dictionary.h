@@ -25,8 +25,8 @@ namespace GS {
 
 class Dictionary {
 public:
-	Dictionary();
-	~Dictionary();
+	Dictionary() = default;
+	~Dictionary() = default;
 
 	void load(const char* filePath);
 	const char* getEntry(const char* word) const;
@@ -34,6 +34,8 @@ public:
 private:
 	Dictionary(const Dictionary&) = delete;
 	Dictionary& operator=(const Dictionary&) = delete;
+	Dictionary(Dictionary&&) = delete;
+	Dictionary& operator=(Dictionary&&) = delete;
 
 	std::unordered_map<std::string, std::string> map_;
 	std::string version_;

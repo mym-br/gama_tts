@@ -49,7 +49,7 @@ public:
 	WavetableGlottalSource(
 			Type type, FloatType sampleRate,
 			FloatType tp = 0.0, FloatType tnMin = 0.0, FloatType tnMax = 0.0);
-	~WavetableGlottalSource() {}
+	~WavetableGlottalSource() = default;
 
 	void reset();
 	FloatType getSample(FloatType frequency);
@@ -57,6 +57,8 @@ public:
 private:
 	WavetableGlottalSource(const WavetableGlottalSource&) = delete;
 	WavetableGlottalSource& operator=(const WavetableGlottalSource&) = delete;
+	WavetableGlottalSource(WavetableGlottalSource&&) = delete;
+	WavetableGlottalSource& operator=(WavetableGlottalSource&&) = delete;
 
 	void incrementTablePosition(FloatType frequency);
 

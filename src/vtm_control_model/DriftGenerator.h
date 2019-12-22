@@ -31,13 +31,15 @@ namespace VTMControlModel {
 class DriftGenerator {
 public:
 	DriftGenerator();
-	~DriftGenerator();
+	~DriftGenerator() = default;
 
 	void setUp(double deviation, double sampleRate, double lowpassCutoff);
 	double drift();
 private:
 	DriftGenerator(const DriftGenerator&) = delete;
 	DriftGenerator& operator=(const DriftGenerator&) = delete;
+	DriftGenerator(DriftGenerator&&) = delete;
+	DriftGenerator& operator=(DriftGenerator&&) = delete;
 
 	VTM::Butterworth2LowPassFilter<double> filter_;
 	double pitchDeviation_;

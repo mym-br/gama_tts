@@ -47,7 +47,13 @@ public:
 	};
 
 	struct PointOrSlope {
-		virtual ~PointOrSlope() {}
+		PointOrSlope() = default;
+		virtual ~PointOrSlope() = default;
+		PointOrSlope(const PointOrSlope&) = delete;
+		PointOrSlope& operator=(const PointOrSlope&) = delete;
+		PointOrSlope(PointOrSlope&&) = delete;
+		PointOrSlope& operator=(PointOrSlope&&) = delete;
+
 		virtual bool isSlopeRatio() const = 0;
 	};
 	typedef std::unique_ptr<PointOrSlope> PointOrSlope_ptr;
@@ -67,7 +73,11 @@ public:
 		float freeTime; // milliseconds
 
 		Point() : type(Type::invalid), value(), timeExpression(), freeTime() {}
-		virtual ~Point() {}
+		virtual ~Point() = default;
+		Point(const Point&) = delete;
+		Point& operator=(const Point&) = delete;
+		Point(Point&&) = delete;
+		Point& operator=(Point&&) = delete;
 
 		virtual bool isSlopeRatio() const { return false; }
 
@@ -96,9 +106,6 @@ public:
 				return "---";
 			}
 		}
-	private:
-		Point(const Point&) = delete;
-		Point& operator=(const Point&) = delete;
 	};
 	typedef std::unique_ptr<Point> Point_ptr;
 
@@ -106,9 +113,11 @@ public:
 		float slope;
 
 		Slope() : slope() {}
-	private:
+		~Slope() = default;
 		Slope(const Slope&) = delete;
 		Slope& operator=(const Slope&) = delete;
+		Slope(Slope&&) = delete;
+		Slope& operator=(Slope&&) = delete;
 	};
 	typedef std::unique_ptr<Slope> Slope_ptr;
 
@@ -116,19 +125,21 @@ public:
 		std::vector<Point_ptr> pointList;
 		std::vector<Slope_ptr> slopeList;
 
-		SlopeRatio() {}
-		virtual ~SlopeRatio() {}
-
-		virtual bool isSlopeRatio() const { return true; }
-	private:
+		SlopeRatio() = default;
+		virtual ~SlopeRatio() = default;
 		SlopeRatio(const SlopeRatio&) = delete;
 		SlopeRatio& operator=(const SlopeRatio&) = delete;
+		SlopeRatio(SlopeRatio&&) = delete;
+		SlopeRatio& operator=(SlopeRatio&&) = delete;
+
+		virtual bool isSlopeRatio() const { return true; }
 	};
 
 	Transition(const std::string& name, Type type, bool special)
 			: name_(name), type_(type), special_(special)
 	{
 	}
+	~Transition() = default;
 
 	const std::string& name() const { return name_; }
 	void setName(const std::string& name) { name_ = name; }
@@ -176,6 +187,11 @@ public:
 		}
 	}
 private:
+	Transition(const Transition&) = delete;
+	Transition& operator=(const Transition&) = delete;
+	Transition(Transition&&) = delete;
+	Transition& operator=(Transition&&) = delete;
+
 	std::string name_;
 	Type type_;
 	bool special_;

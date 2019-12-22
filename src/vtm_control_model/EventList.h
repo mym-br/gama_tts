@@ -122,9 +122,11 @@ struct Event {
 			, interpData{}
 	{
 	}
-
+	~Event() = default;
 	Event(const Event&) = delete;
 	Event& operator=(const Event&) = delete;
+	Event(Event&&) = delete;
+	Event& operator=(Event&&) = delete;
 
 	void setParameter(int index, double value, bool special) {
 		if (index < 0 || static_cast<std::size_t>(index) >= parameters.size()) {
@@ -160,7 +162,7 @@ typedef std::unique_ptr<Event> Event_ptr;
 class EventList {
 public:
 	EventList(const char* configDirPath, Model& model);
-	~EventList();
+	~EventList() = default;
 
 	const std::vector<Event_ptr>& list() const { return list_; }
 	std::vector<IntonationPoint>& intonationPoints() { return intonationPoints_; }
@@ -234,6 +236,8 @@ public:
 private:
 	EventList(const EventList&) = delete;
 	EventList& operator=(const EventList&) = delete;
+	EventList(EventList&&) = delete;
+	EventList& operator=(EventList&&) = delete;
 
 	void addIntonationPoint(double semitone, double offsetTime, double slope, int ruleIndex);
 	void setFullTimeScale();

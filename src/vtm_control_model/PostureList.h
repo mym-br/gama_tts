@@ -50,6 +50,8 @@ public:
 private:
 	PostureList(const PostureList&) = delete;
 	PostureList& operator=(const PostureList&) = delete;
+	PostureList(PostureList&&) = delete;
+	PostureList& operator=(PostureList&&) = delete;
 
 	std::vector<std::unique_ptr<Posture>> postureList_; // always sorted, by name
 };

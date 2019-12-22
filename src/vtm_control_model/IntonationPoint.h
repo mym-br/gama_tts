@@ -31,7 +31,11 @@ class EventList;
 class IntonationPoint {
 public:
 	explicit IntonationPoint(const EventList* eventList);
-	~IntonationPoint() {}
+	~IntonationPoint() = default;
+	IntonationPoint(const IntonationPoint&) = default;
+	IntonationPoint& operator=(const IntonationPoint&) = default;
+	IntonationPoint(IntonationPoint&&) = default;
+	IntonationPoint& operator=(IntonationPoint&&) = default;
 
 	void setSemitone(double newValue) { semitone_ = newValue; }
 	double semitone() const { return semitone_; }

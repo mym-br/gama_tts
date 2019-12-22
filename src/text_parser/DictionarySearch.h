@@ -34,7 +34,7 @@ namespace TextParser {
 class DictionarySearch {
 public:
 	DictionarySearch();
-	~DictionarySearch();
+	~DictionarySearch() = default;
 
 	void load(const char* dictionaryPath, const char* suffixListPath);
 
@@ -57,6 +57,8 @@ private:
 
 	DictionarySearch(const DictionarySearch&) = delete;
 	DictionarySearch& operator=(const DictionarySearch&) = delete;
+	DictionarySearch(DictionarySearch&&) = delete;
+	DictionarySearch& operator=(DictionarySearch&&) = delete;
 
 	void clearBuffers();
 	const char* augmentedSearch(const char* orthography);

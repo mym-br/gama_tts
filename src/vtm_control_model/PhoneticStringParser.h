@@ -40,12 +40,14 @@ class Posture;
 class PhoneticStringParser {
 public:
 	PhoneticStringParser(const char* configDirPath, const Model& model, EventList& eventList);
-	~PhoneticStringParser();
+	~PhoneticStringParser() = default;
 
 	void parse(const char* string /* ASCII */, std::size_t size);
 private:
 	PhoneticStringParser(const PhoneticStringParser&) = delete;
 	PhoneticStringParser& operator=(const PhoneticStringParser&) = delete;
+	PhoneticStringParser(PhoneticStringParser&&) = delete;
+	PhoneticStringParser& operator=(PhoneticStringParser&&) = delete;
 
 	enum class RewriterCommandType {
 		nop,
@@ -58,17 +60,20 @@ private:
 		const Category* category1;
 		RewriterCommandType type;
 		const Posture* posture;
+
 		RewriterCommand() : category1(), type(RewriterCommandType::nop), posture() {}
 	};
 
 	struct RewriterData {
 		const Category* category2;
 		std::vector<RewriterCommand> commandList;
+
 		RewriterData() : category2() {}
 	};
 
 	struct RewriterState {
 		const Posture* lastPosture;
+
 		RewriterState() : lastPosture() {}
 	};
 

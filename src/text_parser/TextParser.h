@@ -32,12 +32,18 @@ public:
 		letter
 	};
 
-	virtual ~TextParser() {}
+	TextParser() = default;
+	virtual ~TextParser() = default;
 
 	virtual std::string parse(const char* text) = 0;
 	virtual void setMode(Mode mode) = 0;
 
 	static std::unique_ptr<TextParser> getInstance(const std::string& configDirPath);
+private:
+	TextParser(const TextParser&) = delete;
+	TextParser& operator=(const TextParser&) = delete;
+	TextParser(TextParser&&) = delete;
+	TextParser& operator=(TextParser&&) = delete;
 };
 
 struct TextParserConfiguration {

@@ -35,10 +35,6 @@ DriftGenerator::DriftGenerator()
 {
 }
 
-DriftGenerator::~DriftGenerator()
-{
-}
-
 /******************************************************************************
 *
 *	function:	setDriftGenerator

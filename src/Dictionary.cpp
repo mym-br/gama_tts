@@ -27,14 +27,6 @@
 
 namespace GS {
 
-Dictionary::Dictionary()
-{
-}
-
-Dictionary::~Dictionary()
-{
-}
-
 void
 Dictionary::load(const char* filePath)
 {

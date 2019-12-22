@@ -52,7 +52,7 @@ public:
 	};
 
 	Posture(const std::string& name, unsigned int numParameters, unsigned int numSymbols);
-	~Posture();
+	~Posture() = default;
 
 	const std::string& name() const { return name_; }
 
@@ -97,6 +97,8 @@ public:
 private:
 	Posture(const Posture&) = delete;
 	Posture& operator=(const Posture&) = delete;
+	Posture(Posture&&) = delete;
+	Posture& operator=(Posture&&) = delete;
 
 	const std::string name_;
 	std::vector<std::shared_ptr<Category>> categoryList_;

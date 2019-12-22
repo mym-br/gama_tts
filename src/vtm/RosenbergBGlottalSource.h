@@ -40,7 +40,7 @@ public:
 	RosenbergBGlottalSource(
 			Type type, FloatType sampleRate,
 			FloatType tp, FloatType tnMin, FloatType tnMax);
-	~RosenbergBGlottalSource() {}
+	~RosenbergBGlottalSource() = default;
 
 	void reset();
 	FloatType getSample(FloatType frequency /* Hz */);
@@ -48,6 +48,8 @@ public:
 private:
 	RosenbergBGlottalSource(const RosenbergBGlottalSource&) = delete;
 	RosenbergBGlottalSource& operator=(const RosenbergBGlottalSource&) = delete;
+	RosenbergBGlottalSource(RosenbergBGlottalSource&&) = delete;
+	RosenbergBGlottalSource& operator=(RosenbergBGlottalSource&&) = delete;
 
 	const Type type_;
 	const FloatType sampleRate_;

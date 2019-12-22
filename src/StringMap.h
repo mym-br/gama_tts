@@ -25,14 +25,16 @@ namespace GS {
 
 class StringMap {
 public:
-	StringMap() {}
-	~StringMap() {}
+	StringMap() = default;
+	~StringMap() = default;
 
 	void load(const char* filePath);
 	const char* getEntry(const char* key) const;
 private:
 	StringMap(const StringMap&) = delete;
 	StringMap& operator=(const StringMap&) = delete;
+	StringMap(StringMap&&) = delete;
+	StringMap& operator=(StringMap&&) = delete;
 
 	std::unordered_map<std::string, std::string> map_;
 };

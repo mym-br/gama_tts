@@ -48,7 +48,7 @@ public:
 	};
 
 	explicit IntonationRhythm(const char* configDirPath);
-	~IntonationRhythm();
+	~IntonationRhythm() = default;
 
 	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }
 	void setFixedIntonationParameter(IntonationParam param, float value) { // range not checked
@@ -83,6 +83,8 @@ public:
 private:
 	IntonationRhythm(const IntonationRhythm&) = delete;
 	IntonationRhythm& operator=(const IntonationRhythm&) = delete;
+	IntonationRhythm(IntonationRhythm&&) = delete;
+	IntonationRhythm& operator=(IntonationRhythm&&) = delete;
 
 	void loadToneGroupParameters(ToneGroup toneGroup, const std::string& filePath);
 

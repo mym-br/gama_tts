@@ -33,10 +33,16 @@ namespace VTMControlModel {
 
 class FormulaNode {
 public:
-	virtual ~FormulaNode() {}
+	FormulaNode() = default;
+	virtual ~FormulaNode() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const = 0;
 	virtual void print(std::ostream& out, int level = 0) const = 0;
+private:
+	FormulaNode(const FormulaNode&) = delete;
+	FormulaNode& operator=(const FormulaNode&) = delete;
+	FormulaNode(FormulaNode&&) = delete;
+	FormulaNode& operator=(FormulaNode&&) = delete;
 };
 
 typedef std::unique_ptr<FormulaNode> FormulaNode_ptr;
@@ -45,11 +51,16 @@ class FormulaMinusUnaryOp : public FormulaNode {
 public:
 	explicit FormulaMinusUnaryOp(FormulaNode_ptr c)
 			: FormulaNode(), child_(std::move(c)) {}
-	virtual ~FormulaMinusUnaryOp() {}
+	virtual ~FormulaMinusUnaryOp() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	FormulaMinusUnaryOp(const FormulaMinusUnaryOp&) = delete;
+	FormulaMinusUnaryOp& operator=(const FormulaMinusUnaryOp&) = delete;
+	FormulaMinusUnaryOp(FormulaMinusUnaryOp&&) = delete;
+	FormulaMinusUnaryOp& operator=(FormulaMinusUnaryOp&&) = delete;
+
 	FormulaNode_ptr child_;
 };
 
@@ -57,11 +68,16 @@ class FormulaAddBinaryOp : public FormulaNode {
 public:
 	FormulaAddBinaryOp(FormulaNode_ptr c1, FormulaNode_ptr c2)
 			: FormulaNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~FormulaAddBinaryOp() {}
+	virtual ~FormulaAddBinaryOp() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	FormulaAddBinaryOp(const FormulaAddBinaryOp&) = delete;
+	FormulaAddBinaryOp& operator=(const FormulaAddBinaryOp&) = delete;
+	FormulaAddBinaryOp(FormulaAddBinaryOp&&) = delete;
+	FormulaAddBinaryOp& operator=(FormulaAddBinaryOp&&) = delete;
+
 	FormulaNode_ptr child1_;
 	FormulaNode_ptr child2_;
 };
@@ -70,11 +86,16 @@ class FormulaSubBinaryOp : public FormulaNode {
 public:
 	FormulaSubBinaryOp(FormulaNode_ptr c1, FormulaNode_ptr c2)
 			: FormulaNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~FormulaSubBinaryOp() {}
+	virtual ~FormulaSubBinaryOp() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	FormulaSubBinaryOp(const FormulaSubBinaryOp&) = delete;
+	FormulaSubBinaryOp& operator=(const FormulaSubBinaryOp&) = delete;
+	FormulaSubBinaryOp(FormulaSubBinaryOp&&) = delete;
+	FormulaSubBinaryOp& operator=(FormulaSubBinaryOp&&) = delete;
+
 	FormulaNode_ptr child1_;
 	FormulaNode_ptr child2_;
 };
@@ -83,11 +104,16 @@ class FormulaMultBinaryOp : public FormulaNode {
 public:
 	FormulaMultBinaryOp(FormulaNode_ptr c1, FormulaNode_ptr c2)
 			: FormulaNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~FormulaMultBinaryOp() {}
+	virtual ~FormulaMultBinaryOp() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	FormulaMultBinaryOp(const FormulaMultBinaryOp&) = delete;
+	FormulaMultBinaryOp& operator=(const FormulaMultBinaryOp&) = delete;
+	FormulaMultBinaryOp(FormulaMultBinaryOp&&) = delete;
+	FormulaMultBinaryOp& operator=(FormulaMultBinaryOp&&) = delete;
+
 	FormulaNode_ptr child1_;
 	FormulaNode_ptr child2_;
 };
@@ -96,11 +122,16 @@ class FormulaDivBinaryOp : public FormulaNode {
 public:
 	FormulaDivBinaryOp(FormulaNode_ptr c1, FormulaNode_ptr c2)
 			: FormulaNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~FormulaDivBinaryOp() {}
+	virtual ~FormulaDivBinaryOp() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	FormulaDivBinaryOp(const FormulaDivBinaryOp&) = delete;
+	FormulaDivBinaryOp& operator=(const FormulaDivBinaryOp&) = delete;
+	FormulaDivBinaryOp(FormulaDivBinaryOp&&) = delete;
+	FormulaDivBinaryOp& operator=(FormulaDivBinaryOp&&) = delete;
+
 	FormulaNode_ptr child1_;
 	FormulaNode_ptr child2_;
 };
@@ -109,11 +140,16 @@ class FormulaConst : public FormulaNode {
 public:
 	explicit FormulaConst(float value)
 			: FormulaNode(), value_(value) {}
-	virtual ~FormulaConst() {}
+	virtual ~FormulaConst() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	FormulaConst(const FormulaConst&) = delete;
+	FormulaConst& operator=(const FormulaConst&) = delete;
+	FormulaConst(FormulaConst&&) = delete;
+	FormulaConst& operator=(FormulaConst&&) = delete;
+
 	float value_;
 };
 
@@ -121,11 +157,16 @@ class FormulaSymbolValue : public FormulaNode {
 public:
 	explicit FormulaSymbolValue(FormulaSymbol::Code symbol)
 			: FormulaNode(), symbol_(symbol) {}
-	virtual ~FormulaSymbolValue() {}
+	virtual ~FormulaSymbolValue() = default;
 
 	virtual float eval(const FormulaSymbolList& symbolList) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	FormulaSymbolValue(const FormulaSymbolValue&) = delete;
+	FormulaSymbolValue& operator=(const FormulaSymbolValue&) = delete;
+	FormulaSymbolValue(FormulaSymbolValue&&) = delete;
+	FormulaSymbolValue& operator=(FormulaSymbolValue&&) = delete;
+
 	FormulaSymbol::Code symbol_;
 };
 

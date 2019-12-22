@@ -32,14 +32,16 @@ namespace VTM {
 template<typename FloatType>
 class RadiationFilter {
 public:
-	RadiationFilter(FloatType apertureCoeff);
-	~RadiationFilter() {}
+	explicit RadiationFilter(FloatType apertureCoeff);
+	~RadiationFilter() = default;
 
 	void reset();
 	FloatType filter(FloatType x);
 private:
 	RadiationFilter(const RadiationFilter&) = delete;
 	RadiationFilter& operator=(const RadiationFilter&) = delete;
+	RadiationFilter(RadiationFilter&&) = delete;
+	RadiationFilter& operator=(RadiationFilter&&) = delete;
 
 	const FloatType b0_;
 	const FloatType b1_;

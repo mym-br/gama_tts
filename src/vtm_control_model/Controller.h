@@ -43,7 +43,7 @@ namespace VTMControlModel {
 class Controller {
 public:
 	Controller(const char* configDirPath, Model& model);
-	~Controller();
+	~Controller() = default;
 
 	Configuration& vtmControlModelConfiguration() { return vtmControlModelConfig_; }
 	EventList& eventList() { return eventList_; }
@@ -78,6 +78,8 @@ public:
 private:
 	Controller(const Controller&) = delete;
 	Controller& operator=(const Controller&) = delete;
+	Controller(Controller&&) = delete;
+	Controller& operator=(Controller&&) = delete;
 
 	void initUtterance();
 

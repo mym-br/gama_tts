@@ -83,10 +83,6 @@ DictionarySearch::DictionarySearch()
 	clearBuffers();
 }
 
-DictionarySearch::~DictionarySearch()
-{
-}
-
 void
 DictionarySearch::clearBuffers()
 {

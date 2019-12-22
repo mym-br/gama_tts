@@ -45,7 +45,7 @@ class Transition;
 class XMLConfigFileReader {
 public:
 	XMLConfigFileReader(Model& model, const std::string& filePath);
-	~XMLConfigFileReader();
+	~XMLConfigFileReader() = default;
 
 	// Loads the model from the XML.
 	//
@@ -54,6 +54,8 @@ public:
 private:
 	XMLConfigFileReader(const XMLConfigFileReader&) = delete;
 	XMLConfigFileReader& operator=(const XMLConfigFileReader&) = delete;
+	XMLConfigFileReader(XMLConfigFileReader&&) = delete;
+	XMLConfigFileReader& operator=(XMLConfigFileReader&&) = delete;
 
 	void parseCategories(rapidxml::xml_node<char>* categoriesElem);
 

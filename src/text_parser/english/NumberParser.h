@@ -84,13 +84,15 @@ public:
 	};
 
 	NumberParser();
-	~NumberParser();
+	~NumberParser() = default;
 
 	const char* parse(const char* word, Mode mode);
 	const char* degenerateString(const char* word);
 private:
 	NumberParser(const NumberParser&) = delete;
 	NumberParser& operator=(const NumberParser&) = delete;
+	NumberParser(NumberParser&&) = delete;
+	NumberParser& operator=(NumberParser&&) = delete;
 
 	void processDigit(char digit, int ordinal, int ordinal_plural, int special_flag);
 	int processTriad(const char* triad, int pause, int ordinal, int right_zero_pad, int ordinal_plural, int special_flag);

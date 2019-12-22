@@ -541,13 +541,6 @@ XMLConfigFileReader::XMLConfigFileReader(Model& model, const std::string& filePa
 {
 }
 
-/*******************************************************************************
- * Destructor.
- */
-XMLConfigFileReader::~XMLConfigFileReader()
-{
-}
-
 void
 XMLConfigFileReader::loadModel()
 {

@@ -31,13 +31,15 @@ template<typename FloatType>
 class NoiseFilter {
 public:
 	NoiseFilter();
-	~NoiseFilter() {}
+	~NoiseFilter() = default;
 
 	void reset();
 	FloatType filter(FloatType x);
 private:
 	NoiseFilter(const NoiseFilter&) = delete;
 	NoiseFilter& operator=(const NoiseFilter&) = delete;
+	NoiseFilter(NoiseFilter&&) = delete;
+	NoiseFilter& operator=(NoiseFilter&&) = delete;
 
 	FloatType x1_;
 };

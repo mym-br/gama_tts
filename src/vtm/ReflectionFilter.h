@@ -33,14 +33,16 @@ namespace VTM {
 template<typename FloatType>
 class ReflectionFilter {
 public:
-	ReflectionFilter(FloatType apertureCoeff);
-	~ReflectionFilter() {}
+	explicit ReflectionFilter(FloatType apertureCoeff);
+	~ReflectionFilter() = default;
 
 	void reset();
 	FloatType filter(FloatType x);
 private:
 	ReflectionFilter(const ReflectionFilter&) = delete;
 	ReflectionFilter& operator=(const ReflectionFilter&) = delete;
+	ReflectionFilter(ReflectionFilter&&) = delete;
+	ReflectionFilter& operator=(ReflectionFilter&&) = delete;
 
 	const FloatType b0_;
 	const FloatType a1_;

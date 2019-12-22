@@ -39,7 +39,7 @@ public:
 	EnglishTextParser(
 		const std::string& textParserConfigDirPath,
 		const TextParserConfiguration& config);
-	~EnglishTextParser();
+	virtual ~EnglishTextParser() = default;
 
 	virtual std::string parse(const char* text);
 	virtual void setMode(Mode mode) { mode_ = mode; }
@@ -50,6 +50,8 @@ private:
 
 	EnglishTextParser(const EnglishTextParser&) = delete;
 	EnglishTextParser& operator=(const EnglishTextParser&) = delete;
+	EnglishTextParser(EnglishTextParser&&) = delete;
+	EnglishTextParser& operator=(EnglishTextParser&&) = delete;
 
 	const char* lookupWord(const char* word);
 	void expandWord(char* word, int is_tonic, std::stringstream& stream);

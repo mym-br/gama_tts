@@ -56,10 +56,6 @@ Pho1Parser::Pho1Parser(const char* configDirPath, const Model& model, EventList&
 	phonemeMap_.load(phonemeMapFilePath.str().c_str());
 }
 
-Pho1Parser::~Pho1Parser()
-{
-}
-
 void
 Pho1Parser::parse(const std::string& pho)
 {

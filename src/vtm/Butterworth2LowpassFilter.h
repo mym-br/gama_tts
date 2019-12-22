@@ -30,7 +30,7 @@ template<typename FloatType>
 class Butterworth2LowPassFilter {
 public:
 	Butterworth2LowPassFilter();
-	~Butterworth2LowPassFilter() {}
+	~Butterworth2LowPassFilter() = default;
 
 	void reset();
 	void update(FloatType sampleRate, FloatType cutoffFreq);
@@ -38,6 +38,8 @@ public:
 private:
 	Butterworth2LowPassFilter(const Butterworth2LowPassFilter&) = delete;
 	Butterworth2LowPassFilter& operator=(const Butterworth2LowPassFilter&) = delete;
+	Butterworth2LowPassFilter(Butterworth2LowPassFilter&&) = delete;
+	Butterworth2LowPassFilter& operator=(Butterworth2LowPassFilter&&) = delete;
 
 	FloatType b0_;
 	FloatType b1_;

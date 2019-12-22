@@ -100,13 +100,6 @@ ConfigurationData::ConfigurationData(const std::string& filePath)
 	}
 }
 
-/*******************************************************************************
- * Destructor.
- */
-ConfigurationData::~ConfigurationData()
-{
-}
-
 
 
 template<>

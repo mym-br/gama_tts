@@ -49,13 +49,6 @@ Posture::Posture(const std::string& name, unsigned int numParameters, unsigned i
 }
 
 /*******************************************************************************
- * Destructor.
- */
-Posture::~Posture()
-{
-}
-
-/*******************************************************************************
  *
  */
 const std::shared_ptr<Category>

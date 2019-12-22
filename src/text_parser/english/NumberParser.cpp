@@ -245,10 +245,6 @@ NumberParser::NumberParser()
 	second_.fill('\0');
 }
 
-NumberParser::~NumberParser()
-{
-}
-
 /******************************************************************************
 *
 *	function:	process_digit

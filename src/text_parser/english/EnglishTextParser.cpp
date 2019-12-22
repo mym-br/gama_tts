@@ -1145,10 +1145,6 @@ EnglishTextParser::EnglishTextParser(
 	specialAcronymsMap_.load(specialAcronymsFilePath.str().c_str());
 }
 
-EnglishTextParser::~EnglishTextParser()
-{
-}
-
 /******************************************************************************
 *
 *       function:       parseText

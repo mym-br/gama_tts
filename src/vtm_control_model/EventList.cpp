@@ -58,10 +58,6 @@ EventList::EventList(const char* configDirPath, Model& model)
 	list_.reserve(128);
 }
 
-EventList::~EventList()
-{
-}
-
 void
 EventList::setUp()
 {

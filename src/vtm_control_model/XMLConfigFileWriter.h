@@ -36,12 +36,14 @@ class Model;
 class XMLConfigFileWriter {
 public:
 	XMLConfigFileWriter(const Model& model, const std::string& filePath);
-	~XMLConfigFileWriter();
+	~XMLConfigFileWriter() = default;
 
 	void saveModel();
 private:
 	XMLConfigFileWriter(const XMLConfigFileWriter&) = delete;
 	XMLConfigFileWriter& operator=(const XMLConfigFileWriter&) = delete;
+	XMLConfigFileWriter(XMLConfigFileWriter&&) = delete;
+	XMLConfigFileWriter& operator=(XMLConfigFileWriter&&) = delete;
 
 	void writeElements(StreamXMLWriter& xml);
 

@@ -88,7 +88,7 @@ namespace VTM {
 template<typename FloatType>
 class PoleZeroRadiationImpedance {
 public:
-	PoleZeroRadiationImpedance(FloatType sampleRate);
+	explicit PoleZeroRadiationImpedance(FloatType sampleRate);
 
 	void reset();
 	void update(FloatType radius /* m */);

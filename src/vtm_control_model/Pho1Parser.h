@@ -33,17 +33,19 @@ class EventList;
 class Model;
 
 struct Pho1IntonationPoint {
-	Pho1IntonationPoint(float pos, float freq) : position(pos), frequency(freq) {}
 	float position;
 	float frequency;
+
+	Pho1IntonationPoint(float pos, float freq) : position(pos), frequency(freq) {}
 };
 
 struct Pho1Data {
-	Pho1Data() : duration(1.0), postureIndex() {}
 	std::string phoneme;
 	float duration;
 	unsigned int postureIndex;
 	std::vector<Pho1IntonationPoint> intonationPoints;
+
+	Pho1Data() : duration(1.0), postureIndex() {}
 };
 
 // Parser for MBROLA file format.
@@ -52,12 +54,14 @@ struct Pho1Data {
 class Pho1Parser {
 public:
 	Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList, const char* phonemeMapFile);
-	~Pho1Parser();
+	~Pho1Parser() = default;
 
 	void parse(const std::string& pho);
 private:
 	Pho1Parser(const Pho1Parser&) = delete;
 	Pho1Parser& operator=(const Pho1Parser&) = delete;
+	Pho1Parser(Pho1Parser&&) = delete;
+	Pho1Parser& operator=(Pho1Parser&&) = delete;
 
 	void loadInputData(const std::string& pho);
 	void replacePhonemes();

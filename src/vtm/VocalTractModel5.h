@@ -69,8 +69,8 @@ namespace VTM {
 template<typename FloatType, unsigned int SectionDelay>
 class VocalTractModel5 : public VocalTractModel {
 public:
-	VocalTractModel5(const ConfigurationData& data, bool interactive = false);
-	virtual ~VocalTractModel5() {}
+	explicit VocalTractModel5(const ConfigurationData& data, bool interactive=false);
+	virtual ~VocalTractModel5() = default;
 
 	virtual void reset();
 
@@ -306,6 +306,8 @@ private:
 
 	VocalTractModel5(const VocalTractModel5&) = delete;
 	VocalTractModel5& operator=(const VocalTractModel5&) = delete;
+	VocalTractModel5(VocalTractModel5&&) = delete;
+	VocalTractModel5& operator=(VocalTractModel5&&) = delete;
 
 	void loadConfiguration(const ConfigurationData& data);
 	void initializeSynthesizer();

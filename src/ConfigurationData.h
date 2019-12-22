@@ -32,7 +32,7 @@ namespace GS {
 class ConfigurationData {
 public:
 	explicit ConfigurationData(const std::string& filePath);
-	~ConfigurationData();
+	~ConfigurationData() = default;
 
 	template<typename T> T value(const std::string& key) const;
 	template<typename T> T value(const std::string& key, T minValue, T maxValue) const;
@@ -46,6 +46,8 @@ private:
 
 	ConfigurationData(const ConfigurationData&) = delete;
 	ConfigurationData& operator=(const ConfigurationData&) = delete;
+	ConfigurationData(ConfigurationData&&) = delete;
+	ConfigurationData& operator=(ConfigurationData&&) = delete;
 
 	template<typename T> static T convertString(const std::string& s);
 	template<typename T> static void convertValue(const T& value, std::string& s);

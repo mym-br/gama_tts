@@ -51,11 +51,16 @@ struct RuleExpressionData {
 
 class RuleBooleanNode {
 public:
-	RuleBooleanNode() {}
-	virtual ~RuleBooleanNode() {}
+	RuleBooleanNode() = default;
+	virtual ~RuleBooleanNode() = default;
 
 	virtual bool eval(const RuleExpressionData& expressionData) const = 0;
 	virtual void print(std::ostream& out, int level = 0) const = 0;
+private:
+	RuleBooleanNode(const RuleBooleanNode&) = delete;
+	RuleBooleanNode& operator=(const RuleBooleanNode&) = delete;
+	RuleBooleanNode(RuleBooleanNode&&) = delete;
+	RuleBooleanNode& operator=(RuleBooleanNode&&) = delete;
 };
 
 typedef std::unique_ptr<RuleBooleanNode> RuleBooleanNode_ptr;
@@ -66,11 +71,16 @@ class RuleBooleanAndExpression : public RuleBooleanNode {
 public:
 	RuleBooleanAndExpression(RuleBooleanNode_ptr c1, RuleBooleanNode_ptr c2)
 			: RuleBooleanNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~RuleBooleanAndExpression() {}
+	virtual ~RuleBooleanAndExpression() = default;
 
 	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	RuleBooleanAndExpression(const RuleBooleanAndExpression&) = delete;
+	RuleBooleanAndExpression& operator=(const RuleBooleanAndExpression&) = delete;
+	RuleBooleanAndExpression(RuleBooleanAndExpression&&) = delete;
+	RuleBooleanAndExpression& operator=(RuleBooleanAndExpression&&) = delete;
+
 	RuleBooleanNode_ptr child1_;
 	RuleBooleanNode_ptr child2_;
 };
@@ -79,11 +89,16 @@ class RuleBooleanOrExpression : public RuleBooleanNode {
 public:
 	RuleBooleanOrExpression(RuleBooleanNode_ptr c1, RuleBooleanNode_ptr c2)
 			: RuleBooleanNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~RuleBooleanOrExpression() {}
+	virtual ~RuleBooleanOrExpression() = default;
 
 	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	RuleBooleanOrExpression(const RuleBooleanOrExpression&) = delete;
+	RuleBooleanOrExpression& operator=(const RuleBooleanOrExpression&) = delete;
+	RuleBooleanOrExpression(RuleBooleanOrExpression&&) = delete;
+	RuleBooleanOrExpression& operator=(RuleBooleanOrExpression&&) = delete;
+
 	RuleBooleanNode_ptr child1_;
 	RuleBooleanNode_ptr child2_;
 };
@@ -92,11 +107,16 @@ class RuleBooleanXorExpression : public RuleBooleanNode {
 public:
 	RuleBooleanXorExpression(RuleBooleanNode_ptr c1, RuleBooleanNode_ptr c2)
 			: RuleBooleanNode(), child1_(std::move(c1)), child2_(std::move(c2)) {}
-	virtual ~RuleBooleanXorExpression() {}
+	virtual ~RuleBooleanXorExpression() = default;
 
 	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	RuleBooleanXorExpression(const RuleBooleanXorExpression&) = delete;
+	RuleBooleanXorExpression& operator=(const RuleBooleanXorExpression&) = delete;
+	RuleBooleanXorExpression(RuleBooleanXorExpression&&) = delete;
+	RuleBooleanXorExpression& operator=(RuleBooleanXorExpression&&) = delete;
+
 	RuleBooleanNode_ptr child1_;
 	RuleBooleanNode_ptr child2_;
 };
@@ -105,11 +125,16 @@ class RuleBooleanNotExpression : public RuleBooleanNode {
 public:
 	explicit RuleBooleanNotExpression(RuleBooleanNode_ptr c)
 			: RuleBooleanNode(), child_(std::move(c)) {}
-	virtual ~RuleBooleanNotExpression() {}
+	virtual ~RuleBooleanNotExpression() = default;
 
 	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	RuleBooleanNotExpression(const RuleBooleanNotExpression&) = delete;
+	RuleBooleanNotExpression& operator=(const RuleBooleanNotExpression&) = delete;
+	RuleBooleanNotExpression(RuleBooleanNotExpression&&) = delete;
+	RuleBooleanNotExpression& operator=(RuleBooleanNotExpression&&) = delete;
+
 	RuleBooleanNode_ptr child_;
 };
 
@@ -117,11 +142,16 @@ class RuleBooleanMarkedExpression : public RuleBooleanNode {
 public:
 	explicit RuleBooleanMarkedExpression(RuleBooleanNode_ptr c)
 			: RuleBooleanNode(), child_(std::move(c)) {}
-	virtual ~RuleBooleanMarkedExpression() {}
+	virtual ~RuleBooleanMarkedExpression() = default;
 
 	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	RuleBooleanMarkedExpression(const RuleBooleanMarkedExpression&) = delete;
+	RuleBooleanMarkedExpression& operator=(const RuleBooleanMarkedExpression&) = delete;
+	RuleBooleanMarkedExpression(RuleBooleanMarkedExpression&&) = delete;
+	RuleBooleanMarkedExpression& operator=(RuleBooleanMarkedExpression&&) = delete;
+
 	RuleBooleanNode_ptr child_;
 };
 
@@ -129,11 +159,16 @@ class RuleBooleanTerminal : public RuleBooleanNode {
 public:
 	explicit RuleBooleanTerminal(const std::shared_ptr<Category>& category)
 			: RuleBooleanNode(), category_(category) {}
-	virtual ~RuleBooleanTerminal() {}
+	virtual ~RuleBooleanTerminal() = default;
 
 	virtual bool eval(const RuleExpressionData& expressionData) const;
 	virtual void print(std::ostream& out, int level = 0) const;
 private:
+	RuleBooleanTerminal(const RuleBooleanTerminal&) = delete;
+	RuleBooleanTerminal& operator=(const RuleBooleanTerminal&) = delete;
+	RuleBooleanTerminal(RuleBooleanTerminal&&) = delete;
+	RuleBooleanTerminal& operator=(RuleBooleanTerminal&&) = delete;
+
 	const std::shared_ptr<Category> category_;
 };
 
@@ -161,12 +196,8 @@ public:
 		std::shared_ptr<Equation> mark3;
 	};
 
-	explicit Rule(unsigned int numParameters)
-		: paramProfileTransitionList_(numParameters)
-		, specialProfileTransitionList_(numParameters)
-		, type_(Type::invalid)
-	{
-	}
+	explicit Rule(unsigned int numParameters);
+	~Rule();
 
 	std::size_t numberOfExpressions() const;
 	bool evalBooleanExpression(const std::vector<RuleExpressionData>& expressionData) const;
@@ -226,6 +257,8 @@ public:
 private:
 	Rule(const Rule&) = delete;
 	Rule& operator=(const Rule&) = delete;
+	Rule(Rule&&) = delete;
+	Rule& operator=(Rule&&) = delete;
 
 	std::vector<std::string> booleanExpressionList_;
 	std::vector<std::shared_ptr<Transition>> paramProfileTransitionList_;

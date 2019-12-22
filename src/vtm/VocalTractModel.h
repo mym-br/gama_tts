@@ -31,7 +31,8 @@ namespace VTM {
 
 class VocalTractModel {
 public:
-	virtual ~VocalTractModel() {}
+	VocalTractModel() = default;
+	virtual ~VocalTractModel() = default;
 
 	virtual void reset() = 0;
 
@@ -51,6 +52,11 @@ protected:
 	enum {
 		OUTPUT_BUFFER_RESERVE = 1024
 	};
+private:
+	VocalTractModel(const VocalTractModel&) = delete;
+	VocalTractModel& operator=(const VocalTractModel&) = delete;
+	VocalTractModel(VocalTractModel&&) = delete;
+	VocalTractModel& operator=(VocalTractModel&&) = delete;
 };
 
 } /* namespace VTM */

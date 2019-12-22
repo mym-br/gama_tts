@@ -33,7 +33,7 @@ template<typename FloatType>
 class BandpassFilter {
 public:
 	BandpassFilter();
-	~BandpassFilter() {}
+	~BandpassFilter() = default;
 
 	void reset();
 	void update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq);
@@ -41,6 +41,8 @@ public:
 private:
 	BandpassFilter(const BandpassFilter&) = delete;
 	BandpassFilter& operator=(const BandpassFilter&) = delete;
+	BandpassFilter(BandpassFilter&&) = delete;
+	BandpassFilter& operator=(BandpassFilter&&) = delete;
 
 	FloatType b0_;
 	FloatType a2_;

@@ -33,21 +33,18 @@ namespace GS {
 template<typename T>
 class ParameterLogger {
 public:
-	ParameterLogger();
+	ParameterLogger() = default;
 	~ParameterLogger();
 
 	void put(unsigned int param, T value, const char* fileName);
 private:
 	ParameterLogger(const ParameterLogger&) = delete;
 	ParameterLogger& operator=(const ParameterLogger&) = delete;
+	ParameterLogger(ParameterLogger&&) = delete;
+	ParameterLogger& operator=(ParameterLogger&&) = delete;
 
 	std::vector<std::pair<std::string, std::vector<T>>> data_;
 };
-
-template<typename T>
-ParameterLogger<T>::ParameterLogger()
-{
-}
 
 template<typename T>
 ParameterLogger<T>::~ParameterLogger()
