@@ -3,16 +3,16 @@
 
   - CMake.
 
-  - A C++ compiler with C++14 support.
+  - A C++ compiler with C++17 support.
     The following compilers have been tested:
     - GCC 8.3      (Linux+GNU x86_64).
     - LLVM/Clang 7 (Linux+GNU x86_64).
 
-  - Rename the current directory to "gama_tts".
+  - The current directory must be named "gama_tts".
 
 - Build:
 
-  - Linux - GCC:
+  - Linux+GNU - GCC:
     - Execute in a terminal:
 
       mkdir ../gama_tts-build
@@ -20,7 +20,7 @@
       cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
       make
 
-  - Linux - LLVM/Clang:
+  - Linux+GNU - Clang:
     - Execute in a terminal:
 
       mkdir ../gama_tts-build
@@ -28,7 +28,7 @@
       CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
       make
 
-- Test (Linux):
+- Test (Linux+GNU):
 
   - Execute in a terminal, in the directory "gama_tts-build":
 
