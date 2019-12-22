@@ -140,6 +140,8 @@ public:
 	{
 	}
 	~Transition() = default;
+	Transition(Transition&&) = default;
+	Transition& operator=(Transition&&) = default;
 
 	const std::string& name() const { return name_; }
 	void setName(const std::string& name) { name_ = name; }
@@ -189,8 +191,6 @@ public:
 private:
 	Transition(const Transition&) = delete;
 	Transition& operator=(const Transition&) = delete;
-	Transition(Transition&&) = delete;
-	Transition& operator=(Transition&&) = delete;
 
 	std::string name_;
 	Type type_;
