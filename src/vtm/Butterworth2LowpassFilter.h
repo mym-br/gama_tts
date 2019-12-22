@@ -26,35 +26,35 @@
 namespace GS {
 namespace VTM {
 
-template<typename FloatType>
+template<typename TFloat>
 class Butterworth2LowPassFilter {
 public:
 	Butterworth2LowPassFilter();
 	~Butterworth2LowPassFilter() = default;
 
 	void reset();
-	void update(FloatType sampleRate, FloatType cutoffFreq);
-	FloatType filter(FloatType x);
+	void update(TFloat sampleRate, TFloat cutoffFreq);
+	TFloat filter(TFloat x);
 private:
 	Butterworth2LowPassFilter(const Butterworth2LowPassFilter&) = delete;
 	Butterworth2LowPassFilter& operator=(const Butterworth2LowPassFilter&) = delete;
 	Butterworth2LowPassFilter(Butterworth2LowPassFilter&&) = delete;
 	Butterworth2LowPassFilter& operator=(Butterworth2LowPassFilter&&) = delete;
 
-	FloatType b0_;
-	FloatType b1_;
-	FloatType a1_;
-	FloatType a2_;
-	FloatType x1_;
-	FloatType x2_;
-	FloatType y1_;
-	FloatType y2_;
+	TFloat b0_;
+	TFloat b1_;
+	TFloat a1_;
+	TFloat a2_;
+	TFloat x1_;
+	TFloat x2_;
+	TFloat y1_;
+	TFloat y2_;
 };
 
 
 
-template<typename FloatType>
-Butterworth2LowPassFilter<FloatType>::Butterworth2LowPassFilter()
+template<typename TFloat>
+Butterworth2LowPassFilter<TFloat>::Butterworth2LowPassFilter()
 		: b0_()
 		, b1_()
 		, a1_()
@@ -66,9 +66,9 @@ Butterworth2LowPassFilter<FloatType>::Butterworth2LowPassFilter()
 {
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-Butterworth2LowPassFilter<FloatType>::reset()
+Butterworth2LowPassFilter<TFloat>::reset()
 {
 	x1_ = 0.0;
 	x2_ = 0.0;
@@ -76,22 +76,22 @@ Butterworth2LowPassFilter<FloatType>::reset()
 	y2_ = 0.0;
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-Butterworth2LowPassFilter<FloatType>::update(FloatType sampleRate, FloatType cutoffFreq)
+Butterworth2LowPassFilter<TFloat>::update(TFloat sampleRate, TFloat cutoffFreq)
 {
-	constexpr FloatType MIN_FREQ = 1.0;
-	constexpr FloatType MAX_FREQ_COEF = 0.48;
+	constexpr TFloat MIN_FREQ = 1.0;
+	constexpr TFloat MAX_FREQ_COEF = 0.48;
 	if (cutoffFreq < MIN_FREQ || cutoffFreq > sampleRate * MAX_FREQ_COEF) {
 		THROW_EXCEPTION(InvalidParameterException, "[Butterworth2LowPassFilter] The cutoff frequency must have a value between "
 				<< MIN_FREQ << " and " << sampleRate * MAX_FREQ_COEF << '.');
 	}
 
-	constexpr FloatType pi = M_PI;
-	const FloatType wcT = 2.0f * std::tan(pi * cutoffFreq / sampleRate);
-	const FloatType wc2T2 = wcT * wcT;
-	const FloatType c1 = 2.0f * std::sqrt(FloatType(2.0)) * wcT;
-	const FloatType c2 = 1.0f / (wc2T2 + c1 + 4.0f);
+	constexpr TFloat pi = M_PI;
+	const TFloat wcT = 2.0f * std::tan(pi * cutoffFreq / sampleRate);
+	const TFloat wc2T2 = wcT * wcT;
+	const TFloat c1 = 2.0f * std::sqrt(TFloat(2.0)) * wcT;
+	const TFloat c2 = 1.0f / (wc2T2 + c1 + 4.0f);
 	b0_ = c2 * wc2T2;
 	b1_ = 2.0f * b0_;
 	// b2_ = b0
@@ -99,11 +99,11 @@ Butterworth2LowPassFilter<FloatType>::update(FloatType sampleRate, FloatType cut
 	a2_ = c2 * (wc2T2 - c1 + 4.0f);
 }
 
-template<typename FloatType>
-FloatType
-Butterworth2LowPassFilter<FloatType>::filter(FloatType x)
+template<typename TFloat>
+TFloat
+Butterworth2LowPassFilter<TFloat>::filter(TFloat x)
 {
-	const FloatType y = b0_ * (x + x2_) + b1_ * x1_ - a1_ * y1_ - a2_ * y2_;
+	const TFloat y = b0_ * (x + x2_) + b1_ * x1_ - a1_ * y1_ - a2_ * y2_;
 	x2_ = x1_;
 	x1_ = x;
 	y2_ = y1_;

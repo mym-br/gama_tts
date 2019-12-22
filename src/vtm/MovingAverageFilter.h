@@ -31,16 +31,16 @@ namespace VTM {
 /*******************************************************************************
  * Moving average filter.
  */
-template<typename FloatType>
+template<typename TFloat>
 class MovingAverageFilter {
 public:
-	MovingAverageFilter(FloatType sampleRate, FloatType period /* seconds */);
+	MovingAverageFilter(TFloat sampleRate, TFloat period /* seconds */);
 
 	void reset();
-	FloatType filter(FloatType value);
+	TFloat filter(TFloat value);
 private:
-	std::vector<FloatType> buf_;
-	typename std::vector<FloatType>::size_type pos_;
+	std::vector<TFloat> buf_;
+	typename std::vector<TFloat>::size_type pos_;
 	double sum_;
 	double invN_;
 };
@@ -50,8 +50,8 @@ private:
 /*******************************************************************************
  * Constructor.
  */
-template<typename FloatType>
-MovingAverageFilter<FloatType>::MovingAverageFilter(FloatType sampleRate, FloatType period)
+template<typename TFloat>
+MovingAverageFilter<TFloat>::MovingAverageFilter(TFloat sampleRate, TFloat period)
 		: buf_(static_cast<std::size_t>(std::round(sampleRate * period)))
 		, pos_(buf_.size())
 		, sum_()
@@ -63,9 +63,9 @@ MovingAverageFilter<FloatType>::MovingAverageFilter(FloatType sampleRate, FloatT
 /*******************************************************************************
  *
  */
-template<typename FloatType>
+template<typename TFloat>
 void
-MovingAverageFilter<FloatType>::reset()
+MovingAverageFilter<TFloat>::reset()
 {
 	for (auto& item : buf_) item = 0.0;
 	pos_ = buf_.size();
@@ -75,9 +75,9 @@ MovingAverageFilter<FloatType>::reset()
 /*******************************************************************************
  *
  */
-template<typename FloatType>
-FloatType
-MovingAverageFilter<FloatType>::filter(FloatType value) {
+template<typename TFloat>
+TFloat
+MovingAverageFilter<TFloat>::filter(TFloat value) {
 	if (++pos_ >= buf_.size()) {
 		if (pos_ > buf_.size()) { // first value
 			buf_.assign(buf_.size(), value);

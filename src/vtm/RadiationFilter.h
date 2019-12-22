@@ -29,29 +29,29 @@ namespace VTM {
 // This is a variable, one-zero, one-pole, highpass filter,
 // whose cutoff point is determined by the aperture
 // coefficient.
-template<typename FloatType>
+template<typename TFloat>
 class RadiationFilter {
 public:
-	explicit RadiationFilter(FloatType apertureCoeff);
+	explicit RadiationFilter(TFloat apertureCoeff);
 	~RadiationFilter() = default;
 
 	void reset();
-	FloatType filter(FloatType x);
+	TFloat filter(TFloat x);
 private:
 	RadiationFilter(const RadiationFilter&) = delete;
 	RadiationFilter& operator=(const RadiationFilter&) = delete;
 	RadiationFilter(RadiationFilter&&) = delete;
 	RadiationFilter& operator=(RadiationFilter&&) = delete;
 
-	const FloatType b0_;
-	const FloatType b1_;
-	const FloatType a1_;
-	FloatType x1_;
-	FloatType y1_;
+	const TFloat b0_;
+	const TFloat b1_;
+	const TFloat a1_;
+	TFloat x1_;
+	TFloat y1_;
 };
 
-template<typename FloatType>
-RadiationFilter<FloatType>::RadiationFilter(FloatType apertureCoeff)
+template<typename TFloat>
+RadiationFilter<TFloat>::RadiationFilter(TFloat apertureCoeff)
 		: b0_(apertureCoeff)
 		, b1_(-b0_)
 		, a1_(-b0_)
@@ -60,19 +60,19 @@ RadiationFilter<FloatType>::RadiationFilter(FloatType apertureCoeff)
 {
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-RadiationFilter<FloatType>::reset()
+RadiationFilter<TFloat>::reset()
 {
 	x1_ = 0.0;
 	y1_ = 0.0;
 }
 
-template<typename FloatType>
-FloatType
-RadiationFilter<FloatType>::filter(FloatType x)
+template<typename TFloat>
+TFloat
+RadiationFilter<TFloat>::filter(TFloat x)
 {
-	const FloatType y = b0_ * x + b1_ * x1_ - a1_ * y1_;
+	const TFloat y = b0_ * x + b1_ * x1_ - a1_ * y1_;
 	x1_ = x;
 	y1_ = y;
 	return y;

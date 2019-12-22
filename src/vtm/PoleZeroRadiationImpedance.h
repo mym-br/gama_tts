@@ -85,35 +85,35 @@ namespace VTM {
  * outR[n] = { (a+b)*outR[n-1] + (a-1)*in[n] + (b-a)*in[n-1] } / (a+1)
  * outR[n] =     cR1*outR[n-1] +   cR2*in[n] +   cR3*in[n-1]
  */
-template<typename FloatType>
+template<typename TFloat>
 class PoleZeroRadiationImpedance {
 public:
-	explicit PoleZeroRadiationImpedance(FloatType sampleRate);
+	explicit PoleZeroRadiationImpedance(TFloat sampleRate);
 
 	void reset();
-	void update(FloatType radius /* m */);
-	void process(FloatType in /* flow */, FloatType& outT /* flow */, FloatType& outR /* flow */);
+	void update(TFloat radius /* m */);
+	void process(TFloat in /* flow */, TFloat& outT /* flow */, TFloat& outR /* flow */);
 private:
-	static FloatType transitionFrequency(FloatType radius /* m */);
+	static TFloat transitionFrequency(TFloat radius /* m */);
 
-	FloatType samplePeriod_;
-	FloatType in1_; // the previous value
-	FloatType outT1_; // the previous value
-	FloatType outR1_; // the previous value
-	FloatType cT1_, cT2_, cT3_; // transmission coefficients
-	FloatType cR1_, cR2_, cR3_; // reflection coefficients
-	FloatType prevRadius_;
+	TFloat samplePeriod_;
+	TFloat in1_; // the previous value
+	TFloat outT1_; // the previous value
+	TFloat outR1_; // the previous value
+	TFloat cT1_, cT2_, cT3_; // transmission coefficients
+	TFloat cR1_, cR2_, cR3_; // reflection coefficients
+	TFloat prevRadius_;
 };
 
 
 
 // sampleRate must be > 50 kHz, but not much higher than 100 kHz.
-template<typename FloatType>
-PoleZeroRadiationImpedance<FloatType>::PoleZeroRadiationImpedance(FloatType sampleRate)
+template<typename TFloat>
+PoleZeroRadiationImpedance<TFloat>::PoleZeroRadiationImpedance(TFloat sampleRate)
 {
 	reset();
 
-	if (sampleRate < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_MIN_SAMPLE_RATE}) {
+	if (sampleRate < TFloat{GS_VTM_POLE_ZERO_RAD_IMPED_MIN_SAMPLE_RATE}) {
 		THROW_EXCEPTION(InvalidValueException, "[PoleZeroRadiationImpedance] Invalid sample rate: " << sampleRate <<
 				" (minimum: " << GS_VTM_POLE_ZERO_RAD_IMPED_MIN_SAMPLE_RATE << ").");
 	} else {
@@ -121,9 +121,9 @@ PoleZeroRadiationImpedance<FloatType>::PoleZeroRadiationImpedance(FloatType samp
 	}
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-PoleZeroRadiationImpedance<FloatType>::reset()
+PoleZeroRadiationImpedance<TFloat>::reset()
 {
 	in1_ = 0.0;
 	outT1_ = 0.0;
@@ -131,18 +131,18 @@ PoleZeroRadiationImpedance<FloatType>::reset()
 	prevRadius_ = -1.0;
 }
 
-template<typename FloatType>
-FloatType
-PoleZeroRadiationImpedance<FloatType>::transitionFrequency(FloatType radius) {
-	if (radius < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
+template<typename TFloat>
+TFloat
+PoleZeroRadiationImpedance<TFloat>::transitionFrequency(TFloat radius) {
+	if (radius < TFloat{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
 		radius = GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS;
 	}
-	return FloatType{62.3371} / radius + FloatType{320.204};
+	return TFloat{62.3371} / radius + TFloat{320.204};
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
+PoleZeroRadiationImpedance<TFloat>::update(TFloat radius)
 {
 	if (radius == prevRadius_) {
 		return;
@@ -150,22 +150,22 @@ PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
 		prevRadius_ = radius;
 	}
 
-	const FloatType transFreq = transitionFrequency(radius);
-	const FloatType cosWT = std::cos(FloatType{2.0 * M_PI} * transFreq * samplePeriod_);
+	const TFloat transFreq = transitionFrequency(radius);
+	const TFloat cosWT = std::cos(TFloat{2.0 * M_PI} * transFreq * samplePeriod_);
 
-	const FloatType qa = 2.0f * cosWT;
-	const FloatType qb = -2.0f * (cosWT + 1.0f);
-	const FloatType qc = cosWT + 1.0f;
-	const FloatType delta = qb * qb - 4.0f * qa * qc;
-	FloatType a = (-qb - std::sqrt(delta)) / (2.0f * qa);
-	const FloatType b = 2.0f * a - 1.0f;
+	const TFloat qa = 2.0f * cosWT;
+	const TFloat qb = -2.0f * (cosWT + 1.0f);
+	const TFloat qc = cosWT + 1.0f;
+	const TFloat delta = qb * qb - 4.0f * qa * qc;
+	TFloat a = (-qb - std::sqrt(delta)) / (2.0f * qa);
+	const TFloat b = 2.0f * a - 1.0f;
 
-	if (radius < FloatType{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
-		a *= FloatType{40391.2} * (radius * radius);
+	if (radius < TFloat{GS_VTM_POLE_ZERO_RAD_IMPED_TRANSITION_RADIUS}) {
+		a *= TFloat{40391.2} * (radius * radius);
 	}
 
-	const FloatType coef = 1.0f / (a + 1.0f);
-	const FloatType aPlusB = a + b;
+	const TFloat coef = 1.0f / (a + 1.0f);
+	const TFloat aPlusB = a + b;
 
 	cT1_ =    aPlusB * coef;
 	cT2_ =      2.0f * coef;
@@ -176,9 +176,9 @@ PoleZeroRadiationImpedance<FloatType>::update(FloatType radius)
 	cR3_ =    (b - a) * coef;
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-PoleZeroRadiationImpedance<FloatType>::process(FloatType in, FloatType& outT, FloatType& outR)
+PoleZeroRadiationImpedance<TFloat>::process(TFloat in, TFloat& outT, TFloat& outR)
 {
 	outT = cT1_ * outT1_ + cT2_ * in + cT3_ * in1_;
 	outR = cR1_ * outR1_ + cR2_ * in + cR3_ * in1_;

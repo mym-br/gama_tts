@@ -27,42 +27,42 @@ namespace GS {
 namespace VTM {
 
 // One-zero lowpass filter.
-template<typename FloatType>
+template<typename TFloat>
 class NoiseFilter {
 public:
 	NoiseFilter();
 	~NoiseFilter() = default;
 
 	void reset();
-	FloatType filter(FloatType x);
+	TFloat filter(TFloat x);
 private:
 	NoiseFilter(const NoiseFilter&) = delete;
 	NoiseFilter& operator=(const NoiseFilter&) = delete;
 	NoiseFilter(NoiseFilter&&) = delete;
 	NoiseFilter& operator=(NoiseFilter&&) = delete;
 
-	FloatType x1_;
+	TFloat x1_;
 };
 
 
 
-template<typename FloatType>
-NoiseFilter<FloatType>::NoiseFilter() : x1_()
+template<typename TFloat>
+NoiseFilter<TFloat>::NoiseFilter() : x1_()
 {
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-NoiseFilter<FloatType>::reset()
+NoiseFilter<TFloat>::reset()
 {
 	x1_ = 0.0;
 }
 
-template<typename FloatType>
-FloatType
-NoiseFilter<FloatType>::filter(FloatType x)
+template<typename TFloat>
+TFloat
+NoiseFilter<TFloat>::filter(TFloat x)
 {
-	const FloatType y = x + x1_;
+	const TFloat y = x + x1_;
 	x1_ = x;
 	return y;
 }

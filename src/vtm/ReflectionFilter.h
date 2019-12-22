@@ -30,47 +30,47 @@ namespace VTM {
 
 // This is a variable, one-pole lowpass filter, whose cutoff
 // is determined by the aperture coefficient.
-template<typename FloatType>
+template<typename TFloat>
 class ReflectionFilter {
 public:
-	explicit ReflectionFilter(FloatType apertureCoeff);
+	explicit ReflectionFilter(TFloat apertureCoeff);
 	~ReflectionFilter() = default;
 
 	void reset();
-	FloatType filter(FloatType x);
+	TFloat filter(TFloat x);
 private:
 	ReflectionFilter(const ReflectionFilter&) = delete;
 	ReflectionFilter& operator=(const ReflectionFilter&) = delete;
 	ReflectionFilter(ReflectionFilter&&) = delete;
 	ReflectionFilter& operator=(ReflectionFilter&&) = delete;
 
-	const FloatType b0_;
-	const FloatType a1_;
-	FloatType y1_;
+	const TFloat b0_;
+	const TFloat a1_;
+	TFloat y1_;
 };
 
 
 
-template<typename FloatType>
-ReflectionFilter<FloatType>::ReflectionFilter(FloatType apertureCoeff)
+template<typename TFloat>
+ReflectionFilter<TFloat>::ReflectionFilter(TFloat apertureCoeff)
 		: b0_(1.0f - std::abs(apertureCoeff))
 		, a1_(-apertureCoeff)
 		, y1_()
 {
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-ReflectionFilter<FloatType>::reset()
+ReflectionFilter<TFloat>::reset()
 {
 	y1_ = 0.0;
 }
 
-template<typename FloatType>
-FloatType
-ReflectionFilter<FloatType>::filter(FloatType x)
+template<typename TFloat>
+TFloat
+ReflectionFilter<TFloat>::filter(TFloat x)
 {
-	const FloatType y = b0_ * x - a1_ * y1_;
+	const TFloat y = b0_ * x - a1_ * y1_;
 	y1_ = y;
 	return y;
 }

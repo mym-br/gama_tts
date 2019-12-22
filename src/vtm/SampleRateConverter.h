@@ -30,14 +30,14 @@
 namespace GS {
 namespace VTM {
 
-template<typename FloatType>
+template<typename TFloat>
 class SampleRateConverter {
 public:
-	SampleRateConverter(FloatType inputRate, FloatType outputRate, std::function<void(float)> output);
+	SampleRateConverter(TFloat inputRate, TFloat outputRate, std::function<void(float)> output);
 	~SampleRateConverter() = default;
 
 	void reset();
-	void dataFill(FloatType data);
+	void dataFill(TFloat data);
 	void flushBuffer();
 private:
 	enum {
@@ -62,12 +62,12 @@ private:
 	SampleRateConverter(SampleRateConverter&&) = delete;
 	SampleRateConverter& operator=(SampleRateConverter&&) = delete;
 
-	void initializeConversion(FloatType inputRate, FloatType outputRate);
+	void initializeConversion(TFloat inputRate, TFloat outputRate);
 	void initializeBuffer();
 	void initializeFilter();
 	void dataEmpty();
 
-	static FloatType Izero(FloatType x);
+	static TFloat Izero(TFloat x);
 	static void srIncrement(int *pointer, int modulus);
 	static void srDecrement(int *pointer, int modulus);
 	template<typename T> static T nValue(T x)        { return (x & N_MASK) >> FRACTION_BITS; }
@@ -75,7 +75,7 @@ private:
 	template<typename T> static T mValue(T x)        { return x & M_MASK; }
 	template<typename T> static T fractionValue(T x) { return x & FRACTION_MASK; }
 
-	FloatType sampleRateRatio_;
+	TFloat sampleRateRatio_;
 	int fillPtr_;
 	int emptyPtr_;
 	int padSize_;
@@ -86,16 +86,16 @@ private:
 	unsigned int timeRegister_;
 	int fillCounter_;
 
-	std::vector<FloatType> h_;
-	std::vector<FloatType> deltaH_;
-	std::vector<FloatType> buffer_;
+	std::vector<TFloat> h_;
+	std::vector<TFloat> deltaH_;
+	std::vector<TFloat> buffer_;
 	std::function<void(float)> output_;
 };
 
 
 
-template<typename FloatType>
-SampleRateConverter<FloatType>::SampleRateConverter(FloatType inputRate, FloatType outputRate, std::function<void(float)> output)
+template<typename TFloat>
+SampleRateConverter<TFloat>::SampleRateConverter(TFloat inputRate, TFloat outputRate, std::function<void(float)> output)
 		: sampleRateRatio_()
 		, fillPtr_()
 		, emptyPtr_()
@@ -114,9 +114,9 @@ SampleRateConverter<FloatType>::SampleRateConverter(FloatType inputRate, FloatTy
 	initializeConversion(inputRate, outputRate);
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::reset()
+SampleRateConverter<TFloat>::reset()
 {
 	emptyPtr_ = 0;
 	timeRegister_ = 0;
@@ -131,9 +131,9 @@ SampleRateConverter<FloatType>::reset()
 *  purpose:   Initializes all the sample rate conversion functions.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::initializeConversion(FloatType inputRate, FloatType outputRate)
+SampleRateConverter<TFloat>::initializeConversion(TFloat inputRate, TFloat outputRate)
 {
 	/*  INITIALIZE FILTER IMPULSE RESPONSE  */
 	initializeFilter();
@@ -145,7 +145,7 @@ SampleRateConverter<FloatType>::initializeConversion(FloatType inputRate, FloatT
 	timeRegisterIncrement_ = static_cast<unsigned int>(std::rint(std::pow(2.0, FRACTION_BITS) / sampleRateRatio_));
 
 	/*  CALCULATE ROUNDED SAMPLE RATE RATIO  */
-	FloatType roundedSampleRateRatio = std::pow(2.0, FRACTION_BITS) / timeRegisterIncrement_;
+	TFloat roundedSampleRateRatio = std::pow(2.0, FRACTION_BITS) / timeRegisterIncrement_;
 
 	/*  CALCULATE PHASE OR FILTER INCREMENT  */
 	if (sampleRateRatio_ >= 1.0f) {
@@ -171,12 +171,12 @@ SampleRateConverter<FloatType>::initializeConversion(FloatType inputRate, FloatT
 *             the first kind, order 0, as a double.
 *
 ******************************************************************************/
-template<typename FloatType>
-FloatType SampleRateConverter<FloatType>::Izero(FloatType x)
+template<typename TFloat>
+TFloat SampleRateConverter<TFloat>::Izero(TFloat x)
 {
-	const FloatType IzeroEPSILON = 1E-21;
+	const TFloat IzeroEPSILON = 1E-21;
 
-	FloatType sum, u, halfx, temp;
+	TFloat sum, u, halfx, temp;
 	int n;
 
 	sum = u = n = 1;
@@ -201,9 +201,9 @@ FloatType SampleRateConverter<FloatType>::Izero(FloatType x)
 *            conversion.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::initializeBuffer()
+SampleRateConverter<TFloat>::initializeBuffer()
 {
 	/*  FILL THE RING BUFFER WITH ALL ZEROS  */
 	for (unsigned int i = 0; i < BUFFER_SIZE; i++) {
@@ -225,25 +225,25 @@ SampleRateConverter<FloatType>::initializeBuffer()
 *             values.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::initializeFilter()
+SampleRateConverter<TFloat>::initializeFilter()
 {
-	const FloatType beta = 5.658;           /*  kaiser window parameter  */
-	const FloatType lpCutoff = 11.0 / 13.0; /*  (0.846 OF NYQUIST)  */
+	const TFloat beta = 5.658;           /*  kaiser window parameter  */
+	const TFloat lpCutoff = 11.0 / 13.0; /*  (0.846 OF NYQUIST)  */
 
 	/*  INITIALIZE THE FILTER IMPULSE RESPONSE  */
 	h_[0] = lpCutoff;
-	const FloatType x = M_PI / L_RANGE;
+	const TFloat x = M_PI / L_RANGE;
 	for (unsigned int i = 1; i < FILTER_LENGTH; i++) {
-		const FloatType y = i * x;
+		const TFloat y = i * x;
 		h_[i] = std::sin(y * lpCutoff) / y;
 	}
 
 	/*  APPLY A KAISER WINDOW TO THE IMPULSE RESPONSE  */
-	const FloatType IBeta = 1.0f / Izero(beta);
+	const TFloat IBeta = 1.0f / Izero(beta);
 	for (unsigned int i = 0; i < FILTER_LENGTH; i++) {
-		const FloatType temp = static_cast<FloatType>(i) / FILTER_LENGTH;
+		const TFloat temp = static_cast<TFloat>(i) / FILTER_LENGTH;
 		h_[i] *= Izero(beta * std::sqrt(1.0f - (temp * temp))) * IBeta;
 	}
 
@@ -263,9 +263,9 @@ SampleRateConverter<FloatType>::initializeFilter()
 *             full.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::dataFill(FloatType data)
+SampleRateConverter<TFloat>::dataFill(TFloat data)
 {
 	/*  PUT THE DATA INTO THE RING BUFFER  */
 	buffer_[fillPtr_] = data;
@@ -290,9 +290,9 @@ SampleRateConverter<FloatType>::dataFill(FloatType data)
 *             sound struct.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::dataEmpty()
+SampleRateConverter<TFloat>::dataEmpty()
 {
 	/*  CALCULATE END POINTER  */
 	int endPtr = fillPtr_ - padSize_;
@@ -311,10 +311,10 @@ SampleRateConverter<FloatType>::dataEmpty()
 	if (sampleRateRatio_ >= 1.0f) {
 		while (emptyPtr_ < endPtr) {
 			/*  RESET ACCUMULATOR TO ZERO  */
-			FloatType output{};
+			TFloat output{};
 
 			/*  CALCULATE INTERPOLATION VALUE (STATIC WHEN UPSAMPLING)  */
-			FloatType interpolation = static_cast<FloatType>(mValue(timeRegister_)) / M_RANGE;
+			TFloat interpolation = static_cast<TFloat>(mValue(timeRegister_)) / M_RANGE;
 
 			/*  COMPUTE THE LEFT SIDE OF THE FILTER CONVOLUTION  */
 			int index = emptyPtr_;
@@ -327,7 +327,7 @@ SampleRateConverter<FloatType>::dataEmpty()
 
 			/*  ADJUST VALUES FOR RIGHT SIDE CALCULATION  */
 			timeRegister_ = ~timeRegister_;
-			interpolation = static_cast<FloatType>(mValue(timeRegister_)) / M_RANGE;
+			interpolation = static_cast<TFloat>(mValue(timeRegister_)) / M_RANGE;
 
 			/*  COMPUTE THE RIGHT SIDE OF THE FILTER CONVOLUTION  */
 			index = emptyPtr_;
@@ -365,7 +365,7 @@ SampleRateConverter<FloatType>::dataEmpty()
 		while (emptyPtr_ < endPtr) {
 
 			/*  RESET ACCUMULATOR TO ZERO  */
-			FloatType output{};
+			TFloat output{};
 
 			/*  COMPUTE P PRIME  */
 			unsigned int phaseIndex = static_cast<unsigned int>(std::rint(fractionValue(timeRegister_) * sampleRateRatio_));
@@ -374,8 +374,8 @@ SampleRateConverter<FloatType>::dataEmpty()
 			int index = emptyPtr_;
 			unsigned int impulseIndex;
 			while ((impulseIndex = (phaseIndex >> M_BITS)) < FILTER_LENGTH) {
-				const FloatType impulse = h_[impulseIndex] + (deltaH_[impulseIndex] *
-								(static_cast<FloatType>(mValue(phaseIndex)) / M_RANGE));
+				const TFloat impulse = h_[impulseIndex] + (deltaH_[impulseIndex] *
+								(static_cast<TFloat>(mValue(phaseIndex)) / M_RANGE));
 				output += buffer_[index] * impulse;
 				srDecrement(&index, BUFFER_SIZE);
 				phaseIndex += phaseIncrement_;
@@ -383,14 +383,14 @@ SampleRateConverter<FloatType>::dataEmpty()
 
 			/*  COMPUTE P PRIME, ADJUSTED FOR RIGHT SIDE  */
 			phaseIndex = static_cast<unsigned int>(std::rint(
-						static_cast<FloatType>(fractionValue(~timeRegister_)) * sampleRateRatio_));
+						static_cast<TFloat>(fractionValue(~timeRegister_)) * sampleRateRatio_));
 
 			/*  COMPUTE THE RIGHT SIDE OF THE FILTER CONVOLUTION  */
 			index = emptyPtr_;
 			srIncrement(&index, BUFFER_SIZE);
 			while ((impulseIndex = (phaseIndex >> M_BITS)) < FILTER_LENGTH) {
-				const FloatType impulse = h_[impulseIndex] + (deltaH_[impulseIndex] *
-								(static_cast<FloatType>(mValue(phaseIndex)) / M_RANGE));
+				const TFloat impulse = h_[impulseIndex] + (deltaH_[impulseIndex] *
+								(static_cast<TFloat>(mValue(phaseIndex)) / M_RANGE));
 				output += buffer_[index] * impulse;
 				srIncrement(&index, BUFFER_SIZE);
 				phaseIndex += phaseIncrement_;
@@ -423,9 +423,9 @@ SampleRateConverter<FloatType>::dataEmpty()
 *             0 to (modulus-1).
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::srIncrement(int *pointer, int modulus)
+SampleRateConverter<TFloat>::srIncrement(int *pointer, int modulus)
 {
 	if (++(*pointer) >= modulus) {
 		(*pointer) -= modulus;
@@ -440,9 +440,9 @@ SampleRateConverter<FloatType>::srIncrement(int *pointer, int modulus)
 *             0 to (modulus-1).
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::srDecrement(int *pointer, int modulus)
+SampleRateConverter<TFloat>::srDecrement(int *pointer, int modulus)
 {
 	if (--(*pointer) < 0) {
 		(*pointer) += modulus;
@@ -457,9 +457,9 @@ SampleRateConverter<FloatType>::srDecrement(int *pointer, int modulus)
 *             converting the remaining samples.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-SampleRateConverter<FloatType>::flushBuffer()
+SampleRateConverter<TFloat>::flushBuffer()
 {
 	/*  PAD END OF RING BUFFER WITH ZEROS  */
 	for (int i = 0; i < padSize_ * 2; i++) {

@@ -24,44 +24,44 @@ namespace GS {
 namespace VTM {
 
 // Central difference.
-template<typename FloatType>
+template<typename TFloat>
 class DifferenceFilter {
 public:
 	DifferenceFilter();
 	~DifferenceFilter() = default;
 
 	void reset();
-	FloatType filter(FloatType x);
+	TFloat filter(TFloat x);
 private:
 	DifferenceFilter(const DifferenceFilter&) = delete;
 	DifferenceFilter& operator=(const DifferenceFilter&) = delete;
 	DifferenceFilter(DifferenceFilter&&) = delete;
 	DifferenceFilter& operator=(DifferenceFilter&&) = delete;
 
-	FloatType x1_;
-	FloatType x2_;
+	TFloat x1_;
+	TFloat x2_;
 };
 
 
 
-template<typename FloatType>
-DifferenceFilter<FloatType>::DifferenceFilter() : x1_(), x2_()
+template<typename TFloat>
+DifferenceFilter<TFloat>::DifferenceFilter() : x1_(), x2_()
 {
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-DifferenceFilter<FloatType>::reset()
+DifferenceFilter<TFloat>::reset()
 {
 	x1_ = 0.0;
 	x2_ = 0.0;
 }
 
-template<typename FloatType>
-FloatType
-DifferenceFilter<FloatType>::filter(FloatType x)
+template<typename TFloat>
+TFloat
+DifferenceFilter<TFloat>::filter(TFloat x)
 {
-	const FloatType y = x - x2_;
+	const TFloat y = x - x2_;
 	x2_ = x1_;
 	x1_ = x;
 	return y;

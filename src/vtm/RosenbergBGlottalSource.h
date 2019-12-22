@@ -29,7 +29,7 @@ namespace VTM {
 
 // Rosenberg, A. E. Effect of glottal pulse shape on the quality of natural vowels.
 // The Journal of the Acoustical Society of America, 1970, 49-2, 583-590.
-template<typename FloatType>
+template<typename TFloat>
 class RosenbergBGlottalSource {
 public:
 	enum class Type {
@@ -38,13 +38,13 @@ public:
 	};
 
 	RosenbergBGlottalSource(
-			Type type, FloatType sampleRate,
-			FloatType tp, FloatType tnMin, FloatType tnMax);
+			Type type, TFloat sampleRate,
+			TFloat tp, TFloat tnMin, TFloat tnMax);
 	~RosenbergBGlottalSource() = default;
 
 	void reset();
-	FloatType getSample(FloatType frequency /* Hz */);
-	void setup(FloatType amplitude /* [0.0, 1.0] */);
+	TFloat getSample(TFloat frequency /* Hz */);
+	void setup(TFloat amplitude /* [0.0, 1.0] */);
 private:
 	RosenbergBGlottalSource(const RosenbergBGlottalSource&) = delete;
 	RosenbergBGlottalSource& operator=(const RosenbergBGlottalSource&) = delete;
@@ -52,22 +52,22 @@ private:
 	RosenbergBGlottalSource& operator=(RosenbergBGlottalSource&&) = delete;
 
 	const Type type_;
-	const FloatType sampleRate_;
-	const FloatType tnMin_;
-	const FloatType tnMax_;
-	FloatType t1_; // time of the peak of the pulse
-	FloatType t2_; // time of the end of the pulse
-	FloatType nextT2_; // t2_ will have this value at the next cycle
-	FloatType prevAmplitude_;
-	FloatType t_; // 0 to 1
+	const TFloat sampleRate_;
+	const TFloat tnMin_;
+	const TFloat tnMax_;
+	TFloat t1_; // time of the peak of the pulse
+	TFloat t2_; // time of the end of the pulse
+	TFloat nextT2_; // t2_ will have this value at the next cycle
+	TFloat prevAmplitude_;
+	TFloat t_; // 0 to 1
 };
 
 
 
-template<typename FloatType>
-RosenbergBGlottalSource<FloatType>::RosenbergBGlottalSource(
-			Type type, FloatType sampleRate,
-			FloatType tp, FloatType tnMin, FloatType tnMax)
+template<typename TFloat>
+RosenbergBGlottalSource<TFloat>::RosenbergBGlottalSource(
+			Type type, TFloat sampleRate,
+			TFloat tp, TFloat tnMin, TFloat tnMax)
 		: type_(type)
 		, sampleRate_(sampleRate)
 		, tnMin_(tnMin / 100.0f)
@@ -78,7 +78,7 @@ RosenbergBGlottalSource<FloatType>::RosenbergBGlottalSource(
 		, prevAmplitude_(-1.0)
 		, t_()
 {
-	constexpr FloatType eps = 1.0e-2;
+	constexpr TFloat eps = 1.0e-2;
 
 	if (t1_ < eps) {
 		THROW_EXCEPTION(InvalidParameterException, "Glottal source: tp too small or negative.");
@@ -97,9 +97,9 @@ RosenbergBGlottalSource<FloatType>::RosenbergBGlottalSource(
 	}
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-RosenbergBGlottalSource<FloatType>::reset()
+RosenbergBGlottalSource<TFloat>::reset()
 {
 	t2_ = t1_ + tnMax_;
 	nextT2_ = t2_;
@@ -107,9 +107,9 @@ RosenbergBGlottalSource<FloatType>::reset()
 	t_ = 0.0;
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-RosenbergBGlottalSource<FloatType>::setup(FloatType amplitude)
+RosenbergBGlottalSource<TFloat>::setup(TFloat amplitude)
 {
 	if (tnMin_ == tnMax_ || amplitude == prevAmplitude_) {
 		return;
@@ -119,27 +119,27 @@ RosenbergBGlottalSource<FloatType>::setup(FloatType amplitude)
 	prevAmplitude_ = amplitude;
 }
 
-template<typename FloatType>
-FloatType
-RosenbergBGlottalSource<FloatType>::getSample(FloatType frequency)
+template<typename TFloat>
+TFloat
+RosenbergBGlottalSource<TFloat>::getSample(TFloat frequency)
 {
-	FloatType value;
+	TFloat value;
 
 	if (type_ == Type::pulse) {
 		if (t_ < t1_) {
-			const FloatType x = t_ / t1_;
+			const TFloat x = t_ / t1_;
 			value = (x * x) * (3.0f - 2.0f * x);
 		} else if (t_ < t2_) {
-			const FloatType x = (t_ - t1_) / (t2_ - t1_);
+			const TFloat x = (t_ - t1_) / (t2_ - t1_);
 			value = 1.0f - x * x;
 		} else {
 			value = 0.0;
 		}
 	} else {
-		value = std::sin(t_ * FloatType{2.0 * M_PI});
+		value = std::sin(t_ * TFloat{2.0 * M_PI});
 	}
 
-	const FloatType dt = frequency / sampleRate_;
+	const TFloat dt = frequency / sampleRate_;
 	t_ += dt;
 	if (t_ > 1.0f) {
 		t_ -= 1.0f;

@@ -70,7 +70,7 @@
 namespace GS {
 namespace VTM {
 
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 class VocalTractModel4 : public VocalTractModel {
 public:
 	explicit VocalTractModel4(const ConfigurationData& data, bool interactive=false);
@@ -231,52 +231,52 @@ private:
 	};
 
 	struct Configuration {
-		FloatType outputRate;                  /*  output sample rate (22.05, 44.1)  */
-		int       waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
-		FloatType tp;                          /*  % glottal pulse rise time  */
-		FloatType tnMin;                       /*  % glottal pulse fall time minimum  */
-		FloatType tnMax;                       /*  % glottal pulse fall time maximum  */
-		FloatType breathiness;                 /*  % glottal source breathiness  */
-		FloatType length;                      /*  nominal tube length (10 - 20 cm)  */
-		FloatType temperature;                 /*  tube temperature (25 - 40 C)  */
-		FloatType lossFactor;                  /*  junction loss factor in (0 - 5 %)  */
-		FloatType apertureRadius;              /*  aperture scl. radius (3.05 - 12 cm)  */
-		FloatType mouthCoef;                   /*  mouth aperture coefficient  */
-		FloatType noseCoef;                    /*  nose aperture coefficient  */
+		TFloat outputRate;                  /*  output sample rate (22.05, 44.1)  */
+		int    waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
+		TFloat tp;                          /*  % glottal pulse rise time  */
+		TFloat tnMin;                       /*  % glottal pulse fall time minimum  */
+		TFloat tnMax;                       /*  % glottal pulse fall time maximum  */
+		TFloat breathiness;                 /*  % glottal source breathiness  */
+		TFloat length;                      /*  nominal tube length (10 - 20 cm)  */
+		TFloat temperature;                 /*  tube temperature (25 - 40 C)  */
+		TFloat lossFactor;                  /*  junction loss factor in (0 - 5 %)  */
+		TFloat apertureRadius;              /*  aperture scl. radius (3.05 - 12 cm)  */
+		TFloat mouthCoef;                   /*  mouth aperture coefficient  */
+		TFloat noseCoef;                    /*  nose aperture coefficient  */
 		// Set nasalRadius[N1] to 0.0, because it is not used.
-		std::array<FloatType, TOTAL_NASAL_SECTIONS> nasalRadius; /*  fixed nasal radii (0 - 3 cm)  */
-		FloatType throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
-		FloatType throatVol;                   /*  throat volume (0 - 48 dB) */
-		int       modulation;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
-		FloatType mixOffset;                   /*  noise crossmix offset (30 - 60 dB)  */
-		std::array<FloatType, TOTAL_REGIONS> radiusCoef;
+		std::array<TFloat, TOTAL_NASAL_SECTIONS> nasalRadius; /*  fixed nasal radii (0 - 3 cm)  */
+		TFloat throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
+		TFloat throatVol;                   /*  throat volume (0 - 48 dB) */
+		int    modulation;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
+		TFloat mixOffset;                   /*  noise crossmix offset (30 - 60 dB)  */
+		std::array<TFloat, TOTAL_REGIONS> radiusCoef;
 	};
 
 	struct Junction2 {
-		FloatType coeff{};
-		void configure(FloatType leftRadius, FloatType rightRadius) {
-			const FloatType r0_2 = leftRadius * leftRadius;
-			const FloatType r1_2 = rightRadius * rightRadius;
+		TFloat coeff{};
+		void configure(TFloat leftRadius, TFloat rightRadius) {
+			const TFloat r0_2 = leftRadius * leftRadius;
+			const TFloat r1_2 = rightRadius * rightRadius;
 			coeff = (r0_2 - r1_2) / (r0_2 + r1_2);
 		}
 	};
 	struct Junction3 {
-		FloatType leftAlpha{};
-		FloatType rightAlpha{};
-		FloatType upperAlpha{};
-		void configure(FloatType leftRadius, FloatType rightRadius, FloatType upperRadius) {
-			const FloatType r0_2 = leftRadius * leftRadius;
-			const FloatType r1_2 = rightRadius * rightRadius;
-			const FloatType r2_2 = upperRadius * upperRadius;
-			const FloatType sum = 2.0f / (r0_2 + r1_2 + r2_2);
+		TFloat leftAlpha{};
+		TFloat rightAlpha{};
+		TFloat upperAlpha{};
+		void configure(TFloat leftRadius, TFloat rightRadius, TFloat upperRadius) {
+			const TFloat r0_2 = leftRadius * leftRadius;
+			const TFloat r1_2 = rightRadius * rightRadius;
+			const TFloat r2_2 = upperRadius * upperRadius;
+			const TFloat sum = 2.0f / (r0_2 + r1_2 + r2_2);
 			leftAlpha  = sum * r0_2;
 			rightAlpha = sum * r1_2;
 			upperAlpha = sum * r2_2;
 		}
 	};
 	struct Section {
-		std::array<FloatType, SectionDelay + 1> top{};
-		std::array<FloatType, SectionDelay + 1> bottom{};
+		std::array<TFloat, SectionDelay + 1> top{};
+		std::array<TFloat, SectionDelay + 1> bottom{};
 		void reset() {
 			top.fill(0.0);
 			bottom.fill(0.0);
@@ -296,20 +296,20 @@ private:
 		right.top[  inPtr_] = left.top[    outPtr_];
 		left.bottom[inPtr_] = right.bottom[outPtr_];
 	}
-	void propagate(Section& left, Section& right, FloatType fricNoise) {
+	void propagate(Section& left, Section& right, TFloat fricNoise) {
 		// With frication and damping.
 		right.top[  inPtr_] = left.top[    outPtr_] * dampingFactor_ + fricNoise;
 		left.bottom[inPtr_] = right.bottom[outPtr_] * dampingFactor_;
 	}
-	void propagateJunction(Section& left, Junction2& junction, Section& right, FloatType fricNoise = 0.0) {
+	void propagateJunction(Section& left, Junction2& junction, Section& right, TFloat fricNoise = 0.0) {
 		// With frication and damping.
-		const FloatType delta = junction.coeff * (left.top[outPtr_] - right.bottom[outPtr_]);
+		const TFloat delta = junction.coeff * (left.top[outPtr_] - right.bottom[outPtr_]);
 		right.top[  inPtr_] = (left.top[    outPtr_] + delta) * dampingFactor_ + fricNoise;
 		left.bottom[inPtr_] = (right.bottom[outPtr_] + delta) * dampingFactor_;
 	}
-	void propagateJunction(Section& left, Junction3& junction, Section& right, Section& upper, FloatType fricNoise) {
+	void propagateJunction(Section& left, Junction3& junction, Section& right, Section& upper, TFloat fricNoise) {
 		// With frication and damping.
-		const FloatType junctionPressure =
+		const TFloat junctionPressure =
 				junction.leftAlpha  *  left.top[   outPtr_] +
 				junction.rightAlpha * right.bottom[outPtr_] +
 				junction.upperAlpha * upper.bottom[outPtr_];
@@ -328,7 +328,7 @@ private:
 	void calculateTubeCoefficients();
 	void initializeNasalCavity();
 	void setFricationTaps();
-	FloatType vocalTract(FloatType input, FloatType frication);
+	TFloat vocalTract(TFloat input, TFloat frication);
 
 	bool interactive_;
 	Configuration config_;
@@ -346,30 +346,30 @@ private:
 	unsigned int outPtr_;
 
 	/*  MEMORY FOR FRICATION TAPS  */
-	std::array<FloatType, TOTAL_FRIC_COEFFICIENTS> fricationTap_;
+	std::array<TFloat, TOTAL_FRIC_COEFFICIENTS> fricationTap_;
 
-	FloatType dampingFactor_;               /*  calculated damping factor  */
-	FloatType crossmixFactor_;              /*  calculated crossmix factor  */
-	FloatType breathinessFactor_;
+	TFloat dampingFactor_;               /*  calculated damping factor  */
+	TFloat crossmixFactor_;              /*  calculated crossmix factor  */
+	TFloat breathinessFactor_;
 
-	std::array<FloatType, TOTAL_PARAMETERS>             currentParameter_;
-	std::vector<float>                                  outputBuffer_;
-	std::unique_ptr<SampleRateConverter<FloatType>>     srConv_;
-	std::unique_ptr<RadiationFilter<FloatType>>         mouthRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>>        mouthReflectionFilter_;
-	std::unique_ptr<RadiationFilter<FloatType>>         nasalRadiationFilter_;
-	std::unique_ptr<ReflectionFilter<FloatType>>        nasalReflectionFilter_;
-	std::unique_ptr<Throat<FloatType>>                  throat_;
-	std::unique_ptr<WavetableGlottalSource<FloatType>>  glottalSource_;
-	std::unique_ptr<BandpassFilter<FloatType>>          bandpassFilter_;
-	std::unique_ptr<NoiseFilter<FloatType>>             noiseFilter_;
-	std::unique_ptr<NoiseSource>                        noiseSource_;
+	std::array<TFloat, TOTAL_PARAMETERS>             currentParameter_;
+	std::vector<float>                               outputBuffer_;
+	std::unique_ptr<SampleRateConverter<TFloat>>     srConv_;
+	std::unique_ptr<RadiationFilter<TFloat>>         mouthRadiationFilter_;
+	std::unique_ptr<ReflectionFilter<TFloat>>        mouthReflectionFilter_;
+	std::unique_ptr<RadiationFilter<TFloat>>         nasalRadiationFilter_;
+	std::unique_ptr<ReflectionFilter<TFloat>>        nasalReflectionFilter_;
+	std::unique_ptr<Throat<TFloat>>                  throat_;
+	std::unique_ptr<WavetableGlottalSource<TFloat>>  glottalSource_;
+	std::unique_ptr<BandpassFilter<TFloat>>          bandpassFilter_;
+	std::unique_ptr<NoiseFilter<TFloat>>             noiseFilter_;
+	std::unique_ptr<NoiseSource>                     noiseSource_;
 };
 
 
 
-template<typename FloatType, unsigned int SectionDelay>
-VocalTractModel4<FloatType, SectionDelay>::VocalTractModel4(const ConfigurationData& data, bool interactive)
+template<typename TFloat, unsigned int SectionDelay>
+VocalTractModel4<TFloat, SectionDelay>::VocalTractModel4(const ConfigurationData& data, bool interactive)
 		: interactive_(interactive)
 {
 	loadConfiguration(data);
@@ -378,47 +378,47 @@ VocalTractModel4<FloatType, SectionDelay>::VocalTractModel4(const ConfigurationD
 	outputBuffer_.reserve(OUTPUT_BUFFER_RESERVE);
 }
 
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::loadConfiguration(const ConfigurationData& data)
+VocalTractModel4<TFloat, SectionDelay>::loadConfiguration(const ConfigurationData& data)
 {
-	config_.outputRate     = data.value<FloatType>("output_rate");
+	config_.outputRate     = data.value<TFloat>("output_rate");
 	config_.waveform       = data.value<int>("waveform");
-	config_.tp             = data.value<FloatType>("glottal_pulse_tp");
-	config_.tnMin          = data.value<FloatType>("glottal_pulse_tn_min");
-	config_.tnMax          = data.value<FloatType>("glottal_pulse_tn_max");
-	config_.breathiness    = data.value<FloatType>("breathiness");
-	config_.length         = data.value<FloatType>("vocal_tract_length_offset") + data.value<FloatType>("vocal_tract_length");
-	config_.temperature    = data.value<FloatType>("temperature");
-	config_.lossFactor     = data.value<FloatType>("loss_factor");
-	config_.mouthCoef      = data.value<FloatType>("mouth_coefficient");
-	config_.noseCoef       = data.value<FloatType>("nose_coefficient");
-	config_.throatCutoff   = data.value<FloatType>("throat_cutoff");
-	config_.throatVol      = data.value<FloatType>("throat_volume");
+	config_.tp             = data.value<TFloat>("glottal_pulse_tp");
+	config_.tnMin          = data.value<TFloat>("glottal_pulse_tn_min");
+	config_.tnMax          = data.value<TFloat>("glottal_pulse_tn_max");
+	config_.breathiness    = data.value<TFloat>("breathiness");
+	config_.length         = data.value<TFloat>("vocal_tract_length_offset") + data.value<TFloat>("vocal_tract_length");
+	config_.temperature    = data.value<TFloat>("temperature");
+	config_.lossFactor     = data.value<TFloat>("loss_factor");
+	config_.mouthCoef      = data.value<TFloat>("mouth_coefficient");
+	config_.noseCoef       = data.value<TFloat>("nose_coefficient");
+	config_.throatCutoff   = data.value<TFloat>("throat_cutoff");
+	config_.throatVol      = data.value<TFloat>("throat_volume");
 	config_.modulation     = data.value<int>("noise_modulation");
-	config_.mixOffset      = data.value<FloatType>("mix_offset");
-	const FloatType globalRadiusCoef      = data.value<FloatType>("global_radius_coef");
-	const FloatType globalNasalRadiusCoef = data.value<FloatType>("global_nasal_radius_coef");
-	config_.apertureRadius = data.value<FloatType>("aperture_radius") * globalRadiusCoef;
+	config_.mixOffset      = data.value<TFloat>("mix_offset");
+	const TFloat globalRadiusCoef      = data.value<TFloat>("global_radius_coef");
+	const TFloat globalNasalRadiusCoef = data.value<TFloat>("global_nasal_radius_coef");
+	config_.apertureRadius = data.value<TFloat>("aperture_radius") * globalRadiusCoef;
 	config_.nasalRadius[0] = 0.0;
-	config_.nasalRadius[1] = data.value<FloatType>("nasal_radius_1") * globalNasalRadiusCoef;
-	config_.nasalRadius[2] = data.value<FloatType>("nasal_radius_2") * globalNasalRadiusCoef;
-	config_.nasalRadius[3] = data.value<FloatType>("nasal_radius_3") * globalNasalRadiusCoef;
-	config_.nasalRadius[4] = data.value<FloatType>("nasal_radius_4") * globalNasalRadiusCoef;
-	config_.nasalRadius[5] = data.value<FloatType>("nasal_radius_5") * globalNasalRadiusCoef;
-	config_.radiusCoef[0]  = data.value<FloatType>("radius_1_coef") * globalRadiusCoef;
-	config_.radiusCoef[1]  = data.value<FloatType>("radius_2_coef") * globalRadiusCoef;
-	config_.radiusCoef[2]  = data.value<FloatType>("radius_3_coef") * globalRadiusCoef;
-	config_.radiusCoef[3]  = data.value<FloatType>("radius_4_coef") * globalRadiusCoef;
-	config_.radiusCoef[4]  = data.value<FloatType>("radius_5_coef") * globalRadiusCoef;
-	config_.radiusCoef[5]  = data.value<FloatType>("radius_6_coef") * globalRadiusCoef;
-	config_.radiusCoef[6]  = data.value<FloatType>("radius_7_coef") * globalRadiusCoef;
-	config_.radiusCoef[7]  = data.value<FloatType>("radius_8_coef") * globalRadiusCoef;
+	config_.nasalRadius[1] = data.value<TFloat>("nasal_radius_1") * globalNasalRadiusCoef;
+	config_.nasalRadius[2] = data.value<TFloat>("nasal_radius_2") * globalNasalRadiusCoef;
+	config_.nasalRadius[3] = data.value<TFloat>("nasal_radius_3") * globalNasalRadiusCoef;
+	config_.nasalRadius[4] = data.value<TFloat>("nasal_radius_4") * globalNasalRadiusCoef;
+	config_.nasalRadius[5] = data.value<TFloat>("nasal_radius_5") * globalNasalRadiusCoef;
+	config_.radiusCoef[0]  = data.value<TFloat>("radius_1_coef") * globalRadiusCoef;
+	config_.radiusCoef[1]  = data.value<TFloat>("radius_2_coef") * globalRadiusCoef;
+	config_.radiusCoef[2]  = data.value<TFloat>("radius_3_coef") * globalRadiusCoef;
+	config_.radiusCoef[3]  = data.value<TFloat>("radius_4_coef") * globalRadiusCoef;
+	config_.radiusCoef[4]  = data.value<TFloat>("radius_5_coef") * globalRadiusCoef;
+	config_.radiusCoef[5]  = data.value<TFloat>("radius_6_coef") * globalRadiusCoef;
+	config_.radiusCoef[6]  = data.value<TFloat>("radius_7_coef") * globalRadiusCoef;
+	config_.radiusCoef[7]  = data.value<TFloat>("radius_8_coef") * globalRadiusCoef;
 }
 
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::reset()
+VocalTractModel4<TFloat, SectionDelay>::reset()
 {
 	for (auto& elem : oropharynx_) {
 		elem.reset();
@@ -449,15 +449,15 @@ VocalTractModel4<FloatType, SectionDelay>::reset()
 *             be run.
 *
 ******************************************************************************/
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::initializeSynthesizer()
+VocalTractModel4<TFloat, SectionDelay>::initializeSynthesizer()
 {
-	FloatType nyquist;
+	TFloat nyquist;
 
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
 	if (config_.length > 0.0) {
-		const FloatType c = Util::speedOfSound(config_.temperature);
+		const TFloat c = Util::speedOfSound(config_.temperature);
 		sampleRate_ = static_cast<int>((c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / config_.length);
 		nyquist = sampleRate_ / 2.0f;
 		if (!interactive_) LOG_DEBUG("[VocalTractModel4] Internal sample rate: " << sampleRate_);
@@ -475,57 +475,57 @@ VocalTractModel4<FloatType, SectionDelay>::initializeSynthesizer()
 	dampingFactor_ = 1.0f - (config_.lossFactor / 100.0f);
 
 	/*  INITIALIZE THE WAVE TABLE  */
-	glottalSource_ = std::make_unique<WavetableGlottalSource<FloatType>>(
+	glottalSource_ = std::make_unique<WavetableGlottalSource<TFloat>>(
 						config_.waveform == GLOTTAL_SOURCE_PULSE ?
-							WavetableGlottalSource<FloatType>::Type::pulse :
-							WavetableGlottalSource<FloatType>::Type::sine,
+							WavetableGlottalSource<TFloat>::Type::pulse :
+							WavetableGlottalSource<TFloat>::Type::sine,
 						sampleRate_,
 						config_.tp, config_.tnMin, config_.tnMax);
 
 	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR MOUTH  */
-	FloatType mouthApertureCoeff = (nyquist - config_.mouthCoef) / nyquist;
-	mouthRadiationFilter_  = std::make_unique<RadiationFilter<FloatType>>(mouthApertureCoeff);
-	mouthReflectionFilter_ = std::make_unique<ReflectionFilter<FloatType>>(mouthApertureCoeff);
+	TFloat mouthApertureCoeff = (nyquist - config_.mouthCoef) / nyquist;
+	mouthRadiationFilter_  = std::make_unique<RadiationFilter<TFloat>>(mouthApertureCoeff);
+	mouthReflectionFilter_ = std::make_unique<ReflectionFilter<TFloat>>(mouthApertureCoeff);
 
 	/*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR NOSE  */
-	FloatType nasalApertureCoeff = (nyquist - config_.noseCoef) / nyquist;
-	nasalRadiationFilter_  = std::make_unique<RadiationFilter<FloatType>>(nasalApertureCoeff);
-	nasalReflectionFilter_ = std::make_unique<ReflectionFilter<FloatType>>(nasalApertureCoeff);
+	TFloat nasalApertureCoeff = (nyquist - config_.noseCoef) / nyquist;
+	nasalRadiationFilter_  = std::make_unique<RadiationFilter<TFloat>>(nasalApertureCoeff);
+	nasalReflectionFilter_ = std::make_unique<ReflectionFilter<TFloat>>(nasalApertureCoeff);
 
 	/*  INITIALIZE NASAL CAVITY FIXED SCATTERING COEFFICIENTS  */
 	initializeNasalCavity();
 
 	/*  INITIALIZE THE THROAT LOWPASS FILTER  */
-	throat_ = std::make_unique<Throat<FloatType>>(sampleRate_, config_.throatCutoff, Util::amplitude60dB(config_.throatVol));
+	throat_ = std::make_unique<Throat<TFloat>>(sampleRate_, config_.throatCutoff, Util::amplitude60dB(config_.throatVol));
 
 	/*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-	srConv_ = std::make_unique<SampleRateConverter<FloatType>>(
+	srConv_ = std::make_unique<SampleRateConverter<TFloat>>(
 					sampleRate_,
 					config_.outputRate,
 					[&](float sample) {
 						outputBuffer_.push_back(sample);
 					});
 
-	bandpassFilter_ = std::make_unique<BandpassFilter<FloatType>>();
-	noiseFilter_    = std::make_unique<NoiseFilter<FloatType>>();
+	bandpassFilter_ = std::make_unique<BandpassFilter<TFloat>>();
+	noiseFilter_    = std::make_unique<NoiseFilter<TFloat>>();
 	noiseSource_    = std::make_unique<NoiseSource>();
 }
 
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::execSynthesisStep()
+VocalTractModel4<TFloat, SectionDelay>::execSynthesisStep()
 {
 	/*  CONVERT PARAMETERS HERE  */
-	FloatType f0 = Util::frequency(currentParameter_[PARAM_GLOT_PITCH]);
-	FloatType ax = Util::amplitude60dB(currentParameter_[PARAM_GLOT_VOL]);
-	FloatType ah1 = Util::amplitude60dB(currentParameter_[PARAM_ASP_VOL]);
+	TFloat f0 = Util::frequency(currentParameter_[PARAM_GLOT_PITCH]);
+	TFloat ax = Util::amplitude60dB(currentParameter_[PARAM_GLOT_VOL]);
+	TFloat ah1 = Util::amplitude60dB(currentParameter_[PARAM_ASP_VOL]);
 	calculateTubeCoefficients();
 	setFricationTaps();
 	bandpassFilter_->update(sampleRate_, currentParameter_[PARAM_FRIC_BW], currentParameter_[PARAM_FRIC_CF]);
 
 	/*  DO SYNTHESIS HERE  */
 	/*  CREATE LOW-PASS FILTERED NOISE  */
-	FloatType lpNoise = noiseFilter_->filter(noiseSource_->getSample());
+	TFloat lpNoise = noiseFilter_->filter(noiseSource_->getSample());
 
 	/*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
 	if (config_.waveform == GLOTTAL_SOURCE_PULSE) {
@@ -533,19 +533,19 @@ VocalTractModel4<FloatType, SectionDelay>::execSynthesisStep()
 	}
 
 	/*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
-	FloatType pulse = glottalSource_->getSample(f0);
+	TFloat pulse = glottalSource_->getSample(f0);
 
 	/*  CREATE PULSED NOISE  */
-	FloatType pulsedNoise = lpNoise * pulse;
+	TFloat pulsedNoise = lpNoise * pulse;
 
 	/*  CREATE NOISY GLOTTAL PULSE  */
 	pulse = ax * ((pulse * (1.0f - breathinessFactor_)) +
 			(pulsedNoise * breathinessFactor_));
 
-	FloatType signal;
+	TFloat signal;
 	/*  CROSS-MIX PURE NOISE WITH PULSED NOISE  */
 	if (config_.modulation) {
-		FloatType crossmix = ax * crossmixFactor_;
+		TFloat crossmix = ax * crossmixFactor_;
 		crossmix = (crossmix < 1.0f) ? crossmix : 1.0f;
 		signal = (pulsedNoise * crossmix) +
 				(lpNoise * (1.0f - crossmix));
@@ -554,11 +554,11 @@ VocalTractModel4<FloatType, SectionDelay>::execSynthesisStep()
 	}
 
 	/*  PUT SIGNAL THROUGH VOCAL TRACT  */
-	signal = vocalTract(((pulse + (ah1 * signal)) * FloatType{GS_VTM4_VT_SCALE}),
+	signal = vocalTract(((pulse + (ah1 * signal)) * TFloat{GS_VTM4_VT_SCALE}),
 				bandpassFilter_->filter(signal));
 
 	/*  PUT PULSE THROUGH THROAT  */
-	signal += throat_->process(pulse * FloatType{GS_VTM4_VT_SCALE});
+	signal += throat_->process(pulse * TFloat{GS_VTM4_VT_SCALE});
 
 	/*  OUTPUT SAMPLE HERE  */
 	srConv_->dataFill(signal);
@@ -572,9 +572,9 @@ VocalTractModel4<FloatType, SectionDelay>::execSynthesisStep()
 *             sections of the nasal cavity.
 *
 ******************************************************************************/
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::initializeNasalCavity()
+VocalTractModel4<TFloat, SectionDelay>::initializeNasalCavity()
 {
 	// Configure junctions for fixed nasal sections.
 	for (int i = NJ2, j = NR2; i < NJ6; ++i, ++j) {
@@ -595,9 +595,9 @@ VocalTractModel4<FloatType, SectionDelay>::initializeNasalCavity()
 *             pair for the mouth and nose.
 *
 ******************************************************************************/
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::calculateTubeCoefficients()
+VocalTractModel4<TFloat, SectionDelay>::calculateTubeCoefficients()
 {
 	// Configure oropharynx junctions.
 	for (int i = J1, j = PARAM_R1; i < J8; ++i, ++j) {
@@ -623,16 +623,16 @@ VocalTractModel4<FloatType, SectionDelay>::calculateTubeCoefficients()
 *             position and amplitude of frication.
 *
 ******************************************************************************/
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::setFricationTaps()
+VocalTractModel4<TFloat, SectionDelay>::setFricationTaps()
 {
-	const FloatType fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]);
+	const TFloat fricationAmplitude = Util::amplitude60dB(currentParameter_[PARAM_FRIC_VOL]);
 
 	/*  CALCULATE POSITION REMAINDER AND COMPLEMENT  */
 	const int integerPart = static_cast<int>(currentParameter_[PARAM_FRIC_POS]);
-	const FloatType complement = currentParameter_[PARAM_FRIC_POS] - integerPart;
-	const FloatType remainder = 1.0f - complement;
+	const TFloat complement = currentParameter_[PARAM_FRIC_POS] - integerPart;
+	const TFloat remainder = 1.0f - complement;
 
 	/*  SET THE FRICATION TAPS  */
 	for (int i = FC1; i < TOTAL_FRIC_COEFFICIENTS; i++) {
@@ -664,9 +664,9 @@ VocalTractModel4<FloatType, SectionDelay>::setFricationTaps()
 *             cavities.  Also injects frication appropriately.
 *
 ******************************************************************************/
-template<typename FloatType, unsigned int SectionDelay>
-FloatType
-VocalTractModel4<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType frication)
+template<typename TFloat, unsigned int SectionDelay>
+TFloat
+VocalTractModel4<TFloat, SectionDelay>::vocalTract(TFloat input, TFloat frication)
 {
 	Section::movePointers(inPtr_, outPtr_);
 
@@ -710,7 +710,7 @@ VocalTractModel4<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 	oropharynx_[S30].bottom[inPtr_] = dampingFactor_ * mouthReflectionFilter_->filter(oropharynxJunction_[J8].coeff * oropharynx_[S30].top[outPtr_]);
 
 	// Output from mouth goes through a highpass filter.
-	FloatType output = mouthRadiationFilter_->filter((1.0f + oropharynxJunction_[J8].coeff) * oropharynx_[S30].top[outPtr_]);
+	TFloat output = mouthRadiationFilter_->filter((1.0f + oropharynxJunction_[J8].coeff) * oropharynx_[S30].top[outPtr_]);
 
 	propagate(nasal_[N1], nasal_[N2]);
 	propagate(nasal_[N2], nasal_[N3]);
@@ -740,9 +740,9 @@ VocalTractModel4<FloatType, SectionDelay>::vocalTract(FloatType input, FloatType
 	return output;
 }
 
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::setParameter(int parameter, float value)
+VocalTractModel4<TFloat, SectionDelay>::setParameter(int parameter, float value)
 {
 	switch (parameter) {
 	case PARAM_GLOT_PITCH:
@@ -765,16 +765,16 @@ VocalTractModel4<FloatType, SectionDelay>::setParameter(int parameter, float val
 	case PARAM_R8:
 		currentParameter_[parameter] = std::max(
 						value * config_.radiusCoef[parameter - PARAM_R1],
-						FloatType{GS_VTM4_MIN_RADIUS});
+						TFloat{GS_VTM4_MIN_RADIUS});
 		break;
 	default:
 		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << parameter << '.');
 	}
 }
 
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::setAllParameters(const std::vector<float>& parameters)
+VocalTractModel4<TFloat, SectionDelay>::setAllParameters(const std::vector<float>& parameters)
 {
 	if (parameters.size() != TOTAL_PARAMETERS) {
 		THROW_EXCEPTION(VTMException, "Wrong number of parameters: "
@@ -788,15 +788,15 @@ VocalTractModel4<FloatType, SectionDelay>::setAllParameters(const std::vector<fl
 	for (std::size_t i = PARAM_R1; i <= PARAM_R8; ++i) {
 		currentParameter_[i] = std::max(
 					parameters[i] * config_.radiusCoef[i - PARAM_R1],
-					FloatType{GS_VTM4_MIN_RADIUS});
+					TFloat{GS_VTM4_MIN_RADIUS});
 	}
 
 	currentParameter_[PARAM_VELUM] = parameters[PARAM_VELUM];
 }
 
-template<typename FloatType, unsigned int SectionDelay>
+template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<FloatType, SectionDelay>::finishSynthesis()
+VocalTractModel4<TFloat, SectionDelay>::finishSynthesis()
 {
 	srConv_->flushBuffer();
 }

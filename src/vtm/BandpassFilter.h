@@ -29,37 +29,37 @@ namespace GS {
 namespace VTM {
 
 // Bandpass filter, with variable center frequency and bandwidth.
-template<typename FloatType>
+template<typename TFloat>
 class BandpassFilter {
 public:
 	BandpassFilter();
 	~BandpassFilter() = default;
 
 	void reset();
-	void update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq);
-	FloatType filter(FloatType x);
+	void update(TFloat sampleRate, TFloat bandwidth, TFloat centerFreq);
+	TFloat filter(TFloat x);
 private:
 	BandpassFilter(const BandpassFilter&) = delete;
 	BandpassFilter& operator=(const BandpassFilter&) = delete;
 	BandpassFilter(BandpassFilter&&) = delete;
 	BandpassFilter& operator=(BandpassFilter&&) = delete;
 
-	FloatType b0_;
-	FloatType a2_;
-	FloatType a1_;
-	FloatType x1_;
-	FloatType x2_;
-	FloatType y1_;
-	FloatType y2_;
-	FloatType prevSampleRate_;
-	FloatType prevBandwidth_;
-	FloatType prevCenterFreq_;
+	TFloat b0_;
+	TFloat a2_;
+	TFloat a1_;
+	TFloat x1_;
+	TFloat x2_;
+	TFloat y1_;
+	TFloat y2_;
+	TFloat prevSampleRate_;
+	TFloat prevBandwidth_;
+	TFloat prevCenterFreq_;
 };
 
 
 
-template<typename FloatType>
-BandpassFilter<FloatType>::BandpassFilter()
+template<typename TFloat>
+BandpassFilter<TFloat>::BandpassFilter()
 		: b0_()
 		, a2_()
 		, a1_()
@@ -73,9 +73,9 @@ BandpassFilter<FloatType>::BandpassFilter()
 {
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-BandpassFilter<FloatType>::reset()
+BandpassFilter<TFloat>::reset()
 {
 	x1_ = 0.0;
 	x2_ = 0.0;
@@ -86,9 +86,9 @@ BandpassFilter<FloatType>::reset()
 	prevCenterFreq_ = -1.0;
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-BandpassFilter<FloatType>::update(FloatType sampleRate, FloatType bandwidth, FloatType centerFreq)
+BandpassFilter<TFloat>::update(TFloat sampleRate, TFloat bandwidth, TFloat centerFreq)
 {
 	if (sampleRate == prevSampleRate_ && bandwidth == prevBandwidth_ && centerFreq == prevCenterFreq_) {
 		return;
@@ -98,10 +98,10 @@ BandpassFilter<FloatType>::update(FloatType sampleRate, FloatType bandwidth, Flo
 		prevCenterFreq_ = centerFreq;
 	}
 
-	constexpr FloatType pi = M_PI;
-	const FloatType T = 1.0f / sampleRate;
-	const FloatType tanValue = std::tan(pi * bandwidth * T);
-	const FloatType cosValue = std::cos(2.0f * pi * centerFreq * T);
+	constexpr TFloat pi = M_PI;
+	const TFloat T = 1.0f / sampleRate;
+	const TFloat tanValue = std::tan(pi * bandwidth * T);
+	const TFloat cosValue = std::cos(2.0f * pi * centerFreq * T);
 	a2_ = (1.0f - tanValue) / (1.0f + tanValue);
 	a1_ = -(1.0f + a2_) * cosValue;
 	b0_ = 0.5f - 0.5f * a2_;
@@ -109,11 +109,11 @@ BandpassFilter<FloatType>::update(FloatType sampleRate, FloatType bandwidth, Flo
 	// b2_ = -b0_
 }
 
-template<typename FloatType>
-FloatType
-BandpassFilter<FloatType>::filter(FloatType x)
+template<typename TFloat>
+TFloat
+BandpassFilter<TFloat>::filter(TFloat x)
 {
-	const FloatType y = b0_ * (x - x2_) - a1_ * y1_ - a2_ * y2_;
+	const TFloat y = b0_ * (x - x2_) - a1_ * y1_ - a2_ * y2_;
 	x2_ = x1_;
 	x1_ = x;
 	y2_ = y1_;

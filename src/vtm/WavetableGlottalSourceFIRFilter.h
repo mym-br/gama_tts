@@ -38,14 +38,14 @@ namespace VTM {
 *  purpose:  Lowpass FIR filter.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 class WavetableGlottalSourceFIRFilter {
 public:
-	WavetableGlottalSourceFIRFilter(FloatType beta, FloatType gamma, FloatType cutoff);
+	WavetableGlottalSourceFIRFilter(TFloat beta, TFloat gamma, TFloat cutoff);
 	~WavetableGlottalSourceFIRFilter() = default;
 
 	void reset();
-	FloatType filter(FloatType input, int needOutput);
+	TFloat filter(TFloat input, int needOutput);
 private:
 	enum {
 		LIMIT = 200
@@ -56,25 +56,25 @@ private:
 	WavetableGlottalSourceFIRFilter(WavetableGlottalSourceFIRFilter&&) = delete;
 	WavetableGlottalSourceFIRFilter& operator=(WavetableGlottalSourceFIRFilter&&) = delete;
 
-	static int maximallyFlat(FloatType beta, FloatType gamma, int* np, FloatType* coefficient);
-	static void trim(FloatType cutoff, int* numberCoefficients, FloatType* coefficient);
+	static int maximallyFlat(TFloat beta, TFloat gamma, int* np, TFloat* coefficient);
+	static void trim(TFloat cutoff, int* numberCoefficients, TFloat* coefficient);
 	static int increment(int pointer, int modulus);
 	static int decrement(int pointer, int modulus);
-	static void rationalApproximation(FloatType number, int* order, int* numerator, int* denominator);
+	static void rationalApproximation(TFloat number, int* order, int* numerator, int* denominator);
 
-	std::vector<FloatType> data_;
-	std::vector<FloatType> coef_;
+	std::vector<TFloat> data_;
+	std::vector<TFloat> coef_;
 	int ptr_;
 	int numberTaps_;
 };
 
 
 
-template<typename FloatType>
-WavetableGlottalSourceFIRFilter<FloatType>::WavetableGlottalSourceFIRFilter(FloatType beta, FloatType gamma, FloatType cutoff)
+template<typename TFloat>
+WavetableGlottalSourceFIRFilter<TFloat>::WavetableGlottalSourceFIRFilter(TFloat beta, TFloat gamma, TFloat cutoff)
 {
 	int numberCoefficients;
-	FloatType coefficient[LIMIT + 1];
+	TFloat coefficient[LIMIT + 1];
 
 	/*  DETERMINE IDEAL LOW PASS FILTER COEFFICIENTS  */
 	maximallyFlat(beta, gamma, &numberCoefficients, coefficient);
@@ -113,9 +113,9 @@ WavetableGlottalSourceFIRFilter<FloatType>::WavetableGlottalSourceFIRFilter(Floa
 #endif
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-WavetableGlottalSourceFIRFilter<FloatType>::reset()
+WavetableGlottalSourceFIRFilter<TFloat>::reset()
 {
 	for (auto& item : data_) item = 0.0;
 	ptr_ = 0;
@@ -132,11 +132,11 @@ WavetableGlottalSourceFIRFilter<FloatType>::reset()
 *             band.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 int
-WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatType gamma, int* np, FloatType* coefficient)
+WavetableGlottalSourceFIRFilter<TFloat>::maximallyFlat(TFloat beta, TFloat gamma, int* np, TFloat* coefficient)
 {
-	FloatType a[LIMIT + 1], c[LIMIT + 1];
+	TFloat a[LIMIT + 1], c[LIMIT + 1];
 	int numerator;
 
 	/*  INITIALIZE NUMBER OF POINTS  */
@@ -148,7 +148,7 @@ WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatT
 	}
 
 	/*  TRANSITION BAND MUST FIT WITH THE STOP BAND  */
-	const FloatType betaMinimum = ((2.0f * beta) < (1.0f - 2.0f * beta)) ?
+	const TFloat betaMinimum = ((2.0f * beta) < (1.0f - 2.0f * beta)) ?
 						(2.0f * beta) :
 						(1.0f - 2.0f * beta);
 	if ((gamma <= 0.0) || (gamma >= betaMinimum)) {
@@ -162,7 +162,7 @@ WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatT
 	}
 
 	/*  CALCULATE THE RATIONAL APPROXIMATION TO THE CUT-OFF POINT  */
-	const FloatType ac = (1.0f + std::cos((2.0f * static_cast<FloatType>(M_PI)) * beta)) / 2.0f;
+	const TFloat ac = (1.0f + std::cos((2.0f * static_cast<TFloat>(M_PI)) * beta)) / 2.0f;
 	rationalApproximation(ac, &nt, &numerator, np);
 
 	/*  CALCULATE FILTER ORDER  */
@@ -176,20 +176,20 @@ WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatT
 	const int ll = nt - numerator;
 
 	for (int i = 2; i <= *np; i++) {
-		c[i] = std::cos((2.0f * static_cast<FloatType>(M_PI)) * (static_cast<FloatType>(i - 1) / n));
-		const FloatType x = (1.0f - c[i]) / 2.0f;
-		FloatType y = x;
+		c[i] = std::cos((2.0f * static_cast<TFloat>(M_PI)) * (static_cast<TFloat>(i - 1) / n));
+		const TFloat x = (1.0f - c[i]) / 2.0f;
+		TFloat y = x;
 
 		if (numerator == nt) {
 			continue;
 		}
 
-		FloatType sum = 1.0;
+		TFloat sum = 1.0;
 		for (int j = 1; j <= ll; j++) {
-			FloatType z = y;
+			TFloat z = y;
 			if (numerator != 1) {
 				for (int jj = 1; jj <= (numerator - 1); jj++) {
-					z *= 1.0f + (static_cast<FloatType>(j) / jj);
+					z *= 1.0f + (static_cast<TFloat>(j) / jj);
 				}
 			}
 			y *= x;
@@ -208,7 +208,7 @@ WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatT
 			}
 			coefficient[i] += c[m+1] * a[j];
 		}
-		coefficient[i] *= 2.0f / static_cast<FloatType>(n);
+		coefficient[i] *= 2.0f / static_cast<TFloat>(n);
 	}
 
 	return 0;
@@ -222,9 +222,9 @@ WavetableGlottalSourceFIRFilter<FloatType>::maximallyFlat(FloatType beta, FloatT
 *             which fall below the cutoff value.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-WavetableGlottalSourceFIRFilter<FloatType>::trim(FloatType cutoff, int* numberCoefficients, FloatType* coefficient)
+WavetableGlottalSourceFIRFilter<TFloat>::trim(TFloat cutoff, int* numberCoefficients, TFloat* coefficient)
 {
 	for (int i = *numberCoefficients; i > 0; i--) {
 		if (std::abs(coefficient[i]) >= std::abs(cutoff)) {
@@ -242,9 +242,9 @@ WavetableGlottalSourceFIRFilter<FloatType>::trim(FloatType cutoff, int* numberCo
 *             buffer, keeping it in the range 0 -> modulus-1.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 int
-WavetableGlottalSourceFIRFilter<FloatType>::increment(int pointer, int modulus)
+WavetableGlottalSourceFIRFilter<TFloat>::increment(int pointer, int modulus)
 {
 	if (++pointer >= modulus) {
 		return 0;
@@ -261,9 +261,9 @@ WavetableGlottalSourceFIRFilter<FloatType>::increment(int pointer, int modulus)
 *             buffer, keeping it in the range 0 -> modulus-1.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 int
-WavetableGlottalSourceFIRFilter<FloatType>::decrement(int pointer, int modulus)
+WavetableGlottalSourceFIRFilter<TFloat>::decrement(int pointer, int modulus)
 {
 	if (--pointer < 0) {
 		return modulus - 1;
@@ -272,11 +272,11 @@ WavetableGlottalSourceFIRFilter<FloatType>::decrement(int pointer, int modulus)
 	}
 }
 
-template<typename FloatType>
-FloatType WavetableGlottalSourceFIRFilter<FloatType>::filter(FloatType input, int needOutput)
+template<typename TFloat>
+TFloat WavetableGlottalSourceFIRFilter<TFloat>::filter(TFloat input, int needOutput)
 {
 	if (needOutput) {
-		FloatType output{};
+		TFloat output{};
 
 		/*  PUT INPUT SAMPLE INTO DATA BUFFER  */
 		data_[ptr_] = input;
@@ -311,9 +311,9 @@ FloatType WavetableGlottalSourceFIRFilter<FloatType>::filter(FloatType input, in
 *             given the maximum 'order'.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-WavetableGlottalSourceFIRFilter<FloatType>::rationalApproximation(FloatType number, int* order, int* numerator, int* denominator)
+WavetableGlottalSourceFIRFilter<TFloat>::rationalApproximation(TFloat number, int* order, int* numerator, int* denominator)
 {
 	/*  RETURN IMMEDIATELY IF THE ORDER IS LESS THAN ONE  */
 	if (*order <= 0) {
@@ -324,19 +324,19 @@ WavetableGlottalSourceFIRFilter<FloatType>::rationalApproximation(FloatType numb
 	}
 
 	/*  FIND THE ABSOLUTE VALUE OF THE FRACTIONAL PART OF THE NUMBER  */
-	const FloatType fractionalPart = std::abs(number - static_cast<int>(number));
+	const TFloat fractionalPart = std::abs(number - static_cast<int>(number));
 
 	/*  DETERMINE THE MAXIMUM VALUE OF THE DENOMINATOR  */
 	int orderMaximum = 2 * (*order);
 	orderMaximum = (orderMaximum > LIMIT) ? LIMIT : orderMaximum;
 
 	/*  FIND THE BEST DENOMINATOR VALUE  */
-	FloatType minimumError = 1.0;
+	TFloat minimumError = 1.0;
 	int modulus = 0;
 	for (int i = (*order); i <= orderMaximum; i++) {
-		const FloatType ps = i * fractionalPart;
+		const TFloat ps = i * fractionalPart;
 		int ip = static_cast<int>(ps + 0.5f);
-		FloatType error = std::abs((ps - static_cast<double>(ip)) / i);
+		TFloat error = std::abs((ps - static_cast<double>(ip)) / i);
 		if (error < minimumError) {
 			minimumError = error;
 			modulus = ip;

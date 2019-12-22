@@ -26,30 +26,30 @@
 namespace GS {
 namespace VTM {
 
-template<typename FloatType>
+template<typename TFloat>
 class Throat {
 public:
-	Throat(FloatType sampleRate, FloatType throatCutoff, FloatType throatGain);
+	Throat(TFloat sampleRate, TFloat throatCutoff, TFloat throatGain);
 	~Throat() = default;
 
 	void reset();
-	FloatType process(FloatType x);
+	TFloat process(TFloat x);
 private:
 	Throat(const Throat&) = delete;
 	Throat& operator=(const Throat&) = delete;
 	Throat(Throat&&) = delete;
 	Throat& operator=(Throat&&) = delete;
 
-	const FloatType b0_;
-	const FloatType a1_;
-	const FloatType throatGain_;
-	FloatType y1_;
+	const TFloat b0_;
+	const TFloat a1_;
+	const TFloat throatGain_;
+	TFloat y1_;
 };
 
 
 
-template<typename FloatType>
-Throat<FloatType>::Throat(FloatType sampleRate, FloatType throatCutoff, FloatType throatGain)
+template<typename TFloat>
+Throat<TFloat>::Throat(TFloat sampleRate, TFloat throatCutoff, TFloat throatGain)
 		// Initializes the throat lowpass filter coefficients
 		// according to the throatCutoff value, and also the
 		// throatGain, according to the throatVol value.
@@ -60,9 +60,9 @@ Throat<FloatType>::Throat(FloatType sampleRate, FloatType throatCutoff, FloatTyp
 {
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-Throat<FloatType>::reset()
+Throat<TFloat>::reset()
 {
 	y1_ = 0.0;
 }
@@ -75,11 +75,11 @@ Throat<FloatType>::reset()
 *             of the throat.
 *
 ******************************************************************************/
-template<typename FloatType>
-FloatType
-Throat<FloatType>::process(FloatType x)
+template<typename TFloat>
+TFloat
+Throat<TFloat>::process(TFloat x)
 {
-	const FloatType y = b0_ * x - a1_ * y1_;
+	const TFloat y = b0_ * x - a1_ * y1_;
 	y1_ = y;
 	return y * throatGain_;
 }

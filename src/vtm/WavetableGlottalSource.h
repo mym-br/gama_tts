@@ -37,7 +37,7 @@
 namespace GS {
 namespace VTM {
 
-template<typename FloatType>
+template<typename TFloat>
 class WavetableGlottalSource {
 public:
 	/*  WAVEFORM TYPES  */
@@ -47,48 +47,48 @@ public:
 	};
 
 	WavetableGlottalSource(
-			Type type, FloatType sampleRate,
-			FloatType tp = 0.0, FloatType tnMin = 0.0, FloatType tnMax = 0.0);
+			Type type, TFloat sampleRate,
+			TFloat tp = 0.0, TFloat tnMin = 0.0, TFloat tnMax = 0.0);
 	~WavetableGlottalSource() = default;
 
 	void reset();
-	FloatType getSample(FloatType frequency);
-	void setup(FloatType amplitude);
+	TFloat getSample(TFloat frequency);
+	void setup(TFloat amplitude);
 private:
 	WavetableGlottalSource(const WavetableGlottalSource&) = delete;
 	WavetableGlottalSource& operator=(const WavetableGlottalSource&) = delete;
 	WavetableGlottalSource(WavetableGlottalSource&&) = delete;
 	WavetableGlottalSource& operator=(WavetableGlottalSource&&) = delete;
 
-	void incrementTablePosition(FloatType frequency);
+	void incrementTablePosition(TFloat frequency);
 
-	FloatType mod0(FloatType value);
+	TFloat mod0(TFloat value);
 
 	/*  GLOTTAL SOURCE OSCILLATOR TABLE VARIABLES  */
 	const unsigned int tableLength_;
 	const unsigned int tableModulus_;
 
 	/*  OVERSAMPLING FIR FILTER CHARACTERISTICS  */
-	const FloatType firBeta_;
-	const FloatType firGamma_;
-	const FloatType firCutoff_;
+	const TFloat firBeta_;
+	const TFloat firGamma_;
+	const TFloat firCutoff_;
 
 	unsigned int tableDiv1_;
 	unsigned int tableDiv2_;
-	FloatType tnLength_;
-	FloatType tnDelta_;
-	FloatType basicIncrement_;
-	FloatType currentPosition_;
-	std::vector<FloatType> wavetable_;
-	std::unique_ptr<WavetableGlottalSourceFIRFilter<FloatType>> firFilter_;
-	FloatType prevAmplitude_;
+	TFloat tnLength_;
+	TFloat tnDelta_;
+	TFloat basicIncrement_;
+	TFloat currentPosition_;
+	std::vector<TFloat> wavetable_;
+	std::unique_ptr<WavetableGlottalSourceFIRFilter<TFloat>> firFilter_;
+	TFloat prevAmplitude_;
 };
 
 
 
-template<typename FloatType>
-WavetableGlottalSource<FloatType>::WavetableGlottalSource(Type type, FloatType sampleRate,
-			FloatType tp, FloatType tnMin, FloatType tnMax)
+template<typename TFloat>
+WavetableGlottalSource<TFloat>::WavetableGlottalSource(Type type, TFloat sampleRate,
+			TFloat tp, TFloat tnMin, TFloat tnMax)
 		: tableLength_(512)
 		, tableModulus_(tableLength_ - 1)
 		, firBeta_(0.2)
@@ -112,15 +112,15 @@ WavetableGlottalSource<FloatType>::WavetableGlottalSource(Type type, FloatType s
 	if (type == Type::pulse) {
 		/*  CALCULATE RISE PORTION OF WAVE TABLE  */
 		for (unsigned int i = 0; i < tableDiv1_; i++) {
-			const FloatType x = static_cast<FloatType>(i) / tableDiv1_;
-			const FloatType x2 = x * x;
-			const FloatType x3 = x2 * x;
+			const TFloat x = static_cast<TFloat>(i) / tableDiv1_;
+			const TFloat x2 = x * x;
+			const TFloat x3 = x2 * x;
 			wavetable_[i] = (3.0f * x2) - (2.0f * x3);
 		}
 
 		/*  CALCULATE FALL PORTION OF WAVE TABLE  */
 		for (unsigned int i = tableDiv1_, j = 0; i < tableDiv2_; i++, j++) {
-			const FloatType x = static_cast<FloatType>(j) / tnLength_;
+			const TFloat x = static_cast<TFloat>(j) / tnLength_;
 			wavetable_[i] = 1.0f - (x * x);
 		}
 
@@ -131,18 +131,18 @@ WavetableGlottalSource<FloatType>::WavetableGlottalSource(Type type, FloatType s
 	} else {
 		/*  SINE WAVE  */
 		for (unsigned int i = 0; i < tableLength_; i++) {
-			wavetable_[i] = std::sin((static_cast<FloatType>(i) / tableLength_) * 2.0f * static_cast<FloatType>(M_PI));
+			wavetable_[i] = std::sin((static_cast<TFloat>(i) / tableLength_) * 2.0f * static_cast<TFloat>(M_PI));
 		}
 	}
 
 #if VTM_WAVETABLE_GLOTTAL_SOURCE_OVERSAMPLING_OSCILLATOR
-	firFilter_ = std::make_unique<WavetableGlottalSourceFIRFilter<FloatType>>(firBeta_, firGamma_, firCutoff_);
+	firFilter_ = std::make_unique<WavetableGlottalSourceFIRFilter<TFloat>>(firBeta_, firGamma_, firCutoff_);
 #endif
 }
 
-template<typename FloatType>
+template<typename TFloat>
 void
-WavetableGlottalSource<FloatType>::reset()
+WavetableGlottalSource<TFloat>::reset()
 {
 	currentPosition_ = 0;
 	firFilter_->reset();
@@ -157,9 +157,9 @@ WavetableGlottalSource<FloatType>::reset()
 *             according to the amplitude.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-WavetableGlottalSource<FloatType>::setup(FloatType amplitude)
+WavetableGlottalSource<TFloat>::setup(TFloat amplitude)
 {
 	if (tnDelta_ == 0.0 || amplitude == prevAmplitude_) {
 		return;
@@ -168,11 +168,11 @@ WavetableGlottalSource<FloatType>::setup(FloatType amplitude)
 	}
 
 	/*  CALCULATE NEW CLOSURE POINT, BASED ON AMPLITUDE  */
-	const FloatType newDiv2 = std::max(tableDiv2_ - std::rint(amplitude * tnDelta_), FloatType{0.0});
-	const FloatType invNewTnLength = 1.0f / (newDiv2 - tableDiv1_);
+	const TFloat newDiv2 = std::max(tableDiv2_ - std::rint(amplitude * tnDelta_), TFloat{0.0});
+	const TFloat invNewTnLength = 1.0f / (newDiv2 - tableDiv1_);
 
 	/*  RECALCULATE THE FALLING PORTION OF THE GLOTTAL PULSE  */
-	FloatType x = 0.0;
+	TFloat x = 0.0;
 	for (unsigned int i = tableDiv1_, end = static_cast<unsigned int>(newDiv2); i < end; ++i, x += invNewTnLength) {
 		wavetable_[i] = 1.0f - (x * x);
 	}
@@ -191,9 +191,9 @@ WavetableGlottalSource<FloatType>::setup(FloatType amplitude)
 *             the desired frequency.
 *
 ******************************************************************************/
-template<typename FloatType>
+template<typename TFloat>
 void
-WavetableGlottalSource<FloatType>::incrementTablePosition(FloatType frequency)
+WavetableGlottalSource<TFloat>::incrementTablePosition(TFloat frequency)
 {
 	currentPosition_ = mod0(currentPosition_ + (frequency * basicIncrement_));
 }
@@ -207,11 +207,11 @@ WavetableGlottalSource<FloatType>::incrementTablePosition(FloatType frequency)
 *
 ******************************************************************************/
 #if VTM_WAVETABLE_GLOTTAL_SOURCE_OVERSAMPLING_OSCILLATOR
-template<typename FloatType>
-FloatType
-WavetableGlottalSource<FloatType>::getSample(FloatType frequency)  /*  2X OVERSAMPLING OSCILLATOR  */
+template<typename TFloat>
+TFloat
+WavetableGlottalSource<TFloat>::getSample(TFloat frequency)  /*  2X OVERSAMPLING OSCILLATOR  */
 {
-	FloatType output{};
+	TFloat output{};
 
 	for (int i = 0; i < 2; i++) {
 		/*  FIRST INCREMENT THE TABLE POSITION, DEPENDING ON FREQUENCY  */
@@ -228,7 +228,7 @@ WavetableGlottalSource<FloatType>::getSample(FloatType frequency)  /*  2X OVERSA
 		}
 
 		/*  CALCULATE INTERPOLATED TABLE VALUE  */
-		const FloatType interpolatedValue = wavetable_[lowerPosition] +
+		const TFloat interpolatedValue = wavetable_[lowerPosition] +
 					((currentPosition_ - lowerPosition) *
 					(wavetable_[upperPosition] - wavetable_[lowerPosition]));
 
@@ -240,9 +240,9 @@ WavetableGlottalSource<FloatType>::getSample(FloatType frequency)  /*  2X OVERSA
 	return output;
 }
 #else
-template<typename FloatType>
-FloatType
-WavetableGlottalSource<FloatType>::getSample(FloatType frequency)  /*  PLAIN OSCILLATOR  */
+template<typename TFloat>
+TFloat
+WavetableGlottalSource<TFloat>::getSample(TFloat frequency)  /*  PLAIN OSCILLATOR  */
 {
 	/*  FIRST INCREMENT THE TABLE POSITION, DEPENDING ON FREQUENCY  */
 	incrementTablePosition(frequency);
@@ -266,9 +266,9 @@ WavetableGlottalSource<FloatType>::getSample(FloatType frequency)  /*  PLAIN OSC
 *             range 0 -> TABLE_MODULUS.
 *
 ******************************************************************************/
-template<typename FloatType>
-FloatType
-WavetableGlottalSource<FloatType>::mod0(FloatType value)
+template<typename TFloat>
+TFloat
+WavetableGlottalSource<TFloat>::mod0(TFloat value)
 {
 	if (value > tableModulus_) {
 		value -= tableLength_;

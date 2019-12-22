@@ -45,13 +45,13 @@ float calculateOutputScale(float maximumAbsoluteValue);
 //******************************************************************************
 // Converts dB level (0 - 60) to amplitude (0 - 1).
 //******************************************************************************
-template<typename FloatType>
-FloatType
-amplitude60dB(FloatType decibelLevel)
+template<typename TFloat>
+TFloat
+amplitude60dB(TFloat decibelLevel)
 {
-	constexpr FloatType p = 10.0;
-	constexpr FloatType k = 1.0 / 20.0;
-	constexpr FloatType volMax = 60.0;
+	constexpr TFloat p = 10.0;
+	constexpr TFloat k = 1.0 / 20.0;
+	constexpr TFloat volMax = 60.0;
 
 	if (decibelLevel <= 0.0) {
 		return 0.0;
@@ -71,14 +71,14 @@ amplitude60dB(FloatType decibelLevel)
 //
 // pitch in semitones (0 = middle C)
 //******************************************************************************
-template<typename FloatType>
-FloatType
-frequency(FloatType pitch)
+template<typename TFloat>
+TFloat
+frequency(TFloat pitch)
 {
-	constexpr FloatType refFreq = 220.0;
-	constexpr FloatType pitchOffset = 3.0; /*  MIDDLE C = 0  */
-	constexpr FloatType p = 2.0;
-	constexpr FloatType k = 1.0 / 12.0;
+	constexpr TFloat refFreq = 220.0;
+	constexpr TFloat pitchOffset = 3.0; /*  MIDDLE C = 0  */
+	constexpr TFloat p = 2.0;
+	constexpr TFloat k = 1.0 / 12.0;
 
 	return refFreq * std::pow(p, (pitch + pitchOffset) * k);
 }
@@ -88,13 +88,13 @@ frequency(FloatType pitch)
 //
 // pitch in semitones (0 = middle C)
 //******************************************************************************
-template<typename FloatType>
-FloatType
-pitch(FloatType frequency)
+template<typename TFloat>
+TFloat
+pitch(TFloat frequency)
 {
-	constexpr FloatType refFreq = 220.0;
-	constexpr FloatType pitchOffset = 3.0; /*  MIDDLE C = 0  */
-	constexpr FloatType k = 12.0;
+	constexpr TFloat refFreq = 220.0;
+	constexpr TFloat pitchOffset = 3.0; /*  MIDDLE C = 0  */
+	constexpr TFloat k = 12.0;
 
 	return k * std::log2(frequency / refFreq) - pitchOffset;
 }
@@ -102,23 +102,23 @@ pitch(FloatType frequency)
 //******************************************************************************
 // Returns the speed of sound (m/s) at a given temperature (degrees Celsius).
 //******************************************************************************
-template<typename FloatType>
-FloatType
-speedOfSound(FloatType temperature)
+template<typename TFloat>
+TFloat
+speedOfSound(TFloat temperature)
 {
-	constexpr FloatType c0 = 331.4;
-	constexpr FloatType c1 = 0.6;
+	constexpr TFloat c0 = 331.4;
+	constexpr TFloat c1 = 0.6;
 
 	return c0 + (c1 * temperature);
 }
 
-template<typename FloatType>
-FloatType
-maximumAbsoluteValue(const std::vector<FloatType>& v)
+template<typename TFloat>
+TFloat
+maximumAbsoluteValue(const std::vector<TFloat>& v)
 {
-	FloatType maxValue = 0.0;
-	for (FloatType value : v) {
-		const FloatType absValue = std::abs(value);
+	TFloat maxValue = 0.0;
+	for (TFloat value : v) {
+		const TFloat absValue = std::abs(value);
 		if (absValue > maxValue) {
 			maxValue = absValue;
 		}
