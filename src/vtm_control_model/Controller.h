@@ -49,7 +49,7 @@ public:
 	EventList& eventList() { return eventList_; }
 	double outputSampleRate() const { return vtm_->outputSampleRate(); }
 	const std::vector<std::vector<float>>& vtmParameterList() const { return vtmParamList_; }
-	const ConfigurationData& vtmConfigData() const { return *vtmConfigData_; }
+	ConfigurationData& vtmConfigData() const { return *vtmConfigData_; }
 	float outputScale() const { return outputScale_; }
 	double vtmInternalSampleRate() const { return vtm_->internalSampleRate(); }
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2016 Marcelo Y. Matuda                                       *
+ *  Copyright 2021 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,41 +15,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "VocalTractModel.h"
+#include "vtm_gama_tts_1.h"
 
-#include "ConfigurationData.h"
-#include "Exception.h"
+#include <iostream>
+
 #include "VocalTractModel0.h"
-#include "VocalTractModel2.h"
-#include "VocalTractModel4.h"
-#include "VocalTractModel5.h"
 
 
 
-namespace GS {
-namespace VTM {
+extern "C" {
 
-std::unique_ptr<VocalTractModel>
-VocalTractModel::getInstance(const ConfigurationData& data, bool interactive)
+void*
+GAMA_TTS_get_vocal_tract_model(void* config_data, int is_interactive)
 {
-	const unsigned int modelNumber = data.value<unsigned int>("model");
-	switch (modelNumber) {
-	case 0:
-		return std::make_unique<VocalTractModel0<double>>(data, interactive);
-	case 1:
-		return std::make_unique<VocalTractModel0<float>>(data, interactive);
-	case 2:
-		return std::make_unique<VocalTractModel2<double, 1>>(data, interactive);
-	case 3:
-		return std::make_unique<VocalTractModel2<double, 3>>(data, interactive);
-	case 4:
-		return std::make_unique<VocalTractModel4<double, 1>>(data, interactive);
-	case 5:
-		return std::make_unique<VocalTractModel5<double, 1>>(data, interactive);
-	default:
-		THROW_EXCEPTION(InvalidValueException, "[VocalTractModel::getInstance] Invalid vocal tract model number: " << modelNumber << '.');
+	try {
+		return new GS::VTM::VocalTractModel0<float>(*reinterpret_cast<GS::ConfigurationData*>(config_data), is_interactive);
+	} catch (std::exception& exc) {
+		std::cerr << "Error in the constructor of VocalTractModel0: " << exc.what() << std::endl;
+		return NULL;
+	} catch (...) {
+		std::cerr << "Unknown exception thrown by the constructor of VocalTractModel0." << std::endl;
+		return NULL;
 	}
 }
 
-} /* namespace VTM */
-} /* namespace GS */
+} // extern "C"

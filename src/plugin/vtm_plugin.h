@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2016 Marcelo Y. Matuda                                       *
+ *  Copyright 2021 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,11 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef VTM_VOCAL_TRACT_MODEL_H_
-#define VTM_VOCAL_TRACT_MODEL_H_
+#ifndef VTM_PLUGIN_H
+#define VTM_PLUGIN_H
 
 #include <memory>
 #include <vector>
+
+#include "VocalTractModel.h"
 
 
 
@@ -29,35 +31,29 @@ class ConfigurationData;
 
 namespace VTM {
 
-class VocalTractModel {
+class VocalTractModelPlugin : public VocalTractModel {
 public:
-	VocalTractModel() = default;
-	virtual ~VocalTractModel() = default;
+	explicit VocalTractModelPlugin(ConfigurationData& data, bool interactive=false);
+	virtual ~VocalTractModelPlugin();
 
-	virtual void reset() = 0;
+	virtual void reset();
 
-	virtual double internalSampleRate() const = 0;
-	virtual double outputSampleRate() const = 0;
+	virtual double internalSampleRate() const;
+	virtual double outputSampleRate() const;
 
-	virtual void setParameter(int parameter, float value) = 0;
-	virtual void setAllParameters(const std::vector<float>& parameters) = 0;
+	virtual void setParameter(int parameter, float value);
+	virtual void setAllParameters(const std::vector<float>& parameters);
 
-	virtual void execSynthesisStep() = 0;
-	virtual void finishSynthesis() = 0;
+	virtual void execSynthesisStep();
+	virtual void finishSynthesis();
 
-	virtual std::vector<float>& outputBuffer() = 0;
-protected:
-	enum {
-		OUTPUT_BUFFER_RESERVE = 1024
-	};
+	virtual std::vector<float>& outputBuffer();
 private:
-	VocalTractModel(const VocalTractModel&) = delete;
-	VocalTractModel& operator=(const VocalTractModel&) = delete;
-	VocalTractModel(VocalTractModel&&) = delete;
-	VocalTractModel& operator=(VocalTractModel&&) = delete;
+	void* dll_;
+	std::unique_ptr<VocalTractModel> vtm_;
 };
 
 } /* namespace VTM */
 } /* namespace GS */
 
-#endif /* VTM_VOCAL_TRACT_MODEL_H_ */
+#endif // VTM_PLUGIN_H

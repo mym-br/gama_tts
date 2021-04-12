@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2016 Marcelo Y. Matuda                                       *
+ *  Copyright 2021 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,49 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef VTM_VOCAL_TRACT_MODEL_H_
-#define VTM_VOCAL_TRACT_MODEL_H_
+#ifndef VTM_GAMA_TTS_3_H
+#define VTM_GAMA_TTS_3_H
 
-#include <memory>
-#include <vector>
+extern "C" {
 
+void* GAMA_TTS_get_vocal_tract_model(void *config_data, int is_interactive);
 
+} // extern "C"
 
-namespace GS {
-
-class ConfigurationData;
-
-namespace VTM {
-
-class VocalTractModel {
-public:
-	VocalTractModel() = default;
-	virtual ~VocalTractModel() = default;
-
-	virtual void reset() = 0;
-
-	virtual double internalSampleRate() const = 0;
-	virtual double outputSampleRate() const = 0;
-
-	virtual void setParameter(int parameter, float value) = 0;
-	virtual void setAllParameters(const std::vector<float>& parameters) = 0;
-
-	virtual void execSynthesisStep() = 0;
-	virtual void finishSynthesis() = 0;
-
-	virtual std::vector<float>& outputBuffer() = 0;
-protected:
-	enum {
-		OUTPUT_BUFFER_RESERVE = 1024
-	};
-private:
-	VocalTractModel(const VocalTractModel&) = delete;
-	VocalTractModel& operator=(const VocalTractModel&) = delete;
-	VocalTractModel(VocalTractModel&&) = delete;
-	VocalTractModel& operator=(VocalTractModel&&) = delete;
-};
-
-} /* namespace VTM */
-} /* namespace GS */
-
-#endif /* VTM_VOCAL_TRACT_MODEL_H_ */
+#endif // VTM_GAMA_TTS_3_H

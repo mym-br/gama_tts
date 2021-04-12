@@ -28,6 +28,7 @@
 
 #include "Exception.h"
 #include "Log.h"
+#include "vtm_plugin.h"
 #include "VTMUtil.h"
 #include "WAVEFileWriter.h"
 
@@ -52,7 +53,7 @@ Controller::Controller(const char* configDirPath, Model& model)
 	vtmConfigData_->insert(*vtmControlModelConfig_.voiceData);
 
 	// Get the vocal tract model instance.
-	vtm_ = VTM::VocalTractModel::getInstance(*vtmConfigData_);
+	vtm_ = std::make_unique<VTM::VocalTractModelPlugin>(*vtmConfigData_);
 
 	eventList_.setControlPeriod(vtmControlModelConfig_.controlPeriod);
 }

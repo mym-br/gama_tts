@@ -11,6 +11,7 @@ endif()
 
 include_directories(
     src
+    src/plugin
     src/rapidxml
     src/text_parser
     src/vtm
@@ -35,6 +36,9 @@ set(LIBRARY_FILES
     src/VocalTractModelParameterValue.h
     src/WAVEFileWriter.cpp
     src/WAVEFileWriter.h
+
+    src/plugin/vtm_plugin.cpp
+    src/plugin/vtm_plugin.h
 
     src/rapidxml/rapidxml.hpp
 
@@ -71,7 +75,6 @@ set(LIBRARY_FILES
     src/vtm/RosenbergBGlottalSource.h
     src/vtm/SampleRateConverter.h
     src/vtm/Throat.h
-    src/vtm/VocalTractModel.cpp
     src/vtm/VocalTractModel.h
     src/vtm/VocalTractModel0.h
     src/vtm/VocalTractModel2.h
@@ -125,12 +128,12 @@ set(LIBRARY_FILES
     src/xml/StreamXMLWriter.h
 )
 
-add_library(gamatts STATIC ${LIBRARY_FILES})
+add_library(gamatts SHARED ${LIBRARY_FILES})
 
 add_executable(gama_tts
     src/main.cpp
 )
-target_link_libraries(gama_tts gamatts)
+target_link_libraries(gama_tts gamatts dl)
 
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
@@ -142,3 +145,51 @@ if(UNIX AND NOT APPLE)
     install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.hpp")
     install(DIRECTORY data DESTINATION share/gama_tts)
 endif()
+
+add_library(vtm_gama_tts_0 MODULE src/plugin/vtm_gama_tts_0.cpp
+                                  src/plugin/vtm_gama_tts_0.h)
+target_include_directories(vtm_gama_tts_0 PRIVATE
+    src
+    src/vtm
+)
+target_link_libraries(vtm_gama_tts_0 gamatts)
+
+add_library(vtm_gama_tts_1 MODULE src/plugin/vtm_gama_tts_1.cpp
+                                  src/plugin/vtm_gama_tts_1.h)
+target_include_directories(vtm_gama_tts_1 PRIVATE
+    src
+    src/vtm
+)
+target_link_libraries(vtm_gama_tts_1 gamatts)
+
+add_library(vtm_gama_tts_2 MODULE src/plugin/vtm_gama_tts_2.cpp
+                                  src/plugin/vtm_gama_tts_2.h)
+target_include_directories(vtm_gama_tts_2 PRIVATE
+    src
+    src/vtm
+)
+target_link_libraries(vtm_gama_tts_2 gamatts)
+
+add_library(vtm_gama_tts_3 MODULE src/plugin/vtm_gama_tts_3.cpp
+                                  src/plugin/vtm_gama_tts_3.h)
+target_include_directories(vtm_gama_tts_3 PRIVATE
+    src
+    src/vtm
+)
+target_link_libraries(vtm_gama_tts_3 gamatts)
+
+add_library(vtm_gama_tts_4 MODULE src/plugin/vtm_gama_tts_4.cpp
+                                  src/plugin/vtm_gama_tts_4.h)
+target_include_directories(vtm_gama_tts_4 PRIVATE
+    src
+    src/vtm
+)
+target_link_libraries(vtm_gama_tts_4 gamatts)
+
+add_library(vtm_gama_tts_5 MODULE src/plugin/vtm_gama_tts_5.cpp
+                                  src/plugin/vtm_gama_tts_5.h)
+target_include_directories(vtm_gama_tts_5 PRIVATE
+    src
+    src/vtm
+)
+target_link_libraries(vtm_gama_tts_5 gamatts)
