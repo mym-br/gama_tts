@@ -24,9 +24,6 @@
 
 
 namespace GS {
-
-class ConfigurationData;
-
 namespace VTM {
 
 class VocalTractModel {
