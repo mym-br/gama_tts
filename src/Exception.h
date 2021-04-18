@@ -26,8 +26,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EXCEPTION_H_
-#define EXCEPTION_H_
+#ifndef GS_EXCEPTION_H_
+#define GS_EXCEPTION_H_
 
 #include <exception>
 #include <iostream>
@@ -125,4 +125,4 @@ struct XMLException : std::runtime_error {
 
 } // namespace GS
 
-#endif /* EXCEPTION_H_ */
+#endif /* GS_EXCEPTION_H_ */
