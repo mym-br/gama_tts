@@ -26,7 +26,7 @@
 extern "C" {
 
 void*
-GAMA_TTS_get_vocal_tract_model(void* config_data, int is_interactive)
+GAMA_TTS_construct_vocal_tract_model(void* config_data, int is_interactive)
 {
 	try {
 		return new GS::VTM::VocalTractModel2<double, 3>(*reinterpret_cast<GS::ConfigurationData*>(config_data), is_interactive);
@@ -37,6 +37,12 @@ GAMA_TTS_get_vocal_tract_model(void* config_data, int is_interactive)
 		std::cerr << "Unknown exception thrown by the constructor of VocalTractModel2." << std::endl;
 		return NULL;
 	}
+}
+
+void
+GAMA_TTS_destruct_vocal_tract_model(void *vtm)
+{
+	delete reinterpret_cast<GS::VTM::VocalTractModel2<double, 3>*>(vtm);
 }
 
 } // extern "C"

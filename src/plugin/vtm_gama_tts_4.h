@@ -20,7 +20,8 @@
 
 extern "C" {
 
-void* GAMA_TTS_get_vocal_tract_model(void *config_data, int is_interactive);
+void* GAMA_TTS_construct_vocal_tract_model(void *config_data, int is_interactive);
+void GAMA_TTS_destruct_vocal_tract_model(void *vtm);
 
 } // extern "C"
 

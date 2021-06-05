@@ -37,13 +37,15 @@
 #include "ConfigurationData.h"
 #include "Exception.h"
 
-#define GET_VTM_SYMBOL "GAMA_TTS_get_vocal_tract_model"
+#define CONSTRUCT_VTM_SYMBOL "GAMA_TTS_construct_vocal_tract_model"
+#define  DESTRUCT_VTM_SYMBOL "GAMA_TTS_destruct_vocal_tract_model"
 
 
 
 extern "C" {
 
-typedef void* (*GetVTM)(void *config_data, int is_interactive);
+typedef void* (*ConstructVTM)(void *config_data, int is_interactive);
+typedef void (*DestructVTM)(void *vtm);
 
 } /* extern "C" */
 
@@ -63,12 +65,17 @@ VocalTractModelPlugin::VocalTractModelPlugin(ConfigurationData& data, bool inter
 		THROW_EXCEPTION(UnavailableResourceException, "Error: " << dlerror());
 	}
 
-	GetVTM getVTM = reinterpret_cast<GetVTM>(dlsym(dll_, GET_VTM_SYMBOL));
-	if (getVTM == NULL) {
+	ConstructVTM constructVTM = reinterpret_cast<ConstructVTM>(dlsym(dll_, CONSTRUCT_VTM_SYMBOL));
+	if (constructVTM == NULL) {
 		THROW_EXCEPTION(UnavailableResourceException, "Error: " << dlerror());
 	}
 
-	vtm_.reset(reinterpret_cast<VocalTractModel*>(getVTM(&data, interactive)));
+	destructVTM_ = dlsym(dll_, DESTRUCT_VTM_SYMBOL);
+	if (destructVTM_ == NULL) {
+		THROW_EXCEPTION(UnavailableResourceException, "Error: " << dlerror());
+	}
+
+	vtm_ = reinterpret_cast<VocalTractModel*>(constructVTM(&data, interactive));
 	if (!vtm_) {
 		THROW_EXCEPTION(UnavailableResourceException, "Could not construct the vocal tract model.");
 	}
@@ -76,7 +83,7 @@ VocalTractModelPlugin::VocalTractModelPlugin(ConfigurationData& data, bool inter
 
 VocalTractModelPlugin::~VocalTractModelPlugin()
 {
-	vtm_.reset(); // must be called before dlclose
+	(*reinterpret_cast<DestructVTM>(destructVTM_))(vtm_); // must be called before dlclose
 
 	dlerror(); // reset error
 	int retVal = dlclose(dll_);

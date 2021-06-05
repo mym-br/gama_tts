@@ -29,7 +29,6 @@
 #ifndef VTM_PLUGIN_H
 #define VTM_PLUGIN_H
 
-#include <memory>
 #include <vector>
 
 #include "VocalTractModel.h"
@@ -61,7 +60,8 @@ public:
 	virtual std::vector<float>& outputBuffer();
 private:
 	void* dll_;
-	std::unique_ptr<VocalTractModel> vtm_;
+	void* destructVTM_;
+	VocalTractModel* vtm_;
 };
 
 } /* namespace VTM */
