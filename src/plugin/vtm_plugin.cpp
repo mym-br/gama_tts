@@ -56,6 +56,7 @@ VocalTractModelPlugin::VocalTractModelPlugin(ConfigurationData& data, bool inter
 		: dll_(nullptr)
 {
 	const std::string dllPath = data.value<std::string>("dll_path");
+	dlerror(); // reset error
 
 	dll_ = dlopen(dllPath.c_str(), RTLD_NOW);
 	if (dll_ == NULL) {
@@ -77,6 +78,7 @@ VocalTractModelPlugin::~VocalTractModelPlugin()
 {
 	vtm_.reset(); // must be called before dlclose
 
+	dlerror(); // reset error
 	int retVal = dlclose(dll_);
 	if (retVal != 0) {
 		std::cerr << "Error in dlclose: " << dlerror() << std::endl;
