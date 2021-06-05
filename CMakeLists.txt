@@ -135,17 +135,6 @@ add_executable(gama_tts
 )
 target_link_libraries(gama_tts gamatts dl)
 
-if(UNIX AND NOT APPLE)
-    include(GNUInstallDirs)
-    install(TARGETS gamatts gama_tts
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.h")
-    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.hpp")
-    install(DIRECTORY data DESTINATION share/gama_tts)
-endif()
-
 add_library(vtm_gama_tts_0 MODULE src/plugin/vtm_gama_tts_0.cpp
                                   src/plugin/vtm_gama_tts_0.h)
 target_include_directories(vtm_gama_tts_0 PRIVATE
@@ -193,3 +182,21 @@ target_include_directories(vtm_gama_tts_5 PRIVATE
     src/vtm
 )
 target_link_libraries(vtm_gama_tts_5 gamatts)
+
+if(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+    install(TARGETS gamatts
+                    gama_tts
+                    vtm_gama_tts_0
+                    vtm_gama_tts_1
+                    vtm_gama_tts_2
+                    vtm_gama_tts_3
+                    vtm_gama_tts_4
+                    vtm_gama_tts_5
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.h")
+    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.hpp")
+    install(DIRECTORY data DESTINATION share/gama_tts)
+endif()
