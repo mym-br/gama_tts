@@ -20,7 +20,7 @@
       mkdir ../gama_tts-build
       cd ../gama_tts-build
       cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
-      make
+      cmake --build .
 
   - Linux+GNU - Clang:
     - Execute in a terminal:
@@ -28,7 +28,7 @@
       mkdir ../gama_tts-build
       cd ../gama_tts-build
       CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
-      make
+      cmake --build .
 
 - Test (Linux+GNU):
 
