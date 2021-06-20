@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2017 Marcelo Y. Matuda                                       *
+ *  Copyright 2017, 2021 Marcelo Y. Matuda                                 *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -53,7 +53,7 @@ struct Pho1Data {
 // It doesn't parse intonation in the format (NN,NN).
 class Pho1Parser {
 public:
-	Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList, const char* phonemeMapFile);
+	Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList);
 	~Pho1Parser() = default;
 
 	void parse(const std::string& pho);

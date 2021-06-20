@@ -122,27 +122,40 @@ Controller::nextChunk(const std::string& phoneticString, std::size_t& index, std
 void
 Controller::getParametersFromPhoneticString(const std::string& phoneticString)
 {
-	if (!phoneticStringParser_) {
-		phoneticStringParser_ = std::make_unique<PhoneticStringParser>(configDirPath_.c_str(), model_, eventList_);
-	}
-
 	vtmParamList_.clear();
-
 	initUtterance();
 
-	std::size_t index = 0, size = 0;
-	while (index < phoneticString.size()) {
-		if (nextChunk(phoneticString, index, size)) {
-			eventList_.setUp();
-
-			phoneticStringParser_->parse(&phoneticString[index], size);
-
-			eventList_.generateEventList();
-			eventList_.applyIntonation();
-			eventList_.generateOutput(vtmParamList_);
+	if (vtmControlModelConfig_.phoStrFormat == PhoneticStringFormat::mbrola) {
+		if (!pho1Parser_) {
+			pho1Parser_ = std::make_unique<Pho1Parser>(configDirPath_.c_str(), model_, eventList_);
 		}
 
-		index += size;
+		eventList_.setMicroIntonation(true);
+		eventList_.setMacroIntonation(true);
+		eventList_.setSmoothIntonation(false);
+
+		eventList_.setUp();
+		pho1Parser_->parse(phoneticString);
+		eventList_.generateOutput(vtmParamList_);
+	} else {
+		if (!phoneticStringParser_) {
+			phoneticStringParser_ = std::make_unique<PhoneticStringParser>(configDirPath_.c_str(), model_, eventList_);
+		}
+
+		std::size_t index = 0, size = 0;
+		while (index < phoneticString.size()) {
+			if (nextChunk(phoneticString, index, size)) {
+				eventList_.setUp();
+
+				phoneticStringParser_->parse(&phoneticString[index], size);
+
+				eventList_.generateEventList();
+				eventList_.applyIntonation();
+				eventList_.generateOutput(vtmParamList_);
+			}
+
+			index += size;
+		}
 	}
 }
 
@@ -196,27 +209,6 @@ Controller::synthesizePhoneticStringToBuffer(const std::string& phoneticString, 
 	getParametersFromPhoneticString(phoneticString);
 	if (vtmParamFile) writeVTMParameterFile(vtmParamList_, vtmParamFile);
 	synthesizeToBuffer(buffer);
-}
-
-void
-Controller::synthesizePho1ToFile(const std::string& phoneticString, const char* phonemeMapFile, const char* vtmParamFile, const char* outputFile)
-{
-	if (!pho1Parser_) {
-		pho1Parser_ = std::make_unique<Pho1Parser>(configDirPath_.c_str(), model_, eventList_, phonemeMapFile);
-	}
-
-	vtmParamList_.clear();
-
-	initUtterance();
-	eventList_.setMicroIntonation(true);
-	eventList_.setMacroIntonation(true);
-	eventList_.setSmoothIntonation(false);
-
-	eventList_.setUp();
-	pho1Parser_->parse(phoneticString);
-	eventList_.generateOutput(vtmParamList_);
-	if (vtmParamFile) writeVTMParameterFile(vtmParamList_, vtmParamFile);
-	synthesizeToFile(outputFile);
 }
 
 void

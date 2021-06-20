@@ -66,6 +66,15 @@ Configuration::Configuration(const char* configDirPath)
 	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << voiceName << ".config";
 	voiceData = std::make_unique<ConfigurationData>(voiceFilePath.str());
 	intonationFactor = voiceData->value<double>("intonation_factor");
+
+	std::string pho = config.value<std::string>("phonetic_string_format");
+	if (pho == "gnuspeech") {
+		phoStrFormat = PhoneticStringFormat::gnuspeech;
+	} else if (pho == "mbrola") {
+		phoStrFormat = PhoneticStringFormat::mbrola;
+	} else {
+		THROW_EXCEPTION(InvalidValueException, "Invalid phonetic string format: " << pho << '.');
+	}
 }
 
 Configuration::~Configuration()

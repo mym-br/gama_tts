@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2017 Marcelo Y. Matuda                                       *
+ *  Copyright 2017, 2021 Marcelo Y. Matuda                                 *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "ConfigurationData.h"
 #include "EventList.h"
 #include "Exception.h"
 #include "Log.h"
@@ -31,6 +32,7 @@
 #define COMMENT_CHAR ';'
 #define PHONEME_SEPARATOR '_'
 #define CONFIG_SUBDIR "/pho1_parser/"
+#define CONFIG_FILE "pho1.config"
 
 
 
@@ -47,10 +49,16 @@ throwException(int lineNumber, const char* message)
 namespace GS {
 namespace VTMControlModel {
 
-Pho1Parser::Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList, const char* phonemeMapFile)
+Pho1Parser::Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList)
 		: model_(model)
 		, eventList_(eventList)
 {
+	std::ostringstream configPath;
+	configPath << configDirPath << CONFIG_SUBDIR << CONFIG_FILE;
+	ConfigurationData config(configPath.str());
+
+	std::string phonemeMapFile = config.value<std::string>("phoneme_map_file");
+
 	std::ostringstream phonemeMapFilePath;
 	phonemeMapFilePath << configDirPath << CONFIG_SUBDIR << phonemeMapFile;
 	phonemeMap_.load(phonemeMapFilePath.str().c_str());

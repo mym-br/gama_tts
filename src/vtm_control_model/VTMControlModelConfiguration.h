@@ -32,6 +32,11 @@ class ConfigurationData;
 
 namespace VTMControlModel {
 
+enum class PhoneticStringFormat {
+	gnuspeech,
+	mbrola
+};
+
 struct Configuration {
 	unsigned int controlPeriod; // 1, 2, 3 or 4 (ms)
 	double controlRate;         // 1000.0 / controlPeriod (Hz)
@@ -56,6 +61,8 @@ struct Configuration {
 	bool randomIntonation;
 
 	std::unique_ptr<ConfigurationData> voiceData;
+
+	PhoneticStringFormat phoStrFormat;
 
 	explicit Configuration(const char* configDirPath);
 	~Configuration();
