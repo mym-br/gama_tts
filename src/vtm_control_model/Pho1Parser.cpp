@@ -98,6 +98,7 @@ Pho1Parser::printInputData()
 void
 Pho1Parser::loadInputData(const std::string& pho)
 {
+	inputData_.clear();
 	std::istringstream in{pho};
 	std::string line;
 	std::size_t lineNumber = 0;
