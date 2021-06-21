@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2017, 2021 Marcelo Y. Matuda                                 *
+ *  Copyright 2021 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,52 +15,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef TEXT_PARSER_H_
-#define TEXT_PARSER_H_
+#ifndef EXTERNAL_TEXT_PARSER_H_
+#define EXTERNAL_TEXT_PARSER_H_
 
-#include <memory>
 #include <string>
 
-#include "VTMControlModelConfiguration.h"
+#include "TextParser.h"
 
 
 
 namespace GS {
 namespace TextParser {
 
-class TextParser {
+class ExternalTextParser : public TextParser {
 public:
-	enum class Mode {
-		normal,
-		emphasis,
-		letter
-	};
+	ExternalTextParser(const std::string& configDirPath);
+	virtual ~ExternalTextParser() = default;
 
-	TextParser() = default;
-	virtual ~TextParser() = default;
-
-	virtual std::string parse(const char* text) = 0;
-	virtual void setMode(Mode mode) = 0;
-
-	static std::unique_ptr<TextParser> getInstance(const std::string& configDirPath, VTMControlModel::PhoneticStringFormat phoStrFormat);
+	virtual std::string parse(const char* text);
+	virtual void setMode(Mode mode);
 private:
-	TextParser(const TextParser&) = delete;
-	TextParser& operator=(const TextParser&) = delete;
-	TextParser(TextParser&&) = delete;
-	TextParser& operator=(TextParser&&) = delete;
-};
+	ExternalTextParser(const ExternalTextParser&) = delete;
+	ExternalTextParser& operator=(const ExternalTextParser&) = delete;
+	ExternalTextParser(ExternalTextParser&&) = delete;
+	ExternalTextParser& operator=(ExternalTextParser&&) = delete;
 
-struct TextParserConfiguration {
-	std::string language;
-	std::string dictionary1File;
-	std::string dictionary2File;
-	std::string dictionary3File;
-	TextParser::Mode mode;
-
-	explicit TextParserConfiguration(const std::string& configDirPath);
+	std::string inputFilePath_;
+	std::string outputFilePath_;
+	std::string command_;
 };
 
 } /* namespace TextParser */
 } /* namespace GS */
 
-#endif /* TEXT_PARSER_H_ */
+#endif /* EXTERNAL_TEXT_PARSER_H_ */

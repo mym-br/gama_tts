@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2017 Marcelo Y. Matuda                                       *
+ *  Copyright 2017, 2021 Marcelo Y. Matuda                                 *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -22,8 +22,9 @@
 #include "ConfigurationData.h"
 #include "english/EnglishTextParser.h"
 #include "Exception.h"
+#include "ExternalTextParser.h"
 
-#define CONFIG_FILE_NAME "/text_parser.config"
+#define CONFIG_FILE_NAME "text_parser.config"
 #define TEXT_PARSER_DIR "/text_parser/"
 
 
@@ -53,16 +54,18 @@ TextParserConfiguration::TextParserConfiguration(const std::string& configDirPat
 }
 
 std::unique_ptr<TextParser>
-TextParser::getInstance(const std::string& configDirPath)
+TextParser::getInstance(const std::string& configDirPath, VTMControlModel::PhoneticStringFormat phoStrFormat)
 {
-	std::string textParserConfigDir = configDirPath + TEXT_PARSER_DIR;
-
-	TextParserConfiguration textParserConfig{textParserConfigDir};
-
-	if (textParserConfig.language == "english") {
-		return std::make_unique<English::EnglishTextParser>(textParserConfigDir, textParserConfig);
+	if (phoStrFormat == VTMControlModel::PhoneticStringFormat::mbrola) {
+		return std::make_unique<ExternalTextParser>(configDirPath);
 	} else {
-		THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << textParserConfig.language << '.');
+		std::string textParserConfigDir = configDirPath + TEXT_PARSER_DIR;
+		TextParserConfiguration textParserConfig{textParserConfigDir};
+		if (textParserConfig.language == "english") {
+			return std::make_unique<English::EnglishTextParser>(textParserConfigDir, textParserConfig);
+		} else {
+			THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << textParserConfig.language << '.');
+		}
 	}
 }
 

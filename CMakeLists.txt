@@ -59,6 +59,8 @@ set(LIBRARY_FILES
     src/text_parser/english/Syllabify.h
     src/text_parser/DictionarySearch.cpp
     src/text_parser/DictionarySearch.h
+    src/text_parser/ExternalTextParser.cpp
+    src/text_parser/ExternalTextParser.h
     src/text_parser/TextParser.cpp
     src/text_parser/TextParser.h
 

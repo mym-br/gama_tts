@@ -169,13 +169,14 @@ tts(int argc, char* argv[])
 	}
 
 	try {
-		auto textParser = GS::TextParser::TextParser::getInstance(dataDir);
-		std::string phoneticString = textParser->parse(text.c_str());
-
 		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
 		vtmControlModel->load(dataDir, VTM_CONTROL_MODEL_CONFIG_FILE);
 
 		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(dataDir, *vtmControlModel);
+		auto textParser = GS::TextParser::TextParser::getInstance(
+								dataDir,
+								vtmController->vtmControlModelConfiguration().phoStrFormat);
+		std::string phoneticString = textParser->parse(text.c_str());
 		vtmController->synthesizePhoneticStringToFile(phoneticString, vtmParamFile, outputFile);
 
 	} catch (std::exception& e) {
