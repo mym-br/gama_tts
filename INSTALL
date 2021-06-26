@@ -15,25 +15,23 @@
 - Build:
 
   - Linux+GNU - GCC:
-    - Execute in a terminal:
 
-      mkdir ../gama_tts-build
-      cd ../gama_tts-build
-      cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
-      cmake --build .
+    mkdir ../gama_tts-build
+    cd ../gama_tts-build
+    cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
+    cmake --build .
 
   - Linux+GNU - Clang:
-    - Execute in a terminal:
 
-      mkdir ../gama_tts-build
-      cd ../gama_tts-build
-      CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
-      cmake --build .
+    mkdir ../gama_tts-build
+    cd ../gama_tts-build
+    CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
+    cmake --build .
 
 - Test (Linux+GNU):
 
-  - Execute in a terminal, in the directory "gama_tts-build":
+  - Execute in the directory "gama_tts-build":
 
-    echo "Hello world." | ./gama_tts tts ../gama_tts/data/english/vtm5 test.wav
+    echo "Hello world." | LD_LIBRARY_PATH=. ./gama_tts tts ../gama_tts/data/english/vtm5 test.wav
 
   - Play the file test.wav.

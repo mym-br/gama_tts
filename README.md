@@ -16,20 +16,7 @@ downloaded in 2014-08-02. The source code was obtained from the directories:
 
 Gnuspeech is licensed under the GNU GPLv3 or later.
 
-Notes:
-
-- GamaTTS is not compatible with Gnuspeech.
-- "Gama" is the portuguese for gamma.
-
 [Gnuspeech]: http://www.gnu.org/software/gnuspeech/
-
-External code
--------------
-
-This software includes code from [RapidXml][], provided by Marcin Kalicinski.
-See the file src/rapidxml/license.txt for details.
-
-[RapidXml]: http://rapidxml.sourceforge.net/
 
 Status
 ------
@@ -38,9 +25,22 @@ Status
 
 Only english is supported.
 
-The quality of the synthesized speech is very far from the best speech
+The quality of the synthesized speech is much lower than that of the best speech
 synthesizers. This software is mostly for people interested in articulatory
 speech synthesis.
+
+OS support
+----------
+
+Linux+GNU (the software may work on other OSes with POSIX).
+
+External code
+-------------
+
+This software includes code from [RapidXml][], provided by Marcin Kalicinski.
+See the file src/rapidxml/license.txt for details.
+
+[RapidXml]: http://rapidxml.sourceforge.net/
 
 License
 -------
