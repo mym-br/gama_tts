@@ -62,7 +62,16 @@ VocalTractModelPlugin::VocalTractModelPlugin(ConfigurationData& data, bool inter
 
 	dll_ = dlopen(dllPath.c_str(), RTLD_NOW);
 	if (dll_ == NULL) {
-		THROW_EXCEPTION(UnavailableResourceException, "Error: " << dlerror());
+		if (dllPath.find('/') == std::string::npos) {
+			// Try again with relative path.
+			const auto relDllPath = "./" + dllPath;
+			dll_ = dlopen(relDllPath.c_str(), RTLD_NOW);
+			if (dll_ == NULL) {
+				THROW_EXCEPTION(UnavailableResourceException, "Error: " << dlerror());
+			}
+		} else {
+			THROW_EXCEPTION(UnavailableResourceException, "Error: " << dlerror());
+		}
 	}
 
 	ConstructVTM constructVTM = reinterpret_cast<ConstructVTM>(dlsym(dll_, CONSTRUCT_VTM_SYMBOL));

@@ -32,6 +32,6 @@
 
   - Execute in the directory "gama_tts-build":
 
-    echo "Hello world." | LD_LIBRARY_PATH=. ./gama_tts tts ../gama_tts/data/english/vtm5 test.wav
+    echo "Hello world." | ./gama_tts tts ../gama_tts/data/english/vtm5 test.wav
 
   - Play the file test.wav.
