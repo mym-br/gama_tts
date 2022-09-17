@@ -1,4 +1,13 @@
 
+- Plugins:
+	- Exceptions thrown from VTM member functions cause segmentation fault.
+	- Could limit visibility with:
+		CMakeLists.txt:
+		target_compile_options(vtm_gama_tts_5 PRIVATE -fvisibility=hidden)
+
+		vtm_gama_tts_5.h:
+		__attribute__((visibility ("default")))
+
 - Two files with the same name:
 	src/SpeechObject/postMonet/server.monet/headerFiles/number_pronunciations.h
 	src/SpeechObject/postMonet/server.monet/letter_to_sound/number_pronunciations.h
