@@ -21,7 +21,7 @@ Gnuspeech is licensed under the GNU GPLv3 or later.
 Status
 ------
 
-**pre-alpha**
+**alpha**
 
 Only english is supported.
 
@@ -32,7 +32,7 @@ speech synthesis.
 OS support
 ----------
 
-Linux+GNU (the software may work on other OSes with POSIX).
+Linux+GNU (the software may work on other operating systems).
 
 External code
 -------------

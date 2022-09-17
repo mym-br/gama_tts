@@ -35,6 +35,9 @@
 
 
 namespace GS {
+
+class ConfigurationData;
+
 namespace VTM {
 
 class VocalTractModel {
@@ -54,6 +57,8 @@ public:
 	virtual void finishSynthesis() = 0;
 
 	virtual std::vector<float>& outputBuffer() = 0;
+
+	static std::unique_ptr<VocalTractModel> getInstance(const ConfigurationData& data, bool interactive = false);
 protected:
 	enum {
 		OUTPUT_BUFFER_RESERVE = 1024

@@ -8,8 +8,6 @@
     - GCC 8.3      (Linux+GNU x86_64).
     - LLVM/Clang 7 (Linux+GNU x86_64).
 
-  - POSIX.1-2001.
-
   - The current directory must be named "gama_tts".
 
 - Build:
