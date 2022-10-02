@@ -1,12 +1,10 @@
 # Configuration file for the interactive VTM.
 
-vtm_config_file = vtm.config
-
-voice_config_file = voice_male.config
-#voice_config_file = voice_female.config
-#voice_config_file = voice_large_child.config
-#voice_config_file = voice_small_child.config
-#voice_config_file = voice_baby.config
+voice_name = male
+#voice_name = female
+#voice_name = large_child
+#voice_name = small_child
+#voice_name = baby
 
 #===============================================================================
 # Dynamic parameters - default: "a".
