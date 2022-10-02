@@ -23,7 +23,6 @@
 #include <cassert>
 #include <cstring>
 #include <limits> /* std::numeric_limits<double>::infinity() */
-#include <sstream>
 #include <vector>
 
 #include "Log.h"
@@ -40,7 +39,7 @@ const double Event::EMPTY_PARAMETER = std::numeric_limits<double>::infinity();
 
 
 
-EventList::EventList(const char* configDirPath, Model& model)
+EventList::EventList(const Index& index, Model& model)
 		: model_(model)
 		, controlPeriod_(DEFAULT_CONTROL_PERIOD_MS)
 		, macroIntonation_()
@@ -51,7 +50,7 @@ EventList::EventList(const char* configDirPath, Model& model)
 		, meanPitch_()
 		, globalTempo_(1.0)
 		, intonationFactor_(1.0)
-		, intonationRhythm_(configDirPath)
+		, intonationRhythm_(index)
 {
 	setUp();
 

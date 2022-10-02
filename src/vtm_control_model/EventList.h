@@ -33,6 +33,9 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace VTMControlModel {
 
 struct PostureData {
@@ -161,7 +164,7 @@ typedef std::unique_ptr<Event> Event_ptr;
 
 class EventList {
 public:
-	EventList(const char* configDirPath, Model& model);
+	EventList(const Index& index, Model& model);
 	~EventList() = default;
 
 	const std::vector<Event_ptr>& list() const { return list_; }

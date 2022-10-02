@@ -30,6 +30,9 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace VTMControlModel {
 
 class Category;
@@ -39,7 +42,7 @@ class Posture;
 
 class PhoneticStringParser {
 public:
-	PhoneticStringParser(const char* configDirPath, const Model& model, EventList& eventList);
+	PhoneticStringParser(const Index& index, const Model& model, EventList& eventList);
 	~PhoneticStringParser() = default;
 
 	void parse(const char* string /* ASCII */, std::size_t size);

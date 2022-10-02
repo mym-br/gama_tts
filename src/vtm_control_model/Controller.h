@@ -38,11 +38,14 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace VTMControlModel {
 
 class Controller {
 public:
-	Controller(const char* configDirPath, Model& model);
+	Controller(const Index& index, Model& model);
 	~Controller() = default;
 
 	Configuration& vtmControlModelConfiguration() { return vtmControlModelConfig_; }
@@ -100,7 +103,7 @@ private:
 	void writeOutputToBuffer(std::vector<float>& outputBuffer, float& scale);
 	void writeVTMParameterFile(const std::vector<std::vector<float>>& vtmParamList, const char* vtmParamFile);
 
-	std::string configDirPath_;
+	const Index& index_;
 	Model& model_;
 	EventList eventList_;
 	std::unique_ptr<PhoneticStringParser> phoneticStringParser_;

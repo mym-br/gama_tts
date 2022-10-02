@@ -23,6 +23,7 @@
 #include "ConfigurationData.h"
 #include "EventList.h"
 #include "Exception.h"
+#include "Index.h"
 #include "Log.h"
 #include "Model.h"
 #include "Posture.h"
@@ -31,7 +32,6 @@
 #define SEPARATORS " \t"
 #define COMMENT_CHAR ';'
 #define PHONEME_SEPARATOR '_'
-#define CONFIG_SUBDIR "/pho1_parser/"
 #define CONFIG_FILE "pho1.txt"
 
 
@@ -49,19 +49,15 @@ throwException(int lineNumber, const char* message)
 namespace GS {
 namespace VTMControlModel {
 
-Pho1Parser::Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList)
+Pho1Parser::Pho1Parser(const Index& index, const Model& model, EventList& eventList)
 		: model_(model)
 		, eventList_(eventList)
 {
-	std::ostringstream configPath;
-	configPath << configDirPath << CONFIG_SUBDIR << CONFIG_FILE;
-	ConfigurationData config(configPath.str());
+	const std::string dir = index.entry("pho1_parser_dir");
+	ConfigurationData config(dir + CONFIG_FILE);
 
 	std::string phonemeMapFile = config.value<std::string>("phoneme_map_file");
-
-	std::ostringstream phonemeMapFilePath;
-	phonemeMapFilePath << configDirPath << CONFIG_SUBDIR << phonemeMapFile;
-	phonemeMap_.load(phonemeMapFilePath.str().c_str());
+	phonemeMap_.load((dir + phonemeMapFile).c_str());
 }
 
 void

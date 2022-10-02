@@ -27,28 +27,25 @@
 #include <sstream>
 
 #include "Exception.h"
+#include "Index.h"
 #include "Log.h"
 #include "VTMUtil.h"
 #include "WAVEFileWriter.h"
-
-#define VTM_CONFIG_FILE_NAME "/vtm.txt"
 
 
 
 namespace GS {
 namespace VTMControlModel {
 
-Controller::Controller(const char* configDirPath, Model& model)
-		: configDirPath_(configDirPath)
+Controller::Controller(const Index& index, Model& model)
+		: index_(index)
 		, model_(model)
-		, eventList_(configDirPath, model_)
-		, vtmControlModelConfig_(configDirPath)
+		, eventList_(index, model_)
+		, vtmControlModelConfig_(index)
 		, outputScale_(1.0)
 {
 	// Load VTM configuration.
-	std::ostringstream vtmConfigFilePath;
-	vtmConfigFilePath << configDirPath << VTM_CONFIG_FILE_NAME;
-	vtmConfigData_ = std::make_unique<ConfigurationData>(vtmConfigFilePath.str());
+	vtmConfigData_ = std::make_unique<ConfigurationData>(index.entry("vtm_file"));
 	vtmConfigData_->insert(*vtmControlModelConfig_.voiceData);
 
 	// Get the vocal tract model instance.
@@ -126,7 +123,7 @@ Controller::getParametersFromPhoneticString(const std::string& phoneticString)
 
 	if (vtmControlModelConfig_.phoStrFormat == PhoneticStringFormat::mbrola) {
 		if (!pho1Parser_) {
-			pho1Parser_ = std::make_unique<Pho1Parser>(configDirPath_.c_str(), model_, eventList_);
+			pho1Parser_ = std::make_unique<Pho1Parser>(index_, model_, eventList_);
 		}
 
 		eventList_.setMicroIntonation(true);
@@ -138,7 +135,7 @@ Controller::getParametersFromPhoneticString(const std::string& phoneticString)
 		eventList_.generateOutput(vtmParamList_);
 	} else {
 		if (!phoneticStringParser_) {
-			phoneticStringParser_ = std::make_unique<PhoneticStringParser>(configDirPath_.c_str(), model_, eventList_);
+			phoneticStringParser_ = std::make_unique<PhoneticStringParser>(index_, model_, eventList_);
 		}
 
 		std::size_t index = 0, size = 0;

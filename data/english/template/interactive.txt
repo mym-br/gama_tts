@@ -1,1 +1,0 @@
-../vtm5/interactive.config

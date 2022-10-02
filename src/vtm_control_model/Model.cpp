@@ -26,6 +26,7 @@
 #include <iostream>
 #include <utility> /* make_pair */
 
+#include "Index.h"
 #include "Log.h"
 #include "Text.h"
 #include "XMLConfigFileReader.h"
@@ -50,6 +51,31 @@ Model::clear()
 	transitionGroupList_.clear();
 	specialTransitionGroupList_.clear();
 	formulaSymbolList_.fill(0.0f);
+}
+
+/*******************************************************************************
+ *
+ */
+void
+Model::load(const Index& index)
+{
+	clear();
+
+	try {
+		std::string filePath = index.entry("artic_file");
+
+		// Load the configuration file.
+		LOG_DEBUG("Loading xml configuration: " << filePath);
+		XMLConfigFileReader cfg(*this, filePath);
+		cfg.loadModel();
+
+		if (Log::debugEnabled) {
+			printInfo();
+		}
+	} catch (...) {
+		clear();
+		throw;
+	}
 }
 
 /*******************************************************************************

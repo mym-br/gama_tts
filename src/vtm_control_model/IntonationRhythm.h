@@ -25,6 +25,9 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace VTMControlModel {
 
 class IntonationRhythm {
@@ -47,7 +50,7 @@ public:
 		NUM_INTONATION_PARAM
 	};
 
-	explicit IntonationRhythm(const char* configDirPath);
+	explicit IntonationRhythm(const Index& index);
 	~IntonationRhythm() = default;
 
 	void setUseFixedIntonationParameters(bool value) { useFixedIntonationParameters_ = value; }

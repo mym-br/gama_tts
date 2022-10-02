@@ -22,8 +22,8 @@
 
 #include "ConfigurationData.h"
 #include "Exception.h"
+#include "Index.h"
 
-#define CONFIG_SUB_DIR "/intonation_rhythm/"
 #define INTONATION_CONFIG_FILE "intonation.txt"
 #define RHYTHM_CONFIG_FILE "rhythm.txt"
 #define TONE_GROUP_PARAM_FILE_STATEMENT    "tone_group_param-statement.txt"
@@ -43,7 +43,7 @@ namespace VTMControlModel {
 /*******************************************************************************
  * Constructor.
  */
-IntonationRhythm::IntonationRhythm(const char* configDirPath)
+IntonationRhythm::IntonationRhythm(const Index& index)
 		: toneGroupParameters_(static_cast<int>(ToneGroup::numberOfGroups))
 		, fixedIntonationParameters_(NUM_INTONATION_PARAM, 0.0)
 		, randSrc_(randDev_())
@@ -51,8 +51,7 @@ IntonationRhythm::IntonationRhythm(const char* configDirPath)
 		, useFixedIntonationParameters_()
 		, randomIntonation_()
 {
-	std::string configDir{configDirPath};
-	configDir += CONFIG_SUB_DIR;
+	std::string configDir = index.entry("intonation_rhythm_dir");
 
 	loadToneGroupParameters(ToneGroup::statement   , configDir + TONE_GROUP_PARAM_FILE_STATEMENT);
 	loadToneGroupParameters(ToneGroup::exclamation , configDir + TONE_GROUP_PARAM_FILE_EXCLAMATION);

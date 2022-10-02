@@ -29,6 +29,7 @@
 namespace GS {
 
 class ConfigurationData;
+class Index;
 
 namespace VTMControlModel {
 
@@ -64,7 +65,7 @@ struct Configuration {
 
 	PhoneticStringFormat phoStrFormat;
 
-	explicit Configuration(const char* configDirPath);
+	explicit Configuration(const Index& index);
 	~Configuration();
 	Configuration(const Configuration&) = delete;
 	Configuration& operator=(const Configuration&) = delete;

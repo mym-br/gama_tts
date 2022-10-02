@@ -27,6 +27,9 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace VTMControlModel {
 
 class EventList;
@@ -53,7 +56,7 @@ struct Pho1Data {
 // It doesn't parse intonation in the format (NN,NN).
 class Pho1Parser {
 public:
-	Pho1Parser(const char* configDirPath, const Model& model, EventList& eventList);
+	Pho1Parser(const Index& index, const Model& model, EventList& eventList);
 	~Pho1Parser() = default;
 
 	void parse(const std::string& pho);

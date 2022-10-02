@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2015 Marcelo Y. Matuda                                       *
+ *  Copyright 2022 Marcelo Y. Matuda                                       *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,9 +15,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GLOBAL_H_
-#define GLOBAL_H_
+#include "Index.h"
 
-#define GAMA_TTS_VERSION "0.9"
 
-#endif /* GLOBAL_H_ */
+
+namespace GS {
+
+Index::Index(const std::string& configDirPath)
+		: configDirPath_(configDirPath.back() == '/' ? configDirPath : configDirPath + '/')
+		, data_(configDirPath_ + "_index.txt")
+{
+}
+
+std::string
+Index::entry(const std::string& key) const
+{
+	return configDirPath_ + data_.value<std::string>(key);
+}
+
+} // namespace GS

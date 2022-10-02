@@ -23,20 +23,18 @@
 #include "english/EnglishTextParser.h"
 #include "Exception.h"
 #include "ExternalTextParser.h"
+#include "Index.h"
 
 #define CONFIG_FILE_NAME "text_parser.txt"
-#define TEXT_PARSER_DIR "/text_parser/"
 
 
 
 namespace GS {
 namespace TextParser {
 
-TextParserConfiguration::TextParserConfiguration(const std::string& configDirPath)
+TextParserConfiguration::TextParserConfiguration(const Index& index)
 {
-	std::ostringstream configFilePath;
-	configFilePath << configDirPath << CONFIG_FILE_NAME;
-	ConfigurationData config(configFilePath.str());
+	ConfigurationData config(index.entry("text_parser_dir") + CONFIG_FILE_NAME);
 
 	language        = config.value<std::string>("language");
 	dictionary1File = config.value<std::string>("dictionary_1_file");
@@ -54,15 +52,14 @@ TextParserConfiguration::TextParserConfiguration(const std::string& configDirPat
 }
 
 std::unique_ptr<TextParser>
-TextParser::getInstance(const std::string& configDirPath, VTMControlModel::PhoneticStringFormat phoStrFormat)
+TextParser::getInstance(const Index& index, VTMControlModel::PhoneticStringFormat phoStrFormat)
 {
 	if (phoStrFormat == VTMControlModel::PhoneticStringFormat::mbrola) {
-		return std::make_unique<ExternalTextParser>(configDirPath);
+		return std::make_unique<ExternalTextParser>(index);
 	} else {
-		std::string textParserConfigDir = configDirPath + TEXT_PARSER_DIR;
-		TextParserConfiguration textParserConfig{textParserConfigDir};
+		TextParserConfiguration textParserConfig{index};
 		if (textParserConfig.language == "english") {
-			return std::make_unique<English::EnglishTextParser>(textParserConfigDir, textParserConfig);
+			return std::make_unique<English::EnglishTextParser>(index, textParserConfig);
 		} else {
 			THROW_EXCEPTION(InvalidValueException, "[TextParser] Invalid language: " << textParserConfig.language << '.');
 		}

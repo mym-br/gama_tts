@@ -31,13 +31,16 @@
 #include "TextParser.h"
 
 namespace GS {
+
+class Index;
+
 namespace TextParser {
 namespace English {
 
 class EnglishTextParser : public TextParser {
 public:
 	EnglishTextParser(
-		const std::string& textParserConfigDirPath,
+		const Index& index,
 		const TextParserConfiguration& config);
 	virtual ~EnglishTextParser() = default;
 

@@ -41,6 +41,9 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace VTMControlModel {
 
 class Model {
@@ -49,6 +52,7 @@ public:
 	~Model() = default;
 
 	void clear();
+	void load(const Index& index);
 	void load(const char* configDirPath, const char* configFileName);
 	void save(const char* configDirPath, const char* configFileName);
 	void clearFormulaSymbolList();

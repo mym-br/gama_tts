@@ -25,11 +25,14 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace TextParser {
 
 class ExternalTextParser : public TextParser {
 public:
-	ExternalTextParser(const std::string& configDirPath);
+	ExternalTextParser(const Index& index);
 	virtual ~ExternalTextParser() = default;
 
 	virtual std::string parse(const char* text);

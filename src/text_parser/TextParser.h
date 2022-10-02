@@ -26,6 +26,9 @@
 
 
 namespace GS {
+
+class Index;
+
 namespace TextParser {
 
 class TextParser {
@@ -42,7 +45,7 @@ public:
 	virtual std::string parse(const char* text) = 0;
 	virtual void setMode(Mode mode) = 0;
 
-	static std::unique_ptr<TextParser> getInstance(const std::string& configDirPath, VTMControlModel::PhoneticStringFormat phoStrFormat);
+	static std::unique_ptr<TextParser> getInstance(const Index& index, VTMControlModel::PhoneticStringFormat phoStrFormat);
 private:
 	TextParser(const TextParser&) = delete;
 	TextParser& operator=(const TextParser&) = delete;
@@ -57,7 +60,7 @@ struct TextParserConfiguration {
 	std::string dictionary3File;
 	TextParser::Mode mode;
 
-	explicit TextParserConfiguration(const std::string& configDirPath);
+	explicit TextParserConfiguration(const Index& index);
 };
 
 } /* namespace TextParser */

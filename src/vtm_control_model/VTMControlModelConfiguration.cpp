@@ -20,26 +20,23 @@
 
 #include "VTMControlModelConfiguration.h"
 
-#include <sstream>
-
 #include "ConfigurationData.h"
 #include "Exception.h"
+#include "Index.h"
 
-#define CONFIG_FILE_NAME "/vtm_control_model.txt"
-#define VOICE_FILE_PREFIX "/voice_"
+
 
 namespace GS {
 namespace VTMControlModel {
 
-Configuration::Configuration(const char* configDirPath)
+Configuration::Configuration(const Index& index)
 {
-	std::ostringstream configFilePath;
-	configFilePath << configDirPath << CONFIG_FILE_NAME;
-	ConfigurationData config(configFilePath.str());
+	const std::string configFilePath = index.entry("vtm_control_model_file");
+	ConfigurationData config(configFilePath);
 
 	controlPeriod      = config.value<unsigned int>("control_period");
 	if (controlPeriod == 0 || controlPeriod > 4U) {
-		THROW_EXCEPTION(InvalidValueException, "Invalid control period in file " << configFilePath.str() << '.');
+		THROW_EXCEPTION(InvalidValueException, "Invalid control period in file " << configFilePath << '.');
 	}
 	controlRate        = 1000.0 / controlPeriod;
 	tempo              = config.value<double>("tempo");
@@ -62,9 +59,8 @@ Configuration::Configuration(const char* configDirPath)
 	randomIntonation = (config.value<int>("random_intonation") != 0);
 
 	// Load voice data.
-	std::ostringstream voiceFilePath;
-	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << voiceName << ".txt";
-	voiceData = std::make_unique<ConfigurationData>(voiceFilePath.str());
+	std::string voiceDirPath = index.entry("voice_dir");
+	voiceData = std::make_unique<ConfigurationData>(voiceDirPath + voiceName + ".txt");
 	intonationFactor = voiceData->value<double>("intonation_factor");
 
 	std::string pho = config.value<std::string>("phonetic_string_format");

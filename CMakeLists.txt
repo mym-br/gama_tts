@@ -25,6 +25,8 @@ set(LIBRARY_FILES
     src/Dictionary.h
     src/Exception.h
     src/global.h
+    src/Index.cpp
+    src/Index.h
     src/Log.cpp
     src/Log.h
     src/ParameterLogger.h

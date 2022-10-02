@@ -56,6 +56,7 @@
 #include "english/EnglishText.h"
 #include "english/LetterToSound.h"
 #include "Exception.h"
+#include "Index.h"
 #include "Log.h"
 
 
@@ -1098,30 +1099,31 @@ namespace TextParser {
 namespace English {
 
 EnglishTextParser::EnglishTextParser(
-			const std::string& textParserConfigDirPath,
+			const Index& index,
 			const TextParserConfiguration& config)
 		: mode_(config.mode)
 {
+	const std::string dir = index.entry("text_parser_dir");
 	std::ostringstream suffixFilePathStream;
-	suffixFilePathStream << textParserConfigDirPath << SUFFIX_LIST_FILE;
+	suffixFilePathStream << dir << SUFFIX_LIST_FILE;
 	std::string suffixFilePath = suffixFilePathStream.str();
 
 	if (config.dictionary1File != "none") {
 		dict1_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
-		filePath << textParserConfigDirPath << config.dictionary1File;
+		filePath << dir << config.dictionary1File;
 		dict1_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 	if (config.dictionary2File != "none") {
 		dict2_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
-		filePath << textParserConfigDirPath << config.dictionary2File;
+		filePath << dir << config.dictionary2File;
 		dict2_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 	if (config.dictionary3File != "none") {
 		dict3_ = std::make_unique<DictionarySearch>();
 		std::ostringstream filePath;
-		filePath << textParserConfigDirPath << config.dictionary3File;
+		filePath << dir << config.dictionary3File;
 		dict3_->load(filePath.str().c_str(), suffixFilePath.c_str());
 	}
 
@@ -1133,15 +1135,15 @@ EnglishTextParser::EnglishTextParser(
 	dictionaryOrder_[5] = TTS_EMPTY;
 
 	std::ostringstream abbrevFilePath;
-	abbrevFilePath << textParserConfigDirPath << ABBREVIATIONS_FILE;
+	abbrevFilePath << dir << ABBREVIATIONS_FILE;
 	abbrevMap_.load(abbrevFilePath.str().c_str());
 
 	std::ostringstream abbrevWithNumberFilePath;
-	abbrevWithNumberFilePath << textParserConfigDirPath << ABBREVIATIONS_WITH_NUMBER_FILE;
+	abbrevWithNumberFilePath << dir << ABBREVIATIONS_WITH_NUMBER_FILE;
 	abbrevWithNumberMap_.load(abbrevWithNumberFilePath.str().c_str());
 
 	std::ostringstream specialAcronymsFilePath;
-	specialAcronymsFilePath << textParserConfigDirPath << SPECIAL_ACRONYMS_FILE;
+	specialAcronymsFilePath << dir << SPECIAL_ACRONYMS_FILE;
 	specialAcronymsMap_.load(specialAcronymsFilePath.str().c_str());
 }
 

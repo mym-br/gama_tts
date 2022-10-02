@@ -23,11 +23,11 @@
 
 #include <cctype> /* isdigit, isspace */
 #include <fstream>
-#include <sstream>
 
 #include "Category.h"
 #include "EventList.h"
 #include "Exception.h"
+#include "Index.h"
 #include "IntonationRhythm.h"
 #include "Log.h"
 #include "Model.h"
@@ -35,7 +35,6 @@
 
 
 
-#define CONFIG_DIR "/phonetic_string_parser/"
 #define REWRITE_CONFIG_FILE_NAME "rewrite.txt"
 #define MIN_TEMPO (0.01)
 #define MAX_TEMPO (100.0)
@@ -65,13 +64,11 @@ throwException(const std::string& filePath, int lineNumber, const char* message,
 namespace GS {
 namespace VTMControlModel {
 
-PhoneticStringParser::PhoneticStringParser(const char* configDirPath, const Model& model, EventList& eventList)
+PhoneticStringParser::PhoneticStringParser(const Index& index, const Model& model, EventList& eventList)
 		: model_(model)
 		, eventList_(eventList)
 {
-	std::ostringstream rewriteFilePath;
-	rewriteFilePath << configDirPath << CONFIG_DIR REWRITE_CONFIG_FILE_NAME;
-	loadRewriterConfiguration(rewriteFilePath.str());
+	loadRewriterConfiguration(index.entry("phonetic_string_parser_dir") + REWRITE_CONFIG_FILE_NAME);
 }
 
 std::shared_ptr<Category>

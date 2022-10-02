@@ -1,0 +1,11 @@
+intonation_rhythm_dir = ../vtm0/intonation_rhythm/
+pho1_parser_dir = ../vtm0/pho1_parser/
+phonetic_string_parser_dir = ../vtm0/phonetic_string_parser/
+text_parser_dir = ../vtm0/text_parser/
+voice_dir = voice/
+
+artic_file = artic.xml
+interactive_file = interactive.txt
+jack_file = ../vtm0/jack.txt
+vtm_control_model_file = vtm_control_model.txt
+vtm_file = vtm.txt

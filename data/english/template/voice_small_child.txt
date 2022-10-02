@@ -1,1 +1,0 @@
-../vtm5/voice_small_child.config

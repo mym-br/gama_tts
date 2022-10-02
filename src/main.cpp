@@ -26,6 +26,7 @@
 #include "Controller.h"
 #include "Exception.h"
 #include "global.h"
+#include "Index.h"
 #include "Log.h"
 #include "Model.h"
 #include "TextParser.h"
@@ -169,12 +170,14 @@ tts(int argc, char* argv[])
 	}
 
 	try {
-		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
-		vtmControlModel->load(dataDir, VTM_CONTROL_MODEL_CONFIG_FILE);
+		const GS::Index index{dataDir};
 
-		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(dataDir, *vtmControlModel);
+		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
+		vtmControlModel->load(index);
+
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(index, *vtmControlModel);
 		auto textParser = GS::TextParser::TextParser::getInstance(
-								dataDir,
+								index,
 								vtmController->vtmControlModelConfiguration().phoStrFormat);
 		std::string phoneticString = textParser->parse(text.c_str());
 		vtmController->synthesizePhoneticStringToFile(phoneticString, vtmParamFile, outputFile);
@@ -259,10 +262,12 @@ pho(int argc, char* argv[])
 	}
 
 	try {
-		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
-		vtmControlModel->load(dataDir, VTM_CONTROL_MODEL_CONFIG_FILE);
+		const GS::Index index{dataDir};
 
-		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(dataDir, *vtmControlModel);
+		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
+		vtmControlModel->load(index);
+
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(index, *vtmControlModel);
 		vtmController->synthesizePhoneticStringToFile(phoneticString, vtmParamFile, outputFile);
 
 	} catch (std::exception& e) {
@@ -312,10 +317,12 @@ vtm(int argc, char* argv[])
 	}
 
 	try {
-		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
-		vtmControlModel->load(dataDir, VTM_CONTROL_MODEL_CONFIG_FILE);
+		const GS::Index index{dataDir};
 
-		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(dataDir, *vtmControlModel);
+		auto vtmControlModel = std::make_unique<GS::VTMControlModel::Model>();
+		vtmControlModel->load(index);
+
+		auto vtmController = std::make_unique<GS::VTMControlModel::Controller>(index, *vtmControlModel);
 		vtmController->synthesizeToFile(paramInputStream, outputFile);
 
 	} catch (std::exception& e) {

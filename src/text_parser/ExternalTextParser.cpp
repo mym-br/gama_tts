@@ -23,24 +23,23 @@
 
 #include "ConfigurationData.h"
 #include "Exception.h"
+#include "Index.h"
 
 #define CONFIG_FILE_NAME "external_text_parser.txt"
-#define TEXT_PARSER_DIR "/text_parser/"
 
 
 
 namespace GS {
 namespace TextParser {
 
-ExternalTextParser::ExternalTextParser(const std::string& configDirPath)
+ExternalTextParser::ExternalTextParser(const Index& index)
 {
-	std::ostringstream configFilePath;
-	configFilePath << configDirPath << TEXT_PARSER_DIR << CONFIG_FILE_NAME;
-	ConfigurationData config(configFilePath.str());
+	const std::string dir = index.entry("text_parser_dir");
+	ConfigurationData config(dir + CONFIG_FILE_NAME);
 
-	inputFilePath_  = configDirPath + '/' + config.value<std::string>("input_file");
-	outputFilePath_ = configDirPath + '/' + config.value<std::string>("output_file");
-	command_        = configDirPath + '/' + config.value<std::string>("command");
+	inputFilePath_  = dir + config.value<std::string>("input_file");
+	outputFilePath_ = dir + config.value<std::string>("output_file");
+	command_        = dir + config.value<std::string>("command");
 }
 
 std::string
