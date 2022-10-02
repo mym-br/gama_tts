@@ -24,8 +24,8 @@
 #include "Exception.h"
 
 #define CONFIG_SUB_DIR "/intonation_rhythm/"
-#define INTONATION_CONFIG_FILE "intonation.config"
-#define RHYTHM_CONFIG_FILE "rhythm.config"
+#define INTONATION_CONFIG_FILE "intonation.txt"
+#define RHYTHM_CONFIG_FILE "rhythm.txt"
 #define TONE_GROUP_PARAM_FILE_STATEMENT    "tone_group_param-statement.txt"
 #define TONE_GROUP_PARAM_FILE_EXCLAMATION  "tone_group_param-exclamation.txt"
 #define TONE_GROUP_PARAM_FILE_QUESTION     "tone_group_param-question.txt"

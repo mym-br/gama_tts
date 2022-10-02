@@ -31,7 +31,7 @@
 #include "VTMUtil.h"
 #include "WAVEFileWriter.h"
 
-#define VTM_CONFIG_FILE_NAME "/vtm.config"
+#define VTM_CONFIG_FILE_NAME "/vtm.txt"
 
 
 

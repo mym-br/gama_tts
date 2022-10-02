@@ -25,7 +25,7 @@
 #include "ConfigurationData.h"
 #include "Exception.h"
 
-#define CONFIG_FILE_NAME "/vtm_control_model.config"
+#define CONFIG_FILE_NAME "/vtm_control_model.txt"
 #define VOICE_FILE_PREFIX "/voice_"
 
 namespace GS {
@@ -63,7 +63,7 @@ Configuration::Configuration(const char* configDirPath)
 
 	// Load voice data.
 	std::ostringstream voiceFilePath;
-	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << voiceName << ".config";
+	voiceFilePath << configDirPath << VOICE_FILE_PREFIX << voiceName << ".txt";
 	voiceData = std::make_unique<ConfigurationData>(voiceFilePath.str());
 	intonationFactor = voiceData->value<double>("intonation_factor");
 

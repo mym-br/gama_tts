@@ -24,7 +24,7 @@
 #include "ConfigurationData.h"
 #include "Exception.h"
 
-#define CONFIG_FILE_NAME "external_text_parser.config"
+#define CONFIG_FILE_NAME "external_text_parser.txt"
 #define TEXT_PARSER_DIR "/text_parser/"
 
 

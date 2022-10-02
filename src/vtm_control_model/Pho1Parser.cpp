@@ -32,7 +32,7 @@
 #define COMMENT_CHAR ';'
 #define PHONEME_SEPARATOR '_'
 #define CONFIG_SUBDIR "/pho1_parser/"
-#define CONFIG_FILE "pho1.config"
+#define CONFIG_FILE "pho1.txt"
 
 
 
