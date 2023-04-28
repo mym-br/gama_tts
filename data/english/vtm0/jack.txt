@@ -4,4 +4,5 @@ client_name_param_modif = gama_tts_param_modif
 client_name_interactive = gama_tts_interactive
 
 #destination_port_name_regexp = jconvolver:in.*
+#destination_port_name_regexp = Easy Effects Sink:playback_.*
 destination_port_name_regexp = system:playback.*
