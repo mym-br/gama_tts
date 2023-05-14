@@ -1,10 +1,6 @@
 # Configuration file for the interactive VTM.
 
-voice_name = male
-#voice_name = female
-#voice_name = large_child
-#voice_name = small_child
-#voice_name = baby
+variant_name = male
 
 #===============================================================================
 # Dynamic parameters - default: "a".

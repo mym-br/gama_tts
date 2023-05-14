@@ -1,6 +1,6 @@
 # Configuration file for the interactive VTM.
 
-variant_name = male
+variant_name = small_child
 
 #===============================================================================
 # Dynamic parameters - default: "a".
