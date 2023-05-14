@@ -22,13 +22,15 @@
 
 #include "ConfigurationData.h"
 
+#define VOICE_INDEX_FILE_NAME "_index.txt"
+
 
 
 namespace GS {
 
 class Index {
 public:
-	Index(const std::string& configDirPath);
+	explicit Index(const std::string& configDirPath);
 
 	std::string entry(const std::string& key) const;
 private:

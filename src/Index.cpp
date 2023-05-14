@@ -23,7 +23,7 @@ namespace GS {
 
 Index::Index(const std::string& configDirPath)
 		: configDirPath_(configDirPath.back() == '/' ? configDirPath : configDirPath + '/')
-		, data_(configDirPath_ + "_index.txt")
+		, data_(configDirPath_ + VOICE_INDEX_FILE_NAME)
 {
 }
 

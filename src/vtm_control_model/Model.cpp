@@ -82,13 +82,11 @@ Model::load(const Index& index)
  *
  */
 void
-Model::load(const char* configDirPath, const char* configFileName)
+Model::load(const std::string& filePath)
 {
 	clear();
 
 	try {
-		std::string filePath = std::string(configDirPath) + configFileName;
-
 		// Load the configuration file.
 		LOG_DEBUG("Loading xml configuration: " << filePath);
 		XMLConfigFileReader cfg(*this, filePath);
@@ -107,10 +105,8 @@ Model::load(const char* configDirPath, const char* configFileName)
  *
  */
 void
-Model::save(const char* configDirPath, const char* configFileName)
+Model::save(const std::string& filePath)
 {
-	std::string filePath = std::string(configDirPath) + configFileName;
-
 	// Save the configuration file.
 	LOG_DEBUG("Saving xml configuration: " << filePath);
 	XMLConfigFileWriter cfg(*this, filePath);

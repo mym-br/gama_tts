@@ -53,8 +53,8 @@ public:
 
 	void clear();
 	void load(const Index& index);
-	void load(const char* configDirPath, const char* configFileName);
-	void save(const char* configDirPath, const char* configFileName);
+	void load(const std::string& filePath);
+	void save(const std::string& filePath);
 	void clearFormulaSymbolList();
 	void setFormulaSymbolValue(FormulaSymbol::Code symbol, float value);
 	float getFormulaSymbolValue(FormulaSymbol::Code symbol) const;
