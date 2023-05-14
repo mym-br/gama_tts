@@ -34,14 +34,6 @@ OS support
 
 Linux+GNU (the software may work on other operating systems).
 
-External code
--------------
-
-This software includes code from [RapidXml][], provided by Marcin Kalicinski.
-See the file src/rapidxml/license.txt for details.
-
-[RapidXml]: http://rapidxml.sourceforge.net/
-
 License
 -------
 
@@ -54,3 +46,11 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 COPYING file for more details.
+
+External code
+-------------
+
+This software includes code from [RapidXml][], provided by Marcin Kalicinski.
+See the file src/rapidxml/license.txt for details.
+
+[RapidXml]: http://rapidxml.sourceforge.net/
