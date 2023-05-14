@@ -30,6 +30,7 @@
 
   - Execute in the directory "gama_tts-build":
 
-    echo "Hello world." | ./gama_tts tts ../gama_tts/data/english/vtm5 test.wav
+    echo "Hello world." | ./gama_tts tts \
+      ../gama_tts/data/voice/english/5_male test.wav
 
   - Play the file test.wav.
