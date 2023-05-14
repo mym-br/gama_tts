@@ -46,7 +46,7 @@ Controller::Controller(const Index& index, Model& model)
 {
 	// Load VTM configuration.
 	vtmConfigData_ = std::make_unique<ConfigurationData>(index.entry("vtm_file"));
-	vtmConfigData_->insert(*vtmControlModelConfig_.voiceData);
+	vtmConfigData_->insert(*vtmControlModelConfig_.variantData);
 
 	// Get the vocal tract model instance.
 	vtm_ = VTM::VocalTractModel::getInstance(*vtmConfigData_);
@@ -62,9 +62,9 @@ Controller::initUtterance()
 	const float vocalTractLength = vtmConfigData_->value<float>("vocal_tract_length");
 
 	if (Log::debugEnabled) {
-		printf("Tube Length = %f\n", vtlOffset + vocalTractLength);
-		printf("Voice: %s\n", vtmControlModelConfig_.voiceName.c_str());
-		printf("sampling Rate: %d\n", outputRate);
+		printf("tube length: %f\n", vtlOffset + vocalTractLength);
+		printf("variant: %s\n", vtmControlModelConfig_.variantName.c_str());
+		printf("sampling rate: %d\n", outputRate);
 	}
 
 	eventList_.setInitialPitch(vtmControlModelConfig_.initialPitch);

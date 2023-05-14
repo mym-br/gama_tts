@@ -4,11 +4,7 @@
 control_period = 4
 
 #
-voice_name = male
-#voice_name = female
-#voice_name = large_child
-#voice_name = small_child
-#voice_name = baby
+variant_name = large_child
 
 #
 tempo = 1.0

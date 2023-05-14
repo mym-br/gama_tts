@@ -2,7 +2,7 @@ intonation_rhythm_dir = intonation_rhythm/
 pho1_parser_dir = pho1_parser/
 phonetic_string_parser_dir = phonetic_string_parser/
 text_parser_dir = text_parser/
-voice_dir = voice/
+variant_dir = variant/
 
 artic_file = artic.xml
 interactive_file = interactive.txt

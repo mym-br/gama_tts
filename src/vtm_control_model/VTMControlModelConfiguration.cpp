@@ -44,7 +44,7 @@ Configuration::Configuration(const Index& index)
 	pitchOffset        = config.value<double>("pitch_offset");
 	driftDeviation     = config.value<double>("drift_deviation");
 	driftLowpassCutoff = config.value<double>("drift_lowpass_cutoff");
-	voiceName          = config.value<std::string>("voice_name");
+	variantName        = config.value<std::string>("variant_name");
 
 	notionalPitch             = config.value<double>("notional_pitch");
 	pretonicPitchRange        = config.value<double>("pretonic_pitch_range");
@@ -58,10 +58,10 @@ Configuration::Configuration(const Index& index)
 	intonationDrift  = (config.value<int>("intonation_drift" ) != 0);
 	randomIntonation = (config.value<int>("random_intonation") != 0);
 
-	// Load voice data.
-	std::string voiceDirPath = index.entry("voice_dir");
-	voiceData = std::make_unique<ConfigurationData>(voiceDirPath + voiceName + ".txt");
-	intonationFactor = voiceData->value<double>("intonation_factor");
+	// Load variant data.
+	std::string variantDirPath = index.entry("variant_dir");
+	variantData = std::make_unique<ConfigurationData>(variantDirPath + variantName + ".txt");
+	intonationFactor = variantData->value<double>("intonation_factor");
 
 	std::string pho = config.value<std::string>("phonetic_string_format");
 	if (pho == "gnuspeech") {

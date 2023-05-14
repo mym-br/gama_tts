@@ -46,7 +46,7 @@ struct Configuration {
 	double pitchOffset;
 	double driftDeviation;
 	double driftLowpassCutoff;
-	std::string voiceName;
+	std::string variantName;
 
 	// Intonation parameters.
 	double notionalPitch;
@@ -61,7 +61,7 @@ struct Configuration {
 	bool intonationDrift;
 	bool randomIntonation;
 
-	std::unique_ptr<ConfigurationData> voiceData;
+	std::unique_ptr<ConfigurationData> variantData;
 
 	PhoneticStringFormat phoStrFormat;
 
