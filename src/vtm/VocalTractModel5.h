@@ -348,6 +348,9 @@ private:
 	std::unique_ptr<Butterworth1LowPassFilter<TFloat>>  glottalFilter_;
 	DifferenceFilter<float>                             outputDiffFilter_;
 	ParameterLogger<TFloat>                             paramLogger_;
+
+	bool constantRadiusMouthImpedance_;
+	TFloat mouthImpedanceRadius_;
 };
 
 
@@ -356,6 +359,8 @@ template<typename TFloat, unsigned int SectionDelay>
 VocalTractModel5<TFloat, SectionDelay>::VocalTractModel5(const ConfigurationData& data, bool interactive)
 		: interactive_(interactive)
 		, logParameters_()
+		, constantRadiusMouthImpedance_()
+		, mouthImpedanceRadius_()
 {
 	loadConfiguration(data);
 	VocalTractModel5::reset();
@@ -404,6 +409,11 @@ VocalTractModel5<TFloat, SectionDelay>::loadConfiguration(const ConfigurationDat
 	config_.bypass               = data.value<int>("bypass");
 
 	logParameters_ = interactive_ ? false : data.value<bool>("log_parameters");
+
+	constantRadiusMouthImpedance_ = data.value<bool>("constant_radius_mouth_impedance");
+	if (constantRadiusMouthImpedance_) {
+		mouthImpedanceRadius_ = data.value<TFloat>("mouth_impedance_radius");
+	}
 }
 
 template<typename TFloat, unsigned int SectionDelay>
@@ -471,6 +481,10 @@ VocalTractModel5<TFloat, SectionDelay>::initializeSynthesizer()
 
 	/*  INITIALIZE RADIATION IMPEDANCE FOR MOUTH  */
 	mouthRadiationImpedance_ = std::make_unique<PoleZeroRadiationImpedance<TFloat>>(sampleRate_);
+
+	if (constantRadiusMouthImpedance_) {
+		mouthRadiationImpedance_->update(mouthImpedanceRadius_ * 1.0e-2f /* cm --> m */);
+	}
 
 	/*  INITIALIZE RADIATION IMPEDANCE FOR NOSE  */
 	nasalRadiationImpedance_ = std::make_unique<PoleZeroRadiationImpedance<TFloat>>(sampleRate_);
@@ -604,7 +618,9 @@ VocalTractModel5<TFloat, SectionDelay>::calculateTubeCoefficients()
 		oropharynxJunction_[i].configure(currentParameter_[j], currentParameter_[j + 1]);
 	}
 
-	mouthRadiationImpedance_->update(currentParameter_[PARAM_R8] * 1.0e-2f /* cm --> m */);
+	if (!constantRadiusMouthImpedance_) {
+		mouthRadiationImpedance_->update(currentParameter_[PARAM_R8] * 1.0e-2f /* cm --> m */);
+	}
 
 	// Configure 3-way junction.
 	// Note: Since junction is in middle of region 4, leftRadius = rightRadius.

@@ -59,3 +59,7 @@ max_glottal_loss = 2.0
 glottal_lowpass_cutoff = 3000.0
 
 intonation_factor = 0.5
+
+constant_radius_mouth_impedance = false
+# cm (only used if constant_radius_mouth_impedance = true)
+mouth_impedance_radius = 0.86
