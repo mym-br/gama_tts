@@ -1,0 +1,44 @@
+
+- Requirements:
+
+  - CMake (tested with version 3.18.4).
+
+  - A C++ compiler with C++17 support.
+    The following compiler has been tested:
+    - GCC 10.2 (Linux+GNU x86_64).
+
+  - Qt 5 (tested with version 5.15).
+
+  - JACK Audio Connection Kit (tested with version 1.9.17) + QjackCtl.
+
+  - FFTW - single precision (tested with version 3.3.8).
+
+  - GamaTTS (use the latest version).
+    The source files must be in ../gama_tts and the build directory
+    must be ../gama_tts-build.
+
+  - The current directory must be named "gama_tts_editor".
+
+- Build (Linux+GNU):
+
+  mkdir ../gama_tts_editor-build
+  cd ../gama_tts_editor-build
+  cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts_editor
+  cmake --build .
+
+- Test (Linux+GNU):
+
+  - Start the JACK server using QjackCtl (this step is not needed when using
+    Pipewire).
+    Note: The sampling rate in JACK must be equal to the value of the parameter
+          "output_rate" in the file vtm.txt located in
+          ../gama_tts/data/voice/english/*/.
+
+  - Execute in the directory "gama_tts_editor-build":
+
+    ./gama_tts_editor &
+
+  - Go to File/Open and select the directory
+    ../gama_tts/data/voice/english/5_male.
+
+  - Open the synthesis window, enter some english text and click on "Parse".
