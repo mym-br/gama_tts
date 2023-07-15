@@ -1,17 +1,21 @@
 
 - Requirements:
 
-  - CMake (tested with version 3.18.4).
+  - CMake (tested with version 3.25.1).
 
   - A C++ compiler with C++17 support.
     The following compiler has been tested:
-    - GCC 10.2 (Linux+GNU x86_64).
+    - GCC 12.2 (Linux+GNU x86_64).
 
-  - Qt 5 (tested with version 5.15).
+  - Qt 5 (tested with version 5.15)
+    or
+    Qt 6 (tested with version 6.4).
 
-  - JACK Audio Connection Kit (tested with version 1.9.17) + QjackCtl.
+  - JACK Audio Connection Kit + QjackCtl
+    or
+    Pipewire (with optional qpwgraph).
 
-  - FFTW - single precision (tested with version 3.3.8).
+  - FFTW - single precision (tested with version 3.3.10).
 
   - Follow ../gama_tts/INSTALL.txt.
 

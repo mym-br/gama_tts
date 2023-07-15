@@ -1,14 +1,12 @@
 
 - Requirements:
 
-  - CMake.
+  - CMake (tested with version 3.25.1).
 
   - A C++ compiler with C++17 support.
     The following compilers have been tested:
-    - GCC 10.2      (Linux+GNU x86_64).
-    - LLVM/Clang 11 (Linux+GNU x86_64).
-
-  - The current directory must be named "gama_tts".
+    - GCC 12.2      (Linux+GNU x86_64).
+    - LLVM/Clang 14 (Linux+GNU x86_64).
 
 - Build:
 
