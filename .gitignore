@@ -2,3 +2,4 @@
 *__NOP
 generated__*
 __pycache__
+/build-*
