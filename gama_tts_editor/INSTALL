@@ -13,16 +13,12 @@
 
   - FFTW - single precision (tested with version 3.3.8).
 
-  - GamaTTS (use the latest version).
-    The source files must be in ../gama_tts and the build directory
-    must be ../gama_tts-build.
-
-  - The current directory must be named "gama_tts_editor".
+  - Follow ../gama_tts/INSTALL.txt.
 
 - Build (Linux+GNU):
 
-  mkdir ../gama_tts_editor-build
-  cd ../gama_tts_editor-build
+  mkdir ../build-gama_tts_editor
+  cd ../build-gama_tts_editor
   cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts_editor
   cmake --build .
 
@@ -34,11 +30,11 @@
           "output_rate" in the file vtm.txt located in
           ../gama_tts/data/voice/english/*/.
 
-  - Execute in the directory "gama_tts_editor-build":
+  - Execute in the directory "build-gama_tts_editor":
 
     ./gama_tts_editor &
 
   - Go to File/Open and select the directory
-    ../gama_tts/data/voice/english/5_male.
+    ../data/voice/english/5_male.
 
   - Open the synthesis window, enter some english text and click on "Parse".

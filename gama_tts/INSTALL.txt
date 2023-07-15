@@ -14,23 +14,22 @@
 
   - Linux+GNU - GCC:
 
-    mkdir ../gama_tts-build
-    cd ../gama_tts-build
+    mkdir ../build-gama_tts
+    cd ../build-gama_tts
     cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
     cmake --build .
 
   - Linux+GNU - Clang:
 
-    mkdir ../gama_tts-build
-    cd ../gama_tts-build
+    mkdir ../build-gama_tts
+    cd ../build-gama_tts
     CXX=clang++ cmake -D CMAKE_BUILD_TYPE=Release ../gama_tts
     cmake --build .
 
 - Test (Linux+GNU):
 
-  - Execute in the directory "gama_tts-build":
+  - Execute in the directory "build-gama_tts":
 
-    echo "Hello world." | ./gama_tts tts \
-      ../gama_tts/data/voice/english/5_male test.wav
+    echo "Hello world." | ./gama_tts tts ../data/voice/english/5_male test.wav
 
   - Play the file test.wav.

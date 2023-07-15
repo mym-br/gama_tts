@@ -147,8 +147,8 @@ target_link_libraries(gama_tts_editor
     PkgConfig::FFTW3F
     PkgConfig::JACK
 
-    debug     ${CMAKE_SOURCE_DIR}/../gama_tts-build-debug/libgamatts.a
-    optimized ${CMAKE_SOURCE_DIR}/../gama_tts-build/libgamatts.a
+    debug     ${CMAKE_SOURCE_DIR}/../build-gama_tts-debug/libgamatts.a
+    optimized ${CMAKE_SOURCE_DIR}/../build-gama_tts/libgamatts.a
 )
 
 if(UNIX AND NOT APPLE)
