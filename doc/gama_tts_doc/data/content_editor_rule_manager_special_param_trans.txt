@@ -1,0 +1,11 @@
+<h1 id="rule_manager_special_param_trans">Rule manager - special parameter transitions</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-rule_manager-special_parameter_transitions.png"
+	alt="Screenshot of the rule manager - special parameter transitions"></p>
+
+<p>Operations:</p>
+<ul>
+<li>Select a Special Transition for a parameter:<br>Select the parameter and select the Special Transition
+ on the Special Transitions tree.</li>
+ <li>Clear a parameter:<br>Select the parameter and click on "Clear". Special Transitions are optional.</li>
+</ul>

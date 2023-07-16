@@ -1,0 +1,18 @@
+<h1 id="rule_tester">Rule tester</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-rule_tester.png"
+	alt="Screenshot of the rule tester"></p>
+
+<p>With this window the user can find out what Rule is selected for a given Posture sequence.
+</p>
+
+<p>Marked Postures can be indicated by an apostrophe at the end of the Posture name.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Shift the Postures:<br>Click on "Shift postures left" and the Posture 2 will be moved to Posture 1,
+ the Posture 3 will be moved to Posture 2 and so on.</li>
+<li>Search for the first matching Rule:<br>Fill the Posture fields and click on "Test".
+ Information about the Rule will appear on the window.</li>
+</ul>

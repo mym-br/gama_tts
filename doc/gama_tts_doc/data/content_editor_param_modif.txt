@@ -1,0 +1,51 @@
+<h1 id="param_modif">Real-time parameter modification</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-parameter_modification.png"
+	alt="Screenshot of the parameter modification window"></p>
+
+<p>In this window the vocal tract parameters can be modified in real time.
+</p>
+
+<p>The parameter that will be modified can be selected in the combo box at the
+top.
+</p>
+
+<p>The modification can be set to "Add" or "Multiply".
+When set to "Add", the modification value will be added to the parameter value.
+When set to "Multiply", the parameter value will be multiplied by the
+modification value.
+</p>
+
+<p>If the amplitude field is set to a value V, and the modification is set to
+"Add", the modification will have a value between -V and V.
+When the modification is set to "Multiply", the amplitude is always 1.0 and
+the modification will have a value between 0.0 and 2.0 (the center in the
+input area have a value of 1.0).
+</p>
+
+<p>Automatic gain normalization is not executed.
+For this reason, an attenuation can be set in the output gain combo box
+(to avoid saturation).
+</p>
+
+<p>In the input area, only the horizontal (x) position of the mouse cursor is
+captured.
+</p>
+
+<p>In the parameter curve graph, the original parameter curve is shown in black,
+and the modified curve is shown in blue.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Modify a parameter:<br>Click on the input area, near the central line, and
+  the synthesis will start. Move the mouse to the left or to the right, and
+  hear the sound of the modified speech in real time.
+  The synthesis will stop at the end of the parameter data.</li>
+<li>Reset a parameter:<br>Click on the button "Reset parameter".</li>
+<li>Synthesize to audio:<br>Click on "Synthesize" and the sound will be sent to JACK audio, using the modified parameters.</li>
+<li>Synthesize to file:<br>Click on "Synthesize to file" and the sound will be sent to a WAVE file, using the modified parameters.
+  If the option "Save VTM parameters to file" is set, the modified parameters will be saved to a file.</li>
+</ul>
+
+<p><a href="https://www.youtube.com/watch?v=e3foh2qwyYU" target="_blank" rel="noopener noreferrer">Demonstration video</a>.</p>

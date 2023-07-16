@@ -1,0 +1,9 @@
+<h1 id="notes">Notes</h1>
+
+<ul>
+<li>The times are defined in milliseconds.</li>
+<li>In Postures, the Symbols "duration" and "markedDuration" are not being used.</li>
+<li>The database must contain the Category "phone", and the Postures "#" and "^".</li>
+<li>The number of Symbols and their names must not be changed.</li>
+<li>The first vocal tract model parameter must be the pitch.</li>
+</ul>

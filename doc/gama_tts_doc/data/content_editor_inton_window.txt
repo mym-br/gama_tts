@@ -1,0 +1,38 @@
+<h1 id="inton_window">Intonation window</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-intonation_window.png"
+	alt="Screenshot of the intonation window"></p>
+
+<p>This window shows the generated macro intonation, and allows the customization of the curve.
+The curve is shown only after a text is synthesized in the Synthesis window.
+</p>
+
+<p>The graph shows the pitch before it is added to
+<code>(vtm_control_model.txt:pitch_offset + voice/*.txt:reference_glottal_pitch).</code>
+</p>
+
+<p>At the top of the graph, the Rule numbers are shown, and below them the Rule duration in milliseconds.
+</p>
+
+<p>The fields "Beat" and "Absolute time" are read-only. The absolute time is the sum of the beat and
+beat offset values.
+</p>
+
+<p>The beat positions are indicated by vertical black lines.
+</p>
+
+<p>The graph shows the cubic interpolation curve and also the linear interpolation one.
+The first segment uses always linear interpolation, even with smooth intonation enabled.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Select an intonation point:<br>Click on the graph near the target point.</li>
+<li>Move point to the previous/next Rule:<br>Press <kbd>LEFT</kbd>/<kbd>RIGHT</kbd>.</li>
+<li>Increase/decrease point value by 1 semitone:<br>Press <kbd>UP</kbd>/<kbd>DOWN</kbd>.</li>
+<li>Change the point value:<br>Enter the value and press <kbd>ENTER</kbd>.</li>
+<li>Change the point slope:<br>Enter the slope and press <kbd>ENTER</kbd>.</li>
+<li>Change the beat offset:<br>Enter the beat offset and press <kbd>ENTER</kbd>.</li>
+<li>Synthesize to audio:<br>Click on "Synthesize" and the sound will be sent to JACK audio.</li>
+<li>Synthesize to file:<br>Click on "Synthesize to file" and the sound will be sent to a WAVE file.</li>
+</ul>

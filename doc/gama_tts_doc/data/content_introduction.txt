@@ -1,0 +1,100 @@
+<h1>Introduction</h1>
+
+<h2>About</h2>
+
+<p>GamaTTS is an <strong>experimental</strong> articulatory speech synthesizer,
+started as a C++ port of <a href="https://www.gnu.org/software/gnuspeech/">Gnuspeech</a>.
+The port is based on the original TTS_Server (developed for NeXTSTEP), which was written in C (70% in lines of code)
+and ObjC (30%).
+</p>
+
+<p>GamaTTS:Editor was later developed to edit the articulatory database, using parts of the source code from Monet (written in ObjC),
+an editor in Gnuspeech. During the development, the available documentation for Monet was used as a reference.
+
+<p>Some of the changes in GamaTTS (compared with Gnuspeech) are:
+</p>
+
+<ul>
+<li>Added features:
+	<ul>
+	<li>Support for multiple vocal tract models.</li>
+	<li>The vocal tract parameters are arbitrary (except the first which must be the pitch).</li>
+	<li>Support for external front-ends, using the MBROLA input file format.</li>
+	<li>Partial support for Unicode text / IPA.</li>
+	<li>Many hard-coded values have been moved to configuration files.</li>
+	<li>Real-time manipulation of vocal tract parameters during speech synthesis.</li>
+	<li>The control sample rate can be changed from 250 Hz to 333 Hz, 500 Hz or 1000 Hz.</li>
+	</ul>
+</li>
+<li>Removed features:
+	<ul>
+	<li>Meta-parameters, which were not working in Gnuspeech.
+	The idea was to use high-level parameters such as "tongue height",
+	"tongue position", or "lung pressure", for example, as meta-parameters.
+	But in GamaTTS such parameters should be used as normal parameters,
+	and the mapping to low-level parameters must be done inside the
+	vocal tract model.</li>
+	<li>In the Interactive Vocal Tract Model (replacement for TRAcT in
+	Gnuspeech), there is no diagram of the
+	vocal tract geometry. Figures showing frequency response of vocal tract
+	model components, and other information, are also missing. The settings
+	that are specific to a vocal tract model must be changed using the
+	configuration files. These limitations are due to the support for
+	multiple vocal tract models.</li>
+	<li>There are parameters that in Monet can be changed in the GUI, but
+	in GamaTTS:Editor must be changed using the configuration files.</li>
+	<li>Marked Postures were removed. It seems that they were not being
+	used in Gnuspeech.</li>
+	<li>The dictionary is stored in memory during runtime, not in databases
+	such as ndbm/gdbm. For this reason, some data may be lost in case of
+	power failure. This change was done to remove the external dependency.</li>
+	<li>The original code could use a DSP, but GamaTTS uses only a CPU,
+	because the modern CPUs are fast enough.</li>
+	<li>In the Synthesis Window, the curves for Special Transitions and
+	normal Transitions are shown in the same figure (with Special Transitions
+	in red), they can't be shown in separate figures.</li>
+	<li>The output sound is always in mono. It can be converted to stereo
+	using JACK effects.</li>
+	</ul>
+</li>
+</ul>
+
+<p>Due to these and other changes, most of the file formats are not compatible with
+Gnuspeech anymore. But the vocal tract models vtm0, vtm1 and vtm2 produce
+speech almost equivalent to Gnuspeech's output.
+</p>
+
+<hr>
+
+<h2>Description</h2>
+
+<img class="figure" src="img/gama_tts.png" alt="Diagram of GamaTTS">
+
+<p>The main modules are:</p>
+
+<ul>
+<li>Text Parser:<br>Converts the input text to a phonetic string. This string contains phonemes and control codes
+  for example to indicate phoneme duration or the start of a word.</li>
+<li>VTM Control Model:<br>Converts the phonetic string to vocal tract model parameters. This module controls the vocal tract model.</li>
+<li>VTM (vocal tract model):<br>Converts the VTM parameters to speech audio, using a simulation of the acoustics of the human vocal tract.</li>
+<li>GamaTTS:Editor is used to modify the articulatory database, because manually editing the database would be very difficult.</li>
+</ul>
+
+<p>The VTM parameters can be adjusted to produce a "schwa" sound, for example. If the parameter values remain constant,
+the output will be a continuous sound. In the Control Model, such a configuration of the VTM is called a <b>Posture</b>.
+</p>
+
+<p>To produce speech, the VTM parameters must change along the time (this is called articulation).
+In the Control Model, the way the parameters change from <b>Posture</b> to <b>Posture</b> is defined by <b>Transitions</b>.
+</p>
+
+<p><b>Transitions</b> use <b>Transition Points</b> to define the piecewise linear function that will control the VTM parameter along the time.
+The time of each <b>Point</b> can be defined using constants, but this is not very flexible. For this reason the Control Model
+uses <b>Equations</b> to define the times. The <b>Equations</b> use formulas to calculate time, using as parameters the
+durations of the <b>Postures</b> involved in a <b>Transition</b>.
+</p>
+
+<p>The Control Model must decide which <b>Transition</b> will be used for each <b>Posture</b> sequence and for each parameter.
+The <b>Rules</b> are used to do this selection, they contain boolean expressions to match a sequence of <b>Postures</b>.
+Boolean expressions can also match <b>Categories</b>, which are groups of <b>Postures</b>.
+</p>

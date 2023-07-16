@@ -1,0 +1,262 @@
+<h1>How to use GamaTTS</h1>
+
+<ol>
+<li><a href="#modes">Modes of execution</a></li>
+<li><a href="#pho0">Gnuspeech phonetic format</a></li>
+<li><a href="#pho1">MBROLA phonetic format</a></li>
+<li><a href="#data">Description of the data files (<code>data/english/vtm0</code> to <code>vtm5</code>)</a></li>
+<li><a href="#notes">Notes</a></li>
+</ol>
+
+<hr>
+<!-- ======================================================================= -->
+<h2 id="modes">Modes of execution</h2>
+
+<p>Execute <code>gama_tts --help</code> to see how to run the program.
+</p>
+
+<p>There are three modes of execution:</p>
+
+<ol>
+<li>Text-to-speech<br>
+<pre><code>gama_tts tts ...</code></pre>
+<p>In this mode, the input text is converted to speech audio. First the text parser converts the text to a phonetic string.
+Then the control model converts this string to vocal tract model parameters.
+Finally, the vocal tract model converts these parameters to speech audio.
+</p>
+</li>
+<li>Synthesis from phonetic string<br>
+<pre><code>gama_tts pho ...</code></pre>
+<p>In this mode, the control model converts the input phonetic string to vocal tract model parameters.
+Then the vocal tract model converts these parameters to speech audio.
+</p>
+<p>The input format is selected in the file <code>vtm_control_model.txt</code>,
+field <code>phonetic_string_format</code>. The available choices are <strong>gnuspeech</strong>
+and <strong>mbrola</strong>.
+</p>
+<p>Note: This mode does not use a Posture rewriter.
+</p>
+</li>
+<li>Synthesis from vocal tract model parameters<br>
+<pre><code>gama_tts vtm ...</code></pre>
+<p>In this mode the vocal tract model converts the input parameters to speech audio.
+</p>
+</li>
+</ol>
+
+<hr>
+<!-- ======================================================================= -->
+<h2 id="pho0">Gnuspeech phonetic format</h2>
+
+<p>- Valid Posture names contain Unicode characters except:</p>
+
+<pre>
+    0000-0020
+    007F (DEL)
+    '    (apostrophe)
+    _    (underscore)
+    *
+    .
+    /
+    0-9
+</pre>
+
+<p>- Postures are separated by <code>_</code> (underscore).
+</p>
+
+<p>- Other symbols:</p>
+<table>
+<tr><td><code>/0</code>     </td><td>Set current tone group type: statement        </td></tr>
+<tr><td><code>/1</code>     </td><td>Set current tone group type: exclamation      </td></tr>
+<tr><td><code>/2</code>     </td><td>Set current tone group type: question         </td></tr>
+<tr><td><code>/3</code>     </td><td>Set current tone group type: continuation     </td></tr>
+<tr><td><code>/4</code>     </td><td>Set current tone group type: semicolon        </td></tr>
+<tr><td><code>/_</code>     </td><td>New foot                                      </td></tr>
+<tr><td><code>/*</code>     </td><td>New marked foot                               </td></tr>
+<tr><td><code>//</code>     </td><td>New tone group                                </td></tr>
+<tr><td><code>/c</code>     </td><td>New chunk                                     </td></tr>
+<tr><td><code>/l</code>     </td><td>Last foot in tone group marker                </td></tr>
+<tr><td><code>/w</code>     </td><td>New word                                      </td></tr>
+<tr><td><code>/fNN.NN</code></td><td>Foot tempo                                    </td></tr>
+<tr><td><code>/rNN.NN</code></td><td>Rule tempo                                    </td></tr>
+<tr><td><code>.</code>      </td><td>New syllable                                  </td></tr>
+<tr><td><code>NN.NN</code>  </td><td>Tempo of the next posture                     </td></tr>
+</table>
+
+<p>- Example:</p>
+<p>
+The quick black dog jumps over the lazy brown fox.<br>
+<code>/c // /0 # /w dh_uh /w /_k_w_i_k /w /_b_l_aa_k /w /_d_o_g /w /_j_a_m_p_s /w /_uh_uu.v_uh_r /w dh_uh /w /_l_e_i.z_i /w /_b_r_ah_uu_n /w /l /*f_o_k_s # // /c</code>
+</p>
+
+<hr>
+<!-- ======================================================================= -->
+<h2 id="pho1">MBROLA phonetic format</h2>
+
+<p>The phonetic string contains lines in the format:<br>
+<code>phoneme duration intonation_point_pos_1 intonation_point_value_1 intonation_point_pos_2 intonation_point_value_2...</code><br>
+Comments start with a semicolon. The intonation points are optional.
+</p>
+
+<p>The duration is in milliseconds. The intonation point position is defined as the percentage of the time between phonemes.
+The intonation point value is in Hz.
+</p>
+
+<p>Example:</p>
+<pre>
+    ; This is a test.
+    pau 220
+    dh   37   0  99
+    ax   44  50 111
+    k   133   0 111
+    w    48
+    ih   52  50 131
+    k    58
+    b    95   0 128
+    r    44
+    aw  183  50 137
+    n    84
+    f   108   0 130
+    aa  165  50 131
+    k   115
+    s   144 100 124
+    pau 220
+</pre>
+
+<hr>
+<!-- ======================================================================= -->
+<h2 id="data">Description of the data files (<code>data/english/vtm0</code> to <code>vtm5</code>)</h2>
+
+<p>Note: Only some parameters are shown here.</p>
+
+<pre>
+artic.xml
+    Contains the articulatory database.
+
+    It can be modified with a plain text editor, but the use of
+    GamaTTS:Editor is recommended.
+
+interactive.txt
+    Configuration file for the interactive vocal tract model.
+
+voice/baby.txt
+voice/female.txt
+voice/large_child.txt
+voice/male.txt
+voice/small_child.txt
+    Contain the voice parameters.
+
+        vocal_tract_length
+
+        glottal_pulse_tp
+            Rise time, in % of the period.
+        glottal_pulse_tn_min
+            Fall time, in % of the period - for the highest pulse
+            amplitude.
+        glottal_pulse_tn_max
+            Fall time, in % of the period - for the lowest pulse
+            amplitude.
+
+            These parameters modify the glottal pulse shape.
+
+        reference_glottal_pitch
+            Modifies the voice pitch.
+
+        breathiness
+
+        loss_factor
+            Defines the acoustic loss inside the vocal tract.
+
+        intonation_factor
+            The intonation curve is multiplied by this factor.
+
+vtm_control_model.txt
+    Contains the parameters for the vocal tract model controller.
+
+        voice_name
+            Example: If voice_name = male, the voice file named
+            voice/male.txt will be loaded.
+        tempo
+            Values greater than 1.0 will speed up the speech.
+        pitch_offset
+            Modifies the voice pitch.
+
+        drift_deviation
+        drift_lowpass_cutoff
+            Control the random perturbations in the intonation
+            (requires intonation_drift = 1).
+
+        phonetic_string_format
+            <strong>gnuspeech</strong> or <strong>mbrola</strong>.
+
+vtm.txt
+    Contains the parameters for the vocal tract model.
+
+        model
+            The vocal tract model type.
+        vocal_tract_length_offset
+            This value is added to the vocal tract length.
+
+intonation_rhythm/
+    intonation.txt
+        Contains constants for the intonation.
+    rhythm.txt
+        Contains constants for the rhythm calculation.
+    tone_group_param-continuation.txt
+    tone_group_param-exclamation.txt
+    tone_group_param-question.txt
+    tone_group_param-semicolon.txt
+    tone_group_param-statement.txt
+        Intonation parameters for each tone group.
+        If random_intonation = 0 in vtm_control_model.txt, only the
+        first line in each file will be used. If random_intonation = 1,
+        the line will be randomly selected.
+
+pho1_parser/
+    Configuration for the phonetic string parser (MBROLA format).
+
+        pho1.txt
+            Main configuration file.
+        phoneme_map-*.txt
+            Contains the mapping between the input phonemes and the
+            internal phonemes (Postures).
+
+phonetic_string_parser/
+    Configuration for the phonetic string parser (Gnuspeech format).
+
+        rewrite.txt
+            Contains rules that may modify the phonetic string.
+
+text_parser/
+    Configuration for the text to phonetic string converter.
+
+        abbreviations_with_number.txt
+        abbreviations.txt
+        external_text_parser.txt
+            Configuration for an external text parser, used when the MBROLA
+            phonetic string format is selected.
+        main_dictionary.txt
+            The main dictionary, which relates words to postures.
+        special_acronyms.txt
+        suffix_list.txt
+        text_parser.txt
+            Configuration for the text parser, used when the Gnuspeech phonetic
+            string format is selected.
+
+                dictionary_1_file
+                dictionary_2_file
+                dictionary_3_file
+                    Indicate the dictionaries (the dictionaries will be
+                    searched in the order 1, 2, 3).
+
+</pre>
+
+<hr>
+<!-- ======================================================================= -->
+<h2 id="notes">Notes</h2>
+
+<ul>
+<li>When setting noise parameters like breathiness or frication volume, the value indicates the amplitude of
+the noise source (the pseudo-random number generator).
+The amplitude after the filtering can be significantly lower.</li>
+</ul>

@@ -1,0 +1,34 @@
+<h1 id="rule_manager_expr">Rule manager - expressions</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-rule_manager-expressions.png"
+	alt="Screenshot of the rule manager - expressions"></p>
+
+<p>Rules are created to select what Transitions and Special Transitions are used for each Posture sequence,
+and for each parameter.
+</p>
+
+<p>A Rule is selected using its boolean expressions.
+A Rule with 2 boolean expressions can match two consecutive Postures (diphone),
+a Rule with 3 boolean expressions can match three consecutive Postures (triphone),
+and a Rule with 4 boolean expressions can match four consecutive Postures (tetraphone).
+Boolean expressions can use Category and Posture names, and boolean operators.
+They can also use the "marked" operator to match a marked Posture.
+</p>
+
+<p>For a given Posture sequence, the Rules are searched from the first to the last (order is important).
+The first matching Rule defines the Transitions and Special Transitions that will be used
+for the Posture sequence.
+</p>
+
+<p>In the "Total matches" lists, marked Postures are indicated by an apostrophe at the end of the Posture name.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Add a Rule:<br>Select a Rule (if the list is not empty), enter two or more boolean expressions and click on "Add".
+ The Rule is created before the selected Rule.</li>
+<li>Remove a Rule:<br>Select a Rule and click on "Remove".</li>
+<li>Move the Rule up:<br>Select a Rule and click on "Move up".</li>
+<li>Move the Rule down:<br>Select a Rule and click on "Move down".</li>
+<li>Change the boolean expressions:<br>Select a Rule, change the boolean expressions and click on "Update".</li>
+</ul>

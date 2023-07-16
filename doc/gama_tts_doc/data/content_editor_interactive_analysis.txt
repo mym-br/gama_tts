@@ -1,0 +1,18 @@
+<h1 id="interactive_analysis">Interactive vocal tract model - analysis</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-interactive-analysis.png"
+	alt="Screenshot of the interactive vocal tract model - analysis window"></p>
+
+<p>This is a simple spectrum/signal viewer. External spectrum viewers can be connected through JACK.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Change the view:<br>Select "Spectrum" to view the spectrum, and "Signal" to see the time domain waveform.</li>
+<li>Start/stop the viewer:<br>Click on "Start" or "Stop".</li>
+<li>Change the parameters of the spectrum:<br>Select the window size and window type.</li>
+<li>Select the maximum frequency of the spectrum:<br>The graph will show from 0 Hz to the selected frequency.</li>
+<li>Select the y-axis scale for the spectrum:<br>Select "Linear" or "Log".</li>
+<li>Select the y log scale limits:<br>Select the minimum dB level.</li>
+<li>Move the mouse over the graph and the coordinates will appear in the top-left corner.</li>
+</ul>

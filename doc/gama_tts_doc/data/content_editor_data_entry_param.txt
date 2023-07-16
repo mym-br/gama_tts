@@ -1,0 +1,24 @@
+<h1 id="data_entry_param">Data entry - parameters</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-data_entry-parameters.png"
+	alt="Screenshot of the data entry window - parameters"></p>
+
+<p>These are the parameters that will be sent to the vocal tract model.
+Each Posture has a set of Parameter values.
+</p>
+
+<p>The operations (except changing the comment) are blocked if there is at least
+one Posture or one Rule in the database.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Change the name or a value:<br>Double-click on the cell, change it and press <kbd>ENTER</kbd>.</li>
+<li>Add an item:<br>Select a line (if the table is not empy), click on "Add"
+ and the new item will be created after the selected line.
+ The name of the new item is "___new___".</li>
+<li>Remove the item:<br>Select a line and click on "Remove".</li>
+<li>Move an item up:<br>Select a line and click on "Move up".</li>
+<li>Move an item down:<br>Select a line and click on "Move down".</li>
+<li>Add/change the comment:<br>Enter the text and click on "Update".</li>
+</ul>

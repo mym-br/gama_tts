@@ -1,0 +1,10 @@
+<h1 id="rule_manager_param_trans">Rule manager - transitions</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-rule_manager-parameter_transitions.png"
+	alt="Screenshot of the rule manager - parameter transitions"></p>
+
+<p>Operations:</p>
+<ul>
+<li>Select a Transition for a parameter:<br>Select the parameter and select the Transition on the Transitions tree.
+ All parameters must have a Transition assigned to them.</li>
+</ul>

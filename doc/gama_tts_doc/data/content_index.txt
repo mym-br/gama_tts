@@ -1,0 +1,7 @@
+<h1>GamaTTS documentation</h1>
+
+<p>This is a work in progress.
+</p>
+
+<p><a href="https://mym.eng.br/gama_tts.html">Project site</a>
+</p>

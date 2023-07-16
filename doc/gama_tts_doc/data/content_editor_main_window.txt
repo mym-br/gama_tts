@@ -1,0 +1,15 @@
+<h1 id="main_window">Main window</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-main_window.png"
+	alt="Screenshot of the main window"></p>
+
+<p>Operations:</p>
+<ul>
+<li>Open a model:<br>Click on File/Open and select the file <code>artic.xml</code> in the data directory.</li>
+<li>Save the model:<br>Click on File/Save.</li>
+<li>Save the model to a different file:<br>Click on File/Save as.</li>
+<li>Reload the model:<br>Click on File/Reload. All changes are lost. When some
+ configuration files are modified, the model must be reloaded manually.</li>
+<li>Quit:<br>Click on File/Quit.</li>
+<li>Open other windows:<br>Click on the buttons.</li>
+</ul>

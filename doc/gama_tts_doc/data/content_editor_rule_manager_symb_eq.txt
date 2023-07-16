@@ -1,0 +1,14 @@
+<h1 id="rule_manager_symb_eq">Rule manager - symbol equations</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-rule_manager-symbol_equations.png"
+	alt="Screenshot of the rule manager - symbol equations"></p>
+
+<p>The symbol equations define the durations for the Rule.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Select an Equation for a symbol:<br>Select the symbol and select the Equation on the Equations tree.</li>
+<li>Clear a symbol:<br>Select the symbol and click on "Clear".
+ Mark 3 should only used by tetraphone Rules, and Mark 2 should only used by triphone and tetraphone Rules.</li>
+</ul>

@@ -1,0 +1,21 @@
+<h1 id="post_editor_sym">Posture editor - symbols</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-posture_editor-symbols.png"
+	alt="Screenshot of the posture editor - symbols"></p>
+
+<p>The Symbol values indicate the durations of each phase of the articulation.<br>
+ Qssa (quasi steady state A) is the duration of the slow variation phase just before the center of the Posture.<br>
+ Qssb (quasi steady state B) is the duration of the slow variation phase just after the center of the Posture.<br>
+ Transition is the duration of the fast variation phase before of after the slow variation phases.<br>
+ "Duration" is the total duration of the Posture, and is roughly equal to qssa + qssb + transition.<br>
+ The symbols with the "marked" prefix are used for marked Postures.
+</p>
+
+<p>Symbol values that are different from the default are shown in bold.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Change a Symbol value:<br>Double-click on a cell in the "Value" column, change it and press <kbd>ENTER</kbd>.</li>
+<li>Use a default Symbol value:<br>Select a line in the Symbols table and click on "Use default".</li>
+</ul>

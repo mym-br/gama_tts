@@ -1,0 +1,48 @@
+<h1 id="prep">Preparation</h1>
+
+<p>The software QjackCtl must be installed. Execute it and configure the
+sample rate to 44100 Hz:
+</p>
+
+<ol>
+<li>Click on "Setup...".</li>
+<li>Set Settings / Parameters / Sample Rate: 44100.</li>
+<li>Click on "Save".</li>
+<li>Close the "Setup" window.</li>
+<li>Click on "Stop".</li>
+<li>Click on "Start".</li>
+</ol>
+
+<p>The sample rate is defined by the parameter "output_rate" in the file <code>vtm.txt</code>,
+located in <code>gama_tts/data/english/vtmX</code>, where X is a number.
+
+<p>Copy the data files contained in the directory <code>gama_tts/data/</code>
+(from the source package of gama_tts or from <code>/usr/local/share/gama_tts/data</code>)
+to another directory.
+The user must have write access to this directory.
+</p>
+
+<p>Run the program <code>gama_tts_editor</code>.
+</p>
+
+
+
+<h2>Quickstart</h2>
+
+<ol>
+<li>In the main window, click on File / Open and select the file <code>data/english/vtm5/artic.xml</code>.</li>
+<li>In the main window, click on "Synthesis window".</li>
+<li>In the synthesis window, enter an english text in the field "Text".
+Click on "Parse". The text will be synthesized.</li>
+<li>In the synthesis window, set the "Tempo" field to 0.5.
+Click on "Synthesize". The text will be synthesized in a slower pace.</li>
+<li>In the synthesis window, set the "Tempo" field to 2.0.
+Click on "Synthesize". The text will be synthesized in a faster pace.</li>
+<li>In the main window, click on "Interactive VTM" (interactive vocal tract model).
+Click on "(Re)start". In the "Dynamic Parameters" area, change the slider for
+"Glot Pitch". In the slider for "R8" (mouth radius), move the value from
+zero to the center value and back to zero, repeatedly and as fast as possible.
+You should hear the sound "ba". Now set the slider for "Velum" to 0.25.
+Move again the slider for "R8". You should hear the sound "ma".
+Click on "Stop".</li>
+</ol>

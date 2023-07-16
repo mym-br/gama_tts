@@ -1,0 +1,38 @@
+[
+	{ "file": "index", "label": "Index", "title": "GamaTTS documentation" },
+	{ "file": "introduction", "label": "Introduction", "title": "GamaTTS - Introduction", "description": "" },
+	[
+		{ "file": "how_to_use"     , "label": "How to use"    , "title": "GamaTTS - How to use", "description": "" },
+		{ "file": "gama_tts"       , "label": "GamaTTS"       , "title": "GamaTTS"             , "description": "How to use the command line synthesizer." },
+		[
+			{ "file": "gama_tts_editor", "label": "GamaTTS:Editor", "title": "GamaTTS - Editor", "description": "How to use the editor." },
+			{ "file": "editor_prep", "label": "Preparation", "title": "Preparation", "description": "" },
+			{ "file": "editor_notes", "label": "Notes", "title": "Notes", "description": "" },
+			{ "file": "editor_main_window", "label": "Main window", "title": "Main window", "description": "" },
+			{ "file": "editor_data_entry_cat", "label": "Data entry - categories", "title": "Data entry - categories", "description": "" },
+			{ "file": "editor_data_entry_param", "label": "Data entry - parameters", "title": "Data entry - parameters", "description": "" },
+			{ "file": "editor_data_entry_sym", "label": "Data entry - symbols", "title": "Data entry - symbols", "description": "" },
+			{ "file": "editor_post_editor_cat", "label": "Posture editor - management and categories", "title": "Posture editor - management and categories", "description": "" },
+			{ "file": "editor_post_editor_param", "label": "Posture editor - parameters", "title": "Posture editor - parameters", "description": "" },
+			{ "file": "editor_post_editor_sym", "label": "Posture editor - symbols", "title": "Posture editor - symbols", "description": "" },
+			{ "file": "editor_interactive", "label": "Interactive vocal tract model", "title": "Interactive vocal tract model", "description": "" },
+			{ "file": "editor_interactive_analysis", "label": "Interactive vocal tract model - analysis", "title": "Interactive vocal tract model - analysis", "description": "" },
+			{ "file": "editor_proto_manager_eq", "label": "Prototype manager - equations", "title": "Prototype manager - equations", "description": "" },
+			{ "file": "editor_proto_manager_tran", "label": "Prototype manager - transitions", "title": "Prototype manager - transitions", "description": "" },
+			{ "file": "editor_transition_editor", "label": "Transition editor", "title": "Transition editor", "description": "" },
+			{ "file": "editor_proto_manager_special_tran", "label": "Prototype manager - special transitions", "title": "Prototype manager - special transitions", "description": "" },
+			{ "file": "editor_special_transition_editor", "label": "Special transition editor", "title": "Special transition editor", "description": "" },
+			{ "file": "editor_rule_manager_expr", "label": "Rule manager - expressions", "title": "Rule manager - expressions", "description": "" },
+			{ "file": "editor_rule_manager_param_trans", "label": "Rule manager - transitions", "title": "Rule manager - transitions", "description": "" },
+			{ "file": "editor_rule_manager_special_param_trans", "label": "Rule manager - special parameter transitions", "title": "Rule manager - special parameter transitions", "description": "" },
+			{ "file": "editor_rule_manager_symb_eq", "label": "Rule manager - symbol equations", "title": "Rule manager - symbol equations", "description": "" },
+			{ "file": "editor_rule_manager_comment", "label": "Rule manager - comment", "title": "Rule manager - comment", "description": "" },
+			{ "file": "editor_rule_tester", "label": "Rule tester", "title": "Rule tester", "description": "" },
+			{ "file": "editor_inton_param", "label": "Intonation parameters", "title": "Intonation parameters", "description": "" },
+			{ "file": "editor_synth_window", "label": "Synthesis window", "title": "Synthesis window", "description": "" },
+			{ "file": "editor_inton_window", "label": "Intonation window", "title": "Intonation window", "description": "" },
+			{ "file": "editor_param_modif", "label": "Real-time parameter modification", "title": "Real-time parameter modification", "description": "" }
+		]
+	],
+	{ "file": "contact", "label": "Contact", "title": "GamaTTS - Contact" }
+]

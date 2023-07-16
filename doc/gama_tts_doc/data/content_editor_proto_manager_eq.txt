@@ -1,0 +1,27 @@
+<h1 id="proto_manager_eq">Prototype manager - equations</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-prototype_manager-equations.png"
+	alt="Screenshot of the prototype manager - equations"></p>
+
+<p>Equations are used to calculate times from the values of Posture symbols.
+Qssa1 is the value of qssa for the Posture 1, qssa2 is the value for Posture 2, and so on.
+Equations can use constant times too (in milliseconds), if needed.
+</p>
+
+<p>The column "Is used?" is read-only and indicates if the Equation is being used and how many times
+it is referenced.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Add a group:<br>Select an item (if the list is not empty) and click on "Add".
+ The name of new group is "___new___" and it is created at the end.</li>
+<li>Add an item:<br>Select a group and click on "Add".
+ The name of new item is "___new___" and it is created at the end of the group.</li>
+<li>Rename a group/item:<br>Double-click on the group/item, change the text and press <kbd>ENTER</kbd>.</li>
+<li>Remove a group/item:<br>Select the group or item and click on "Remove".</li>
+<li>Move the group/item up:<br>Select the group or item and click on "Move up".</li>
+<li>Move the group/item down:<br>Select the group or item and click on "Move down".</li>
+<li>Add/change the comment:<br>Select the item, enter the text and click on "Update".</li>
+<li>Change the formula:<br>Select the item, enter the formula and click on "Update".</li>
+</ul>

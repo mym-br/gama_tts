@@ -1,0 +1,31 @@
+<h1 id="interactive">Interactive vocal tract model</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-interactive.png"
+	alt="Screenshot of the interactive vocal tract model"></p>
+
+<p>The interactive vocal tract model is used to find a configuration that produces the correct sound of a Posture.
+</p>
+
+<p>During the synthesis, the volume is normalized (to avoid clipping), but the gain is only reduced, never increased.
+To increase the gain if the sound is well below the threshold for the current configuration, the synthesis must be restarted.
+</p>
+
+<p>Dynamic parameters can be changed without a restart. To change static parameters, the synthesis must be restarted.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Load the parameter values of a Posture:<br>Select a Posture in the posture editor.</li>
+<li>Paste parameter values from the clipboard:<br>Click on "Past dyn. parameters" to use the values copied from the Posture editor.</li>
+<li>Copy parameter values to the clipboard:<br>Click on "Copy dyn. parameters" to send the values to the Posture editor.</li>
+<li>Start/restart the interactive session:<br>Click on "(Re)start". The synthesis is restarted without reloading the configuration.</li>
+<li>Stop the interactive session:<br>Click on "Stop".</li>
+<li>Reload the configuration:<br>Click on "Reload Configuration". The configuration files are read and the synthesis is restarted.</li>
+<li>Open the analysis window:<br>Click on "Analysis".</li>
+<li>Change the dynamic parameters:<br>Move the sliders, or enter the new value in the text input and press <kbd>ENTER</kbd>.</li>
+<li>Change the static parameters:<br>Move the sliders, or enter the new value in the text input and press <kbd>ENTER</kbd>.
+ Then click on "Apply".
+ The synthesis is restarted.</li>
+<li>Load dynamic parameters from a file:<br>Click on File/Load Dynamic Parameters.</li>
+<li>Save dynamic parameters to a file:<br>Click on File/Save Dynamic Parameters.</li>
+</ul>

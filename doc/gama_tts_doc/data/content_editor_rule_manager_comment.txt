@@ -1,0 +1,9 @@
+<h1 id="rule_manager_comment">Rule manager - comment</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-rule_manager-comment.png"
+	alt="Screenshot of the rule manager - comment"></p>
+
+<p>Operations:</p>
+<ul>
+<li>Add/change the comment:<br>Enter the text and click on "Update".</li>
+</ul>

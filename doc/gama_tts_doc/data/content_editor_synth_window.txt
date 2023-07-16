@@ -1,0 +1,36 @@
+<h1 id="synth_window">Synthesis window</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-synthesis_window.png"
+	alt="Screenshot of the synthesis window"></p>
+
+<p>In this window, speech may be synthesized from a text or from a phonetic string (Gnuspeech format).
+</p>
+
+<p>Tempo values greater than one speed up the synthesized speech, and vice versa.
+</p>
+
+<p>When the checkbox "Save VTM parameters to file" is checked, the vocal tract parameters are saved to the file
+<code>generated__vtm_param.txt</code> in the data directory.
+</p>
+
+<p>The mouse tracking shows the time and value for the current cursor position in the graph.
+</p>
+
+<p>Signals produced using Special Transitions are shown in red.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Parse the text and synthesize it:<br>Enter the text in the field "Text" and press <kbd>ENTER</kbd>, or click on "Parse".
+ A phonetic string is inserted into the field "Phonetic string".</li>
+<li>Synthesize the phonetic string using the saved data:<br>Click on "Reference" and the sound will be sent to JACK audio.
+This is useful to compare the (unsaved) modifications with the saved (reference) data.</li>
+<li>Synthesize the phonetic string:<br>Click on "Synthesize" and the sound will be sent to JACK audio.</li>
+<li>Synthesize the phonetic string to file:<br>Click on "Synthesize to file" and the sound will be sent to a WAVE file.</li>
+<li>Unselect a parameter:<br>Uncheck a checkbox in the Parameters list.</li>
+<li>Select a parameter:<br>Check a checkbox in the Parameters list.
+ The parameter is added at the bottom of the graph.</li>
+<li>Adjust the zoom in the graph:<br>Set the x and y zoom controls, entering the value, using the mouse wheel
+ or clicking on the up/down arrows.</li>
+<li>Reset the zoom:<br>Double-click on the graph.</li>
+</ul>

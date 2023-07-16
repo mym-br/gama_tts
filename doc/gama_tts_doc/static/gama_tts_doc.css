@@ -1,0 +1,149 @@
+
+@font-face {
+	/* font/Hack-LICENSE.md */
+	font-family: "Hack";
+	font-style: normal;
+	font-weight: 400;
+	src: local("Hack"),
+	     url(font/Hack-Regular.latin1.woff2) format("woff2");
+	unicode-range: U+0000-00FF;
+}
+
+code, pre {
+	font: inherit;
+}
+
+body {
+	background-color: #f0f0f0;
+	margin: 0;
+	font-family: 'Hack', monospace;
+	font-size: 11pt;
+}
+
+h1 {
+	font-size: 120%;
+	color: black;
+}
+
+h2 {
+	font-size: 110%;
+	/*font-style: italic;*/
+	color: black;
+}
+
+a:link {
+	color: black;
+}
+a:visited {
+	color: black;
+}
+a:hover {
+	color: black;
+}
+a:active {
+	color: black;
+}
+
+#page {
+	max-width: 1700px;
+	margin: 0 auto auto auto;
+	background-color: white;
+	color: black;
+}
+
+.content {
+	padding: 0.5em 1.0em 1.5em 1.0em;
+	margin: 0;
+	min-height: 400px;
+}
+
+#footer {
+	font-size: 10pt;
+	background-color: #e0e0e0;
+	text-align: center;
+	padding: 0.25em;
+}
+
+.horizontal-menu {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	color: white;
+	background-color: black;
+}
+
+.horizontal-menu > li {
+	float: left;
+}
+
+.horizontal-menu a.menu-item:link {
+	color: white;
+	padding: 0.25em 1.0em 0.25em 1.0em;
+	display: inline-block;
+	background-color: black;
+	text-decoration: none;
+}
+.horizontal-menu a.menu-item:visited {
+	color: white;
+	padding: 0.25em 1.0em 0.25em 1.0em;
+	display: inline-block;
+	background-color: black;
+	text-decoration: none;
+}
+.horizontal-menu a.menu-item:hover {
+	color: white;
+	padding: 0.25em 1.0em 0.25em 1.0em;
+	display: inline-block;
+	background-color: #505050;
+	text-decoration: none;
+}
+.horizontal-menu a.menu-item:active {
+	color: white;
+	padding: 0.25em 1.0em 0.25em 1.0em;
+	display: inline-block;
+	background-color: black;
+	text-decoration: none;
+}
+
+img.screenshot {
+	display: block;
+	margin: auto;
+	max-width: 100%;
+	height: auto;
+}
+
+img.figure {
+	display: block;
+	margin: auto;
+	max-width: 100%;
+	height: auto;
+}
+
+code {
+	background-color: #e2edff;
+}
+
+pre code {
+	display: block;
+	box-sizing: border-box;
+	border-style: solid;
+	border-width: thin;
+	border-color: #d0d0d0;
+	background-color: #f8f8f8;
+	padding: 1.0em;
+}
+
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
+em {
+	background-color: #d0ffd0;
+}
+
+ul {
+	padding-left: 1.2em;
+}

@@ -1,0 +1,19 @@
+<h1 id="post_editor_param">Posture editor - parameters</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-posture_editor-parameters.png"
+	alt="Screenshot of the posture editor - parameters"></p>
+
+<p>The Parameter values are configurations of the vocal tract model that produce the desired sound.
+</p>
+
+<p>Parameter values that are different from the default are shown in bold.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Change a Parameter value:<br>Double-click on a cell in the "Value" column, change it and press <kbd>ENTER</kbd>.</li>
+<li>Use a default Parameter value:<br>Select a line in the Parameters table and click on "Use default".</li>
+<li>Copy the Parameter values to the clipboard:<br>Click on "Copy". The values can be copied to the interactive VTM.</li>
+<li>Paste the Parameter values from the clipboard:<br>Click on "Paste".
+ The format must be the same as the one used by the "Copy" button.</li>
+</ul>

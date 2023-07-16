@@ -1,0 +1,63 @@
+<h1 id="transition_editor">Transition editor</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-transition_editor.png"
+	alt="Screenshot of the transition editor"></p>
+
+<p>Transitions can be diphone (two Postures), triphone (three Postures) or tetraphone
+(four Postures).
+</p>
+
+<p>Diphone Transitions have one phase (between Posture 1 and Posture 2),
+triphone two (between Posture 1 and Posture 2 and between Posture 2 and Posture 3)
+and tetraphone three (between Posture 1 and Posture 2, between Posture 2 and Posture 3 and between Posture 3 and Posture 4).
+</p>
+
+<p>The parameter values are linearly interpolated between points.
+</p>
+
+<p>In each phase, the point values vary from 0 at the start Posture to 100 at the end Posture.
+The parameter value is calculated by:<br>
+<code>value = start_value + (start_value - end_value) * (point_value / 100)</code>.
+</p>
+
+<p>The point values can be defined manually, or by using slopes.
+In a slope group, the effective slopes of each linear segment are proportional to the defined slope values.
+This means that the slopes are relative to the other slopes in the group.
+The slopes are indicated at the bottom of the graph.
+</p>
+
+<p>In this editor, for the calculation of the point times (using the Equations), the following values are set:<br>
+qssa / qssb / transition = 100/3 ms<br>
+phase duration = 100 ms<br>
+mark1 = 100 ms<br>
+mark2 = 200 ms<br>
+mark3 = 300 ms<br>
+total duration = 100 ms (diphone), 200 ms (triphone), 300 ms (tetraphone)
+</p>
+
+<p>The points are sorted by type and by time.
+</p>
+
+<p>The last point of the Transition is ignored (it is a "phantom" point).
+</p>
+
+<p>The modifications in this window are not executed directly on the main Model.
+Only when the user clicks on "Update" the changes are sent to the Model.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Select the type of the Transition:<br>Select the type in the "Type" combobox.</li>
+<li>Add a point:<br>Double click on the graph. The point type is determined by the phase in which the point is created.
+ The point is created with absolute time (the time is not defined by an Equation).</li>
+<li>Select a point:<br>Click on the graph near the point or select a line in the points table.</li>
+<li>Remove a point:<br>Select a point and click on "Remove".</li>
+<li>Change the point value:<br>Select a point, double-click on the "Value" column, enter the value and press <kbd>ENTER</kbd>.
+ The value can not be changed if the point is the start of a slope, because in this case the slope calculation is what determines the
+ value of the point.</li>
+<li>Set the point as the start of a slope:<br>Select a point and check the "Has slope?" column.</li>
+<li>Set the slope:<br>Select a point, double-click on the "Slope" column, enter the value and press <kbd>ENTER</kbd>.</li>
+<li>Set the point time:<br>Select a point and select an Equation in the Equations tree at the right.
+ It is not possible to clear the time (go back to absolute time).</li>
+<li>Send the changes to the Model:<br>Click on "Update". Any modifications are lost if this operation is not executed.</li>
+</ul>

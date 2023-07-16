@@ -1,0 +1,19 @@
+<h1 id="post_editor_cat">Posture editor - management and categories</h1>
+
+<p><img class="screenshot" src="img/gama_tts_editor-posture_editor-categories.png"
+	alt="Screenshot of the posture editor - categories"></p>
+
+<p>The Categories are used to make filtering Postures easier.
+</p>
+
+<p>Operations:</p>
+<ul>
+<li>Rename the Posture:<br>Double-click on the cell, change it and press <kbd>ENTER</kbd>.</li>
+<li>Add a Posture:<br>Click on "Add". The name of the new item is "###new###".
+ The Postures are sorted by the values of the code units (bytes) in the UTF-8 encoding.</li>
+<li>Remove a Posture:<br>Select a line in the Posture list and click on "Remove".
+ The "#" and "^" Postures must not be removed.</li>
+<li>Add/change the comment:<br>Enter the text and click on "Update".</li>
+<li>Add the Posture to a Category:<br>Select a line in the Categories table and check the checkbox in the "Is member?" column.
+Uncheck to remove the Posture from a Category. The Posture can not be removed from the "phone" Category.</li>
+</ul>
