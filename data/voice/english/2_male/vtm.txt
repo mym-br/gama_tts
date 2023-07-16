@@ -3,7 +3,7 @@
 model = 2
 
 # Hz
-output_rate = 44100.0
+output_rate = 48000.0
 
 # 0: pulse
 # 1: sine
