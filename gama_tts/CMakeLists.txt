@@ -138,11 +138,9 @@ target_link_libraries(gama_tts gamatts)
 
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
-    install(TARGETS gamatts gama_tts
+    install(TARGETS gama_tts
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.h")
-    install(DIRECTORY src/ DESTINATION include/gama_tts FILES_MATCHING PATTERN "*.hpp")
-    install(DIRECTORY data DESTINATION share/gama_tts)
+    install(DIRECTORY ../data DESTINATION share/gama_tts)
 endif()
