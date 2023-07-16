@@ -1,7 +1,5 @@
 
-config_dir_path = /usr/local/share/gama_tts/data/english/vtm5
-
-voice_file = voice_male.config
+config_dir_path = /usr/local/share/gama_tts/data/voice/english/5_male
 
 # Execute "/usr/lib64/speech-dispatcher-modules/sd_gama_tts -o"
 # or        "/usr/lib/speech-dispatcher-modules/sd_gama_tts -o"

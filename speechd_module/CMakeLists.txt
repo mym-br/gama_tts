@@ -1,4 +1,4 @@
-project(gama_tts_speech_dispatcher_module)
+project(speechd_module)
 cmake_minimum_required(VERSION 2.8)
 
 if(UNIX)
@@ -38,12 +38,12 @@ add_executable(sd_gama_tts ${SOURCE_FILES})
 
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(sd_gama_tts
-        -L../gama_tts-build-debug -l:libgamatts.a
+        -L../build-gama_tts-debug -l:libgamatts.a
         ${RTAUDIO_LINKLIBS}
     )
 ELSE(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(sd_gama_tts
-        -L../gama_tts-build -l:libgamatts.a
+        -L../build-gama_tts -l:libgamatts.a
         ${RTAUDIO_LINKLIBS}
     )
 ENDIF(CMAKE_BUILD_TYPE STREQUAL "Debug")

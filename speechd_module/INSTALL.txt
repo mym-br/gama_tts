@@ -3,33 +3,32 @@
 
   - A C++ compiler with C++17 support.
     The following compiler has been tested:
-    - GCC 10.2 (Linux+GNU x86_64).
+    - GCC 12.2 (Linux+GNU x86_64).
 
   - CMake.
 
-  - Speech Dispatcher (tested with version 0.10.2).
+  - Speech Dispatcher (tested with version 0.11.4).
 
-  - GamaTTS (use the latest version).
-    The source files must be in ../gama_tts and the build directory
-    must be ../gama_tts-build.
-    Also, it must be installed using (as root):
+  - Follow ../gama_tts/INSTALL.txt.
+    gama_tts must be installed using (as root, in the build directory):
       cmake --build . --target install
 
   - Libraries and headers for the audio interface (ALSA, JACK or PulseAudio).
 
 - Build (Linux+GNU):
 
-  pkg_dir=$PWD
-  mkdir ../gama_tts_speech_dispatcher_module-build
-  cd ../gama_tts_speech_dispatcher_module-build
-
-  # If you want to use PulseAudio, add "-D AUDIO_LINUX_ALSA=OFF"
-  # (without the quotes) after "cmake" in the command below.
+  mkdir ../build-speechd_module
+  cd ../build-speechd_module
 
   # If the Speech Dispatcher modules are in /usr/lib/speech-dispatcher-modules/:
-  cmake -D CMAKE_INSTALL_PREFIX=/usr -D CMAKE_BUILD_TYPE=Release $pkg_dir
+  cmake -D CMAKE_INSTALL_PREFIX=/usr -D CMAKE_BUILD_TYPE=Release \
+    -D RTAUDIO_API_ALSA=OFF -D RTAUDIO_API_JACK=OFF \
+    ../speechd_module
   # If the Speech Dispatcher modules are in /usr/lib64/speech-dispatcher-modules/:
-  cmake -D CMAKE_INSTALL_PREFIX=/usr -D CMAKE_BUILD_TYPE=Release -D LIB_DIR_SUFFIX=64 $pkg_dir
+  cmake -D CMAKE_INSTALL_PREFIX=/usr -D CMAKE_BUILD_TYPE=Release \
+    -D RTAUDIO_API_ALSA=OFF -D RTAUDIO_API_JACK=OFF \
+    -D LIB_DIR_SUFFIX=64 \
+    ../speechd_module
 
   cmake --build .
 
