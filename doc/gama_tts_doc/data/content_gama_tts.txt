@@ -4,7 +4,7 @@
 <li><a href="#modes">Modes of execution</a></li>
 <li><a href="#pho0">Gnuspeech phonetic format</a></li>
 <li><a href="#pho1">MBROLA phonetic format</a></li>
-<li><a href="#data">Description of the data files (<code>data/english/vtm0</code> to <code>vtm5</code>)</a></li>
+<li><a href="#data">Description of the data files (in <code>data/voice/english/*</code>)</a></li>
 <li><a href="#notes">Notes</a></li>
 </ol>
 
@@ -125,11 +125,14 @@ The intonation point value is in Hz.
 
 <hr>
 <!-- ======================================================================= -->
-<h2 id="data">Description of the data files (<code>data/english/vtm0</code> to <code>vtm5</code>)</h2>
+<h2 id="data">Description of the data files (in <code>data/voice/english/*</code>)</h2>
 
 <p>Note: Only some parameters are shown here.</p>
 
 <pre>
+_index.txt
+    File that indicates the location of other files/directories.
+
 artic.xml
     Contains the articulatory database.
 
@@ -139,12 +142,44 @@ artic.xml
 interactive.txt
     Configuration file for the interactive vocal tract model.
 
-voice/baby.txt
-voice/female.txt
-voice/large_child.txt
-voice/male.txt
-voice/small_child.txt
-    Contain the voice parameters.
+jack.txt
+    Configuration for JACK audio.
+
+vtm.txt
+    Contains the parameters for the vocal tract model.
+
+        model
+            The vocal tract model type.
+        vocal_tract_length_offset
+            This value is added to the vocal tract length.
+        loss_factor
+            Defines the acoustic loss inside the vocal tract.
+
+vtm_control_model.txt
+    Contains the parameters for the vocal tract model controller.
+
+        variant_name
+            Example: If variant_name = male, the file variant/male.txt will
+            be loaded.
+        tempo
+            Values greater than 1.0 will speed up the speech.
+        pitch_offset
+            Modifies the voice pitch.
+
+        drift_deviation
+        drift_lowpass_cutoff
+            Control the random perturbations in the intonation
+            (requires intonation_drift = 1).
+
+        phonetic_string_format
+            <strong>gnuspeech</strong> or <strong>mbrola</strong>.
+
+variant/baby.txt
+variant/female.txt
+variant/large_child.txt
+variant/male.txt
+variant/small_child.txt
+    Contain the variant parameters.
 
         vocal_tract_length
 
@@ -164,38 +199,8 @@ voice/small_child.txt
 
         breathiness
 
-        loss_factor
-            Defines the acoustic loss inside the vocal tract.
-
         intonation_factor
             The intonation curve is multiplied by this factor.
-
-vtm_control_model.txt
-    Contains the parameters for the vocal tract model controller.
-
-        voice_name
-            Example: If voice_name = male, the voice file named
-            voice/male.txt will be loaded.
-        tempo
-            Values greater than 1.0 will speed up the speech.
-        pitch_offset
-            Modifies the voice pitch.
-
-        drift_deviation
-        drift_lowpass_cutoff
-            Control the random perturbations in the intonation
-            (requires intonation_drift = 1).
-
-        phonetic_string_format
-            <strong>gnuspeech</strong> or <strong>mbrola</strong>.
-
-vtm.txt
-    Contains the parameters for the vocal tract model.
-
-        model
-            The vocal tract model type.
-        vocal_tract_length_offset
-            This value is added to the vocal tract length.
 
 intonation_rhythm/
     intonation.txt
@@ -230,8 +235,8 @@ phonetic_string_parser/
 text_parser/
     Configuration for the text to phonetic string converter.
 
-        abbreviations_with_number.txt
         abbreviations.txt
+        abbreviations_with_number.txt
         external_text_parser.txt
             Configuration for an external text parser, used when the MBROLA
             phonetic string format is selected.

@@ -60,7 +60,7 @@ an editor in Gnuspeech. During the development, the available documentation for 
 </ul>
 
 <p>Due to these and other changes, most of the file formats are not compatible with
-Gnuspeech anymore. But the vocal tract models vtm0, vtm1 and vtm2 produce
+Gnuspeech anymore. But the vocal tract models 0, 1 and 2 produce
 speech almost equivalent to Gnuspeech's output.
 </p>
 

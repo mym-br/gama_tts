@@ -1,12 +1,12 @@
 <h1 id="prep">Preparation</h1>
 
-<p>The software QjackCtl must be installed. Execute it and configure the
-sample rate to 44100 Hz:
+<p>If your system is not using Pipewire, the software QjackCtl must be installed.
+Execute it and configure the sample rate to 48000 Hz:
 </p>
 
 <ol>
 <li>Click on "Setup...".</li>
-<li>Set Settings / Parameters / Sample Rate: 44100.</li>
+<li>Set Settings / Parameters / Sample Rate: 48000.</li>
 <li>Click on "Save".</li>
 <li>Close the "Setup" window.</li>
 <li>Click on "Stop".</li>
@@ -14,12 +14,12 @@ sample rate to 44100 Hz:
 </ol>
 
 <p>The sample rate is defined by the parameter "output_rate" in the file <code>vtm.txt</code>,
-located in <code>gama_tts/data/english/vtmX</code>, where X is a number.
+located in <code>data/voice/english/*/vtm.txt</code>.
 
-<p>Copy the data files contained in the directory <code>gama_tts/data/</code>
-(from the source package of gama_tts or from <code>/usr/local/share/gama_tts/data</code>)
-to another directory.
-The user must have write access to this directory.
+<p>Copy the data files contained in the directory <code>data/</code>
+(from the source package of gama_tts) to another directory.
+The user must have write access to this directory, which will be used in the
+quickstart.
 </p>
 
 <p>Run the program <code>gama_tts_editor</code>.
@@ -30,7 +30,7 @@ The user must have write access to this directory.
 <h2>Quickstart</h2>
 
 <ol>
-<li>In the main window, click on File / Open and select the file <code>data/english/vtm5/artic.xml</code>.</li>
+<li>In the main window, click on File / Open and select the directory <code>data/voice/english/5_male</code>.</li>
 <li>In the main window, click on "Synthesis window".</li>
 <li>In the synthesis window, enter an english text in the field "Text".
 Click on "Parse". The text will be synthesized.</li>
