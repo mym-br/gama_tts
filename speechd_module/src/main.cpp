@@ -21,18 +21,18 @@
 #include <iomanip>
 #include <iostream>
 
+#include "global.h"
 #include "ModuleController.h"
 #include "RtAudio.h"
 
 #define PROGRAM_NAME "sd_gama_tts"
-#define PROGRAM_VERSION "2019_12_22"
 
 
 
 void
 showUsage()
 {
-	std::cerr << "\nGamaTTS module " << PROGRAM_VERSION << " for Speech Dispatcher.\n\n";
+	std::cerr << "\nGamaTTS " << GAMA_TTS_VERSION << " module for Speech Dispatcher.\n\n";
 	std::cerr << "Usage:\n"
 			<< PROGRAM_NAME << " <config. file path>\n"
 			<< "        Run module.\n"

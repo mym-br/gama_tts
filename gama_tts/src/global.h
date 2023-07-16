@@ -18,6 +18,6 @@
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
 
-#define GAMA_TTS_VERSION "0.9"
+#define GAMA_TTS_VERSION "2023_07_16"
 
 #endif /* GLOBAL_H_ */
