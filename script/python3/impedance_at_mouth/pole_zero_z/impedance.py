@@ -1,3 +1,5 @@
+# This file is in the public domain.
+
 # Pole-zero in Z domain.
 #
 # fs must be > 50 kHz, but not much higher than 100 kHz.

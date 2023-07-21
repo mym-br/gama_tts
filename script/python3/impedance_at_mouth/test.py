@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# This file is in the public domain.
+
 import numpy as np
 import matplotlib.pyplot as plt
 

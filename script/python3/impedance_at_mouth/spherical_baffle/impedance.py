@@ -1,3 +1,5 @@
+# This file is in the public domain.
+
 # Circular piston in spherical baffle.
 
 # Sources:
