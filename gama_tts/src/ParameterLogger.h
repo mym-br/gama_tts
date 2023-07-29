@@ -18,6 +18,7 @@
 #ifndef GS_PARAMETER_LOGGER_H_
 #define GS_PARAMETER_LOGGER_H_
 
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -34,9 +35,9 @@ template<typename T>
 class ParameterLogger {
 public:
 	ParameterLogger() = default;
-	~ParameterLogger();
+	~ParameterLogger() noexcept;
 
-	void put(unsigned int param, T value, const char* fileName);
+	void put(unsigned int param, T value, const char* fileName) noexcept;
 private:
 	ParameterLogger(const ParameterLogger&) = delete;
 	ParameterLogger& operator=(const ParameterLogger&) = delete;
@@ -47,37 +48,49 @@ private:
 };
 
 template<typename T>
-ParameterLogger<T>::~ParameterLogger()
+ParameterLogger<T>::~ParameterLogger() noexcept
 {
-	int i = -1;
-	for (const auto& param : data_) {
-		++i;
-		if (param.first.empty()) {
-			std::cerr << "[GS::ParameterLogger] Empty file name (parameter " << i << ")." << std::endl;
-			continue;
+	try {
+		int i = -1;
+		for (const auto& param : data_) {
+			++i;
+			if (param.first.empty()) {
+				std::cerr << "[GS::ParameterLogger] Empty file name (parameter " << i << ")." << std::endl;
+				continue;
+			}
+			std::ofstream out(param.first, std::ios_base::binary);
+			if (!out) {
+				std::cerr << "[GS::ParameterLogger] Could not open the file " << param.first << '.' << std::endl;
+				continue;
+			}
+			for (const T value : param.second) {
+				out << value << '\n';
+			}
 		}
-		std::ofstream out(param.first, std::ios_base::binary);
-		if (!out) {
-			std::cerr << "[GS::ParameterLogger] Could not open the file " << param.first << '.' << std::endl;
-			continue;
-		}
-		for (const T value : param.second) {
-			out << value << '\n';
-		}
+	} catch (std::exception& e) {
+		std::cerr << "[ParameterLogger<T>::~ParameterLogger] Exception: " << e.what() << std::endl;
+	} catch (...) {
+		std::cerr << "[ParameterLogger<T>::~ParameterLogger] Unknown exception." << std::endl;
 	}
 }
 
 template<typename T>
 void
-ParameterLogger<T>::put(unsigned int param, T value, const char* fileName)
+ParameterLogger<T>::put(unsigned int param, T value, const char* fileName) noexcept
 {
-	if (data_.size() <= param) {
-		data_.resize(param + 1);
+	try {
+		if (data_.size() <= param) {
+			data_.resize(param + 1);
+		}
+		if (data_[param].first.empty()) { // empty file name
+			data_[param].first = std::string(fileName) + ".txt";
+		}
+		data_[param].second.push_back(value);
+	} catch (std::exception& e) {
+		std::cerr << "[ParameterLogger<T>::put] Exception: " << e.what() << std::endl;
+	} catch (...) {
+		std::cerr << "[ParameterLogger<T>::put] Unknown exception." << std::endl;
 	}
-	if (data_[param].first.empty()) { // empty file name
-		data_[param].first = std::string(fileName) + ".txt";
-	}
-	data_[param].second.push_back(value);
 }
 
 } /* namespace GS */

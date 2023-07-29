@@ -43,20 +43,20 @@ namespace VTM {
 class VocalTractModel {
 public:
 	VocalTractModel() = default;
-	virtual ~VocalTractModel() = default;
+	virtual ~VocalTractModel() noexcept = default;
 
-	virtual void reset() = 0;
+	virtual void reset() noexcept = 0;
 
-	virtual double internalSampleRate() const = 0;
-	virtual double outputSampleRate() const = 0;
+	virtual double internalSampleRate() const noexcept = 0;
+	virtual double outputSampleRate() const noexcept = 0;
 
-	virtual void setParameter(int parameter, float value) = 0;
-	virtual void setAllParameters(const std::vector<float>& parameters) = 0;
+	virtual void setParameter(int parameter, float value) noexcept = 0;
+	virtual void setAllParameters(const std::vector<float>& parameters) noexcept = 0;
 
-	virtual void execSynthesisStep() = 0;
-	virtual void finishSynthesis() = 0;
+	virtual void execSynthesisStep() noexcept = 0;
+	virtual void finishSynthesis() noexcept = 0;
 
-	virtual std::vector<float>& outputBuffer() = 0;
+	virtual std::vector<float>& outputBuffer() noexcept = 0;
 
 	static std::unique_ptr<VocalTractModel> getInstance(const ConfigurationData& data, bool interactive = false);
 protected:

@@ -46,7 +46,6 @@
 
 #include "BandpassFilter.h"
 #include "ConfigurationData.h"
-#include "Exception.h"
 #include "Log.h"
 #include "NoiseFilter.h"
 #include "NoiseSource.h"
@@ -74,22 +73,25 @@ template<typename TFloat, unsigned int SectionDelay>
 class VocalTractModel4 : public VocalTractModel {
 public:
 	explicit VocalTractModel4(const ConfigurationData& data, bool interactive=false);
-	virtual ~VocalTractModel4() = default;
+	virtual ~VocalTractModel4() noexcept = default;
 
-	virtual void reset();
+	virtual void reset() noexcept;
 
-	virtual double internalSampleRate() const { return sampleRate_; }
-	virtual double outputSampleRate() const { return config_.outputRate; }
+	virtual double internalSampleRate() const noexcept { return sampleRate_; }
+	virtual double outputSampleRate() const noexcept { return config_.outputRate; }
 
-	virtual void setParameter(int parameter, float value);
-	virtual void setAllParameters(const std::vector<float>& parameters);
+	virtual void setParameter(int parameter, float value) noexcept;
+	virtual void setAllParameters(const std::vector<float>& parameters) noexcept;
 
-	virtual void execSynthesisStep();
-	virtual void finishSynthesis();
+	virtual void execSynthesisStep() noexcept;
+	virtual void finishSynthesis() noexcept;
 
-	virtual std::vector<float>& outputBuffer() { return outputBuffer_; }
+	virtual std::vector<float>& outputBuffer() noexcept { return outputBuffer_; }
 
 private:
+	static constexpr TFloat MIN_VOCAL_TRACT_LENGTH = 3.0;
+	static constexpr TFloat MAX_VOCAL_TRACT_LENGTH = 30.0;
+
 	enum { /*  OROPHARYNX REGIONS  */
 		R1 = 0, /*  S1  - S3   */
 		R2 = 1, /*  S4  - S5   */
@@ -389,6 +391,11 @@ VocalTractModel4<TFloat, SectionDelay>::loadConfiguration(const ConfigurationDat
 	config_.tnMax          = data.value<TFloat>("glottal_pulse_tn_max");
 	config_.breathiness    = data.value<TFloat>("breathiness");
 	config_.length         = data.value<TFloat>("vocal_tract_length_offset") + data.value<TFloat>("vocal_tract_length");
+	if (config_.length < MIN_VOCAL_TRACT_LENGTH) {
+		config_.length = MIN_VOCAL_TRACT_LENGTH;
+	} else if (config_.length > MAX_VOCAL_TRACT_LENGTH) {
+		config_.length = MAX_VOCAL_TRACT_LENGTH;
+	}
 	config_.temperature    = data.value<TFloat>("temperature");
 	config_.lossFactor     = data.value<TFloat>("loss_factor");
 	config_.mouthCoef      = data.value<TFloat>("mouth_coefficient");
@@ -418,7 +425,7 @@ VocalTractModel4<TFloat, SectionDelay>::loadConfiguration(const ConfigurationDat
 
 template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<TFloat, SectionDelay>::reset()
+VocalTractModel4<TFloat, SectionDelay>::reset() noexcept
 {
 	for (auto& elem : oropharynx_) {
 		elem.reset();
@@ -456,14 +463,10 @@ VocalTractModel4<TFloat, SectionDelay>::initializeSynthesizer()
 	TFloat nyquist;
 
 	/*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL TUBE LENGTH AND SPEED OF SOUND  */
-	if (config_.length > 0.0) {
-		const TFloat c = Util::speedOfSound(config_.temperature);
-		sampleRate_ = static_cast<int>((c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / config_.length);
-		nyquist = sampleRate_ / 2.0f;
-		if (!interactive_) LOG_DEBUG("[VocalTractModel4] Internal sample rate: " << sampleRate_);
-	} else {
-		THROW_EXCEPTION(VTMException, "Illegal tube length.\n");
-	}
+	const TFloat c = Util::speedOfSound(config_.temperature);
+	sampleRate_ = static_cast<int>((c * (TOTAL_SECTIONS * SectionDelay) * 100.0f) / config_.length);
+	nyquist = sampleRate_ / 2.0f;
+	if (!interactive_) LOG_DEBUG("[VocalTractModel4] Internal sample rate: " << sampleRate_);
 
 	/*  CALCULATE THE BREATHINESS FACTOR  */
 	breathinessFactor_ = config_.breathiness / 100.0f;
@@ -513,7 +516,7 @@ VocalTractModel4<TFloat, SectionDelay>::initializeSynthesizer()
 
 template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<TFloat, SectionDelay>::execSynthesisStep()
+VocalTractModel4<TFloat, SectionDelay>::execSynthesisStep() noexcept
 {
 	/*  CONVERT PARAMETERS HERE  */
 	TFloat f0 = Util::frequency(currentParameter_[PARAM_GLOT_PITCH]);
@@ -742,7 +745,7 @@ VocalTractModel4<TFloat, SectionDelay>::vocalTract(TFloat input, TFloat fricatio
 
 template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<TFloat, SectionDelay>::setParameter(int parameter, float value)
+VocalTractModel4<TFloat, SectionDelay>::setParameter(int parameter, float value) noexcept
 {
 	switch (parameter) {
 	case PARAM_GLOT_PITCH:
@@ -768,17 +771,18 @@ VocalTractModel4<TFloat, SectionDelay>::setParameter(int parameter, float value)
 						TFloat{GS_VTM4_MIN_RADIUS});
 		break;
 	default:
-		THROW_EXCEPTION(VTMException, "Invalid parameter index: " << parameter << '.');
+		// Invalid parameter index.
+		return; // fail silently
 	}
 }
 
 template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<TFloat, SectionDelay>::setAllParameters(const std::vector<float>& parameters)
+VocalTractModel4<TFloat, SectionDelay>::setAllParameters(const std::vector<float>& parameters) noexcept
 {
 	if (parameters.size() != TOTAL_PARAMETERS) {
-		THROW_EXCEPTION(VTMException, "Wrong number of parameters: "
-				<< parameters.size() << " (should be " << TOTAL_PARAMETERS << ").");
+		// Wrong number of parameters.
+		return; // fail silently
 	}
 
 	for (std::size_t i = PARAM_GLOT_PITCH; i <= PARAM_FRIC_BW; ++i) {
@@ -796,7 +800,7 @@ VocalTractModel4<TFloat, SectionDelay>::setAllParameters(const std::vector<float
 
 template<typename TFloat, unsigned int SectionDelay>
 void
-VocalTractModel4<TFloat, SectionDelay>::finishSynthesis()
+VocalTractModel4<TFloat, SectionDelay>::finishSynthesis() noexcept
 {
 	srConv_->flushBuffer();
 }

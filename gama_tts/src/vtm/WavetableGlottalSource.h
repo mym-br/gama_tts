@@ -220,12 +220,6 @@ WavetableGlottalSource<TFloat>::getSample(TFloat frequency)  /*  2X OVERSAMPLING
 		/*  FIND SURROUNDING INTEGER TABLE POSITIONS  */
 		const unsigned int lowerPosition = static_cast<unsigned int>(currentPosition_);
 		const unsigned int upperPosition = static_cast<unsigned int>(mod0(lowerPosition + 1));
-		if (lowerPosition >= wavetable_.size()) {
-			THROW_EXCEPTION(InvalidValueException, "[WavetableGlottalSource] lowerPosition >= wavetable_.size().");
-		}
-		if (upperPosition >= wavetable_.size()) {
-			THROW_EXCEPTION(InvalidValueException, "[WavetableGlottalSource] upperPosition >= wavetable_.size().");
-		}
 
 		/*  CALCULATE INTERPOLATED TABLE VALUE  */
 		const TFloat interpolatedValue = wavetable_[lowerPosition] +
