@@ -1,5 +1,18 @@
 project(gama_tts)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.12)
+
+set(GAMATTS_ENABLE_VTM_PLUGINS OFF CACHE BOOL "Enable VTM plugins.")
+
+if($CACHE{GAMATTS_ENABLE_VTM_PLUGINS})
+    add_compile_definitions(ENABLE_VTM_PLUGINS=1)
+    set(VTM_PLUGIN_SRC
+        src/vtm/VocalTractModelPlugin.cpp
+        src/vtm/VocalTractModelPlugin.h
+    )
+    set(VTM_PLUGIN_LIBS
+        ${CMAKE_DL_LIBS}
+    )
+endif()
 
 if(UNIX)
     if(APPLE)
@@ -127,6 +140,8 @@ set(LIBRARY_FILES
     src/xml/RapidXmlUtil.cpp
     src/xml/RapidXmlUtil.h
     src/xml/StreamXMLWriter.h
+
+    ${VTM_PLUGIN_SRC}
 )
 
 add_library(gamatts STATIC ${LIBRARY_FILES})
@@ -134,7 +149,7 @@ add_library(gamatts STATIC ${LIBRARY_FILES})
 add_executable(gama_tts
     src/main.cpp
 )
-target_link_libraries(gama_tts gamatts)
+target_link_libraries(gama_tts gamatts ${VTM_PLUGIN_LIBS})
 
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)

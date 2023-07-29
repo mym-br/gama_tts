@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2016 Marcelo Y. Matuda                                       *
+ *  Copyright 2016, 2023 Marcelo Y. Matuda                                 *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -23,6 +23,9 @@
 #include "VocalTractModel2.h"
 #include "VocalTractModel4.h"
 #include "VocalTractModel5.h"
+#ifdef ENABLE_VTM_PLUGINS
+# include "VocalTractModelPlugin.h"
+#endif
 
 
 
@@ -46,6 +49,10 @@ VocalTractModel::getInstance(const ConfigurationData& data, bool interactive)
 		return std::make_unique<VocalTractModel4<double, 1>>(data, interactive);
 	case 5:
 		return std::make_unique<VocalTractModel5<double, 1>>(data, interactive);
+#ifdef ENABLE_VTM_PLUGINS
+	case 2000:
+		return std::make_unique<VocalTractModelPlugin>(data, interactive);
+#endif
 	default:
 		THROW_EXCEPTION(InvalidValueException, "[VocalTractModel::getInstance] Invalid vocal tract model number: " << modelNumber << '.');
 	}
