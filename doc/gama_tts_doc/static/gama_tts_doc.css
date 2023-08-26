@@ -1,12 +1,26 @@
 
 @font-face {
-	/* font/Hack-LICENSE.md */
-	font-family: "Hack";
+	/* font/IntelOneMono-LICENSE.txt */
+	font-family: "Intel One Mono";
 	font-style: normal;
-	font-weight: 400;
-	src: local("Hack"),
-	     url(font/Hack-Regular.latin1.woff2) format("woff2");
-	unicode-range: U+0000-00FF;
+	font-weight: normal;
+	src: url(font/IntelOneMono-Regular.woff2) format("woff2");
+}
+
+@font-face {
+	/* font/IntelOneMono-LICENSE.txt */
+	font-family: "Intel One Mono";
+	font-style: normal;
+	font-weight: bold;
+	src: url(font/IntelOneMono-Bold.woff2) format("woff2");
+}
+
+@font-face {
+	/* font/IntelOneMono-LICENSE.txt */
+	font-family: "Intel One Mono";
+	font-style: italic;
+	font-weight: normal;
+	src: url(font/IntelOneMono-Italic.woff2) format("woff2");
 }
 
 code, pre {
@@ -16,8 +30,8 @@ code, pre {
 body {
 	background-color: #f0f0f0;
 	margin: 0;
-	font-family: 'Hack', monospace;
-	font-size: 11pt;
+	font-family: 'Intel One Mono', monospace;
+	font-size: 12pt;
 }
 
 h1 {
