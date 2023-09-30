@@ -29,8 +29,11 @@
 #include "ConfigurationData.h"
 
 #include <cctype> /* isspace */
+#include <filesystem>
 #include <fstream>
 #include <limits>
+
+namespace fs = std::filesystem;
 
 
 
@@ -69,6 +72,9 @@ ConfigurationData::ConfigurationData(const std::string& filePath)
 
 	std::ifstream in(filePath.c_str(), std::ios_base::binary);
 	if (!in) THROW_EXCEPTION(IOException, "Could not open the file: " << filePath << '.');
+
+	fs::path fsPath{filePath};
+	dirPath_ = fsPath.has_parent_path() ? fsPath.parent_path().string() : "";
 
 	std::string line;
 	int lineNum = 0;

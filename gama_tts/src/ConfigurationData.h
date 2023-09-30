@@ -52,6 +52,8 @@ public:
 	template<typename T> void put(const std::string& key, T value);
 	void put(const std::string& key, const char* value);
 	ConfigurationData& insert(const ConfigurationData& other);
+
+	const std::string& dirPath() const { return dirPath_; }
 private:
 	typedef std::unordered_map<std::string, std::string> Map;
 
@@ -59,6 +61,7 @@ private:
 	template<typename T> static void convertValue(const T& value, std::string& s);
 
 	std::string filePath_;
+	std::string dirPath_;
 	Map valueMap_;
 };
 
