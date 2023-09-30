@@ -78,7 +78,7 @@ ConfigurationData::ConfigurationData(const std::string& filePath)
 
 	std::string line;
 	int lineNum = 0;
-	while (getline(in, line)) {
+	while (std::getline(in, line)) {
 		++lineNum;
 
 		if (line.empty()) continue;

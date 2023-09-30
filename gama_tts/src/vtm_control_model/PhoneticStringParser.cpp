@@ -354,7 +354,7 @@ PhoneticStringParser::loadRewriterConfiguration(const std::string& filePath)
 	};
 
 	int lineNum = 0;
-	while (getline(in, line)) {
+	while (std::getline(in, line)) {
 		++lineNum;
 
 		if (line.empty()) continue;
