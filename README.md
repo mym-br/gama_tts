@@ -7,6 +7,17 @@ speech, derived from [Gnuspeech][].
 
 [Gnuspeech]: http://www.gnu.org/software/gnuspeech/
 
+Status
+------
+
+**alpha**
+
+Only english is supported.
+
+The quality of the synthesized speech is much lower than that of the best speech
+synthesizers. This software is mostly for people interested in articulatory
+speech synthesis.
+
 Contents
 --------
 
@@ -17,6 +28,17 @@ Contents
 - speechd_module/ - Module for Speech Dispatcher.
 - data/ - The articulatory database and other data.
 - doc/ - The documentation for GamaTTS and GamaTTS:Editor.
+
+OS support
+----------
+
+- GamaTTS: Multiplatform software developed in C++ with no external
+  dependencies.
+- GamaTTS:Editor: Multiplatform software developed in C++.
+  It may work on any OS supported by Qt (5 or 6), FFTW and JACK Audio Connection
+  Kit.
+- Module for Speech Dispatcher: Multiplatform software developed in C++. It may
+  work on any OS supported by Speech Dispatcher and RtAudio.
 
 License
 -------
