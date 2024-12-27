@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
 project(gama_tts_editor)
 

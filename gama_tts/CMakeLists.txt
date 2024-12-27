@@ -1,5 +1,6 @@
-project(gama_tts)
 cmake_minimum_required(VERSION 3.12)
+
+project(gama_tts)
 
 set(GAMATTS_ENABLE_VTM_PLUGINS OFF CACHE BOOL "Enable VTM plugins.")
 
