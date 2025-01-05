@@ -32,6 +32,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QTimer>
@@ -192,8 +193,16 @@ QWidget*
 InteractiveVTMWindow::initDynamicParametersGroupBox(QWidget* parent)
 {
 	QGroupBox* group = new QGroupBox(tr("Dynamic Parameters"), parent);
+	QVBoxLayout* groupLayout = new QVBoxLayout(group);
 
-	QGridLayout* layout = new QGridLayout(group);
+	QScrollArea* scrollArea = new QScrollArea(group);
+	groupLayout->addWidget(scrollArea);
+
+	QWidget* widget = new QWidget(scrollArea);
+	scrollArea->setWidget(widget);
+	scrollArea->setWidgetResizable(true); // without this the contents are not shown
+
+	QGridLayout* layout = new QGridLayout(widget);
 	layout->setVerticalSpacing(0);
 	layout->setColumnStretch(0, 1);
 	layout->setColumnStretch(1, 20);
@@ -202,13 +211,13 @@ InteractiveVTMWindow::initDynamicParametersGroupBox(QWidget* parent)
 	const std::size_t numParam = configuration_->dynamicParamNameList.size();
 	for (std::size_t i = 0; i < numParam; ++i) {
 		// Label.
-		layout->addWidget(new QLabel(configuration_->dynamicParamLabelList[i].c_str(), group), i, 0);
+		layout->addWidget(new QLabel(configuration_->dynamicParamLabelList[i].c_str(), widget), i, 0);
 
 		// Slider.
 		dynamicParamSliderList_[i] = new ParameterSlider(
 						configuration_->dynamicParamMinList[i],
 						configuration_->dynamicParamMaxList[i],
-						group);
+						widget);
 		layout->addWidget(dynamicParamSliderList_[i], i, 1);
 
 		// Value.
@@ -216,7 +225,7 @@ InteractiveVTMWindow::initDynamicParametersGroupBox(QWidget* parent)
 							configuration_->dynamicParamMinList[i],
 							configuration_->dynamicParamMaxList[i],
 							0.0,
-							group);
+							widget);
 		layout->addWidget(dynamicParamEditList_[i], i, 2);
 
 		connect(dynamicParamEditList_[i]  , qOverload<int, float>(&ParameterLineEdit::parameterValueChanged),
@@ -230,7 +239,7 @@ InteractiveVTMWindow::initDynamicParametersGroupBox(QWidget* parent)
 	}
 
 	// Stretch.
-	layout->addWidget(new QWidget(group), numParam, 0, 1, 3);
+	layout->addWidget(new QWidget(widget), numParam, 0, 1, 3);
 	layout->setRowStretch(numParam, 1);
 
 	return group;
@@ -243,24 +252,31 @@ QWidget*
 InteractiveVTMWindow::initStaticParametersGroupBox(QWidget* parent)
 {
 	QGroupBox* group = new QGroupBox(tr("Static Parameters"), parent);
+	QVBoxLayout* groupLayout = new QVBoxLayout(group);
 
-	QGridLayout* layout = new QGridLayout(group);
+	QScrollArea* scrollArea = new QScrollArea(group);
+	groupLayout->addWidget(scrollArea);
+
+	QWidget* widget = new QWidget(scrollArea);
+	scrollArea->setWidget(widget);
+	scrollArea->setWidgetResizable(true); // without this the contents are not shown
+
+	QGridLayout* layout = new QGridLayout(widget);
 	layout->setVerticalSpacing(0);
 	layout->setColumnStretch(0, 1);
 	layout->setColumnStretch(1, 20);
 	layout->setColumnStretch(2, 1);
 
 	const std::size_t numParam = configuration_->staticParamNameList.size();
-	std::size_t i = 0;
-	for ( ; i < numParam; ++i) {
+	for (std::size_t i = 0; i < numParam; ++i) {
 		// Label.
-		layout->addWidget(new QLabel(configuration_->staticParamLabelList[i].c_str(), group), i, 0);
+		layout->addWidget(new QLabel(configuration_->staticParamLabelList[i].c_str(), widget), i, 0);
 
 		// Slider.
 		staticParamSliderList_[i] = new ParameterSlider(
 						configuration_->staticParamMinList[i],
 						configuration_->staticParamMaxList[i],
-						group);
+						widget);
 		layout->addWidget(staticParamSliderList_[i], i, 1);
 
 		// Value.
@@ -268,7 +284,7 @@ InteractiveVTMWindow::initStaticParametersGroupBox(QWidget* parent)
 							configuration_->staticParamMinList[i],
 							configuration_->staticParamMaxList[i],
 							0.0,
-							group);
+							widget);
 		layout->addWidget(staticParamEditList_[i], i, 2);
 
 		connect(staticParamEditList_[i]  , qOverload<int, float>(&ParameterLineEdit::parameterValueChanged),
@@ -280,13 +296,14 @@ InteractiveVTMWindow::initStaticParametersGroupBox(QWidget* parent)
 
 		staticParamEditList_[i]->setParameterValue(configuration_->staticParameter(i));
 	}
-	QPushButton* applyStaticParametersButton = new QPushButton(tr("Appl&y"), group);
-	layout->addWidget(applyStaticParametersButton, i++, 0, 1, 3);
-	connect(applyStaticParametersButton, &QPushButton::clicked, this, &InteractiveVTMWindow::applyStaticParameters);
 
 	// Stretch.
-	layout->addWidget(new QWidget(group), i, 0, 1, 3);
-	layout->setRowStretch(i, 1);
+	layout->addWidget(new QWidget(widget), numParam, 0, 1, 3);
+	layout->setRowStretch(numParam, 1);
+
+	QPushButton* applyStaticParametersButton = new QPushButton(tr("Appl&y"), group);
+	groupLayout->addWidget(applyStaticParametersButton);
+	connect(applyStaticParametersButton, &QPushButton::clicked, this, &InteractiveVTMWindow::applyStaticParameters);
 
 	return group;
 }
