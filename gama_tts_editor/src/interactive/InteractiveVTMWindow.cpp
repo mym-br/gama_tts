@@ -83,6 +83,8 @@ InteractiveVTMWindow::InteractiveVTMWindow(const char* configDirPath, bool mainW
 	layout->addWidget(initButtons(widget));
 	layout->addWidget(initParametersWidget(widget));
 	layout->setStretch(1, 1);
+	layout->setSpacing(0);
+	layout->setContentsMargins(3, 0, 3, 3);
 	setWindowTitle(INTERACTIVE_NAME);
 
 	// Transfer timer.
@@ -155,6 +157,7 @@ InteractiveVTMWindow::initButtons(QWidget* parent)
 
 	QHBoxLayout* layout = new QHBoxLayout(widget);
 	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setSpacing(0);
 	layout->addWidget(pasteDynamicParametersButton);
 	layout->addWidget(copyDynamicParametersButton);
 	layout->addWidget(startAudioButton);
@@ -180,6 +183,8 @@ InteractiveVTMWindow::initParametersWidget(QWidget* parent)
 {
 	QWidget* widget = new QWidget(parent);
 	QHBoxLayout* layout = new QHBoxLayout(widget);
+	layout->setSpacing(0);
+	layout->setContentsMargins(0, 6, 0, 0);
 	layout->addWidget(initDynamicParametersGroupBox(widget));
 	layout->addWidget(initStaticParametersGroupBox(widget));
 
@@ -194,6 +199,8 @@ InteractiveVTMWindow::initDynamicParametersGroupBox(QWidget* parent)
 {
 	QGroupBox* group = new QGroupBox(tr("Dynamic Parameters"), parent);
 	QVBoxLayout* groupLayout = new QVBoxLayout(group);
+	groupLayout->setSpacing(0);
+	groupLayout->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea* scrollArea = new QScrollArea(group);
 	groupLayout->addWidget(scrollArea);
@@ -226,6 +233,7 @@ InteractiveVTMWindow::initDynamicParametersGroupBox(QWidget* parent)
 							configuration_->dynamicParamMaxList[i],
 							0.0,
 							widget);
+		dynamicParamEditList_[i]->setFrame(false);
 		layout->addWidget(dynamicParamEditList_[i], i, 2);
 
 		connect(dynamicParamEditList_[i]  , qOverload<int, float>(&ParameterLineEdit::parameterValueChanged),
@@ -253,6 +261,8 @@ InteractiveVTMWindow::initStaticParametersGroupBox(QWidget* parent)
 {
 	QGroupBox* group = new QGroupBox(tr("Static Parameters"), parent);
 	QVBoxLayout* groupLayout = new QVBoxLayout(group);
+	groupLayout->setSpacing(0);
+	groupLayout->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea* scrollArea = new QScrollArea(group);
 	groupLayout->addWidget(scrollArea);
@@ -285,6 +295,7 @@ InteractiveVTMWindow::initStaticParametersGroupBox(QWidget* parent)
 							configuration_->staticParamMaxList[i],
 							0.0,
 							widget);
+		staticParamEditList_[i]->setFrame(false);
 		layout->addWidget(staticParamEditList_[i], i, 2);
 
 		connect(staticParamEditList_[i]  , qOverload<int, float>(&ParameterLineEdit::parameterValueChanged),
