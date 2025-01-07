@@ -36,7 +36,7 @@ struct InteractiveVTMConfiguration;
 class InteractiveAudio {
 public:
 	enum {
-		PARAMETER_RINGBUFFER_SIZE = 32,
+		PARAMETER_RINGBUFFER_SIZE = 256,
 		MAX_NUM_SAMPLES_FOR_ANALYSIS = 65536
 	};
 
