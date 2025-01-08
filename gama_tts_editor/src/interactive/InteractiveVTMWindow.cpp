@@ -69,7 +69,7 @@ InteractiveVTMWindow::InteractiveVTMWindow(const char* configDirPath, bool mainW
 {
 	// Configure the QMainWindow.
 	QWidget* widget = new QWidget();
-	widget->setMinimumWidth(1300);
+	widget->setMinimumWidth(1000);
 	setCentralWidget(widget);
 
 	// What to do if the window is closed.
@@ -92,6 +92,8 @@ InteractiveVTMWindow::InteractiveVTMWindow(const char* configDirPath, bool mainW
 	transferTimer_->setTimerType(Qt::PreciseTimer);
 	connect(transferTimer_, &QTimer::timeout, this, &InteractiveVTMWindow::transferDynamicParameter);
 	transferTimer_->start(TRANSFER_TIMER_TIMEOUT_MS);
+
+	resize(1200, 900);
 }
 
 /*******************************************************************************
