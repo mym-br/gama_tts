@@ -11,11 +11,6 @@
 <body>
 	<div id="page">
 		${menu}
-		<div>
-			<ul class="horizontal-menu-spacer">
-				<li>&nbsp;</li>
-			</ul>
-		</div>
 
 		<div class="content">
 			${content}
