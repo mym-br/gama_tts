@@ -36,7 +36,7 @@ menu_config_file = open(DATA_DIR + MENU_CONFIG_FILE_NAME, "r")
 menu_config = json.load(menu_config_file)
 menu_config_file.close()
 
-localfile_re = re.compile("\$\{localfile:([^}]+)\}")
+localfile_re = re.compile(r"\$\{localfile:([^}]+)\}")
 
 
 
@@ -124,7 +124,7 @@ def create_page(item, level, number, parent):
         if not os.path.isfile(localfile_path):
             raise Exception("The file {} does not exist.".format(localfile_path))
         else:
-            content = re.sub("\$\{localfile:" + match.group(1) + "\}", match.group(1), content)
+            content = re.sub(r"\$\{localfile:" + match.group(1) + r"\}", match.group(1), content)
 
     if level == 0 and number == 0:
         content += create_site_map()
