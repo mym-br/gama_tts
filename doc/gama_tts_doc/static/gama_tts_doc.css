@@ -23,6 +23,10 @@
 	src: url(font/IntelOneMono-Italic.woff2) format("woff2");
 }
 
+* {
+	box-sizing: border-box;
+}
+
 code, pre {
 	font: inherit;
 }
@@ -78,6 +82,17 @@ a:active {
 	padding: 0.25em;
 }
 
+.horizontal-menu-spacer {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.horizontal-menu-spacer > li {
+	padding: 0.25em 1.0em 0.25em 1.0em;
+	display: inline-block;
+}
+
 .horizontal-menu {
 	list-style-type: none;
 	margin: 0;
@@ -85,6 +100,10 @@ a:active {
 	overflow: hidden;
 	color: white;
 	background-color: black;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	max-width: 1700px;
 }
 
 .horizontal-menu > li {
